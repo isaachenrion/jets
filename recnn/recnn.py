@@ -132,42 +132,32 @@ class GRNNTransformSimple(nn.Module):
     def __init__(self, n_features, n_hidden):
         super().__init__()
         self.fc_u = nn.Linear(n_features, n_hidden)
-        self.fc_h = nn.Linear(3 * n_hidden, n_hidden)
+        self.fc_h = nn.Linear(n_hidden, 3 * n_hidden)
 
-    def forward(self, jets):
+    def forward(jets):
         levels, children, n_inners, contents = batch(jets)
         n_levels = len(levels)
         embeddings = []
 
         for i, nodes in enumerate(levels[::-1]):
             j = n_levels - 1 - i
-            try:
-                inner = nodes[:n_inners[j]]
-            except ValueError:
-                inner = []
-            try:
-                outer = nodes[n_inners[j]:]
-            except ValueError:
-                outer = []
+            inner = nodes[:n_inners[j]]
+            outer = nodes[n_inners[j]:]
 
-            u_k = F.tanh(self.fc_u(contents[j]))
+            u_k = F.relu(self.fc_u(contents[j]))
 
             if len(inner) > 0:
-                h_L = embeddings[-1][children[inner, torch.zeros(1).long()]]
-                h_R = embeddings[-1][children[inner, torch.ones(1).long()]]
-                h = F.tanh(
+                h_L = embeddings[-1][children[inner, 0]]
+                h_R = embeddings[-1][children[inner, 1]]
+                h = F.relu(
                         self.fc_h(
-                            torch.cat(
+                            torch.stack(
                                 (h_L, h_R, u_k[:n_inners[j]]), 1
                             )
                         )
                     )
 
-                try:
-                    embeddings.append(torch.cat((h, u_k[n_inners[j]:]), 0))
-                except ValueError:
-                    embeddings.append(h)
-
+                embeddings.append(torch.cat((h, u_k[n_inners[j]:]), 0))
 
             else:
                 embeddings.append(u_k)
@@ -184,8 +174,8 @@ class GRNNPredictSimple(nn.Module):
 
     def forward(self, jets):
         h = self.grnn_transform_simple(jets)
-        h = F.tanh(self.fc1(h))
-        h = F.tanh(self.fc2(h))
+        h = F.relu(self.fc1(h))
+        h = F.relu(self.fc2(h))
         h = F.sigmoid(self.fc3(h))
         return h
 
@@ -196,13 +186,9 @@ class GRNNTransformGated(nn.Module):
         self.n_hidden = n_hidden
         self.n_features = n_features
         self.fc_u = nn.Linear(n_features, n_hidden)
-        self.bn_u = nn.BatchNorm1d(n_features)
         self.fc_h = nn.Linear(3 * n_hidden, n_hidden)
-        self.bn_h = nn.BatchNorm1d(3 * n_hidden)
         self.fc_z = nn.Linear(4 * n_hidden, 4 * n_hidden)
-        self.bn_z = nn.BatchNorm1d(4 * n_hidden)
         self.fc_r = nn.Linear(3 * n_hidden, 3 * n_hidden)
-        self.bn_r = nn.BatchNorm1d(3 * n_hidden)
 
     def forward(self, jets, return_states=False):
         levels, children, n_inners, contents = batch(jets)
@@ -226,7 +212,7 @@ class GRNNTransformGated(nn.Module):
             except ValueError:
                 outer = []
 
-            u_k = F.relu(self.fc_u(self.bn_u(contents[j])))
+            u_k = F.relu(self.fc_u(contents[j]))
 
             if len(inner) > 0:
                 try:
@@ -242,10 +228,10 @@ class GRNNTransformGated(nn.Module):
                 h_R = embeddings[-1][children[inner, torch.ones(1).long()]]
 
                 hhu = torch.cat((h_L, h_R, u_k_inners), 1)
-                r = F.sigmoid(self.fc_r(self.bn_r(hhu)))
-                h_H = F.relu(self.fc_h(self.bn_h(r * hhu)))
+                r = F.sigmoid(self.fc_r(hhu))
+                h_H = F.relu(self.fc_h(r * hhu))
 
-                z = self.fc_z(self.bn_z(torch.cat((h_H, hhu), -1)))
+                z = self.fc_z(torch.cat((h_H, hhu), -1))
                 z_H = z[:, :n_hidden]               # new activation
                 z_L = z[:, n_hidden:2*n_hidden]     # left activation
                 z_R = z[:, 2*n_hidden:3*n_hidden]   # right activation

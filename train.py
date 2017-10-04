@@ -41,8 +41,8 @@ logging.basicConfig(level=logging.INFO,
 @click.option("--n_hidden", default=40)
 @click.option("--n_epochs", default=20)
 @click.option("--batch_size", default=64)
-@click.option("--step_size", default=0.01)
-@click.option("--decay", default=0.999)
+@click.option("--step_size", default=0.0005)
+@click.option("--decay", default=0.9)
 @click.option("--random_state", default=1)
 @click.option("--gpu", default=0)
 def train(filename_train,
@@ -127,7 +127,7 @@ def train(filename_train,
         Model = GRNNPredictSimple
     # initialize model
     model = Model(n_features, n_hidden)
-    logging.info(model)
+
     if torch.cuda.is_available():
         torch.cuda.device(args.gpu)
         torch.cuda.manual_seed(random_state)
@@ -145,7 +145,7 @@ def train(filename_train,
 
     def loss(X, y):
         y_pred = model(X)
-        l = log_loss(y, y_pred.squeeze()).mean()
+        l = log_loss(y, y_pred).mean()
         return l
 
 
@@ -174,7 +174,7 @@ def train(filename_train,
 
     for i in range(n_epochs):
         logging.info("epoch = %d" % i)
-        logging.info("step_size = %.8f" % step_size)
+        logging.info("step_size = %.4f" % step_size)
 
         for j in range(n_batches):
             optimizer.zero_grad()
@@ -183,7 +183,7 @@ def train(filename_train,
             idx = slice(start, start+batch_size)
             X = X_train[idx]
             y = y_train[idx]
-            #import ipdb; ipdb.set_trace()
+
             l = loss(X, y)
             l.backward()
             optimizer.step()
