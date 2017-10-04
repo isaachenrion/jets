@@ -281,6 +281,7 @@ class GRNNTransformGated(nn.Module):
         else:
             return embeddings[-1].view((len(jets), -1))
 
+
 class GRNNPredictGated(nn.Module):
     def __init__(self, n_features, n_hidden):
         super().__init__()

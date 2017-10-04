@@ -1,7 +1,8 @@
-# python -m ipdb train.py data/w-vs-qcd/pickles/antikt-kt-train.pickle model.pickle
+
 import torch
 from torch.autograd import Variable
 from torch.optim import Adam, lr_scheduler
+torch.utils.backcompat.broadcast_warning.enabled = True
 
 import click
 import copy
@@ -92,23 +93,35 @@ def train(filename_train,
     # Make data
     logging.warning("Loading data...")
 
-    with open(os.path.join(DATA_DIR, filename_train), mode="rb") as fd:
-        X, y = pickle.load(fd, encoding='latin-1')
+    # Preprocessing
+    path_to_preprocessed = os.path.join(DATA_DIR, 'preprocessed', filename_train)
 
-    y = np.array(y)
+    if not os.path.isfile(path_to_preprocessed):
+        with open(os.path.join(DATA_DIR, filename_train), mode="rb") as fd:
+            X, y = pickle.load(fd, encoding='latin-1')
+        y = np.array(y)
 
-    if n_tr > 0:
-        indices = torch.randperm(len(X)).numpy()[:n_tr]
-        X = [X[i] for i in indices]
-        y = y[indices]
+        if n_tr > 0:
+            indices = torch.randperm(len(X)).numpy()[:n_tr]
+            X = [X[i] for i in indices]
+            y = y[indices]
+
+        logging.warning("Preprocessing...")
+        X = [extract(permute_by_pt(rewrite_content(jet))) for jet in X]
+
+        with open(path_to_preprocessed, mode="wb") as fd:
+            pickle.dump((X, y), fd)
+
+    else:
+        with open(path_to_preprocessed, mode="rb") as fd:
+            X, y = pickle.load(fd, encoding='latin-1')
+
 
     logging.warning("\tfilename = %s" % filename_train)
     logging.warning("\tX size = %d" % len(X))
     logging.warning("\ty size = %d" % len(y))
 
-    # Preprocessing
-    logging.warning("Preprocessing...")
-    X = [extract(permute_by_pt(rewrite_content(jet))) for jet in X]
+
     tf = RobustScaler().fit(np.vstack([jet["content"] for jet in X]))
 
     for jet in X:
