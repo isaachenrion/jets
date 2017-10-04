@@ -91,6 +91,7 @@ def batch(jets):
         inner = np.array(inner, dtype=int)
         outer = np.array(outer, dtype=int)
         level = np.concatenate((inner, outer))
+        level = torch.from_numpy(level)
         levels.append(level)
 
         left = prev_inner[level_children[prev_inner, 1] == 1]
@@ -123,7 +124,6 @@ def batch(jets):
 
     level_children = torch.from_numpy(level_children).long()
     n_inners = torch.from_numpy(np.array(n_inners)).long()
-    levels = [torch.from_numpy(l) for l in levels]
     if torch.cuda.is_available():
         level_children = level_children.cuda()
         n_inners = n_inners.cuda()
