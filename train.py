@@ -129,7 +129,7 @@ def train(filename_train,
     model = Model(n_features, n_hidden)
 
     if torch.cuda.is_available():
-        torch.cuda.device(args.gpu)
+        torch.cuda.device(gpu)
         torch.cuda.manual_seed(random_state)
         model.cuda()
     else:
