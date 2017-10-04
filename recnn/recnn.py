@@ -134,22 +134,28 @@ class GRNNTransformSimple(nn.Module):
         self.fc_u = nn.Linear(n_features, n_hidden)
         self.fc_h = nn.Linear(3 * n_hidden, n_hidden)
 
-    def forward(jets):
+    def forward(self, jets):
         levels, children, n_inners, contents = batch(jets)
         n_levels = len(levels)
         embeddings = []
 
         for i, nodes in enumerate(levels[::-1]):
             j = n_levels - 1 - i
-            inner = nodes[:n_inners[j]]
-            outer = nodes[n_inners[j]:]
+            try:
+                inner = nodes[:n_inners[j]]
+            except ValueError:
+                inner = []
+            try:
+                outer = nodes[n_inners[j]:]
+            except ValueError:
+                outer = []
 
-            u_k = F.relu(self.fc_u(contents[j]))
+            u_k = F.tanh(self.fc_u(contents[j]))
 
             if len(inner) > 0:
-                h_L = embeddings[-1][children[inner, 0]]
-                h_R = embeddings[-1][children[inner, 1]]
-                h = F.relu(
+                h_L = embeddings[-1][children[inner, torch.zeros(1).long()]]
+                h_R = embeddings[-1][children[inner, torch.ones(1).long()]]
+                h = F.tanh(
                         self.fc_h(
                             torch.cat(
                                 (h_L, h_R, u_k[:n_inners[j]]), 1
@@ -157,7 +163,10 @@ class GRNNTransformSimple(nn.Module):
                         )
                     )
 
-                embeddings.append(torch.cat((h, u_k[n_inners[j]:]), 0))
+                try:
+                    embeddings.append(torch.cat((h, u_k[n_inners[j]:]), 0))
+                except ValueError:
+                    embeddings.append(h)
 
             else:
                 embeddings.append(u_k)
@@ -174,8 +183,8 @@ class GRNNPredictSimple(nn.Module):
 
     def forward(self, jets):
         h = self.grnn_transform_simple(jets)
-        h = F.relu(self.fc1(h))
-        h = F.relu(self.fc2(h))
+        h = F.tanh(self.fc1(h))
+        h = F.tanh(self.fc2(h))
         h = F.sigmoid(self.fc3(h))
         return h
 
@@ -212,7 +221,7 @@ class GRNNTransformGated(nn.Module):
             except ValueError:
                 outer = []
 
-            u_k = F.relu(self.fc_u(contents[j]))
+            u_k = F.tanh(self.fc_u(contents[j]))
 
             if len(inner) > 0:
                 try:
@@ -229,7 +238,7 @@ class GRNNTransformGated(nn.Module):
 
                 hhu = torch.cat((h_L, h_R, u_k_inners), 1)
                 r = F.sigmoid(self.fc_r(hhu))
-                h_H = F.relu(self.fc_h(r * hhu))
+                h_H = F.tanh(self.fc_h(r * hhu))
 
                 z = self.fc_z(torch.cat((h_H, hhu), -1))
                 z_H = z[:, :n_hidden]               # new activation
@@ -274,8 +283,8 @@ class GRNNPredictGated(nn.Module):
 
     def forward(self, jets):
         h = self.grnn_transform_gated(jets)
-        h = F.relu(self.fc1(h))
-        h = F.relu(self.fc2(h))
+        h = F.tanh(self.fc1(h))
+        h = F.tanh(self.fc2(h))
         h = F.sigmoid(self.fc3(h))
         return h
 
@@ -339,7 +348,7 @@ def event_transform(params, X, n_jets_per_event=10):
                      np.dot(params["rnn_W_zx"], xt.T).T + params["rnn_b_z"])
         rt = sigmoid(np.dot(params["rnn_W_rh"], h.T).T +
                      np.dot(params["rnn_W_rx"], xt.T).T + params["rnn_b_r"])
-        ht = relu(np.dot(params["rnn_W_hh"], np.multiply(rt, h).T).T +
+        ht = tanh(np.dot(params["rnn_W_hh"], np.multiply(rt, h).T).T +
                   np.dot(params["rnn_W_hx"], xt.T).T + params["rnn_b_h"])
         h = np.multiply(1. - zt, h) + np.multiply(zt, ht)
 
@@ -350,8 +359,8 @@ def event_predict(params, X, n_jets_per_event=10):
     h = event_transform(params, X,
                         n_jets_per_event=n_jets_per_event)
 
-    h = relu(np.dot(params["W_clf"][0], h.T).T + params["b_clf"][0])
-    h = relu(np.dot(params["W_clf"][1], h.T).T + params["b_clf"][1])
+    h = tanh(np.dot(params["W_clf"][0], h.T).T + params["b_clf"][0])
+    h = tanh(np.dot(params["W_clf"][1], h.T).T + params["b_clf"][1])
     h = sigmoid(np.dot(params["W_clf"][2], h.T).T + params["b_clf"][2])
 
     return h.ravel()
@@ -403,7 +412,7 @@ def event_baseline_transform(params, X, n_particles_per_event=10):
                      np.dot(params["rnn_W_zx"], xt.T).T + params["rnn_b_z"])
         rt = sigmoid(np.dot(params["rnn_W_rh"], h.T).T +
                      np.dot(params["rnn_W_rx"], xt.T).T + params["rnn_b_r"])
-        ht = relu(np.dot(params["rnn_W_hh"], np.multiply(rt, h).T).T +
+        ht = tanh(np.dot(params["rnn_W_hh"], np.multiply(rt, h).T).T +
                   np.dot(params["rnn_W_hx"], xt.T).T + params["rnn_b_h"])
         h = np.multiply(1. - zt, h) + np.multiply(zt, ht)
 
@@ -414,8 +423,8 @@ def event_baseline_predict(params, X, n_particles_per_event=10):
     h = event_baseline_transform(params, X,
                                  n_particles_per_event=n_particles_per_event)
 
-    h = relu(np.dot(params["W_clf"][0], h.T).T + params["b_clf"][0])
-    h = relu(np.dot(params["W_clf"][1], h.T).T + params["b_clf"][1])
+    h = tanh(np.dot(params["W_clf"][0], h.T).T + params["b_clf"][0])
+    h = tanh(np.dot(params["W_clf"][1], h.T).T + params["b_clf"][1])
     h = sigmoid(np.dot(params["W_clf"][2], h.T).T + params["b_clf"][2])
 
     return h.ravel()

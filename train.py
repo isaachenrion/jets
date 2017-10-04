@@ -35,18 +35,18 @@ logging.basicConfig(level=logging.INFO,
 
 @click.command()
 @click.argument("filename_train")
-@click.option("--n_events_train", default=-1)
+@click.option("--n_tr", default=-1)
 @click.option("--simple", is_flag=True, default=False)
 @click.option("--n_features", default=7)
 @click.option("--n_hidden", default=40)
 @click.option("--n_epochs", default=20)
 @click.option("--batch_size", default=64)
 @click.option("--step_size", default=0.0005)
-@click.option("--decay", default=0.9)
+@click.option("--decay", default=.999)
 @click.option("--random_state", default=1)
 @click.option("--gpu", default=0)
 def train(filename_train,
-          n_events_train=-1,
+          n_tr=-1,
           simple=False,
           n_features=7,
           n_hidden=30,
@@ -75,7 +75,7 @@ def train(filename_train,
     logging.info("Calling with...")
     logging.info("\tfilename_train = %s" % filename_train)
     logging.info("\tfilename_model = %s" % filename_model)
-    logging.info("\tn_events_train = %d" % n_events_train)
+    logging.info("\tn_tr = %d" % n_tr)
     logging.info("\tgated = %s" % (not simple))
     logging.info("\tn_features = %d" % n_features)
     logging.info("\tn_hidden = %d" % n_hidden)
@@ -93,8 +93,8 @@ def train(filename_train,
 
     y = np.array(y)
 
-    if n_events_train > 0:
-        indices = torch.randperm(len(X)).numpy()[:n_events_train]
+    if n_tr > 0:
+        indices = torch.randperm(len(X)).numpy()[:n_tr]
         X = [X[i] for i in indices]
         y = y[indices]
 
@@ -144,8 +144,9 @@ def train(filename_train,
     best_model = copy.deepcopy(model)
 
     def loss(X, y):
-        y_pred = model(X)
-        l = log_loss(y, y_pred.squeeze()).mean()
+        y_pred = model(X).squeeze(1)
+        #import ipdb; ipdb.set_trace()
+        l = log_loss(y, y_pred).mean()
         return l
 
 
@@ -174,7 +175,7 @@ def train(filename_train,
 
     for i in range(n_epochs):
         logging.info("epoch = %d" % i)
-        logging.info("step_size = %.4f" % step_size)
+        logging.info("step_size = %.8f" % step_size)
 
         for j in range(n_batches):
             optimizer.zero_grad()
@@ -183,6 +184,7 @@ def train(filename_train,
             idx = slice(start, start+batch_size)
             X = X_train[idx]
             y = y_train[idx]
+            #import ipdb; ipdb.set_trace()
 
             l = loss(X, y)
             l.backward()
