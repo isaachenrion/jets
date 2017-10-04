@@ -28,15 +28,11 @@ from recnn.recnn import GRNNPredictSimple
 MODELS_DIR = 'models'
 DATA_DIR = 'data/w-vs-qcd/pickles'
 
-logging.basicConfig(level=logging.INFO,
-                    format="[%(asctime)s %(levelname)s] %(message)s")
-
-
-
 @click.command()
 @click.argument("filename_train")
 @click.option("--n_tr", default=-1)
 @click.option("--simple", is_flag=True, default=False)
+@click.option("--silent", is_flag=True, default=False)
 @click.option("--n_features", default=7)
 @click.option("--n_hidden", default=40)
 @click.option("--n_epochs", default=20)
@@ -55,38 +51,46 @@ def train(filename_train,
           step_size=0.01,
           decay=0.7,
           random_state=1,
-          gpu=0):
+          gpu=0,
+          silent=False):
 
     # get timestamp for model id and set up logging
     dt = datetime.datetime.now()
     filename_model = '{}-{}/{:02d}-{:02d}-{:02d}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
     model_dir = os.path.join(MODELS_DIR, filename_model)
     os.makedirs(model_dir)
-    logging.basicConfig(filename=os.path.join(model_dir, 'log.txt'),level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-    root = logging.getLogger()
-    #root.setLevel(logging.DEBUG)
-    #ch = logging.StreamHandler(sys.stdout)
+    logging.basicConfig(level=logging.DEBUG, filename=os.path.join(model_dir, 'log.txt'), filemode="a+",
+                        format="%(asctime)-15s %(message)s")
+    if not silent:
+        root = logging.getLogger()
+        root.setLevel(logging.DEBUG)
+        ch = logging.StreamHandler(sys.stdout)
+        ch.setLevel(logging.WARNING)
+        formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        ch.setFormatter(formatter)
+        root.addHandler(ch)
     #ch.setLevel(logging.DEBUG)
-    #formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+    #root.setFormatter(formatter)
     #ch.setFormatter(formatter)
     #root.addHandler(ch)
 
 
-    logging.info("Calling with...")
-    logging.info("\tfilename_train = %s" % filename_train)
-    logging.info("\tfilename_model = %s" % filename_model)
-    logging.info("\tn_tr = %d" % n_tr)
-    logging.info("\tgated = %s" % (not simple))
-    logging.info("\tn_features = %d" % n_features)
-    logging.info("\tn_hidden = %d" % n_hidden)
-    logging.info("\tn_epochs = %d" % n_epochs)
-    logging.info("\tbatch_size = %d" % batch_size)
-    logging.info("\tstep_size = %f" % step_size)
-    logging.info("\tdecay = %f" % decay)
-    logging.info("\trandom_state = %d" % random_state)
+    logging.warning("Calling with...")
+    logging.warning("\tfilename_train = %s" % filename_train)
+    logging.warning("\tfilename_model = %s" % filename_model)
+    logging.warning("\tn_tr = %d" % n_tr)
+    logging.warning("\tgated = %s" % (not simple))
+    logging.warning("\tn_features = %d" % n_features)
+    logging.warning("\tn_hidden = %d" % n_hidden)
+    logging.warning("\tn_epochs = %d" % n_epochs)
+    logging.warning("\tbatch_size = %d" % batch_size)
+    logging.warning("\tstep_size = %f" % step_size)
+    logging.warning("\tdecay = %f" % decay)
+    logging.warning("\trandom_state = %d" % random_state)
+    logging.warning("\tPID = {}".format(os.getpid()))
 
     # Make data
-    logging.info("Loading data...")
+    logging.warning("Loading data...")
 
     with open(os.path.join(DATA_DIR, filename_train), mode="rb") as fd:
         X, y = pickle.load(fd, encoding='latin-1')
@@ -98,12 +102,12 @@ def train(filename_train,
         X = [X[i] for i in indices]
         y = y[indices]
 
-    logging.info("\tfilename = %s" % filename_train)
-    logging.info("\tX size = %d" % len(X))
-    logging.info("\ty size = %d" % len(y))
+    logging.warning("\tfilename = %s" % filename_train)
+    logging.warning("\tX size = %d" % len(X))
+    logging.warning("\ty size = %d" % len(y))
 
     # Preprocessing
-    logging.info("Preprocessing...")
+    logging.warning("Preprocessing...")
     X = [extract(permute_by_pt(rewrite_content(jet))) for jet in X]
     tf = RobustScaler().fit(np.vstack([jet["content"] for jet in X]))
 
@@ -112,12 +116,12 @@ def train(filename_train,
     #y = wrap(y)
 
     # Split into train+validation
-    logging.info("Splitting into train and validation...")
+    logging.warning("Splitting into train and validation...")
 
     X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=min(5000, len(X) // 5))
     y_train = wrap(y_train)
     y_valid = wrap(y_valid)
-    logging.info("Training...")
+    logging.warning("Training...")
 
     # Initialization
     gated = not simple
