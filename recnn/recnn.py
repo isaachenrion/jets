@@ -239,8 +239,10 @@ class GRNNTransformGated(nn.Module):
                 except ValueError:
                     u_k_leaves = []
 
-                h_L = embeddings[-1][children[inner, torch.zeros(1).long()]]
-                h_R = embeddings[-1][children[inner, torch.ones(1).long()]]
+                zero = torch.zeros(1).long(); one = torch.ones(1).long()
+                if torch.cuda.is_available(): zero = zero.cuda(); one = one.cuda()
+                h_L = embeddings[-1][children[inner, zero]]
+                h_R = embeddings[-1][children[inner, one]]
 
                 hhu = torch.cat((h_L, h_R, u_k_inners), 1)
                 r = F.sigmoid(self.fc_r(hhu))
