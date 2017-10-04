@@ -161,9 +161,10 @@ def train(filename_train,
                 fd = open(os.path.join(model_dir, 'model.pt'), "wb")
                 torch.save(best_model, fd)
                 fd.close()
-
+            model.eval()
             train_loss = unwrap(loss(X_train[:5000], y_train[:5000]))
             valid_loss = unwrap(loss(X_valid, y_valid))
+            model.train()
             logging.info(
                 "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f"
                 "\troc_auc(valid)=%.4f\tbest_roc_auc(valid)=%.4f" % (

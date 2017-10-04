@@ -91,7 +91,6 @@ def batch(jets):
         inner = np.array(inner, dtype=int)
         outer = np.array(outer, dtype=int)
         level = np.concatenate((inner, outer))
-        level = torch.from_numpy(level).long()
         levels.append(level)
 
         left = prev_inner[level_children[prev_inner, 1] == 1]
@@ -124,6 +123,11 @@ def batch(jets):
 
     level_children = torch.from_numpy(level_children).long()
     n_inners = torch.from_numpy(np.array(n_inners)).long()
+    levels = [torch.from_numpy(l) for l in levels]
+    if torch.cuda.is_available():
+        level_children = level_children.cuda()
+        n_inners = n_inners.cuda()
+        levels = [l.cuda() for l in levels]
 
     return (levels, level_children[:, [0, 2]], n_inners, contents)
 
@@ -153,8 +157,10 @@ class GRNNTransformSimple(nn.Module):
             u_k = F.tanh(self.fc_u(contents[j]))
 
             if len(inner) > 0:
-                h_L = embeddings[-1][children[inner, torch.zeros(1).long()]]
-                h_R = embeddings[-1][children[inner, torch.ones(1).long()]]
+                zero = torch.zeros(1).long(); one = torch.ones(1).long()
+                if torch.cuda.is_available(): zero = zero.cuda(); one = one.cuda()
+                h_L = embeddings[-1][children[inner, zero]]
+                h_R = embeddings[-1][children[inner, one]]
                 h = F.tanh(
                         self.fc_h(
                             torch.cat(
