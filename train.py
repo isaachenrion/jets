@@ -145,7 +145,7 @@ def train(filename_train,
 
     def loss(X, y):
         y_pred = model(X)
-        l = log_loss(y, y_pred).mean()
+        l = log_loss(y, y_pred.squeeze()).mean()
         return l
 
 

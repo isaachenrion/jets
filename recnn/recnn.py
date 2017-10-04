@@ -132,7 +132,7 @@ class GRNNTransformSimple(nn.Module):
     def __init__(self, n_features, n_hidden):
         super().__init__()
         self.fc_u = nn.Linear(n_features, n_hidden)
-        self.fc_h = nn.Linear(n_hidden, 3 * n_hidden)
+        self.fc_h = nn.Linear(3 * n_hidden, n_hidden)
 
     def forward(jets):
         levels, children, n_inners, contents = batch(jets)
@@ -151,7 +151,7 @@ class GRNNTransformSimple(nn.Module):
                 h_R = embeddings[-1][children[inner, 1]]
                 h = F.relu(
                         self.fc_h(
-                            torch.stack(
+                            torch.cat(
                                 (h_L, h_R, u_k[:n_inners[j]]), 1
                             )
                         )
