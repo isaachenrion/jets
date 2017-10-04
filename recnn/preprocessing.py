@@ -15,6 +15,8 @@ def wrap(data, dtype='float'):
     return d
 
 def unwrap(variable):
+    if variable.is_cuda:
+        return variable.cpu().data.numpy()
     return variable.data.numpy()
 
 def wrap_X(X):
