@@ -97,6 +97,14 @@ def train(filename_train,
     logging.warning("\tdecay = %f" % decay)
     logging.warning("\trandom_state = %d" % random_state)
     logging.warning("\tPID = {}".format(os.getpid()))
+    logging.warning("\tGPU = {}".format(gpu)))
+
+    # set device and seed
+    if torch.cuda.is_available():
+        torch.cuda.device(gpu)
+        torch.cuda.manual_seed(random_state)
+    else:
+        torch.manual_seed(random_state)
 
     # Make data
     logging.warning("Loading data...")
@@ -155,13 +163,8 @@ def train(filename_train,
     logging.warning(model)
     out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))
     logging.warning(out_str)
+    if torch.cuda.is_available():model.cuda()
 
-    if torch.cuda.is_available():
-        torch.cuda.device(gpu)
-        torch.cuda.manual_seed(random_state)
-        model.cuda()
-    else:
-        torch.manual_seed(random_state)
 
 
     optimizer = Adam(model.parameters(), lr=step_size)
