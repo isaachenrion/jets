@@ -120,6 +120,11 @@ def train(filename_train,
 
         X = [extract(permute_by_pt(rewrite_content(jet))) for jet in X]
 
+
+        tf = RobustScaler().fit(np.vstack([jet["content"] for jet in X]))
+
+        for jet in X:
+            jet["content"] = tf.transform(jet["content"])
         with open(path_to_preprocessed, mode="wb") as fd:
             pickle.dump((X, y), fd)
 
@@ -138,11 +143,6 @@ def train(filename_train,
     logging.warning("\tX size = %d" % len(X))
     logging.warning("\ty size = %d" % len(y))
 
-
-    tf = RobustScaler().fit(np.vstack([jet["content"] for jet in X]))
-
-    for jet in X:
-        jet["content"] = tf.transform(jet["content"])
 
     # Split into train+validation
     logging.warning("Splitting into train and validation...")
