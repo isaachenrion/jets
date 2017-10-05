@@ -20,11 +20,14 @@ def unwrap(variable):
     return variable.data.numpy()
 
 def wrap_X(X):
+    X_new = []
     for jet in X:
         j = wrap(jet["content"])
         if torch.cuda.is_available():
             j = j.cuda()
         jet["content"] = j
+        X_new.append(jet)
+    return X_new
 
 
 

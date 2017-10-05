@@ -189,11 +189,11 @@ def train(filename_train,
             #import ipdb; ipdb.set_trace()
             for i in range(len(X_valid) // batch_size):
                 Xt, yt = X_train[offset:offset+batch_size], y_train[offset:offset+batch_size]
-                Xt, yt = wrap(Xt), wrap(yt)
+                Xt, yt = wrap_X(Xt), wrap(yt)
                 tl = unwrap(loss(Xt, yt)); train_loss.append(tl)
 
                 Xv, yv = X_valid[offset:offset+batch_size], y_valid[offset:offset+batch_size]
-                Xv, yv = wrap(Xv), wrap(yv)
+                Xv, yv = wrap_X(Xv), wrap(yv)
                 vl = unwrap(loss(Xv, yv)); valid_loss.append(vl)
 
                 roc_auc.append(roc_auc_score(unwrap(yv), unwrap(model(Xv))))
@@ -232,7 +232,7 @@ def train(filename_train,
             start = torch.round(torch.rand(1) * (len(X_train) - batch_size)).numpy()[0].astype(np.int32)
             idx = slice(start, start+batch_size)
             X, y = X_train[idx], y_train[idx]
-            X, y = wrap(X), wrap(y)
+            X, y = wrap_X(X), wrap(y)
             l = loss(X, y)
             l.backward()
             optimizer.step()
