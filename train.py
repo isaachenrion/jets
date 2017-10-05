@@ -214,7 +214,7 @@ def train(filename_train,
 
             if roc_auc > best_score[0]:
                 best_score[0] = roc_auc
-                best_params = model.state_dict
+                best_model = copy.deepcopy(model)
 
                 fd = open(os.path.join(model_dir, 'model.pt'), "wb")
                 torch.save(best_model, fd)
