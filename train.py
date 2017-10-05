@@ -21,7 +21,7 @@ from sklearn.preprocessing import RobustScaler
 from recnn.preprocessing import rewrite_content
 from recnn.preprocessing import permute_by_pt
 from recnn.preprocessing import extract
-from recnn.preprocessing import wrap, unwrap
+from recnn.preprocessing import wrap, unwrap, wrap_X
 from recnn.recnn import log_loss
 from recnn.recnn import GRNNPredictGated
 from recnn.recnn import GRNNPredictSimple
