@@ -109,11 +109,6 @@ def train(filename_train,
             X, y = pickle.load(fd, encoding='latin-1')
         y = np.array(y)
 
-        if n_tr > 0:
-            indices = torch.randperm(len(X)).numpy()[:n_tr]
-            X = [X[i] for i in indices]
-            y = y[indices]
-
         logging.warning("Preprocessing...")
         X = [extract(permute_by_pt(rewrite_content(jet))) for jet in X]
 
@@ -123,6 +118,11 @@ def train(filename_train,
     else:
         with open(path_to_preprocessed, mode="rb") as fd:
             X, y = pickle.load(fd, encoding='latin-1')
+
+    if n_tr > 0:
+        indices = torch.randperm(len(X)).numpy()[:n_tr]
+        X = [X[i] for i in indices]
+        y = y[indices]
 
 
     logging.warning("\tfilename = %s" % filename_train)
@@ -191,8 +191,18 @@ def train(filename_train,
                 torch.save(best_model, fd)
                 fd.close()
             model.eval()
-            train_loss = unwrap(loss(X_train[:5000], y_train[:5000]))
-            valid_loss = unwrap(loss(X_valid, y_valid))
+            offset = 0; train_loss = []; valid_loss = []
+            for i in range(len(X_valid) // batch_size):
+                Xt, yt = X_train[offset:offset+batch_size], y_train[offset:offset+batch_size]
+                tl = unwrap(loss(Xt, yt)); train_loss.append(tl)
+
+                Xv, yv = X_valid[offset:offset+batch_size], y_valid[offset:offset+batch_size]
+                vl = unwrap(loss(Xv, yv)); valid_loss.append(vl)
+
+                offset+=batch_size
+
+            train_loss = np.mean(np.array(train_loss))
+            valid_loss = np.mean(np.array(valid_loss))
             model.train()
             logging.info(
                 "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f"
