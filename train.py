@@ -177,9 +177,8 @@ def train(filename_train,
     best_score = [-np.inf]  # yuck, but works
     best_model = copy.deepcopy(model)
 
-    def loss(X, y):
-        y_pred = model(X).squeeze(1)
-        l = log_loss(y, y_pred).mean()
+    def loss(y_pred, y):
+        l = log_loss(y, y_pred.squeeze(1)).mean()
         return l
 
 
@@ -188,25 +187,29 @@ def train(filename_train,
             model.eval()
 
             offset = 0; train_loss = []; valid_loss = []; roc_auc = []
-
+            yy, yy_pred = [], []
             #import ipdb; ipdb.set_trace()
             for i in range(len(X_valid) // batch_size):
                 Xt, yt = X_train[offset:offset+batch_size], y_train[offset:offset+batch_size]
                 X_var = wrap_X(Xt); y_var = wrap(yt)
-                tl = unwrap(loss(X_var, y_var)); train_loss.append(tl)
+                tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
                 X = unwrap_X(X_var); y = unwrap(y_var)
 
                 Xv, yv = X_valid[offset:offset+batch_size], y_valid[offset:offset+batch_size]
                 X_var = wrap_X(Xv); y_var = wrap(yv)
-                vl = unwrap(loss(X_var, y_var)); valid_loss.append(vl)
+                y_pred = model(X_var)
+                vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
                 roc_auc.append(roc_auc_score(unwrap(y_var), unwrap(model(X_var))))
-                X = unwrap_X(X_var); y = unwrap(y_var)
+                X = unwrap_X(X_var); y = unwrap(y_var); y_pred = unwrap(y_pred)
+                yy.append(y); yy_pred.append(y_pred)
 
                 offset+=batch_size
 
             train_loss = np.mean(np.array(train_loss))
             valid_loss = np.mean(np.array(valid_loss))
-            roc_auc = np.mean(np.array(roc_auc))
+            yy = np.concatenate(yy, 0)
+            yy_pred = np.concatenate(yy_pred, 0)
+            roc_auc = roc_auc_score(yy, yy_pred)
             model.train()
 
             if roc_auc > best_score[0]:
@@ -237,7 +240,7 @@ def train(filename_train,
             idx = slice(start, start+batch_size)
             X, y = X_train[idx], y_train[idx]
             X_var = wrap_X(X); y_var = wrap(y)
-            l = loss(X_var, y_var)
+            l = loss(model(X_var), y_var)
             l.backward()
             optimizer.step()
             X = unwrap_X(X_var); y = unwrap(y_var)
