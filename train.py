@@ -36,6 +36,7 @@ DATA_DIR = 'data/w-vs-qcd/pickles'
 @click.option("--model_type", default=0)
 @click.option("--silent", is_flag=True, default=False)
 @click.option("--verbose", is_flag=True, default=False)
+@click.option("--pp", is_flag=True, default=False)
 @click.option("--n_features", default=7)
 @click.option("--n_hidden", default=40)
 @click.option("--n_epochs", default=20)
@@ -58,7 +59,8 @@ def train(filename_train,
           random_state=1,
           gpu=0,
           silent=False,
-          verbose=False):
+          verbose=False,
+          pp=False):
 
     # get timestamp for model id and set up logging
     dt = datetime.datetime.now()
@@ -112,7 +114,7 @@ def train(filename_train,
     # Preprocessing
     path_to_preprocessed = os.path.join(DATA_DIR, 'preprocessed', filename_train)
 
-    if not os.path.isfile(path_to_preprocessed):
+    if pp or not os.path.isfile(path_to_preprocessed):
         logging.warning("Preprocessing...")
         with open(os.path.join(DATA_DIR, filename_train), mode="rb") as fd:
             X, y = pickle.load(fd, encoding='latin-1')
@@ -163,7 +165,8 @@ def train(filename_train,
     logging.warning(model)
     out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))
     logging.warning(out_str)
-    if torch.cuda.is_available():model.cuda()
+    if torch.cuda.is_available():
+        model.cuda()
 
 
 

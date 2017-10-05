@@ -385,9 +385,8 @@ class GCNTransformConnected(nn.Module):
     def __init__(self, n_features, n_hidden):
         super().__init__()
         self.fc_u = nn.Linear(n_features, n_hidden)
-
+        self.fc_u1 = nn.Linear(n_hidden, n_hidden)
         self.fc_edge =nn.Linear(n_hidden, n_hidden)
-        #self.pool = lambda x: torch.mean(x, 1)
 
     def preprocess(self, jets):
         for jet in jets_padded:
@@ -410,21 +409,14 @@ class GCNTransformConnected(nn.Module):
 
         output = []
         x = F.relu(self.fc_u(jets_padded))
+        x = F.relu(self.fc_u1(x))
         shp = x.size()
         x_l = x.view(shp[0], shp[1], 1, shp[2])
         x_r = x.view(shp[0], 1, shp[1], shp[2])
         h = torch.tanh(self.fc_edge(x_l + x_r))
         output = h.view(shp[0], shp[1] * shp[1], -1).mean(1)
         t1 = time.time(); logging.debug("Batch took {:.3f}s".format(t1-t0))
-        #import ipdb; ipdb.set_trace()
-        #offset = 0
-        #for jet_size in jet_sizes:
-        #    embedding = embeddings[offset:offset+jet_size]; jet_size += offset
-        #    edge_embedding = F.tanh(self.fc_edge(embedding, embedding))
-        #    #import ipdb; ipdb.set_trace()
-        #    pooled = torch.mean(edge_embedding, 0)
-        #    output.append(pooled)
-        #output = torch.stack(output, 0)
+
         return output
 
 class GCNPredictConnected(nn.Module):
