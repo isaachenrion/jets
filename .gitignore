@@ -1,4 +1,4 @@
 data
 models
 .git
-*__pycache__*
+*/__pycache__/*
