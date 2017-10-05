@@ -3,8 +3,23 @@ from sklearn.utils import check_random_state
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import time
+import logging
+from torch.autograd import Variable
 
 # Batchization of the recursion
+def pad_batch(jets):
+    jet_contents = [jet["content"] for jet in jets]
+    biggest_jet_size = max(len(jet) for jet in jet_contents)
+    jets_padded = []
+    for jet in jet_contents:
+        if jet.size()[0] < biggest_jet_size:
+            zeros = Variable(torch.zeros(biggest_jet_size - jet.size()[0], jet.size()[1]))
+            jets_padded.append(torch.cat((jet, zeros), 0))
+        else:
+            jets_padded.append(jet)
+    jets_padded = torch.stack(jets_padded, 0)
+    return jets_padded
 
 def batch(jets):
     # Batch the recursive activations across all nodes of a same level
@@ -143,6 +158,7 @@ class GRNNTransformSimple(nn.Module):
         n_levels = len(levels)
         embeddings = []
 
+
         for i, nodes in enumerate(levels[::-1]):
             j = n_levels - 1 - i
             try:
@@ -179,6 +195,7 @@ class GRNNTransformSimple(nn.Module):
 
         return embeddings[-1].view((len(jets), -1))
 
+
 class GRNNPredictSimple(nn.Module):
     def __init__(self, n_features, n_hidden):
         super().__init__()
@@ -206,15 +223,26 @@ class GRNNTransformGated(nn.Module):
         self.fc_r = nn.Linear(3 * n_hidden, 3 * n_hidden)
 
     def forward(self, jets, return_states=False):
-        levels, children, n_inners, contents = batch(jets)
-        n_levels = len(levels)
-        n_hidden = self.n_hidden
 
-        if return_states:
-            states = {"embeddings": [], "z": [], "r": [], "levels": levels,
-                      "children": children, "n_inners": n_inners}
+
+        levels, children, n_inners, contents = batch(jets)
+
+        states = {"embeddings": [], "z": [], "r": [], "levels": levels,
+                    "children": children, "n_inners": n_inners}
 
         embeddings = []
+
+        states = self.up_the_tree(states, embeddings, levels, children, n_inners, contents)
+
+        if return_states:
+            return states
+        else:
+            return embeddings[-1].view((len(jets), -1))
+
+
+    def up_the_tree(self, states, embeddings, levels, children, n_inners, contents):
+        n_levels = len(levels)
+        n_hidden = self.n_hidden
 
         for i, nodes in enumerate(levels[::-1]):
             j = n_levels - 1 - i
@@ -265,21 +293,76 @@ class GRNNTransformGated(nn.Module):
                     embeddings.append(torch.cat((h, u_k_leaves), 0))
                 except AttributeError:
                     embeddings.append(h)
-                if return_states:
-                    states["embeddings"].append(embeddings[-1])
-                    states["z"].append(z)
-                    states["r"].append(r)
+                states["embeddings"].append(embeddings[-1])
+                states["z"].append(z)
+                states["r"].append(r)
 
             else:
                 embeddings.append(u_k)
 
-                if return_states:
-                    states["embeddings"].append(embeddings[-1])
+                states["embeddings"].append(embeddings[-1])
 
-        if return_states:
-            return states
-        else:
-            return embeddings[-1].view((len(jets), -1))
+    def down_the_tree(self, states, embeddings, levels, children, n_inners, contents):
+        n_levels = len(levels)
+        n_hidden = self.n_hidden
+
+        for j, nodes in enumerate(levels):
+
+            try:
+                inner = nodes[:n_inners[j]]
+            except ValueError:
+                inner = []
+            try:
+                outer = nodes[n_inners[j]:]
+            except ValueError:
+                outer = []
+
+            u_k = F.tanh(self.fc_u(contents[j]))
+
+            if len(inner) > 0:
+                try:
+                    u_k_inners = u_k[:n_inners[j]]
+                except ValueError:
+                    u_k_inners = []
+                try:
+                    u_k_leaves = u_k[n_inners[j]:]
+                except ValueError:
+                    u_k_leaves = []
+
+                zero = torch.zeros(1).long(); one = torch.ones(1).long()
+                if torch.cuda.is_available(): zero = zero.cuda(); one = one.cuda()
+                h_L = embeddings[-1][children[inner, zero]]
+                h_R = embeddings[-1][children[inner, one]]
+
+                hhu = torch.cat((h_L, h_R, u_k_inners), 1)
+                r = F.sigmoid(self.fc_r(hhu))
+                h_H = F.tanh(self.fc_h(r * hhu))
+
+                z = self.fc_z(torch.cat((h_H, hhu), -1))
+                z_H = z[:, :n_hidden]               # new activation
+                z_L = z[:, n_hidden:2*n_hidden]     # left activation
+                z_R = z[:, 2*n_hidden:3*n_hidden]   # right activation
+                z_N = z[:, 3*n_hidden:]             # local state
+                z = torch.stack([z_H,z_L,z_R,z_N], 2)
+                z = F.softmax(z)
+
+                h = ((z[:, :, 0] * h_H) +
+                     (z[:, :, 1] * h_L) +
+                     (z[:, :, 2] * h_R) +
+                     (z[:, :, 3] * u_k_inners))
+
+                try:
+                    embeddings.append(torch.cat((h, u_k_leaves), 0))
+                except AttributeError:
+                    embeddings.append(h)
+                states["embeddings"].append(embeddings[-1])
+                states["z"].append(z)
+                states["r"].append(r)
+
+            else:
+                embeddings.append(u_k)
+
+                states["embeddings"].append(embeddings[-1])
 
 
 class GRNNPredictGated(nn.Module):
@@ -292,6 +375,67 @@ class GRNNPredictGated(nn.Module):
 
     def forward(self, jets):
         h = self.grnn_transform_gated(jets)
+        h = F.tanh(self.fc1(h))
+        h = F.tanh(self.fc2(h))
+        h = F.sigmoid(self.fc3(h))
+        return h
+
+class GCNTransformConnected(nn.Module):
+    def __init__(self, n_features, n_hidden):
+        super().__init__()
+        self.fc_u = nn.Linear(n_features, n_hidden)
+
+        self.fc_edge =nn.Linear(n_hidden, n_hidden)
+        #self.pool = lambda x: torch.mean(x, 1)
+
+    def preprocess(self, jets):
+        for jet in jets_padded:
+            jet_size = len(jet)
+            pairs = []
+            for i in range(jet_size):
+                for j in range(i + 1):
+                    pair = torch.stack([node[i], node[j]], 0)
+                    pairs.append(pair)
+            pairs = torch.stack(pairs, 0)
+            pairs_batch.append(pairs)
+        return pairs_batch
+
+
+    def forward(self, jets):
+        jets_padded = pad_batch(jets)
+        t0 = time.time()
+        jet_contents = [jet["content"] for jet in jets]
+        jet_sizes = [len(jet['content']) for jet in jets]
+
+        output = []
+        x = F.relu(self.fc_u(jets_padded))
+        shp = x.size()
+        x_l = x.view(shp[0], shp[1], 1, shp[2])
+        x_r = x.view(shp[0], 1, shp[1], shp[2])
+        h = torch.tanh(self.fc_edge(x_l + x_r))
+        output = h.view(shp[0], shp[1] * shp[1], -1).mean(1)
+        t1 = time.time(); logging.debug("Batch took {:.3f}s".format(t1-t0))
+        #import ipdb; ipdb.set_trace()
+        #offset = 0
+        #for jet_size in jet_sizes:
+        #    embedding = embeddings[offset:offset+jet_size]; jet_size += offset
+        #    edge_embedding = F.tanh(self.fc_edge(embedding, embedding))
+        #    #import ipdb; ipdb.set_trace()
+        #    pooled = torch.mean(edge_embedding, 0)
+        #    output.append(pooled)
+        #output = torch.stack(output, 0)
+        return output
+
+class GCNPredictConnected(nn.Module):
+    def __init__(self, n_features, n_hidden):
+        super().__init__()
+        self.transform = GCNTransformConnected(n_features, n_hidden)
+        self.fc1 = nn.Linear(n_hidden, n_hidden)
+        self.fc2 = nn.Linear(n_hidden, n_hidden)
+        self.fc3 = nn.Linear(n_hidden, 1)
+
+    def forward(self, jets):
+        h = self.transform(jets)
         h = F.tanh(self.fc1(h))
         h = F.tanh(self.fc2(h))
         h = F.sigmoid(self.fc3(h))

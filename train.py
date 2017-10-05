@@ -25,6 +25,7 @@ from recnn.preprocessing import wrap, unwrap
 from recnn.recnn import log_loss
 from recnn.recnn import GRNNPredictGated
 from recnn.recnn import GRNNPredictSimple
+from recnn.recnn import GCNPredictConnected
 
 MODELS_DIR = 'models'
 DATA_DIR = 'data/w-vs-qcd/pickles'
@@ -32,8 +33,9 @@ DATA_DIR = 'data/w-vs-qcd/pickles'
 @click.command()
 @click.argument("filename_train")
 @click.option("--n_tr", default=-1)
-@click.option("--simple", is_flag=True, default=False)
+@click.option("--model_type", default=0)
 @click.option("--silent", is_flag=True, default=False)
+@click.option("--verbose", is_flag=True, default=False)
 @click.option("--n_features", default=7)
 @click.option("--n_hidden", default=40)
 @click.option("--n_epochs", default=20)
@@ -42,9 +44,11 @@ DATA_DIR = 'data/w-vs-qcd/pickles'
 @click.option("--decay", default=.999)
 @click.option("--random_state", default=1)
 @click.option("--gpu", default=0)
+
+
 def train(filename_train,
           n_tr=-1,
-          simple=False,
+          model_type=None,
           n_features=7,
           n_hidden=30,
           n_epochs=5,
@@ -53,7 +57,8 @@ def train(filename_train,
           decay=0.7,
           random_state=1,
           gpu=0,
-          silent=False):
+          silent=False,
+          verbose=False):
 
     # get timestamp for model id and set up logging
     dt = datetime.datetime.now()
@@ -66,7 +71,10 @@ def train(filename_train,
         root = logging.getLogger()
         root.setLevel(logging.DEBUG)
         ch = logging.StreamHandler(sys.stdout)
-        ch.setLevel(logging.WARNING)
+        if verbose:
+            ch.setLevel(logging.INFO)
+        else:
+            ch.setLevel(logging.WARNING)
         formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
         ch.setFormatter(formatter)
         root.addHandler(ch)
@@ -80,7 +88,7 @@ def train(filename_train,
     logging.warning("\tfilename_train = %s" % filename_train)
     logging.warning("\tfilename_model = %s" % filename_model)
     logging.warning("\tn_tr = %d" % n_tr)
-    logging.warning("\tgated = %s" % (not simple))
+    logging.warning("\tmodel_type = %s" % model_type)
     logging.warning("\tn_features = %d" % n_features)
     logging.warning("\tn_hidden = %d" % n_hidden)
     logging.warning("\tn_epochs = %d" % n_epochs)
@@ -137,13 +145,18 @@ def train(filename_train,
     logging.warning("Training...")
 
     # Initialization
-    gated = not simple
-    if gated:
-        Model = GRNNPredictGated
-    else:
-        Model = GRNNPredictSimple
+
+    ModelClasses = [
+        GRNNPredictGated,
+        GRNNPredictSimple,
+        GCNPredictConnected,
+    ]
+    Model = ModelClasses[model_type]
     # initialize model
     model = Model(n_features, n_hidden)
+    logging.warning(model)
+    out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))
+    logging.warning(out_str)
 
     if torch.cuda.is_available():
         torch.cuda.device(gpu)
@@ -162,7 +175,6 @@ def train(filename_train,
 
     def loss(X, y):
         y_pred = model(X).squeeze(1)
-        #import ipdb; ipdb.set_trace()
         l = log_loss(y, y_pred).mean()
         return l
 
@@ -202,7 +214,6 @@ def train(filename_train,
             idx = slice(start, start+batch_size)
             X = X_train[idx]
             y = y_train[idx]
-            #import ipdb; ipdb.set_trace()
 
             l = loss(X, y)
             l.backward()
