@@ -193,7 +193,7 @@ def train(filename_train,
                 Xv, yv = X_valid[offset:offset+batch_size], y_valid[offset:offset+batch_size]
                 vl = unwrap(loss(Xv, yv)); valid_loss.append(vl)
 
-                roc_auc.append(roc_auc_score(unwrap(Xv), unwrap(model(yv))))
+                roc_auc.append(roc_auc_score(unwrap(yv), unwrap(model(Xv))))
 
                 offset+=batch_size
 
