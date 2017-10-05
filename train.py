@@ -97,7 +97,7 @@ def train(filename_train,
     logging.warning("\tdecay = %f" % decay)
     logging.warning("\trandom_state = %d" % random_state)
     logging.warning("\tPID = {}".format(os.getpid()))
-    logging.warning("\tGPU = {}".format(gpu)))
+    logging.warning("\tGPU = {}".format(gpu))
 
     # set device and seed
     if torch.cuda.is_available():
