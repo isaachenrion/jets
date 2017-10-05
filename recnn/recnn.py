@@ -15,6 +15,7 @@ def pad_batch(jets):
     for jet in jet_contents:
         if jet.size()[0] < biggest_jet_size:
             zeros = Variable(torch.zeros(biggest_jet_size - jet.size()[0], jet.size()[1]))
+            if torch.cuda.is_available(): zeros = zeros.cuda()
             jets_padded.append(torch.cat((jet, zeros), 0))
         else:
             jets_padded.append(jet)
