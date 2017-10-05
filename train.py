@@ -192,6 +192,8 @@ def train(filename_train,
                 fd.close()
             model.eval()
             offset = 0; train_loss = []; valid_loss = []
+
+            #import ipdb; ipdb.set_trace()
             for i in range(len(X_valid) // batch_size):
                 Xt, yt = X_train[offset:offset+batch_size], y_train[offset:offset+batch_size]
                 tl = unwrap(loss(Xt, yt)); train_loss.append(tl)
