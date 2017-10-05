@@ -181,17 +181,9 @@ def train(filename_train,
 
     def callback(iteration, model):
         if iteration % 25 == 0:
-            roc_auc = roc_auc_score(unwrap(y_valid), unwrap(model(X_valid)))
-
-            if roc_auc > best_score[0]:
-                best_score[0] = roc_auc
-                best_params = model.state_dict
-
-                fd = open(os.path.join(model_dir, 'model.pt'), "wb")
-                torch.save(best_model, fd)
-                fd.close()
             model.eval()
-            offset = 0; train_loss = []; valid_loss = []
+
+            offset = 0; train_loss = []; valid_loss = []; roc_auc = []
 
             #import ipdb; ipdb.set_trace()
             for i in range(len(X_valid) // batch_size):
@@ -201,11 +193,23 @@ def train(filename_train,
                 Xv, yv = X_valid[offset:offset+batch_size], y_valid[offset:offset+batch_size]
                 vl = unwrap(loss(Xv, yv)); valid_loss.append(vl)
 
+                roc_auc.append(roc_auc_score(unwrap(Xv), unwrap(model(yv))))
+
                 offset+=batch_size
 
             train_loss = np.mean(np.array(train_loss))
             valid_loss = np.mean(np.array(valid_loss))
+            roc_auc = np.mean(np.array(roc_auc))
             model.train()
+
+            if roc_auc > best_score[0]:
+                best_score[0] = roc_auc
+                best_params = model.state_dict
+
+                fd = open(os.path.join(model_dir, 'model.pt'), "wb")
+                torch.save(best_model, fd)
+                fd.close()
+
             logging.info(
                 "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f"
                 "\troc_auc(valid)=%.4f\tbest_roc_auc(valid)=%.4f" % (
