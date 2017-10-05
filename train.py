@@ -199,7 +199,7 @@ def train(filename_train,
                 X_var = wrap_X(Xv); y_var = wrap(yv)
                 y_pred = model(X_var)
                 vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
-                roc_auc.append(roc_auc_score(unwrap(y_var), unwrap(model(X_var))))
+                #roc_auc.append(roc_auc_score(unwrap(y_var), unwrap(model(X_var))))
                 X = unwrap_X(X_var); y = unwrap(y_var); y_pred = unwrap(y_pred)
                 yy.append(y); yy_pred.append(y_pred)
 
