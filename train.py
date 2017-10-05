@@ -105,11 +105,11 @@ def train(filename_train,
     path_to_preprocessed = os.path.join(DATA_DIR, 'preprocessed', filename_train)
 
     if not os.path.isfile(path_to_preprocessed):
+        logging.warning("Preprocessing...")
         with open(os.path.join(DATA_DIR, filename_train), mode="rb") as fd:
             X, y = pickle.load(fd, encoding='latin-1')
         y = np.array(y)
 
-        logging.warning("Preprocessing...")
         X = [extract(permute_by_pt(rewrite_content(jet))) for jet in X]
 
         with open(path_to_preprocessed, mode="wb") as fd:
@@ -118,6 +118,7 @@ def train(filename_train,
     else:
         with open(path_to_preprocessed, mode="rb") as fd:
             X, y = pickle.load(fd, encoding='latin-1')
+        logging.warning("Data loaded and already preprocessed")
 
     if n_tr > 0:
         indices = torch.randperm(len(X)).numpy()[:n_tr]
@@ -133,7 +134,7 @@ def train(filename_train,
     tf = RobustScaler().fit(np.vstack([jet["content"] for jet in X]))
 
     for jet in X:
-        jet["content"] = wrap(tf.transform(jet["content"]))
+        jet["content"] = tf.transform(jet["content"])
     #y = wrap(y)
 
     # Split into train+validation
@@ -188,9 +189,11 @@ def train(filename_train,
             #import ipdb; ipdb.set_trace()
             for i in range(len(X_valid) // batch_size):
                 Xt, yt = X_train[offset:offset+batch_size], y_train[offset:offset+batch_size]
+                Xt, yt = wrap(Xt), wrap(yt)
                 tl = unwrap(loss(Xt, yt)); train_loss.append(tl)
 
                 Xv, yv = X_valid[offset:offset+batch_size], y_valid[offset:offset+batch_size]
+                Xv, yv = wrap(Xv), wrap(yv)
                 vl = unwrap(loss(Xv, yv)); valid_loss.append(vl)
 
                 roc_auc.append(roc_auc_score(unwrap(yv), unwrap(model(Xv))))
@@ -228,9 +231,8 @@ def train(filename_train,
 
             start = torch.round(torch.rand(1) * (len(X_train) - batch_size)).numpy()[0].astype(np.int32)
             idx = slice(start, start+batch_size)
-            X = X_train[idx]
-            y = y_train[idx]
-
+            X, y = X_train[idx], y_train[idx]
+            X, y = wrap(X), wrap(y)
             l = loss(X, y)
             l.backward()
             optimizer.step()
