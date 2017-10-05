@@ -21,7 +21,7 @@ from sklearn.preprocessing import RobustScaler
 from recnn.preprocessing import rewrite_content
 from recnn.preprocessing import permute_by_pt
 from recnn.preprocessing import extract
-from recnn.preprocessing import wrap, unwrap, wrap_X
+from recnn.preprocessing import wrap, unwrap, wrap_X, unwrap_X
 from recnn.recnn import log_loss
 from recnn.recnn import GRNNPredictGated
 from recnn.recnn import GRNNPredictSimple
@@ -135,7 +135,6 @@ def train(filename_train,
 
     for jet in X:
         jet["content"] = tf.transform(jet["content"])
-    #y = wrap(y)
 
     # Split into train+validation
     logging.warning("Splitting into train and validation...")
@@ -187,14 +186,15 @@ def train(filename_train,
             #import ipdb; ipdb.set_trace()
             for i in range(len(X_valid) // batch_size):
                 Xt, yt = X_train[offset:offset+batch_size], y_train[offset:offset+batch_size]
-                Xt, yt = wrap_X(Xt), wrap(yt)
-                tl = unwrap(loss(Xt, yt)); train_loss.append(tl)
+                X_var = wrap_X(Xt); y_var = wrap(yt)
+                tl = unwrap(loss(X_var, y_var)); train_loss.append(tl)
+                X = unwrap_X(X_var); y = unwrap(y_var)
 
                 Xv, yv = X_valid[offset:offset+batch_size], y_valid[offset:offset+batch_size]
-                Xv, yv = wrap_X(Xv), wrap(yv)
-                vl = unwrap(loss(Xv, yv)); valid_loss.append(vl)
-
-                roc_auc.append(roc_auc_score(unwrap(yv), unwrap(model(Xv))))
+                X_var = wrap_X(Xv); y_var = wrap(yv)
+                vl = unwrap(loss(X_var, y_var)); valid_loss.append(vl)
+                roc_auc.append(roc_auc_score(unwrap(y_var), unwrap(model(X_var))))
+                X = unwrap_X(X_var); y = unwrap(y_var)
 
                 offset+=batch_size
 
@@ -230,10 +230,11 @@ def train(filename_train,
             start = torch.round(torch.rand(1) * (len(X_train) - batch_size)).numpy()[0].astype(np.int32)
             idx = slice(start, start+batch_size)
             X, y = X_train[idx], y_train[idx]
-            X, y = wrap_X(X), wrap(y)
-            l = loss(X, y)
+            X_var = wrap_X(X); y_var = wrap(y)
+            l = loss(X_var, y_var)
             l.backward()
             optimizer.step()
+            X = unwrap_X(X_var); y = unwrap(y_var)
 
             callback(j, model)
 

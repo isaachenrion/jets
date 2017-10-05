@@ -4,28 +4,34 @@ import pickle
 import torch
 from torch.autograd import Variable
 # wrapping
-def wrap(data, dtype='float'):
-    d = Variable(torch.from_numpy(data))
+def wrap(y, dtype='float'):
+    y_wrap = Variable(torch.from_numpy(y))
     if dtype=='float':
-        d = d.float()
+        y_wrap = y_wrap.float()
     elif dtype == 'long':
-         d = d.long()
+         y_wrap = y_wrap.long()
     if torch.cuda.is_available():
-        d = d.cuda()
-    return d
+        y_wrap = y_wrap.cuda()
+    return y_wrap
 
-def unwrap(variable):
-    if variable.is_cuda:
-        return variable.cpu().data.numpy()
-    return variable.data.numpy()
+def unwrap(y_wrap):
+    if y_wrap.is_cuda:
+        y = y_wrap.cpu().data.numpy()
+    else:
+        y = y_wrap.data.numpy()
+    return y
 
 def wrap_X(X):
+    X_wrap = copy.deepcopy(X)
+    for jet in X_wrap:
+        jet["content"] = wrap(jet["content"])
+    return X_wrap
+
+def unwrap_X(X_wrap):
+    #X = copy.deepcopy(X_wrap)
     X_new = []
-    for jet in X:
-        j = wrap(jet["content"])
-        if torch.cuda.is_available():
-            j = j.cuda()
-        jet["content"] = j
+    for jet in X_wrap:
+        jet["content"] = unwrap(jet["content"])
         X_new.append(jet)
     return X_new
 
