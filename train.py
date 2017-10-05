@@ -141,8 +141,6 @@ def train(filename_train,
     logging.warning("Splitting into train and validation...")
 
     X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=min(5000, len(X) // 5))
-    y_train = wrap(y_train)
-    y_valid = wrap(y_valid)
     logging.warning("Training...")
 
     # Initialization
