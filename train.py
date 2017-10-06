@@ -23,11 +23,12 @@ from recnn.preprocessing import rewrite_content
 from recnn.preprocessing import permute_by_pt
 from recnn.preprocessing import extract
 from recnn.preprocessing import wrap, unwrap, wrap_X, unwrap_X
-from recnn.recnn import log_loss
-from recnn.recnn import GRNNTransformGated
-from recnn.recnn import GRNNTransformSimple
-from recnn.recnn import RelNNTransformConnected
-from recnn.recnn import PredictFromParticleEmbedding
+from losses import log_loss
+from recnn import GRNNTransformGated
+from recnn import GRNNTransformSimple
+from recnn import RelNNTransformConnected
+from recnn import MPNNTransform
+from recnn import PredictFromParticleEmbedding
 
 MODELS_DIR = 'models'
 DATA_DIR = 'data/w-vs-qcd/pickles'
@@ -35,30 +36,41 @@ DATA_DIR = 'data/w-vs-qcd/pickles'
 
 parser = argparse.ArgumentParser(description='Jets')
 
-parser.add_argument("--f_tr", type=str, default='antikt-kt-train.pickle')
-parser.add_argument("--n_tr", type=int, default=-1)
-parser.add_argument("--model_type", type=int, default=0)
-parser.add_argument("--silent", action='store_true', default=False)
-parser.add_argument("--verbose", action='store_true', default=False)
-parser.add_argument("--pp", action='store_true', default=False)
+parser.add_argument("-f", "--f_tr", type=str, default='antikt-kt-train.pickle')
+parser.add_argument("-n", "--n_tr", type=int, default=-1)
+parser.add_argument("-m", "--model_type", type=int, default=0)
+parser.add_argument("-s", "--silent", action='store_true', default=False)
+parser.add_argument("-v", "--verbose", action='store_true', default=False)
+parser.add_argument("-p", "--preprocess", action='store_true', default=False)
+parser.add_argument("-r", "--restart", action='store_true', default=False)
 parser.add_argument("--n_features", type=int, default=7)
 parser.add_argument("--n_hidden", type=int, default=40)
-parser.add_argument("--n_epochs", type=int, default=20)
-parser.add_argument("--batch_size", type=int, default=64)
-parser.add_argument("--step_size", type=float, default=0.0005)
-parser.add_argument("--decay", type=float, default=.999)
+parser.add_argument("-e", "--n_epochs", type=int, default=25)
+parser.add_argument("-b", "--batch_size", type=int, default=64)
+parser.add_argument("-a", "--step_size", type=float, default=0.0005)
+parser.add_argument("-d", "--decay", type=float, default=.9)
 parser.add_argument("--seed", type=int, default=1)
-parser.add_argument("--gpu", type=int, default=0)
+parser.add_argument("-g", "--gpu", type=int, default=0)
+parser.add_argument("-l", "--load", type=str, default=None)
 
 args = parser.parse_args()
 
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
 
+MODEL_TYPES = ['RelationNet', 'RecNN-simple', 'RecNN-gated', 'MPNN']
+TRANSFORMS = [
+    RelNNTransformConnected,
+    GRNNTransformSimple,
+    GRNNTransformGated,
+    MPNNTransform,
+]
+
 def train():
+    model_type = MODEL_TYPES[args.model_type]
 
     # get timestamp for model id and set up logging
     dt = datetime.datetime.now()
-    filename_model = '{}-{}/{:02d}-{:02d}-{:02d}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
+    filename_model = '{}/{}-{}/{:02d}-{:02d}-{:02d}'.format(model_type, dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
     model_dir = os.path.join(MODELS_DIR, filename_model)
     os.makedirs(model_dir)
     logging.basicConfig(level=logging.DEBUG, filename=os.path.join(model_dir, 'log.txt'), filemode="a+",
@@ -77,9 +89,9 @@ def train():
 
 
     logging.warning("Calling with...")
-    logging.warning("\tf_tr = %s" % args.f_tr)
+    logging.warning("\tfilename_train = %s" % args.f_tr)
     logging.warning("\tfilename_model = %s" % filename_model)
-    logging.warning("\tn_tr = %d" % args.n_tr)
+    logging.warning("\tnumber of training examples = %d" % args.n_tr)
     logging.warning("\tmodel_type = %s" % args.model_type)
     logging.warning("\tn_features = %d" % args.n_features)
     logging.warning("\tn_hidden = %d" % args.n_hidden)
@@ -90,6 +102,8 @@ def train():
     logging.warning("\tseed = %d" % args.seed)
     logging.warning("\tPID = {}".format(os.getpid()))
     logging.warning("\tgpu = {}".format(args.gpu))
+    logging.warning("\tloaded model = {}".format(args.load))
+    logging.warning("\trestart = {}".format(args.restart))
 
     # set device and seed
     if torch.cuda.is_available():
@@ -104,15 +118,13 @@ def train():
     # Preprocessing
     path_to_preprocessed = os.path.join(DATA_DIR, 'preprocessed', args.f_tr)
 
-    if args.pp or not os.path.isfile(path_to_preprocessed):
+    if args.preprocess or not os.path.isfile(path_to_preprocessed):
         logging.warning("Preprocessing...")
         with open(os.path.join(DATA_DIR, args.f_tr), mode="rb") as fd:
             X, y = pickle.load(fd, encoding='latin-1')
         y = np.array(y)
 
         X = [extract(permute_by_pt(rewrite_content(jet))) for jet in X]
-
-
         tf = RobustScaler().fit(np.vstack([jet["content"] for jet in X]))
 
         for jet in X:
@@ -142,25 +154,30 @@ def train():
     logging.warning("Training...")
 
     # Initialization
+    Transform = TRANSFORMS[args.model_type]
 
-    Transforms = [
-        GRNNTransformGated,
-        GRNNTransformSimple,
-        RelNNTransformConnected,
-    ]
-    Transform = Transforms[args.model_type]
     # initialize model
-    model = PredictFromParticleEmbedding(Transform, args.n_features, args.n_hidden)
+    if args.load is None:
+        model = PredictFromParticleEmbedding(Transform, args.n_features, args.n_hidden)
+    else:
+        with open(os.path.join(args.load, 'model.pickle'), 'rb') as f:
+            model = pickle.load(f)
+        if args.restart:
+            with open(os.path.join(args.load, 'settings.pickle'), "rb") as f:
+                settings = pickle.load(f, encoding='latin-1')
+            args.step_size = settings["step_size"]
+    if torch.cuda.is_available():
+        model.cuda()
+
     logging.warning(model)
     out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))
     logging.warning(out_str)
-    if torch.cuda.is_available():
-        model.cuda()
 
 
 
     optimizer = Adam(model.parameters(), lr=args.step_size)
     scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
+    settings = {}
 
     n_batches = int(np.ceil(len(X_train) / args.batch_size))
     best_score = [-np.inf]  # yuck, but works
@@ -203,10 +220,7 @@ def train():
             if roc_auc > best_score[0]:
                 best_score[0] = roc_auc
                 best_model = copy.deepcopy(model)
-
-                fd = open(os.path.join(model_dir, 'model.pt'), "wb")
-                torch.save(best_model, fd)
-                fd.close()
+                save_everything()
 
             logging.info(
                 "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f"
@@ -217,9 +231,17 @@ def train():
                     roc_auc,
                     best_score[0]))
 
+    def save_everything():
+        with open(os.path.join(model_dir, 'model.pickle'), "wb") as f:
+            pickle.dump(best_model, f)
+
+        with open(os.path.join(model_dir, 'settings.pickle'), "wb") as f:
+            pickle.dump(settings, f)
+
+
     for i in range(args.n_epochs):
         logging.info("epoch = %d" % i)
-        logging.info("args.step_size = %.8f" % args.step_size)
+        logging.info("step_size = %.8f" % args.step_size)
 
         for j in range(n_batches):
             optimizer.zero_grad()
@@ -236,6 +258,7 @@ def train():
             callback(j, model)
 
         scheduler.step()
+        settings['step_size'] = scheduler.get_lr()
 
 if __name__ == "__main__":
     train()
