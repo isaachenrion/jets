@@ -3,9 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class PredictFromParticleEmbedding(nn.Module):
-    def __init__(self, particle_transform, n_features, n_hidden):
+    def __init__(self, particle_transform, n_features, n_hidden, *args):
         super().__init__()
-        self.transform = particle_transform(n_features, n_hidden)
+        self.transform = particle_transform(n_features, n_hidden, *args)
         self.fc1 = nn.Linear(n_hidden, n_hidden)
         self.fc2 = nn.Linear(n_hidden, n_hidden)
         self.fc3 = nn.Linear(n_hidden, 1)

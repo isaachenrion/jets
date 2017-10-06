@@ -7,12 +7,11 @@ class Message(nn.Module):
     ''' Base class implementing neural message function for MPNNs. All subclasses
         should implement build_nn, which returns a lambda function
     '''
-    def __init__(self, config):
+    def __init__(self, hidden_dim, message_dim, edge_dim):
         super().__init__()
-        self.config = config
-        self.vertex_dim = config.hidden_dim
-        self.edge_dim = config.edge_dim
-        self.message_dim = config.message_dim
+        self.vertex_dim = hidden_dim
+        self.edge_dim = edge_dim
+        self.message_dim = message_dim
 
     def forward(self, *args):
         if self.edge_dim == 0:

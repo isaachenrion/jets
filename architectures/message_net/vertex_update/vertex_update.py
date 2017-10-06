@@ -5,12 +5,11 @@ import torch.nn.functional as F
 from .nn_utils import AnyBatchGRUCell
 
 class VertexUpdate(nn.Module):
-    def __init__(self, config):
+    def __init__(self, message_dim, hidden_dim, vertex_state_dim):
         super().__init__()
-        self.config = config
-        self.hidden_dim = config.hidden_dim
-        self.message_dim = config.message_dim
-        self.vertex_state_dim = config.vertex_state_dim
+        self.hidden_dim = hidden_dim
+        self.message_dim = message_dim
+        self.vertex_state_dim = vertex_state_dim
         self.has_vertex_state = self.vertex_state_dim > 0
 
     def forward(self, *args):
@@ -27,8 +26,8 @@ class VertexUpdate(nn.Module):
 
 
 class GRUUpdate(VertexUpdate):
-    def __init__(self, config):
-        super().__init__(config)
+    def __init__(self, message_dim, hidden_dim, vertex_state_dim):
+        super().__init__(message_dim, hidden_dim, vertex_state_dim)
         self.activation = F.tanh
         self.gru = AnyBatchGRUCell(self.message_dim + self.vertex_state_dim, self.hidden_dim)
 
@@ -44,10 +43,3 @@ class GRUUpdate(VertexUpdate):
     def _forward_without_vertex_state(self, h, message):
         h = self.gru(message, h)
         return h
-
-
-def make_vertex_update(vertex_update_config):
-    if vertex_update_config.function == 'gru':
-        return GRUUpdate(vertex_update_config.config)
-    else:
-        raise ValueError("Unsupported vertex update function! ({})".format(vertex_update_config.function))

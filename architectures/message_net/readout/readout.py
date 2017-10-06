@@ -2,51 +2,36 @@ import torch
 import torch.nn as nn
 import numpy as np
 import torch.nn.functional as F
-from collections import namedtuple
 
 from .set2set import Set2Vec
 
-ReadoutConfig = namedtuple(
-        'ReadoutConfig', [
-            'hidden_dim',
-            'readout_hidden_dim',
-            'mode',
-            'target_dim',
-        ]
-)
 
 class Readout(nn.Module):
-    def __init__(self, config):
+    def __init__(self, hidden_dim, target_dim):
         super().__init__()
-        self.config = config
-        self.classify = (self.config.mode == 'clf')
-        self.hidden_dim = config.hidden_dim
-        self.target_dim = config.target_dim
-        self.readout_hidden_dim = config.readout_hidden_dim
-        self.activation = nn.LeakyReLU
+        self.hidden_dim = hidden_dim
+        self.target_dim = target_dim
+        self.activation = F.tanh
 
 
-    def forward(self, G):
+    def forward(self, h):
         pass
 
 
 class DTNNReadout(Readout):
-    def __init__(self, config):
-        super().__init__(config)
-        net = nn.Sequential(
-                nn.Linear(self.hidden_dim, self.readout_hidden_dim),
-                self.activation(),
-                nn.BatchNorm1d(self.readout_hidden_dim),
-                nn.Linear(self.readout_hidden_dim, self.target_dim),
-                )
-        self.net = net
+    def __init__(self, hidden_dim, target_dim):
+        super().__init__(hidden_dim, target_dim)
+        self.fc1 = nn.Linear(hidden_dim, hidden_dim)
+        #self.bn1 = nn.BatchNorm1d(hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, target_dim)
 
-    def forward(self, h):
-        bs, gd, dd = (s for s in h.size())
-        x = h.view(-1, dd)
-        x = self.net(x)
-        x = x.view(bs, gd, -1)
-        x = x.sum(1)
+    def forward(self, x):
+        bs, n_nodes, n_hidden = (s for s in x.size())
+        x = self.fc1(x)
+        x = F.tanh(x)
+        #x = self.bn1(x)
+        x = self.fc2(x)
+        x = x.mean(1)
         return x
 
 class FullyConnectedReadout(Readout):

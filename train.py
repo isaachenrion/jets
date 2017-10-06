@@ -19,16 +19,16 @@ from sklearn.cross_validation import train_test_split
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import RobustScaler
 
-from recnn.preprocessing import rewrite_content
-from recnn.preprocessing import permute_by_pt
-from recnn.preprocessing import extract
-from recnn.preprocessing import wrap, unwrap, wrap_X, unwrap_X
+from architectures.preprocessing import rewrite_content
+from architectures.preprocessing import permute_by_pt
+from architectures.preprocessing import extract
+from architectures.preprocessing import wrap, unwrap, wrap_X, unwrap_X
 from losses import log_loss
-from recnn import GRNNTransformGated
-from recnn import GRNNTransformSimple
-from recnn import RelNNTransformConnected
-from recnn import MPNNTransform
-from recnn import PredictFromParticleEmbedding
+from architectures import GRNNTransformGated
+from architectures import GRNNTransformSimple
+from architectures import RelNNTransformConnected
+from architectures import MPNNTransform
+from architectures import PredictFromParticleEmbedding
 
 MODELS_DIR = 'models'
 DATA_DIR = 'data/w-vs-qcd/pickles'
@@ -52,6 +52,7 @@ parser.add_argument("-d", "--decay", type=float, default=.9)
 parser.add_argument("--seed", type=int, default=1)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-l", "--load", type=str, default=None)
+parser.add_argument("-i", "--n_iters", type=int, default=1)
 
 args = parser.parse_args()
 
@@ -145,9 +146,6 @@ def train():
 
     logging.warning("\tX size = %d" % len(X))
     logging.warning("\ty size = %d" % len(y))
-
-
-    # Split into train+validation
     logging.warning("Splitting into train and validation...")
 
     X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=min(5000, len(X) // 5))
@@ -155,10 +153,13 @@ def train():
 
     # Initialization
     Transform = TRANSFORMS[args.model_type]
+    model_args = [args.n_features, args.n_hidden]
+    if Transform == MPNNTransform:
+        model_args += [args.n_iters]
 
-    # initialize model
+
     if args.load is None:
-        model = PredictFromParticleEmbedding(Transform, args.n_features, args.n_hidden)
+        model = PredictFromParticleEmbedding(Transform, *model_args)
     else:
         with open(os.path.join(args.load, 'model.pickle'), 'rb') as f:
             model = pickle.load(f)
@@ -166,7 +167,7 @@ def train():
             with open(os.path.join(args.load, 'settings.pickle'), "rb") as f:
                 settings = pickle.load(f, encoding='latin-1')
             args.step_size = settings["step_size"]
-    
+
     logging.warning(model)
     out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))
     logging.warning(out_str)
