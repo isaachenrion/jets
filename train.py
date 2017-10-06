@@ -166,13 +166,13 @@ def train():
             with open(os.path.join(args.load, 'settings.pickle'), "rb") as f:
                 settings = pickle.load(f, encoding='latin-1')
             args.step_size = settings["step_size"]
-    if torch.cuda.is_available():
-        model.cuda()
-
+    
     logging.warning(model)
     out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))
     logging.warning(out_str)
 
+    if torch.cuda.is_available():
+        model.cuda()
 
 
     optimizer = Adam(model.parameters(), lr=args.step_size)
