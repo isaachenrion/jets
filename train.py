@@ -29,6 +29,7 @@ from architectures import GRNNTransformSimple
 from architectures import RelNNTransformConnected
 from architectures import MPNNTransform
 from architectures import PredictFromParticleEmbedding
+from loggers import StatsLogger
 
 MODELS_DIR = 'models'
 DATA_DIR = 'data/w-vs-qcd/pickles'
@@ -67,13 +68,17 @@ TRANSFORMS = [
 ]
 
 def train():
+    ''' ADMIN '''
+    '''----------------------------------------------------------------------- '''
     model_type = MODEL_TYPES[args.model_type]
-
     # get timestamp for model id and set up logging
     dt = datetime.datetime.now()
     filename_model = '{}/{}-{}/{:02d}-{:02d}-{:02d}'.format(model_type, dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
     model_dir = os.path.join(MODELS_DIR, filename_model)
     os.makedirs(model_dir)
+
+    ''' LOGGING '''
+    '''----------------------------------------------------------------------- '''
     logging.basicConfig(level=logging.DEBUG, filename=os.path.join(model_dir, 'log.txt'), filemode="a+",
                         format="%(asctime)-15s %(message)s")
     if not args.silent:
@@ -87,7 +92,6 @@ def train():
         formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
         ch.setFormatter(formatter)
         root.addHandler(ch)
-
 
     logging.warning("Calling with...")
     logging.warning("\tfilename_train = %s" % args.f_tr)
@@ -106,6 +110,8 @@ def train():
     logging.warning("\tloaded model = {}".format(args.load))
     logging.warning("\trestart = {}".format(args.restart))
 
+    ''' CUDA '''
+    '''----------------------------------------------------------------------- '''
     # set device and seed
     if torch.cuda.is_available():
         torch.cuda.device(args.gpu)
@@ -113,9 +119,9 @@ def train():
     else:
         torch.manual_seed(args.seed)
 
-    # Make data
+    ''' DATA '''
+    '''----------------------------------------------------------------------- '''
     logging.warning("Loading data...")
-
     # Preprocessing
     path_to_preprocessed = os.path.join(DATA_DIR, 'preprocessed', args.f_tr)
 
@@ -132,7 +138,6 @@ def train():
             jet["content"] = tf.transform(jet["content"])
         with open(path_to_preprocessed, mode="wb") as fd:
             pickle.dump((X, y), fd)
-
     else:
         with open(path_to_preprocessed, mode="rb") as fd:
             X, y = pickle.load(fd, encoding='latin-1')
@@ -143,20 +148,19 @@ def train():
         X = [X[i] for i in indices]
         y = y[indices]
 
-
     logging.warning("\tX size = %d" % len(X))
     logging.warning("\ty size = %d" % len(y))
     logging.warning("Splitting into train and validation...")
 
     X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=min(5000, len(X) // 5))
-    logging.warning("Training...")
 
+    ''' MODEL '''
+    '''----------------------------------------------------------------------- '''
     # Initialization
     Transform = TRANSFORMS[args.model_type]
     model_args = [args.n_features, args.n_hidden]
     if Transform == MPNNTransform:
         model_args += [args.n_iters]
-
 
     if args.load is None:
         model = PredictFromParticleEmbedding(Transform, *model_args)
@@ -175,6 +179,8 @@ def train():
     if torch.cuda.is_available():
         model.cuda()
 
+    ''' OPTIMIZER AND LOSS '''
+    '''----------------------------------------------------------------------- '''
 
     optimizer = Adam(model.parameters(), lr=args.step_size)
     scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
@@ -188,14 +194,38 @@ def train():
         l = log_loss(y, y_pred.squeeze(1)).mean()
         return l
 
+    ''' TRAINING '''
+    '''----------------------------------------------------------------------- '''
+    logging.warning("Training...")
+    for i in range(args.n_epochs):
+        logging.info("epoch = %d" % i)
+        logging.info("step_size = %.8f" % args.step_size)
 
+        for j in range(n_batches):
+            optimizer.zero_grad()
+
+            start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
+            idx = slice(start, start+args.batch_size)
+            X, y = X_train[idx], y_train[idx]
+            X_var = wrap_X(X); y_var = wrap(y)
+            l = loss(model(X_var), y_var)
+            l.backward()
+            optimizer.step()
+            X = unwrap_X(X_var); y = unwrap(y_var)
+
+            callback(j, model)
+
+        scheduler.step()
+        settings['step_size'] = scheduler.get_lr()
+
+    ''' VALIDATION '''
+    '''----------------------------------------------------------------------- '''
     def callback(iteration, model):
         if iteration % 25 == 0:
             model.eval()
 
             offset = 0; train_loss = []; valid_loss = []; roc_auc = []
             yy, yy_pred = [], []
-            #import ipdb; ipdb.set_trace()
             for i in range(len(X_valid) // args.batch_size):
                 Xt, yt = X_train[offset:offset+args.batch_size], y_train[offset:offset+args.batch_size]
                 X_var = wrap_X(Xt); y_var = wrap(yt)
@@ -239,27 +269,6 @@ def train():
         with open(os.path.join(model_dir, 'settings.pickle'), "wb") as f:
             pickle.dump(settings, f)
 
-
-    for i in range(args.n_epochs):
-        logging.info("epoch = %d" % i)
-        logging.info("step_size = %.8f" % args.step_size)
-
-        for j in range(n_batches):
-            optimizer.zero_grad()
-
-            start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
-            idx = slice(start, start+args.batch_size)
-            X, y = X_train[idx], y_train[idx]
-            X_var = wrap_X(X); y_var = wrap(y)
-            l = loss(model(X_var), y_var)
-            l.backward()
-            optimizer.step()
-            X = unwrap_X(X_var); y = unwrap(y_var)
-
-            callback(j, model)
-
-        scheduler.step()
-        settings['step_size'] = scheduler.get_lr()
 
 if __name__ == "__main__":
     train()
