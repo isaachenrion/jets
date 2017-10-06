@@ -23,9 +23,10 @@ from recnn.preprocessing import permute_by_pt
 from recnn.preprocessing import extract
 from recnn.preprocessing import wrap, unwrap, wrap_X, unwrap_X
 from recnn.recnn import log_loss
-from recnn.recnn import GRNNPredictGated
-from recnn.recnn import GRNNPredictSimple
-from recnn.recnn import GCNPredictConnected
+from recnn.recnn import GRNNTransformGated
+from recnn.recnn import GRNNTransformSimple
+from recnn.recnn import RelNNTransformConnected
+from recnn.recnn import PredictFromParticleEmbedding
 
 MODELS_DIR = 'models'
 DATA_DIR = 'data/w-vs-qcd/pickles'
@@ -154,14 +155,14 @@ def train(filename_train,
 
     # Initialization
 
-    ModelClasses = [
-        GRNNPredictGated,
-        GRNNPredictSimple,
-        GCNPredictConnected,
+    Transforms = [
+        GRNNTransformGated,
+        GRNNTransformSimple,
+        RelNNTransformConnected,
     ]
-    Model = ModelClasses[model_type]
+    Transform = Transforms[model_type]
     # initialize model
-    model = Model(n_features, n_hidden)
+    model = PredictFromParticleEmbedding(Transform, n_features, n_hidden)
     logging.warning(model)
     out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))
     logging.warning(out_str)

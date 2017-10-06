@@ -197,22 +197,6 @@ class GRNNTransformSimple(nn.Module):
         return embeddings[-1].view((len(jets), -1))
 
 
-class GRNNPredictSimple(nn.Module):
-    def __init__(self, n_features, n_hidden):
-        super().__init__()
-        self.grnn_transform_simple = GRNNTransformSimple(n_features, n_hidden)
-        self.fc1 = nn.Linear(n_hidden, n_hidden)
-        self.fc2 = nn.Linear(n_hidden, n_hidden)
-        self.fc3 = nn.Linear(n_hidden, 1)
-
-    def forward(self, jets):
-        h = self.grnn_transform_simple(jets)
-        h = F.tanh(self.fc1(h))
-        h = F.tanh(self.fc2(h))
-        h = F.sigmoid(self.fc3(h))
-        return h
-
-
 class GRNNTransformGated(nn.Module):
     def __init__(self, n_features, n_hidden):
         super().__init__()
@@ -366,22 +350,7 @@ class GRNNTransformGated(nn.Module):
                 states["embeddings"].append(embeddings[-1])
 
 
-class GRNNPredictGated(nn.Module):
-    def __init__(self, n_features, n_hidden):
-        super().__init__()
-        self.grnn_transform_gated = GRNNTransformGated(n_features, n_hidden)
-        self.fc1 = nn.Linear(n_hidden, n_hidden)
-        self.fc2 = nn.Linear(n_hidden, n_hidden)
-        self.fc3 = nn.Linear(n_hidden, 1)
-
-    def forward(self, jets):
-        h = self.grnn_transform_gated(jets)
-        h = F.tanh(self.fc1(h))
-        h = F.tanh(self.fc2(h))
-        h = F.sigmoid(self.fc3(h))
-        return h
-
-class GCNTransformConnected(nn.Module):
+class RelNNTransformConnected(nn.Module):
     def __init__(self, n_features, n_hidden):
         super().__init__()
         self.fc_u = nn.Linear(n_features, n_hidden)
@@ -419,10 +388,10 @@ class GCNTransformConnected(nn.Module):
 
         return output
 
-class GCNPredictConnected(nn.Module):
-    def __init__(self, n_features, n_hidden):
+class PredictFromParticleEmbedding(nn.Module):
+    def __init__(self, particle_transform, n_features, n_hidden):
         super().__init__()
-        self.transform = GCNTransformConnected(n_features, n_hidden)
+        self.transform = particle_transform(n_features, n_hidden)
         self.fc1 = nn.Linear(n_hidden, n_hidden)
         self.fc2 = nn.Linear(n_hidden, n_hidden)
         self.fc3 = nn.Linear(n_hidden, 1)
