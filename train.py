@@ -13,6 +13,7 @@ import datetime
 import time
 import sys
 import os
+import argparse
 
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import roc_auc_score
@@ -31,37 +32,29 @@ from recnn.recnn import PredictFromParticleEmbedding
 MODELS_DIR = 'models'
 DATA_DIR = 'data/w-vs-qcd/pickles'
 #
-@click.command()
-@click.argument("filename_train")
-@click.option("--n_tr", default=-1)
-@click.option("--model_type", default=0)
-@click.option("--silent", is_flag=True, default=False)
-@click.option("--verbose", is_flag=True, default=False)
-@click.option("--pp", is_flag=True, default=False)
-@click.option("--n_features", default=7)
-@click.option("--n_hidden", default=40)
-@click.option("--n_epochs", default=20)
-@click.option("--batch_size", default=64)
-@click.option("--step_size", default=0.0005)
-@click.option("--decay", default=.999)
-@click.option("--random_state", default=1)
-@click.option("--gpu", default=0)
 
+parser = argparse.ArgumentParser(description='Jets')
 
-def train(filename_train,
-          n_tr=-1,
-          model_type=None,
-          n_features=7,
-          n_hidden=30,
-          n_epochs=5,
-          batch_size=64,
-          step_size=0.01,
-          decay=0.7,
-          random_state=1,
-          gpu=0,
-          silent=False,
-          verbose=False,
-          pp=False):
+parser.add_argument("--f_tr", type=str, default='antikt-kt-train.pickle')
+parser.add_argument("--n_tr", type=int, default=-1)
+parser.add_argument("--model_type", type=int, default=0)
+parser.add_argument("--silent", action='store_true', default=False)
+parser.add_argument("--verbose", action='store_true', default=False)
+parser.add_argument("--pp", action='store_true', default=False)
+parser.add_argument("--n_features", type=int, default=7)
+parser.add_argument("--n_hidden", type=int, default=40)
+parser.add_argument("--n_epochs", type=int, default=20)
+parser.add_argument("--batch_size", type=int, default=64)
+parser.add_argument("--step_size", type=float, default=0.0005)
+parser.add_argument("--decay", type=float, default=.999)
+parser.add_argument("--seed", type=int, default=1)
+parser.add_argument("--gpu", type=int, default=0)
+
+args = parser.parse_args()
+
+os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
+
+def train():
 
     # get timestamp for model id and set up logging
     dt = datetime.datetime.now()
@@ -70,54 +63,50 @@ def train(filename_train,
     os.makedirs(model_dir)
     logging.basicConfig(level=logging.DEBUG, filename=os.path.join(model_dir, 'log.txt'), filemode="a+",
                         format="%(asctime)-15s %(message)s")
-    if not silent:
+    if not args.silent:
         root = logging.getLogger()
         root.setLevel(logging.DEBUG)
         ch = logging.StreamHandler(sys.stdout)
-        if verbose:
+        if args.verbose:
             ch.setLevel(logging.INFO)
         else:
             ch.setLevel(logging.WARNING)
         formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
         ch.setFormatter(formatter)
         root.addHandler(ch)
-    #ch.setLevel(logging.DEBUG)
-    #root.setFormatter(formatter)
-    #ch.setFormatter(formatter)
-    #root.addHandler(ch)
 
 
     logging.warning("Calling with...")
-    logging.warning("\tfilename_train = %s" % filename_train)
+    logging.warning("\tf_tr = %s" % args.f_tr)
     logging.warning("\tfilename_model = %s" % filename_model)
-    logging.warning("\tn_tr = %d" % n_tr)
-    logging.warning("\tmodel_type = %s" % model_type)
-    logging.warning("\tn_features = %d" % n_features)
-    logging.warning("\tn_hidden = %d" % n_hidden)
-    logging.warning("\tn_epochs = %d" % n_epochs)
-    logging.warning("\tbatch_size = %d" % batch_size)
-    logging.warning("\tstep_size = %f" % step_size)
-    logging.warning("\tdecay = %f" % decay)
-    logging.warning("\trandom_state = %d" % random_state)
+    logging.warning("\tn_tr = %d" % args.n_tr)
+    logging.warning("\tmodel_type = %s" % args.model_type)
+    logging.warning("\tn_features = %d" % args.n_features)
+    logging.warning("\tn_hidden = %d" % args.n_hidden)
+    logging.warning("\tn_epochs = %d" % args.n_epochs)
+    logging.warning("\tbatch_size = %d" % args.batch_size)
+    logging.warning("\tstep_size = %f" % args.step_size)
+    logging.warning("\tdecay = %f" % args.decay)
+    logging.warning("\tseed = %d" % args.seed)
     logging.warning("\tPID = {}".format(os.getpid()))
-    logging.warning("\tGPU = {}".format(gpu))
+    logging.warning("\tgpu = {}".format(args.gpu))
 
     # set device and seed
     if torch.cuda.is_available():
-        torch.cuda.device(gpu)
-        torch.cuda.manual_seed(random_state)
+        torch.cuda.device(args.gpu)
+        torch.cuda.manual_seed(args.seed)
     else:
-        torch.manual_seed(random_state)
+        torch.manual_seed(args.seed)
 
     # Make data
     logging.warning("Loading data...")
 
     # Preprocessing
-    path_to_preprocessed = os.path.join(DATA_DIR, 'preprocessed', filename_train)
+    path_to_preprocessed = os.path.join(DATA_DIR, 'preprocessed', args.f_tr)
 
-    if pp or not os.path.isfile(path_to_preprocessed):
+    if args.pp or not os.path.isfile(path_to_preprocessed):
         logging.warning("Preprocessing...")
-        with open(os.path.join(DATA_DIR, filename_train), mode="rb") as fd:
+        with open(os.path.join(DATA_DIR, args.f_tr), mode="rb") as fd:
             X, y = pickle.load(fd, encoding='latin-1')
         y = np.array(y)
 
@@ -136,13 +125,12 @@ def train(filename_train,
             X, y = pickle.load(fd, encoding='latin-1')
         logging.warning("Data loaded and already preprocessed")
 
-    if n_tr > 0:
-        indices = torch.randperm(len(X)).numpy()[:n_tr]
+    if args.n_tr > 0:
+        indices = torch.randperm(len(X)).numpy()[:args.n_tr]
         X = [X[i] for i in indices]
         y = y[indices]
 
 
-    logging.warning("\tfilename = %s" % filename_train)
     logging.warning("\tX size = %d" % len(X))
     logging.warning("\ty size = %d" % len(y))
 
@@ -160,9 +148,9 @@ def train(filename_train,
         GRNNTransformSimple,
         RelNNTransformConnected,
     ]
-    Transform = Transforms[model_type]
+    Transform = Transforms[args.model_type]
     # initialize model
-    model = PredictFromParticleEmbedding(Transform, n_features, n_hidden)
+    model = PredictFromParticleEmbedding(Transform, args.n_features, args.n_hidden)
     logging.warning(model)
     out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))
     logging.warning(out_str)
@@ -171,10 +159,10 @@ def train(filename_train,
 
 
 
-    optimizer = Adam(model.parameters(), lr=step_size)
-    scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=decay)
+    optimizer = Adam(model.parameters(), lr=args.step_size)
+    scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
 
-    n_batches = int(np.ceil(len(X_train) / batch_size))
+    n_batches = int(np.ceil(len(X_train) / args.batch_size))
     best_score = [-np.inf]  # yuck, but works
     best_model = copy.deepcopy(model)
 
@@ -190,21 +178,20 @@ def train(filename_train,
             offset = 0; train_loss = []; valid_loss = []; roc_auc = []
             yy, yy_pred = [], []
             #import ipdb; ipdb.set_trace()
-            for i in range(len(X_valid) // batch_size):
-                Xt, yt = X_train[offset:offset+batch_size], y_train[offset:offset+batch_size]
+            for i in range(len(X_valid) // args.batch_size):
+                Xt, yt = X_train[offset:offset+args.batch_size], y_train[offset:offset+args.batch_size]
                 X_var = wrap_X(Xt); y_var = wrap(yt)
                 tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
                 X = unwrap_X(X_var); y = unwrap(y_var)
 
-                Xv, yv = X_valid[offset:offset+batch_size], y_valid[offset:offset+batch_size]
+                Xv, yv = X_valid[offset:offset+args.batch_size], y_valid[offset:offset+args.batch_size]
                 X_var = wrap_X(Xv); y_var = wrap(yv)
                 y_pred = model(X_var)
                 vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
-                #roc_auc.append(roc_auc_score(unwrap(y_var), unwrap(model(X_var))))
                 X = unwrap_X(X_var); y = unwrap(y_var); y_pred = unwrap(y_pred)
                 yy.append(y); yy_pred.append(y_pred)
 
-                offset+=batch_size
+                offset+=args.batch_size
 
             train_loss = np.mean(np.array(train_loss))
             valid_loss = np.mean(np.array(valid_loss))
@@ -230,15 +217,15 @@ def train(filename_train,
                     roc_auc,
                     best_score[0]))
 
-    for i in range(n_epochs):
+    for i in range(args.n_epochs):
         logging.info("epoch = %d" % i)
-        logging.info("step_size = %.8f" % step_size)
+        logging.info("args.step_size = %.8f" % args.step_size)
 
         for j in range(n_batches):
             optimizer.zero_grad()
 
-            start = torch.round(torch.rand(1) * (len(X_train) - batch_size)).numpy()[0].astype(np.int32)
-            idx = slice(start, start+batch_size)
+            start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
+            idx = slice(start, start+args.batch_size)
             X, y = X_train[idx], y_train[idx]
             X_var = wrap_X(X); y_var = wrap(y)
             l = loss(model(X_var), y_var)

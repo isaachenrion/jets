@@ -388,6 +388,7 @@ class RelNNTransformConnected(nn.Module):
 
         return output
 
+
 class PredictFromParticleEmbedding(nn.Module):
     def __init__(self, particle_transform, n_features, n_hidden):
         super().__init__()
