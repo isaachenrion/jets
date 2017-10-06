@@ -1,4 +1,6 @@
 data
 models
 .git
+*.pyc
+*.pyo
 */__pycache__/*
