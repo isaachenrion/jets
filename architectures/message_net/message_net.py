@@ -22,7 +22,6 @@ class MPNNTransform(nn.Module):
     def forward(self, jets):
         jets = pad_batch(jets)
         h = self.embedding(jets)
-        #import ipdb; ipdb.set_trace()
         for i in range(self.n_iters):
             shp = h.size()
             h_l = h.view(shp[0], shp[1], 1, shp[2])

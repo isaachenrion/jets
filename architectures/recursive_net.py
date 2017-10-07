@@ -5,10 +5,19 @@ import torch.nn.functional as F
 from .batching import pad_batch, batch
 
 class GRNNTransformSimple(nn.Module):
-    def __init__(self, n_features, n_hidden):
+    def __init__(self, n_features=None, n_hidden=None, bn=None):
         super().__init__()
+
+        self.activation = F.relu
+
         self.fc_u = nn.Linear(n_features, n_hidden)
         self.fc_h = nn.Linear(3 * n_hidden, n_hidden)
+
+        self.bn = bn
+        if bn:
+            self.bn_u = nn.BatchNorm1d(n_hidden)
+            self.bn_h = nn.BatchNorm1d(n_hidden)
+
 
     def forward(self, jets):
         levels, children, n_inners, contents = batch(jets)
@@ -27,20 +36,22 @@ class GRNNTransformSimple(nn.Module):
             except ValueError:
                 outer = []
 
-            u_k = F.tanh(self.fc_u(contents[j]))
+            u_k = self.fc_u(contents[j])
+            if self.bn:
+                u_k = self.bn_u(u_k)
+            u_k = self.activation(u_k)
+
 
             if len(inner) > 0:
                 zero = torch.zeros(1).long(); one = torch.ones(1).long()
                 if torch.cuda.is_available(): zero = zero.cuda(); one = one.cuda()
                 h_L = embeddings[-1][children[inner, zero]]
                 h_R = embeddings[-1][children[inner, one]]
-                h = F.tanh(
-                        self.fc_h(
-                            torch.cat(
-                                (h_L, h_R, u_k[:n_inners[j]]), 1
-                            )
-                        )
-                    )
+
+                h = torch.cat((h_L, h_R, u_k[:n_inners[j]]), 1)
+                h = self.fc_h(h)
+                if self.bn: h = self.bn_h(h)
+                h = self.activation(h)
 
                 try:
                     embeddings.append(torch.cat((h, u_k[n_inners[j]:]), 0))
@@ -54,14 +65,23 @@ class GRNNTransformSimple(nn.Module):
 
 
 class GRNNTransformGated(nn.Module):
-    def __init__(self, n_features, n_hidden):
+    def __init__(self, n_features=None, n_hidden=None, bn=None):
         super().__init__()
         self.n_hidden = n_hidden
-        self.n_features = n_features
+        self.activation = F.relu
+
         self.fc_u = nn.Linear(n_features, n_hidden)
         self.fc_h = nn.Linear(3 * n_hidden, n_hidden)
         self.fc_z = nn.Linear(4 * n_hidden, 4 * n_hidden)
         self.fc_r = nn.Linear(3 * n_hidden, 3 * n_hidden)
+
+        self.bn = bn
+        if self.bn:
+            self.bn_u = nn.BatchNorm1d(n_hidden)
+            self.bn_h = nn.BatchNorm1d(n_hidden)
+            self.bn_z = nn.BatchNorm1d(4 * n_hidden)
+            self.bn_r = nn.BatchNorm1d(3 * n_hidden)
+
 
     def forward(self, jets, return_states=False):
 
@@ -96,7 +116,9 @@ class GRNNTransformGated(nn.Module):
             except ValueError:
                 outer = []
 
-            u_k = F.tanh(self.fc_u(contents[j]))
+            u_k = self.fc_u(contents[j])
+            if self.bn: u_k = self.bn_u(u_k)
+            u_k = self.activation(u_k)
 
             if len(inner) > 0:
                 try:
@@ -114,10 +136,17 @@ class GRNNTransformGated(nn.Module):
                 h_R = embeddings[-1][children[inner, one]]
 
                 hhu = torch.cat((h_L, h_R, u_k_inners), 1)
-                r = F.sigmoid(self.fc_r(hhu))
-                h_H = F.tanh(self.fc_h(r * hhu))
+                r = self.fc_r(hhu)
+                if self.bn: r = self.bn_r(r)
+                r = F.sigmoid(r)
+
+                h_H = self.fc_h(r * hhu)
+                if self.bn: h_H = self.bn_h(h_H)
+                h_H = self.activation(h_H)
 
                 z = self.fc_z(torch.cat((h_H, hhu), -1))
+                if self.bn: z = self.bn_z(z)
+
                 z_H = z[:, :n_hidden]               # new activation
                 z_L = z[:, n_hidden:2*n_hidden]     # left activation
                 z_R = z[:, 2*n_hidden:3*n_hidden]   # right activation
@@ -158,7 +187,7 @@ class GRNNTransformGated(nn.Module):
             except ValueError:
                 outer = []
 
-            u_k = F.tanh(self.fc_u(contents[j]))
+            u_k = self.activation(self.fc_u(contents[j]))
 
             if len(inner) > 0:
                 try:
@@ -177,7 +206,7 @@ class GRNNTransformGated(nn.Module):
 
                 hhu = torch.cat((h_L, h_R, u_k_inners), 1)
                 r = F.sigmoid(self.fc_r(hhu))
-                h_H = F.tanh(self.fc_h(r * hhu))
+                h_H = self.activation(self.fc_h(r * hhu))
 
                 z = self.fc_z(torch.cat((h_H, hhu), -1))
                 z_H = z[:, :n_hidden]               # new activation

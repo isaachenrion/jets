@@ -31,10 +31,8 @@ from architectures import MPNNTransform
 from architectures import PredictFromParticleEmbedding
 from loggers import StatsLogger
 
-MODELS_DIR = 'models'
-DATA_DIR = 'data/w-vs-qcd/pickles'
-#
-
+''' ARGUMENTS '''
+'''----------------------------------------------------------------------- '''
 parser = argparse.ArgumentParser(description='Jets')
 
 parser.add_argument("-f", "--f_tr", type=str, default='antikt-kt-train.pickle')
@@ -44,6 +42,7 @@ parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("-p", "--preprocess", action='store_true', default=False)
 parser.add_argument("-r", "--restart", action='store_true', default=False)
+parser.add_argument("--bn", action='store_true', default=False)
 parser.add_argument("--n_features", type=int, default=7)
 parser.add_argument("--n_hidden", type=int, default=40)
 parser.add_argument("-e", "--n_epochs", type=int, default=25)
@@ -57,8 +56,11 @@ parser.add_argument("-i", "--n_iters", type=int, default=1)
 
 args = parser.parse_args()
 
+''' LOOKUP TABLES '''
+'''----------------------------------------------------------------------- '''
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
-
+MODELS_DIR = 'models'
+DATA_DIR = 'data/w-vs-qcd/pickles'
 MODEL_TYPES = ['RelationNet', 'RecNN-simple', 'RecNN-gated', 'MPNN']
 TRANSFORMS = [
     RelNNTransformConnected,
@@ -71,7 +73,6 @@ def train():
     ''' ADMIN '''
     '''----------------------------------------------------------------------- '''
     model_type = MODEL_TYPES[args.model_type]
-    # get timestamp for model id and set up logging
     dt = datetime.datetime.now()
     filename_model = '{}/{}-{}/{:02d}-{:02d}-{:02d}'.format(model_type, dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
     model_dir = os.path.join(MODELS_DIR, filename_model)
@@ -158,12 +159,16 @@ def train():
     '''----------------------------------------------------------------------- '''
     # Initialization
     Transform = TRANSFORMS[args.model_type]
-    model_args = [args.n_features, args.n_hidden]
+    model_kwargs = {
+        'n_features': args.n_features,
+        'n_hidden': args.n_hidden,
+        'bn': args.bn
+    }
     if Transform == MPNNTransform:
-        model_args += [args.n_iters]
+        model_kwargs['n_iters'] = args.n_iters
 
     if args.load is None:
-        model = PredictFromParticleEmbedding(Transform, *model_args)
+        model = PredictFromParticleEmbedding(Transform, **model_kwargs)
     else:
         with open(os.path.join(args.load, 'model.pickle'), 'rb') as f:
             model = pickle.load(f)
@@ -194,33 +199,16 @@ def train():
         l = log_loss(y, y_pred.squeeze(1)).mean()
         return l
 
-    ''' TRAINING '''
-    '''----------------------------------------------------------------------- '''
-    logging.warning("Training...")
-    for i in range(args.n_epochs):
-        logging.info("epoch = %d" % i)
-        logging.info("step_size = %.8f" % args.step_size)
 
-        for j in range(n_batches):
-            optimizer.zero_grad()
-
-            start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
-            idx = slice(start, start+args.batch_size)
-            X, y = X_train[idx], y_train[idx]
-            X_var = wrap_X(X); y_var = wrap(y)
-            l = loss(model(X_var), y_var)
-            l.backward()
-            optimizer.step()
-            X = unwrap_X(X_var); y = unwrap(y_var)
-
-            callback(j, model)
-
-        scheduler.step()
-        settings['step_size'] = scheduler.get_lr()
-
-    ''' VALIDATION '''
+        ''' VALIDATION '''
     '''----------------------------------------------------------------------- '''
     def callback(iteration, model):
+        def save_everything():
+            with open(os.path.join(model_dir, 'model.pickle'), "wb") as f:
+                pickle.dump(best_model, f)
+
+            with open(os.path.join(model_dir, 'settings.pickle'), "wb") as f:
+                pickle.dump(settings, f)
         if iteration % 25 == 0:
             model.eval()
 
@@ -262,12 +250,32 @@ def train():
                     roc_auc,
                     best_score[0]))
 
-    def save_everything():
-        with open(os.path.join(model_dir, 'model.pickle'), "wb") as f:
-            pickle.dump(best_model, f)
+    ''' TRAINING '''
+    '''----------------------------------------------------------------------- '''
+    logging.warning("Training...")
+    for i in range(args.n_epochs):
+        logging.info("epoch = %d" % i)
+        logging.info("step_size = %.8f" % args.step_size)
 
-        with open(os.path.join(model_dir, 'settings.pickle'), "wb") as f:
-            pickle.dump(settings, f)
+        for j in range(n_batches):
+            model.train()
+            optimizer.zero_grad()
+            start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
+            idx = slice(start, start+args.batch_size)
+            X, y = X_train[idx], y_train[idx]
+            X_var = wrap_X(X); y_var = wrap(y)
+            l = loss(model(X_var), y_var)
+            l.backward()
+            optimizer.step()
+            X = unwrap_X(X_var); y = unwrap(y_var)
+
+            callback(j, model)
+
+        scheduler.step()
+        settings['step_size'] = scheduler.get_lr()
+
+
+
 
 
 if __name__ == "__main__":
