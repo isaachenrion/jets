@@ -8,10 +8,15 @@ class GRNNTransformSimple(nn.Module):
     def __init__(self, n_features=None, n_hidden=None, bn=None):
         super().__init__()
 
-        self.activation = F.relu
+        activation_string = 'relu'
+        self.activation = getattr(F, activation_string)
 
         self.fc_u = nn.Linear(n_features, n_hidden)
         self.fc_h = nn.Linear(3 * n_hidden, n_hidden)
+
+        gain = nn.init.calculate_gain(activation_string)
+        nn.init.xavier_uniform(self.fc_u.weight, gain=gain)
+        nn.init.orthogonal(self.fc_h.weight, gain=gain)
 
         self.bn = bn
         if bn:
@@ -67,12 +72,20 @@ class GRNNTransformGated(nn.Module):
     def __init__(self, n_features=None, n_hidden=None, bn=None):
         super().__init__()
         self.n_hidden = n_hidden
-        self.activation = F.relu
+        activation_string = 'relu'
+        self.activation = getattr(F, activation_string)
+
 
         self.fc_u = nn.Linear(n_features, n_hidden)
         self.fc_h = nn.Linear(3 * n_hidden, n_hidden)
         self.fc_z = nn.Linear(4 * n_hidden, 4 * n_hidden)
         self.fc_r = nn.Linear(3 * n_hidden, 3 * n_hidden)
+
+        gain = nn.init.calculate_gain(activation_string)
+        nn.init.xavier_uniform(self.fc_u.weight, gain=gain)
+        nn.init.orthogonal(self.fc_h.weight, gain=gain)
+        nn.init.xavier_uniform(self.fc_z.weight, gain=gain)
+        nn.init.xavier_uniform(self.fc_r.weight, gain=gain)
 
         self.bn = bn
         if self.bn:
