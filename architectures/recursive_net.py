@@ -24,7 +24,6 @@ class GRNNTransformSimple(nn.Module):
         n_levels = len(levels)
         embeddings = []
 
-
         for i, nodes in enumerate(levels[::-1]):
             j = n_levels - 1 - i
             try:

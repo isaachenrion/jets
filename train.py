@@ -233,7 +233,13 @@ def train():
             valid_loss = np.mean(np.array(valid_loss))
             yy = np.concatenate(yy, 0)
             yy_pred = np.concatenate(yy_pred, 0)
-            roc_auc = roc_auc_score(yy, yy_pred)
+
+            try:
+                roc_auc = roc_auc_score(yy, yy_pred)
+            except ValueError as e:
+                logging.warning('Batch {}'.format(iteration))
+                logging.warning(e)
+                roc_auc = -np.inf
             model.train()
 
             if roc_auc > best_score[0]:
