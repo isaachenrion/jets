@@ -5,11 +5,20 @@ import torch.nn.functional as F
 from .batching import pad_batch, batch
 
 class RelNNTransformConnected(nn.Module):
-    def __init__(self, n_features, n_hidden):
+    def __init__(self, n_features=None, n_hidden=None, **kwargs):
         super().__init__()
+
+        activation_string = 'relu'
+        self.activation = getattr(F, activation_string)
+
         self.fc_u = nn.Linear(n_features, n_hidden)
         self.fc_u1 = nn.Linear(n_hidden, n_hidden)
         self.fc_edge =nn.Linear(n_hidden, n_hidden)
+
+        gain = nn.init.calculate_gain(activation_string)
+        nn.init.xavier_uniform(self.fc_u.weight, gain=gain)
+        nn.init.orthogonal(self.fc_u1.weight, gain=gain)
+        nn.init.orthogonal(self.fc_edge.weight, gain=gain)
 
     def preprocess(self, jets):
         for jet in jets_padded:
@@ -30,8 +39,8 @@ class RelNNTransformConnected(nn.Module):
         jet_sizes = [len(jet['content']) for jet in jets]
 
         output = []
-        x = F.relu(self.fc_u(jets_padded))
-        x = F.relu(self.fc_u1(x))
+        x = self.activation(self.fc_u(jets_padded))
+        x = self.activation(self.fc_u1(x))
         shp = x.size()
         x_l = x.view(shp[0], shp[1], 1, shp[2])
         x_r = x.view(shp[0], 1, shp[1], shp[2])
