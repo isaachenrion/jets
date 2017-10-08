@@ -8,7 +8,7 @@ from .readout import DTNNReadout
 from .message import DTNNMessage
 
 class MPNNTransform(nn.Module):
-    def __init__(self, n_features, n_hidden, n_iters):
+    def __init__(self, n_features=None, n_hidden=None, bn=None, n_iters=None):
         super().__init__()
         self.n_iters = n_iters
 
