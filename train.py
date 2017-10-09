@@ -14,6 +14,7 @@ import time
 import sys
 import os
 import argparse
+import smtplib
 
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import roc_auc_score
@@ -94,22 +95,24 @@ def train():
         ch.setFormatter(formatter)
         root.addHandler(ch)
 
-    logging.warning("Calling with...")
-    logging.warning("\tfilename_train = %s" % args.f_tr)
-    logging.warning("\tfilename_model = %s" % filename_model)
-    logging.warning("\tnumber of training examples = %d" % args.n_tr)
-    logging.warning("\tmodel_type = %s" % args.model_type)
-    logging.warning("\tn_features = %d" % args.n_features)
-    logging.warning("\tn_hidden = %d" % args.n_hidden)
-    logging.warning("\tn_epochs = %d" % args.n_epochs)
-    logging.warning("\tbatch_size = %d" % args.batch_size)
-    logging.warning("\tstep_size = %f" % args.step_size)
-    logging.warning("\tdecay = %f" % args.decay)
-    logging.warning("\tseed = %d" % args.seed)
-    logging.warning("\tPID = {}".format(os.getpid()))
-    logging.warning("\tgpu = {}".format(args.gpu))
-    logging.warning("\tloaded model = {}".format(args.load))
-    logging.warning("\trestart = {}".format(args.restart))
+    for k, v in sorted(vars(args).items()): logging.warning('{} : {}\n'.format(k, v))
+
+    #logging.warning("Calling with...")
+    #logging.warning("\tfilename_train = %s" % args.f_tr)
+    #logging.warning("\tfilename_model = %s" % filename_model)
+    #logging.warning("\tnumber of training examples = %d" % args.n_tr)
+    #logging.warning("\tmodel_type = %s" % args.model_type)
+    #logging.warning("\tn_features = %d" % args.n_features)
+    #logging.warning("\tn_hidden = %d" % args.n_hidden)
+    #logging.warning("\tn_epochs = %d" % args.n_epochs)
+    #logging.warning("\tbatch_size = %d" % args.batch_size)
+    #logging.warning("\tstep_size = %f" % args.step_size)
+    #logging.warning("\tdecay = %f" % args.decay)
+    #logging.warning("\tseed = %d" % args.seed)
+    #logging.warning("\tPID = {}".format(os.getpid()))
+    #logging.warning("\tgpu = {}".format(args.gpu))
+    #logging.warning("\tloaded model = {}".format(args.load))
+    #logging.warning("\trestart = {}".format(args.restart))
 
     ''' CUDA '''
     '''----------------------------------------------------------------------- '''
@@ -203,12 +206,26 @@ def train():
         ''' VALIDATION '''
     '''----------------------------------------------------------------------- '''
     def callback(iteration, model):
+        def sendmail(from_who, to, msg):
+            s = smtplib.SMTP('localhost')
+            s.sendmail(from_who, [to], msg)
+            s.quit()
         def save_everything():
             with open(os.path.join(model_dir, 'model.pickle'), "wb") as f:
                 pickle.dump(best_model, f)
 
             with open(os.path.join(model_dir, 'settings.pickle'), "wb") as f:
                 pickle.dump(settings, f)
+
+            emailing = False
+            if emailing:
+                with open(os.path.join(model_dir, 'log.txt'), 'r') as f:
+                    msg = f.read()
+                    sendmail('isaachenrion@gmail.com', 'isaachenrion@gmail.com', msg)
+
+
+
+
         if iteration % 25 == 0:
             model.eval()
 
