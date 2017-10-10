@@ -23,14 +23,24 @@ from sklearn.preprocessing import RobustScaler
 from architectures.preprocessing import rewrite_content
 from architectures.preprocessing import permute_by_pt
 from architectures.preprocessing import extract
-from architectures.preprocessing import wrap, unwrap, wrap_X, unwrap_X
+
+from architectures.preprocessing import wrap
+from architectures.preprocessing import unwrap
+from architectures.preprocessing import wrap_X
+from architectures.preprocessing import unwrap_X
+
 from losses import log_loss
+
 from architectures import GRNNTransformGated
 from architectures import GRNNTransformSimple
 from architectures import RelNNTransformConnected
 from architectures import MPNNTransform
 from architectures import PredictFromParticleEmbedding
+
 from loggers import StatsLogger
+
+from data_loading import load_data
+from data_loading import load_tf
 
 ''' ARGUMENTS '''
 '''----------------------------------------------------------------------- '''
@@ -41,7 +51,7 @@ parser.add_argument("-n", "--n_tr", type=int, default=-1)
 parser.add_argument("-m", "--model_type", type=int, default=0)
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
-parser.add_argument("-p", "--preprocess", action='store_true', default=False)
+#parser.add_argument("-p", "--preprocess", action='store_true', default=False)
 parser.add_argument("-r", "--restart", action='store_true', default=False)
 parser.add_argument("--bn", action='store_true', default=False)
 parser.add_argument("--n_features", type=int, default=7)
@@ -95,24 +105,8 @@ def train():
         ch.setFormatter(formatter)
         root.addHandler(ch)
 
-    for k, v in sorted(vars(args).items()): logging.warning('{} : {}\n'.format(k, v))
-
-    #logging.warning("Calling with...")
-    #logging.warning("\tfilename_train = %s" % args.f_tr)
-    #logging.warning("\tfilename_model = %s" % filename_model)
-    #logging.warning("\tnumber of training examples = %d" % args.n_tr)
-    #logging.warning("\tmodel_type = %s" % args.model_type)
-    #logging.warning("\tn_features = %d" % args.n_features)
-    #logging.warning("\tn_hidden = %d" % args.n_hidden)
-    #logging.warning("\tn_epochs = %d" % args.n_epochs)
-    #logging.warning("\tbatch_size = %d" % args.batch_size)
-    #logging.warning("\tstep_size = %f" % args.step_size)
-    #logging.warning("\tdecay = %f" % args.decay)
-    #logging.warning("\tseed = %d" % args.seed)
-    #logging.warning("\tPID = {}".format(os.getpid()))
-    #logging.warning("\tgpu = {}".format(args.gpu))
-    #logging.warning("\tloaded model = {}".format(args.load))
-    #logging.warning("\trestart = {}".format(args.restart))
+    for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
+    logging.warning("\tPID = {}".format(os.getpid()))
 
     ''' CUDA '''
     '''----------------------------------------------------------------------- '''
@@ -126,26 +120,12 @@ def train():
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
     logging.warning("Loading data...")
-    # Preprocessing
-    path_to_preprocessed = os.path.join(DATA_DIR, 'preprocessed', args.f_tr)
+    X, y = load_data(DATA_DIR, args.f_tr)
+    tf = load_tf(DATA_DIR, args.f_tr)
 
-    if args.preprocess or not os.path.isfile(path_to_preprocessed):
-        logging.warning("Preprocessing...")
-        with open(os.path.join(DATA_DIR, args.f_tr), mode="rb") as fd:
-            X, y = pickle.load(fd, encoding='latin-1')
-        y = np.array(y)
+    for jet in X:
+        jet["content"] = tf.transform(jet["content"])
 
-        X = [extract(permute_by_pt(rewrite_content(jet))) for jet in X]
-        tf = RobustScaler().fit(np.vstack([jet["content"] for jet in X]))
-
-        for jet in X:
-            jet["content"] = tf.transform(jet["content"])
-        with open(path_to_preprocessed, mode="wb") as fd:
-            pickle.dump((X, y), fd)
-    else:
-        with open(path_to_preprocessed, mode="rb") as fd:
-            X, y = pickle.load(fd, encoding='latin-1')
-        logging.warning("Data loaded and already preprocessed")
 
     if args.n_tr > 0:
         indices = torch.randperm(len(X)).numpy()[:args.n_tr]
@@ -229,7 +209,7 @@ def train():
         if iteration % 25 == 0:
             model.eval()
 
-            offset = 0; train_loss = []; valid_loss = []; roc_auc = []
+            offset = 0; train_loss = []; valid_loss = []
             yy, yy_pred = [], []
             for i in range(len(X_valid) // args.batch_size):
                 Xt, yt = X_train[offset:offset+args.batch_size], y_train[offset:offset+args.batch_size]
