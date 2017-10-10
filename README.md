@@ -1,3 +1,7 @@
+# Graph neural nets for jet physics
+Building on the following.
+
+
 # QCD-Aware Recursive Neural Networks for Jet Physics
 https://arxiv.org/abs/1702.00748
 
