@@ -1,8 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+plt.rcParams["figure.figsize"] = (6, 6)
+import logging
+import os
+import pickle
 from scipy import interp
 
+
+DATA_DIR = '../data/w-vs-qcd/pickles'
+MODELS_DIR = '../models'
 def remove_outliers(rocs, fprs, tprs):
     inv_fprs = []
     base_tpr = np.linspace(0.05, 1, 476)
@@ -98,19 +104,43 @@ def plot_show(filename=None):
     plt.show()
 
 def main():
-    for pattern, gated, label, color in [
-        ("antikt-kt", False, "RNN $k_t$ (simple)", "r"),
-        ("antikt-kt", True, "RNN $k_t$ (gated)", "b")
-        ]:
+    logging.basicConfig(level=logging.DEBUG,
+                        format="%(asctime)-15s %(message)s")
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
 
-        fd = open("../models/jet-study-2/rocs/rocs-%s-%s.pickle" % ("s" if not gated else "g", pattern), "rb")
-        r, f, t = pickle.load(fd)
-        fd.close()
 
-        r, f, t = remove_outliers(r, f, t)
+    data_paths = ["antikt-kt"]
+    leaf_model_paths = [
+        os.path.join('MPNN', 'Oct-10'),
+        os.path.join('RecNN-gated', 'Oct-10'),
+        os.path.join('RecNN-simple', 'Oct-10'),
+        os.path.join('RelationNet', 'Oct-10'),
+    ]
+    model_paths = [os.path.join(MODELS_DIR, path) for path in leaf_model_paths]
+    logging.info(data_paths)
+    logging.info(model_paths)
 
-        plot_rocs(r, f, t, label=label, color=color)
-        report_score(r, f, t, label=label)
+    #for data_path in data_paths:
+    #    for model_path in model_paths:
+    #        r, f, t = build_rocs(data_path, data_path, model_path)
+    #        # Save
+    #        fd = open("../reports/rocs/rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path), "wb")
+    #        pickle.dump((r, f, t), fd)
+    #        fd.close()
+    labels = leaf_model_paths
+    colors = ['c', 'm', 'y', 'k']
+
+    for data_path in data_paths:
+        for model_path, label, color in zip(model_paths, labels, colors):
+
+            with open("../reports/rocs/rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path), "rb") as fd:
+                r, f, t = pickle.load(fd)
+
+            #r, f, t = remove_outliers(r, f, t)
+
+            plot_rocs(r, f, t, label=label, color=color)
+            report_score(r, f, t, label=label)
 
     plot_show()
 
