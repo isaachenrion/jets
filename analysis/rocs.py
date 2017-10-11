@@ -31,7 +31,7 @@ def load_model(filename):
         model = torch.load(f)
         f.close()
     except FileNotFoundError:
-        pickle_name = os.path.join(filename,'model.pickle')
+        pickle_name = os.path.join(filename,'model.pickle', encoding='latin-1')
         logging.warning("Loading from pickle {}".format(pickle_name))
         with open(pickle_name, "rb") as fd:
             try:
@@ -59,33 +59,36 @@ def evaluate_models(X, y, w, model_filenames, batch_size=64):
         if 'DS_Store' not in filename:
             logging.info("Loading %s" % filename),
             model = load_model(filename)
-            model.eval()
+            logging.info("FILE LOADED! {}".format(filename))
+            work = False
+            if work:
+                model.eval()
 
-            offset = 0
-            y_pred = []
-            n_batches, remainder = np.divmod(len(X), batch_size)
-            for i in range(n_batches):
-                X_batch = X[offset:offset+batch_size]
-                X_var = wrap_X(X_batch)
-                y_pred.append(unwrap(model(X_var)))
-                unwrap_X(X_var)
-                offset+=batch_size
-            if remainder > 0:
-                X_batch = X[-remainder:]
-                X_var = wrap_X(X_batch)
-                y_pred.append(unwrap(model(X_var)))
-                unwrap_X(X_var)
-            y_pred = np.squeeze(np.concatenate(y_pred, 0), 1)
+                offset = 0
+                y_pred = []
+                n_batches, remainder = np.divmod(len(X), batch_size)
+                for i in range(n_batches):
+                    X_batch = X[offset:offset+batch_size]
+                    X_var = wrap_X(X_batch)
+                    y_pred.append(unwrap(model(X_var)))
+                    unwrap_X(X_var)
+                    offset+=batch_size
+                if remainder > 0:
+                    X_batch = X[-remainder:]
+                    X_var = wrap_X(X_batch)
+                    y_pred.append(unwrap(model(X_var)))
+                    unwrap_X(X_var)
+                y_pred = np.squeeze(np.concatenate(y_pred, 0), 1)
 
-            # Roc
-            #import ipdb; ipdb.set_trace()
-            rocs.append(roc_auc_score(y, y_pred, sample_weight=w))
-            fpr, tpr, _ = roc_curve(y, y_pred, sample_weight=w)
+                # Roc
+                #import ipdb; ipdb.set_trace()
+                rocs.append(roc_auc_score(y, y_pred, sample_weight=w))
+                fpr, tpr, _ = roc_curve(y, y_pred, sample_weight=w)
 
-            fprs.append(fpr)
-            tprs.append(tpr)
+                fprs.append(fpr)
+                tprs.append(tpr)
 
-            logging.info("ROC AUC = {:.4f}".format(rocs[-1]))
+                logging.info("ROC AUC = {:.4f}".format(rocs[-1]))
 
     logging.info("Mean ROC AUC = %.4f" % np.mean(rocs))
 

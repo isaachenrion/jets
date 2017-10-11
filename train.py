@@ -157,7 +157,7 @@ def train():
             with open(os.path.join(args.load, 'model.pt'), 'rb') as f:
                 model = torch.load(f)
         except FileNotFoundError:
-            with open(os.path.join(args.load, 'model.pickle'), 'rb') as f:
+            with open(os.path.join(args.load, 'model.pickle', encoding='latin-1'), 'rb') as f:
                 model = pickle.load(f)
 
         if args.restart:
