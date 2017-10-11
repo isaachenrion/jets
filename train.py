@@ -153,8 +153,13 @@ def train():
     if args.load is None:
         model = PredictFromParticleEmbedding(Transform, **model_kwargs)
     else:
-        with open(os.path.join(args.load, 'model.pickle'), 'rb') as f:
-            model = pickle.load(f)
+        try:
+            with open(os.path.join(args.load, 'model.pt'), 'rb') as f:
+                model = torch.load(f)
+        except FileNotFoundError:
+            with open(os.path.join(args.load, 'model.pickle'), 'rb') as f:
+                model = pickle.load(f)
+
         if args.restart:
             with open(os.path.join(args.load, 'settings.pickle'), "rb") as f:
                 settings = pickle.load(f, encoding='latin-1')
@@ -191,8 +196,8 @@ def train():
             s.sendmail(from_who, [to], msg)
             s.quit()
         def save_everything():
-            with open(os.path.join(model_dir, 'model.pickle'), "wb") as f:
-                pickle.dump(best_model, f)
+            with open(os.path.join(model_dir, 'model.pt'), 'wb') as f:
+                torch.save(best_model, f)
 
             with open(os.path.join(model_dir, 'settings.pickle'), "wb") as f:
                 pickle.dump(settings, f)

@@ -1,0 +1,56 @@
+2017-10-11 11:35:58,414 	batch_size = 64
+2017-10-11 11:35:58,414 	data_list_filename = evaldatasets.txt
+2017-10-11 11:35:58,414 	gpu = 0
+2017-10-11 11:35:58,414 	model_list_filename = evalmodels.txt
+2017-10-11 11:35:58,414 	n_test = 1000
+2017-10-11 11:35:58,414 	silent = False
+2017-10-11 11:35:58,414 	verbose = True
+2017-10-11 11:35:58,414 	PID = 64719
+2017-10-11 11:35:58,415 DATA PATHS
+antikt-kt
+2017-10-11 11:35:58,415 LEAF MODEL PATHS
+RecNN-gated/Oct-10
+RecNN-simple/Oct-10
+RelationNet/Oct-10
+2017-10-11 11:35:58,415 Building ROCs for models/RecNN-gated/Oct-10 trained on antikt-kt
+2017-10-11 11:35:58,415 TF already computed. Loading it.
+2017-10-11 11:35:58,415 Loading test data: antikt-kt-test.pickle
+2017-10-11 11:36:00,327 Data loaded and already preprocessed
+2017-10-11 11:36:03,574 Cropping...
+2017-10-11 11:36:03,852 	X size = 37972
+2017-10-11 11:36:03,852 	y size = 37972
+2017-10-11 11:36:04,219 ['models/RecNN-gated/Oct-10/11-42-03', 'models/RecNN-gated/Oct-10/11-43-50']
+2017-10-11 11:36:04,219 Loading models/RecNN-gated/Oct-10/11-42-03
+2017-10-11 11:36:05,159 ROC AUC = 0.5584
+2017-10-11 11:36:05,159 Loading models/RecNN-gated/Oct-10/11-43-50
+2017-10-11 11:36:06,039 ROC AUC = 0.4685
+2017-10-11 11:36:06,039 Mean ROC AUC = 0.5134
+2017-10-11 11:36:06,047 Building ROCs for models/RecNN-simple/Oct-10 trained on antikt-kt
+2017-10-11 11:36:06,047 TF already computed. Loading it.
+2017-10-11 11:36:06,047 Loading test data: antikt-kt-test.pickle
+2017-10-11 11:36:07,643 Data loaded and already preprocessed
+2017-10-11 11:36:11,053 Cropping...
+2017-10-11 11:36:11,334 	X size = 37972
+2017-10-11 11:36:11,334 	y size = 37972
+2017-10-11 11:36:11,673 ['models/RecNN-simple/Oct-10/11-41-54', 'models/RecNN-simple/Oct-10/11-43-43']
+2017-10-11 11:36:11,673 Loading models/RecNN-simple/Oct-10/11-41-54
+2017-10-11 11:36:12,105 ROC AUC = 0.6219
+2017-10-11 11:36:12,105 Loading models/RecNN-simple/Oct-10/11-43-43
+2017-10-11 11:36:12,530 ROC AUC = 0.5762
+2017-10-11 11:36:12,530 Mean ROC AUC = 0.5990
+2017-10-11 11:36:12,539 Building ROCs for models/RelationNet/Oct-10 trained on antikt-kt
+2017-10-11 11:36:12,539 TF already computed. Loading it.
+2017-10-11 11:36:12,540 Loading test data: antikt-kt-test.pickle
+2017-10-11 11:36:14,112 Data loaded and already preprocessed
+2017-10-11 11:36:17,718 Cropping...
+2017-10-11 11:36:17,997 	X size = 37972
+2017-10-11 11:36:17,998 	y size = 37972
+2017-10-11 11:36:18,346 ['models/RelationNet/Oct-10/.DS_Store', 'models/RelationNet/Oct-10/11-41-32', 'models/RelationNet/Oct-10/11-43-36']
+2017-10-11 11:36:18,346 Loading models/RelationNet/Oct-10/11-41-32
+2017-10-11 11:36:48,022 ROC AUC = 0.7634
+2017-10-11 11:36:48,024 Loading models/RelationNet/Oct-10/11-43-36
+2017-10-11 11:37:17,049 ROC AUC = 0.7314
+2017-10-11 11:37:17,049 Mean ROC AUC = 0.7474
+2017-10-11 11:37:17,119               RecNN-gated/Oct-10	ROC AUC=0.5134+-0.04	1/FPR@TPR=0.5=2.12+-0.34
+2017-10-11 11:37:17,122              RecNN-simple/Oct-10	ROC AUC=0.5990+-0.02	1/FPR@TPR=0.5=2.78+-0.25
+2017-10-11 11:37:17,123               RelationNet/Oct-10	ROC AUC=0.7474+-0.02	1/FPR@TPR=0.5=6.02+-0.97

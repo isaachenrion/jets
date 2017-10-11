@@ -49,7 +49,7 @@ def load_tf(data_dir, filename):
     return tf
 
 
-def load_test(tf, data_dir, filename_test, cropping=True):
+def load_test(tf, data_dir, filename_test, n_test=-1, cropping=True):
     logging.warning("Loading test data: {}".format(filename_test))
 
     X, y = load_data(data_dir, filename_test)
@@ -92,5 +92,9 @@ def load_test(tf, data_dir, filename_test, cropping=True):
     inv_w = 1. / pdf[indices]
     inv_w /= inv_w.sum()
     w[y==1] = inv_w
+
+    X = X[:n_test]
+    y = y[:n_test]
+    w = w[:n_test]
 
     return X, y, w

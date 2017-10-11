@@ -1,0 +1,22 @@
+2017-10-11 11:22:55,499 	batch_size = 64
+2017-10-11 11:22:55,499 	data_list_filename = evaldatasets.txt
+2017-10-11 11:22:55,499 	gpu = 0
+2017-10-11 11:22:55,499 	model_list_filename = evalmodels.txt
+2017-10-11 11:22:55,499 	n_test = -1
+2017-10-11 11:22:55,499 	silent = False
+2017-10-11 11:22:55,499 	verbose = True
+2017-10-11 11:22:55,499 	PID = 64677
+2017-10-11 11:22:55,499 DATA PATHS
+antikt-kt
+2017-10-11 11:22:55,500 LEAF MODEL PATHS
+RecNN-gated/Oct-10
+RecNN-simple/Oct-10
+RelationNet/Oct-10
+2017-10-11 11:22:55,500 Building ROCs for models/RecNN-gated/Oct-10 trained on antikt-kt
+2017-10-11 11:22:55,500 TF already computed. Loading it.
+2017-10-11 11:22:55,500 Loading test data: antikt-kt-test.pickle
+2017-10-11 11:22:57,110 Data loaded and already preprocessed
+2017-10-11 11:23:00,504 Cropping...
+2017-10-11 11:23:00,773 	X size = 37972
+2017-10-11 11:23:00,773 	y size = 37972
+2017-10-11 11:23:00,834 ['models/RecNN-gated/Oct-10/11-42-03', 'models/RecNN-gated/Oct-10/11-43-50']

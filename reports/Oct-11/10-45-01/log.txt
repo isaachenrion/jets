@@ -1,0 +1,23 @@
+2017-10-11 10:45:01,588 	batch_size = 64
+2017-10-11 10:45:01,589 	data_list_filename = evaldatasets.txt
+2017-10-11 10:45:01,589 	gpu = 0
+2017-10-11 10:45:01,589 	model_list_filename = evalmodels.txt
+2017-10-11 10:45:01,589 	n_test = 500
+2017-10-11 10:45:01,589 	silent = False
+2017-10-11 10:45:01,589 	verbose = True
+2017-10-11 10:45:01,589 	PID = 64517
+2017-10-11 10:45:01,589 DATA PATHS
+antikt-kt
+
+2017-10-11 10:45:01,589 LEAF MODEL PATHS
+MPNN/Oct-10
+
+RecNN-gated/Oct-10
+
+RecNN-simple/Oct-10
+
+RelationNet/Oct-10
+
+2017-10-11 10:45:01,589 Building ROCs for models/MPNN/Oct-10
+ trained on antikt-kt
+

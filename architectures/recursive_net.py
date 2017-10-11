@@ -4,6 +4,8 @@ import torch.nn.functional as F
 
 from .batching import pad_batch, batch
 
+from architectures.nn_utils import AnyBatchGRUCell
+
 class GRNNTransformSimple(nn.Module):
     def __init__(self, n_features=None, n_hidden=None, bn=None):
         super().__init__()
@@ -69,10 +71,11 @@ class GRNNTransformSimple(nn.Module):
 
 
 class GRNNTransformGated(nn.Module):
-    def __init__(self, n_features=None, n_hidden=None, bn=None):
+    def __init__(self, n_features=None, n_hidden=None, bn=None, n_iters=0):
         super().__init__()
         self.n_hidden = n_hidden
-        activation_string = 'relu'
+        #self.n_iters = n_iters
+        activation_string = 'relu' if n_iters == 0 else 'tanh'
         self.activation = getattr(F, activation_string)
 
 
@@ -86,6 +89,9 @@ class GRNNTransformGated(nn.Module):
         nn.init.orthogonal(self.fc_h.weight, gain=gain)
         nn.init.xavier_uniform(self.fc_z.weight, gain=gain)
         nn.init.xavier_uniform(self.fc_r.weight, gain=gain)
+
+        #self.down_root = nn.Linear(n_hidden, n_hidden)
+        #self.down_gru = AnyBatchGRUCell(n_hidden, n_hidden)
 
         self.bn = bn
         if self.bn:
@@ -106,6 +112,13 @@ class GRNNTransformGated(nn.Module):
         embeddings = []
 
         states = self.up_the_tree(states, embeddings, levels, children, n_inners, contents)
+
+        #if self.n_iters == 0:
+        #    states = self.up_the_tree(states, embeddings, levels, children, n_inners, contents)
+        #else:
+        #    for _ in range(self.n_iters):
+        #        states = self.up_the_tree(states, embeddings, levels, children, n_inners, contents)
+        #        states = self.down_the_tree(states, embeddings, levels, children, n_inners, contents)
 
         if return_states:
             return states
@@ -131,6 +144,7 @@ class GRNNTransformGated(nn.Module):
             u_k = self.fc_u(contents[j])
             if self.bn: u_k = self.bn_u(u_k)
             u_k = self.activation(u_k)
+
 
             if len(inner) > 0:
                 try:
@@ -199,9 +213,9 @@ class GRNNTransformGated(nn.Module):
             except ValueError:
                 outer = []
 
-            u_k = self.activation(self.fc_u(contents[j]))
+            h = F.tanh(self.down_root(contents[j]))
 
-            if len(inner) > 0:
+            if len(outer) > 0:
                 try:
                     u_k_inners = u_k[:n_inners[j]]
                 except ValueError:
