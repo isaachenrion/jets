@@ -25,19 +25,21 @@ from architectures.preprocessing import wrap, unwrap, wrap_X, unwrap_X
 
 
 def load_model(filename):
+    torch_name = os.path.join(filename,'model.pt')
     try:
-        with open(os.path.join(filename,'model.pt'), 'rb') as f:
-            model = torch.load(f)
+        f = open(torch_name, 'rb')
+        model = torch.load(f)
+        f.close()
     except FileNotFoundError:
+        logging.warning("Loading from pickle {}".format(pickle_name))
         pickle_name = os.path.join(filename,'model.pickle')
         with open(pickle_name, "rb") as fd:
-            logging.warning("Loading from pickle {}".format(pickle_name))
+            logging.warning('FILESIZE = {}'.format(os.path.getsize(fd.name)))
             model = pickle.load(fd)
 
-        torch_name = os.path.join(filename,'model.pt')
         with open(torch_name, 'wb') as f:
             torch.save(model, f)
-            logging.warning("Saved to .pt file: {}".format(torch_name))
+        logging.warning("Saved to .pt file: {}".format(torch_name))
     if torch.cuda.is_available():
         model = model.cuda()
     return model
