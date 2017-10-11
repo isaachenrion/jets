@@ -29,10 +29,15 @@ def load_model(filename):
         with open(os.path.join(filename,'model.pt'), 'rb') as f:
             model = torch.load(f)
     except FileNotFoundError:
-        with open(os.path.join(filename,'model.pickle'), "rb") as fd:
+        pickle_name = os.path.join(filename,'model.pickle')
+        with open(pickle_name, "rb") as fd:
+            logging.warning("Loading from pickle {}".format(pickle_name))
             model = pickle.load(fd)
-        with open(os.path.join(filename,'model.pt'), 'wb') as f:
+
+        torch_name = os.path.join(filename,'model.pt')
+        with open(torch_name, 'wb') as f:
             torch.save(model, f)
+            logging.warning("Saved to .pt file: {}".format(torch_name))
     if torch.cuda.is_available():
         model = model.cuda()
     return model
