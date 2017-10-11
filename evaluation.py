@@ -26,6 +26,10 @@ parser.add_argument("-b", "--batch_size", type=int, default=64)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 
 args = parser.parse_args()
+os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
+
+''' LOOKUP TABLES '''
+'''----------------------------------------------------------------------- '''
 
 DATA_DIR = 'data/w-vs-qcd/pickles'
 MODELS_DIR = 'models'

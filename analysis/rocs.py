@@ -34,9 +34,11 @@ def load_model(filename):
         pickle_name = os.path.join(filename,'model.pickle')
         logging.warning("Loading from pickle {}".format(pickle_name))
         with open(pickle_name, "rb") as fd:
-            logging.warning('FILESIZE = {}'.format(os.path.getsize(fd.name)))
-            model = pickle.load(fd)
-
+            try:
+                model = pickle.load(fd)
+            except EOFError as e:
+                logging.warning("EMPTY MODEL FILE: CRITICAL FAILURE")
+                raise e
         with open(torch_name, 'wb') as f:
             torch.save(model, f)
         logging.warning("Saved to .pt file: {}".format(torch_name))

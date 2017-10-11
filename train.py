@@ -66,10 +66,10 @@ parser.add_argument("-l", "--load", type=str, default=None)
 parser.add_argument("-i", "--n_iters", type=int, default=1)
 
 args = parser.parse_args()
+os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
 
 ''' LOOKUP TABLES '''
 '''----------------------------------------------------------------------- '''
-os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
 MODELS_DIR = 'models'
 DATA_DIR = 'data/w-vs-qcd/pickles'
 MODEL_TYPES = ['RelationNet', 'RecNN-simple', 'RecNN-gated', 'MPNN']
