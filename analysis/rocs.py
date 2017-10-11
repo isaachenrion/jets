@@ -33,9 +33,9 @@ def load_model(filename):
     except FileNotFoundError:
         pickle_name = os.path.join(filename,'model.pickle')
         logging.warning("Loading from pickle {}".format(pickle_name))
-        with open(pickle_name, "rb", encoding='latin-1') as fd:
+        with open(pickle_name, "rb") as fd:
             try:
-                model = pickle.load(fd)
+                model = pickle.load(fd, encoding='latin-1')
             except EOFError as e:
                 logging.warning("EMPTY MODEL FILE: CRITICAL FAILURE")
                 raise e
