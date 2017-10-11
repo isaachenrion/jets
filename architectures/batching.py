@@ -16,6 +16,21 @@ def pad_batch(jets):
     jets_padded = torch.stack(jets_padded, 0)
     return jets_padded
 
+def build_parents(tree):
+    tree_max = np.max(tree)
+    tree_min = tree_max - tree.shape[0] + 1
+    parents = []
+    for i in range(tree_min, tree_max + 1):
+        query = np.where(tree == i)[0]
+        if len(query) == 0:
+            query = -1
+        else:
+            query += tree_min
+        parents.append(query)
+    parents = np.array(parents)
+
+    return parents
+
 def batch(jets):
     # Batch the recursive activations across all nodes of a same level
     # !!! Assume that jets have at least one inner node.
@@ -30,11 +45,13 @@ def batch(jets):
     # jet_contents: array of shape [n_nodes, n_features]
     #     jet_contents[node_id] is the feature vector of node_id
     jet_children = []
+
     offset = 0
 
-    for jet in jets:
+    for j, jet in enumerate(jets):
         tree = np.copy(jet["tree"])
         tree[tree != -1] += offset
+
         jet_children.append(tree)
         offset += len(tree)
 
@@ -139,3 +156,67 @@ def batch(jets):
         n_inners = n_inners.cuda()
 
     return (levels, level_children[:, [0, 2]], n_inners, contents)
+
+
+def batch_parents(jets):
+    # Batch the recursive activations across all nodes of a same level
+    # !!! Assume that jets have at least one inner node.
+    #     Leads to off-by-one errors otherwise :(
+
+    #
+    # jet_contents: array of shape [n_nodes, n_features]
+    #     jet_contents[node_id] is the feature vector of node_id
+    jet_parents = []
+
+    offset = 0
+
+    for jet in jets:
+        tree = np.copy(jet["tree"])
+        tree[tree != -1] += offset
+        parents = build_parents(tree)
+        jet_parents.append(parents)
+        offset += len(tree)
+    jet_parents = np.concatenate(jet_parents)
+
+    '''
+    level_parents = np.zeros((n_nodes, 2), dtype=np.int32)
+    level_parents[:, 0] -= 1
+
+    non_roots = []   # Inner nodes at level i
+    roots = []
+    offset = 0
+    for jet in jets:
+        queue = [(jet["root_id"] + offset, -1, 0)]
+
+        while len(queue) > 0:
+            node, child, depth = queue.pop(0)
+
+            if len(non_roots) < depth + 1:
+                non_roots.append([])
+            if len(roots) < depth + 1:
+                roots.append([])
+
+            # Not the root node
+            if jet_parents[node, 0] != -1:
+                non_roots[depth].append(node)
+                position = len(non_roots[depth]) - 1
+                is_leaf = False
+
+                queue.append((jet_parents[node], node, depth + 1))
+
+
+            # Root node
+            else:
+                outers[depth].append(node)
+                position = len(outers[depth]) - 1
+                is_leaf = True
+
+            # Register parent at its child
+            level_parents[child] = parent
+            if parent >= 0:
+                level_parents[parent, 0] = position
+
+
+        offset += len(jet["tree"])
+    '''
+    return torch.from_numpy(jet_parents)

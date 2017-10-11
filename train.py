@@ -63,7 +63,7 @@ parser.add_argument("-d", "--decay", type=float, default=.9)
 parser.add_argument("--seed", type=int, default=1)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-l", "--load", type=str, default=None)
-parser.add_argument("-i", "--n_iters", type=int, default=1)
+parser.add_argument("-i", "--n_iters", type=int, default=0)
 
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
@@ -145,9 +145,9 @@ def train():
     model_kwargs = {
         'n_features': args.n_features,
         'n_hidden': args.n_hidden,
-        'bn': args.bn
+        'bn': args.bn,
     }
-    if Transform == MPNNTransform:
+    if Transform in [MPNNTransform, GRNNTransformGated]:
         model_kwargs['n_iters'] = args.n_iters
 
     if args.load is None:
