@@ -31,8 +31,8 @@ def load_model(filename):
         model = torch.load(f)
         f.close()
     except FileNotFoundError:
-        logging.warning("Loading from pickle {}".format(pickle_name))
         pickle_name = os.path.join(filename,'model.pickle')
+        logging.warning("Loading from pickle {}".format(pickle_name))
         with open(pickle_name, "rb") as fd:
             logging.warning('FILESIZE = {}'.format(os.path.getsize(fd.name)))
             model = pickle.load(fd)
