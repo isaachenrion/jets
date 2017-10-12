@@ -100,7 +100,7 @@ def main():
             report_score(r, f, t, label=label)
             plot_rocs(r, f, t, label=label, color=color)
 
-    figure_filename = os.path.join(report_dir, 'rocs.fig')
+    figure_filename = os.path.join(report_dir, 'rocs.png')
     plot_show(figure_filename)
 
 if __name__ == '__main__':
