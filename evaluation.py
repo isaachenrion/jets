@@ -24,6 +24,7 @@ parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("-b", "--batch_size", type=int, default=64)
 parser.add_argument("-g", "--gpu", type=int, default=0)
+parser.add_argument("-p", "--plot", action="store_true")
 
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
@@ -77,7 +78,6 @@ def main():
         for leaf_model_path in leaf_model_paths:
             model_path = os.path.join(MODELS_DIR, leaf_model_path)
             r, f, t = build_rocs(data_path, data_path, model_path, DATA_DIR, args.n_test, args.batch_size)
-            # Save
             absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(leaf_model_path.split('/')), data_path))
             with open(absolute_roc_path, "wb") as fd:
                 pickle.dump((r, f, t), fd)
@@ -97,8 +97,9 @@ def main():
 
             #r, f, t = remove_outliers(r, f, t)
 
-            plot_rocs(r, f, t, label=label, color=color)
             report_score(r, f, t, label=label)
+            plot_rocs(r, f, t, label=label, color=color)
+
     figure_filename = os.path.join(report_dir, 'rocs.fig')
     plot_show(figure_filename)
 

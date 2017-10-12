@@ -63,7 +63,7 @@ parser.add_argument("-d", "--decay", type=float, default=.9)
 parser.add_argument("--seed", type=int, default=1)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-l", "--load", type=str, default=None)
-parser.add_argument("-i", "--n_iters", type=int, default=0)
+parser.add_argument("-i", "--n_iters", type=int, default=1)
 
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
@@ -141,29 +141,27 @@ def train():
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
     # Initialization
-    Transform = TRANSFORMS[args.model_type]
-    model_kwargs = {
-        'n_features': args.n_features,
-        'n_hidden': args.n_hidden,
-        'bn': args.bn,
-    }
-    if Transform in [MPNNTransform, GRNNTransformGated]:
-        model_kwargs['n_iters'] = args.n_iters
-
     if args.load is None:
+        Transform = TRANSFORMS[args.model_type]
+        model_kwargs = {
+            'n_features': args.n_features,
+            'n_hidden': args.n_hidden,
+            'bn': args.bn,
+        }
+        if Transform in [MPNNTransform, GRNNTransformGated:
+            model_kwargs['n_iters'] = args.n_iters
         model = PredictFromParticleEmbedding(Transform, **model_kwargs)
+
     else:
-        try:
-            with open(os.path.join(args.load, 'model.pt'), 'rb') as f:
-                model = torch.load(f)
-        except FileNotFoundError:
-            with open(os.path.join(args.load, 'model.pickle', encoding='latin-1'), 'rb') as f:
-                model = pickle.load(f)
+        with open(os.path.join(args.load, 'model_state_dict.pt'), 'rb') as f:
+            state_dict = torch.load(f)
+            model.load_state_dict(state_dict)
 
         if args.restart:
             with open(os.path.join(args.load, 'settings.pickle'), "rb") as f:
                 settings = pickle.load(f, encoding='latin-1')
             args.step_size = settings["step_size"]
+            Transform = settings["transform"]
 
     logging.warning(model)
     out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))

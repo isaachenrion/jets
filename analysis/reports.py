@@ -1,7 +1,11 @@
-import numpy as np
+
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 plt.rcParams["figure.figsize"] = (6, 6)
+
 import logging
+import numpy as np
 
 from scipy import interp
 
