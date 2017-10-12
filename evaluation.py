@@ -84,22 +84,26 @@ def main():
     '''----------------------------------------------------------------------- '''
     if args.load_rocs is None:
         for data_path in data_paths:
+
             logging.info('Building ROCs for models trained on {}'.format(data_path))
             tf = load_tf(DATA_DIR, "{}-train.pickle".format(data_path))
             data = load_test(tf, DATA_DIR, "{}-test.pickle".format(data_path), args.n_test)
+
             for model_path in model_paths:
                 logging.info('\tBuilding ROCs for instances of {}'.format(model_paths))
-                absolute_model_path = os.path.join(MODELS_DIR, model_path)
-                    r, f, t = build_rocs(data, absolute_model_path, args.batch_size)
+                r, f, t = build_rocs(data, os.path.join(MODELS_DIR, model_path), args.batch_size)
+
                 absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
                 with open(absolute_roc_path, "wb") as fd:
                     pickle.dump((r, f, t), fd)
     else:
         for data_path in data_paths:
             for model_path in model_paths:
+
                 previous_absolute_roc_path = os.path.join(REPORTS_DIR, args.load_rocs, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
                 with open(previous_absolute_roc_path, "rb") as fd:
                     r, f, t = pickle.load(fd)
+
                 absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
                 with open(absolute_roc_path, "wb") as fd:
                     pickle.dump((r, f, t), fd)
