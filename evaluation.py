@@ -8,6 +8,7 @@ import datetime
 import sys
 
 from analysis.reports import report_score
+from analysis.reports import remove_outliers
 
 from analysis.rocs import build_rocs
 
