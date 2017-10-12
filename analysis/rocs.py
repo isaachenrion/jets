@@ -13,8 +13,6 @@ from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 from sklearn.utils import check_random_state
 
-from data_loading import load_tf
-from data_loading import load_test
 
 
 from architectures.recursive_net import GRNNTransformSimple
