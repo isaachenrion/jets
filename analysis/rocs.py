@@ -55,9 +55,9 @@ def evaluate_models(X, y, w, model_filenames, batch_size=64):
 
     for filename in model_filenames:
         if 'DS_Store' not in filename:
-            logging.info("Loading %s" % filename),
+            logging.info("\t\tLoading %s" % filename),
             model = load_model(filename)
-            logging.info("FILE LOADED! {}".format(filename))
+            #logging.info("FILE LOADED! {}".format(filename))
             work = True
             if work:
                 model.eval()
@@ -85,17 +85,14 @@ def evaluate_models(X, y, w, model_filenames, batch_size=64):
                 fprs.append(fpr)
                 tprs.append(tpr)
 
-                logging.info("ROC AUC = {:.4f}".format(rocs[-1]))
+                logging.info("\t\t\tROC AUC = {:.4f}".format(rocs[-1]))
 
-    logging.info("Mean ROC AUC = %.4f" % np.mean(rocs))
+    logging.info("\t\tMean ROC AUC = %.4f" % np.mean(rocs))
 
     return rocs, fprs, tprs
 
-def build_rocs(prefix_train, prefix_test, model_path, data_dir, n_data, batch_size):
-    logging.info('Building ROCs for {} trained on {}'.format(model_path, prefix_train))
-    tf = load_tf(data_dir, "{}-train.pickle".format(prefix_train))
-    X, y, w = load_test(tf, data_dir, "{}-test.pickle".format(prefix_test), n_data)
-
+def build_rocs(data, model_path, batch_size):
+    X, y, w = data
     model_filenames = [os.path.join(model_path, fn) for fn in os.listdir(model_path)]
     logging.debug(model_filenames)
     rocs, fprs, tprs = evaluate_models(X, y, w, model_filenames, batch_size)

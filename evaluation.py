@@ -71,40 +71,48 @@ def main():
     ''' GET RELATIVE PATHS TO DATA AND MODELS '''
     '''----------------------------------------------------------------------- '''
     with open(args.model_list_filename, "r") as f:
-        leaf_model_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
+        model_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
 
     with open(args.data_list_filename, "r") as f:
         data_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
 
     logging.info("DATA PATHS\n{}".format("\n".join(data_paths)))
-    logging.info("LEAF MODEL PATHS\n{}".format("\n".join(leaf_model_paths)))
+    logging.info("MODEL PATHS\n{}".format("\n".join(model_paths)))
 
 
     ''' BUILD ROCS '''
     '''----------------------------------------------------------------------- '''
-
-    for data_path in data_paths:
-        for leaf_model_path in leaf_model_paths:
-            model_path = os.path.join(MODELS_DIR, leaf_model_path)
-            if args.load_rocs is None:
-                r, f, t = build_rocs(data_path, data_path, model_path, DATA_DIR, args.n_test, args.batch_size)
-            else:
-                previous_absolute_roc_path = os.path.join(REPORTS_DIR, args.load_rocs, "rocs-{}-{}.pickle".format("-".join(leaf_model_path.split('/')), data_path))
+    if args.load_rocs is None:
+        for data_path in data_paths:
+            logging.info('Building ROCs for models trained on {}'.format(data_path))
+            tf = load_tf(DATA_DIR, "{}-train.pickle".format(data_path))
+            data = load_test(tf, DATA_DIR, "{}-test.pickle".format(data_path), args.n_test)
+            for model_path in model_paths:
+                logging.info('\tBuilding ROCs for instances of {}'.format(model_paths))
+                absolute_model_path = os.path.join(MODELS_DIR, model_path)
+                    r, f, t = build_rocs(data, absolute_model_path, args.batch_size)
+                absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
+                with open(absolute_roc_path, "wb") as fd:
+                    pickle.dump((r, f, t), fd)
+    else:
+        for data_path in data_paths:
+            for model_path in model_paths:
+                previous_absolute_roc_path = os.path.join(REPORTS_DIR, args.load_rocs, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
                 with open(previous_absolute_roc_path, "rb") as fd:
                     r, f, t = pickle.load(fd)
-            absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(leaf_model_path.split('/')), data_path))
-            with open(absolute_roc_path, "wb") as fd:
-                pickle.dump((r, f, t), fd)
+                absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
+                with open(absolute_roc_path, "wb") as fd:
+                    pickle.dump((r, f, t), fd)
 
     ''' PLOT ROCS '''
     '''----------------------------------------------------------------------- '''
 
-    labels = leaf_model_paths
+    labels = model_paths
     colors = ['c', 'm', 'y', 'k']
 
     for data_path in data_paths:
-        for leaf_model_path, label, color in zip(leaf_model_paths, labels, colors):
-            absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(leaf_model_path.split('/')), data_path))
+        for model_path, label, color in zip(model_paths, labels, colors):
+            absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
             with open(absolute_roc_path, "rb") as fd:
                 r, f, t = pickle.load(fd)
 
