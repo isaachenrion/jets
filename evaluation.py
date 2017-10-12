@@ -8,10 +8,11 @@ import datetime
 import sys
 
 from analysis.reports import report_score
-from analysis.reports import plot_rocs
-from analysis.reports import plot_show
 
 from analysis.rocs import build_rocs
+
+from analysis.plotting import plot_rocs
+from analysis.plotting import plot_show
 
 ''' ARGUMENTS '''
 '''----------------------------------------------------------------------- '''
@@ -95,7 +96,7 @@ def main():
             with open(absolute_roc_path, "rb") as fd:
                 r, f, t = pickle.load(fd)
 
-            #r, f, t = remove_outliers(r, f, t)
+            r, f, t = remove_outliers(r, f, t)
 
             report_score(r, f, t, label=label)
             plot_rocs(r, f, t, label=label, color=color)
