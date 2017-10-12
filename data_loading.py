@@ -51,7 +51,7 @@ def load_tf(data_dir, filename):
 
 def load_test(tf, data_dir, filename_test, n_test=-1, cropping=True):
     logging.warning("Loading test data: {}".format(filename_test))
-37
+
     X, y = load_data(data_dir, filename_test)
 
     #X = [rewrite_content(jet) for jet in X]
