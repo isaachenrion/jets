@@ -44,7 +44,8 @@ parser.add_argument("--password", type=str, default="deeplearning")
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
 
-''' LOOKUP TABLES '''
+
+''' CONSTANTS '''
 '''----------------------------------------------------------------------- '''
 
 DATA_DIR = 'data/w-vs-qcd/pickles'
@@ -81,7 +82,6 @@ def main():
 
     ''' EMAIL '''
     '''----------------------------------------------------------------------- '''
-    server = smtplib.SMTP('smtp.gmail.com', 587)
     server = smtplib.SMTP('smtp.gmail.com:587')
     server.ehlo()
     server.starttls()

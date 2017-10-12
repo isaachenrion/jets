@@ -1,27 +1,29 @@
 import os
 import pickle
 import torch
-import logging 
+import logging
 def load_model(filename):
-    with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
-        settings = pickle.load(f, encoding='latin-1')
-        Transform = settings["transform"]
-        Predict = settings["predict"]
-        model_kwargs = settings["model_kwargs"]
+    try:
+        with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
+            settings = pickle.load(f, encoding='latin-1')
+            Transform = settings["transform"]
+            Predict = settings["predict"]
+            model_kwargs = settings["model_kwargs"]
 
-    with open(os.path.join(filename, 'model_state_dict.pt'), 'rb') as f:
-        state_dict = torch.load(f)
-        model = Predict(Transform, **model_kwargs)
-        model.load_state_dict(state_dict)
-    #try:
+        with open(os.path.join(filename, 'model_state_dict.pt'), 'rb') as f:
+            state_dict = torch.load(f)
+            model = Predict(Transform, **model_kwargs)
+            model.load_state_dict(state_dict)
+    except KeyError: # backwards compatibility
+        torch_name = os.path.join(filename,'model.pt')
+        f = open(torch_name, 'rb')
+        model = torch.load(f)
+        f.close()
+
     #    f = open(torch_name, 'rb')
     #    model = torch.load(f)
     #    f.close()
-    #torch_name = os.path.join(filename,'model.pt')
-    #try:
-    #    f = open(torch_name, 'rb')
-    #    model = torch.load(f)
-    #    f.close()
+
     #except FileNotFoundError:
     #    pickle_name = os.path.join(filename,'model.pickle')
     #    logging.warning("Loading from pickle {}".format(pickle_name))
