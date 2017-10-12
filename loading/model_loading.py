@@ -5,7 +5,7 @@ import logging
 def load_model(filename):
     try:
         with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
-            settings = pickle.load(f, encoding='latin-1')
+            settings = pickle.load(f)
             Transform = settings["transform"]
             Predict = settings["predict"]
             model_kwargs = settings["model_kwargs"]
