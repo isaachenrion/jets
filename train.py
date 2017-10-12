@@ -147,6 +147,7 @@ def train():
     try:
         X_valid, y_valid = load_data(tf, DATA_DIR, "{}-valid.pickle".format(args.filename), args.n_valid)
     except FileNotFoundError:
+        X_train, y_train = load_data(tf, DATA_DIR, "{}-train.pickle".format(args.filename), -1)
         X_valid, y_valid = X_train[:5000], y_train[:5000]
         with open(os.path.join(DATA_DIR, "preprocessed/{}-valid.pickle".format(args.filename)), 'wb') as f:
             pickle.dump((X_valid, y_valid), f)
