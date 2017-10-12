@@ -62,7 +62,8 @@ def main():
 
     ''' LOGGING '''
     '''----------------------------------------------------------------------- '''
-    logging.basicConfig(level=logging.DEBUG, filename=os.path.join(report_dir, 'log.txt'), filemode="a+",
+    logfile = os.path.join(report_dir, 'log.txt')
+    logging.basicConfig(level=logging.DEBUG, filename=logfile, filemode="a+",
                         format="%(asctime)-15s %(message)s")
     if not args.silent:
         root = logging.getLogger()

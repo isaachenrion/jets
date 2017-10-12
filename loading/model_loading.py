@@ -19,6 +19,10 @@ def load_model(filename):
         f = open(torch_name, 'rb')
         model = torch.load(f)
         f.close()
+        #with open(os.path.join(filename, 'settings.pickle'), "wb") as f:
+        #    settings = pickle.load(f)
+        #    settings['transform'] = model.transform.__class__
+        #    settings["predict"] = model.__class__
 
     #    f = open(torch_name, 'rb')
     #    model = torch.load(f)
