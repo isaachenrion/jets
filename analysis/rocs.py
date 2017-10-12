@@ -13,51 +13,13 @@ from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 from sklearn.utils import check_random_state
 
-
-
 from architectures.recursive_net import GRNNTransformSimple
 from architectures.relation_net import RelNNTransformConnected
 from architectures.message_net import MPNNTransform
 from architectures.predict import PredictFromParticleEmbedding
 from architectures.preprocessing import wrap, unwrap, wrap_X, unwrap_X
 
-
-def load_model(filename):
-    with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
-        settings = pickle.load(f, encoding='latin-1')
-        Transform = settings["transform"]
-        Predict = settings["predict"]
-        model_kwargs = settings["model_kwargs"]
-
-    with open(os.path.join(filename, 'model_state_dict.pt'), 'rb') as f:
-        state_dict = torch.load(f)
-        model = Predict(Transform, **model_kwargs)
-        model.load_state_dict(state_dict)
-    #try:
-    #    f = open(torch_name, 'rb')
-    #    model = torch.load(f)
-    #    f.close()
-    #torch_name = os.path.join(filename,'model.pt')
-    #try:
-    #    f = open(torch_name, 'rb')
-    #    model = torch.load(f)
-    #    f.close()
-    #except FileNotFoundError:
-    #    pickle_name = os.path.join(filename,'model.pickle')
-    #    logging.warning("Loading from pickle {}".format(pickle_name))
-    #    with open(pickle_name, "rb") as fd:
-    #        try:
-    #            model = pickle.load(fd, encoding='latin-1')
-    #        except EOFError as e:
-    #            logging.warning("EMPTY MODEL FILE: CRITICAL FAILURE")
-    #            raise e
-    #    with open(torch_name, 'wb') as f:
-    #        torch.save(model, f)
-    #    logging.warning("Saved to .pt file: {}".format(torch_name))
-    if torch.cuda.is_available():
-        model = model.cuda()
-    return model
-
+from loading import load_model
 
 def evaluate_models(X, y, w, model_filenames, batch_size=64):
     rocs = []
@@ -69,7 +31,8 @@ def evaluate_models(X, y, w, model_filenames, batch_size=64):
         if 'DS_Store' not in filename:
             logging.info("\t\tLoading %s" % filename),
             model = load_model(filename)
-            #logging.info("FILE LOADED! {}".format(filename))
+            if torch.cuda.is_available():
+                model.cuda()
             work = True
             if work:
                 model.eval()

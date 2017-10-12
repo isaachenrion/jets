@@ -7,8 +7,8 @@ import argparse
 import datetime
 import sys
 
-from data_loading import load_tf
-from data_loading import load_test
+from loading import load_tf
+from loading import load_test
 
 from analysis.reports import report_score
 from analysis.reports import remove_outliers

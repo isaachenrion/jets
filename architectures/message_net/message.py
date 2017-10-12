@@ -26,19 +26,27 @@ class Message(nn.Module):
         pass
 
 class DTNNMessage(Message):
-    def __init__(self, *args):
+    def __init__(self, activation=None, *args):
         super().__init__(*args)
+        self.activation = activation
+        if self.activation is None:
+            def constant(x):
+                return x
+            self.activation = constant
         self.vertex_wx_plus_b = nn.Linear(self.vertex_dim, self.message_dim)
         if self.edge_dim > 0:
             self.edge_wx_plus_b = nn.Linear(self.edge_dim, self.message_dim)
             self.combo_wx = nn.Linear(self.message_dim, self.message_dim, bias=False)
 
     def _forward_with_edge(self, vertices, edges):
-        message = F.tanh(self.combo_wx(self.vertex_wx_plus_b(vertices) * self.edge_wx_plus_b(edges)))
+        message = self.combo_wx(self.vertex_wx_plus_b(vertices) * self.edge_wx_plus_b(edges))
+        message = self.activation(message)
         return message
 
     def _forward_without_edge(self, vertices):
-        return F.tanh(self.vertex_wx_plus_b(vertices))
+        message = self.vertex_wx_plus_b(vertices)
+        message = self.activation(message)
+        return message
 
 class FullyConnectedMessage(Message):
     def __init__(self, *args):

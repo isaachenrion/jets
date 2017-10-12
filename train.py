@@ -2,7 +2,7 @@
 import torch
 from torch.autograd import Variable
 from torch.optim import Adam, lr_scheduler
-torch.utils.backcompat.broadcast_warning.enabled = True
+#torch.utils.backcompat.broadcast_warning.enabled = True
 
 import click
 import copy
@@ -15,6 +15,7 @@ import sys
 import os
 import argparse
 import smtplib
+from email.mime.text import MIMEText
 
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import roc_auc_score
@@ -39,8 +40,9 @@ from architectures import PredictFromParticleEmbedding
 
 from loggers import StatsLogger
 
-from data_loading import load_data
-from data_loading import load_tf
+from loading import load_data
+from loading import load_tf
+from loading import load_model
 
 ''' ARGUMENTS '''
 '''----------------------------------------------------------------------- '''
@@ -64,6 +66,11 @@ parser.add_argument("--seed", type=int, default=1)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-l", "--load", type=str, default=None)
 parser.add_argument("-i", "--n_iters", type=int, default=1)
+
+# email
+parser.add_argument("--username", type=str, default="results74207281")
+parser.add_argument("--password", type=str, default="deeplearning")
+parser.add_argument("--emailing", action='store_true', default=False)
 
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
@@ -91,7 +98,8 @@ def train():
 
     ''' LOGGING '''
     '''----------------------------------------------------------------------- '''
-    logging.basicConfig(level=logging.DEBUG, filename=os.path.join(model_dir, 'log.txt'), filemode="a+",
+    logfile = os.path.join(model_dir, 'log.txt')
+    logging.basicConfig(level=logging.DEBUG, filename=logfile, filemode="a+",
                         format="%(asctime)-15s %(message)s")
     if not args.silent:
         root = logging.getLogger()
@@ -106,7 +114,21 @@ def train():
         root.addHandler(ch)
 
     for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
-    logging.warning("\tPID = {}".format(os.getpid()))
+    pid = os.getpid()
+    logging.warning("\tPID = {}".format(pid))
+
+    ''' EMAIL '''
+    '''----------------------------------------------------------------------- '''
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server = smtplib.SMTP('smtp.gmail.com:587')
+    server.ehlo()
+    server.starttls()
+    server.login(args.username, args.password)
+    source_email = args.username + "@gmail.com"
+    target_email = "henrion@nyu.edu"
+
+    def send_msg(msg):
+        server.send_message(msg)
 
     ''' CUDA '''
     '''----------------------------------------------------------------------- '''
@@ -154,17 +176,7 @@ def train():
         model = Predict(Transform, **model_kwargs)
         settings = {"transform": Transform, "predict": Predict, "model_kwargs": model_kwargs}
     else:
-        with open(os.path.join(args.load, 'settings.pickle'), "rb") as f:
-            settings = pickle.load(f, encoding='latin-1')
-            Transform = settings["transform"]
-            Predict = settings["predict"]
-            model_kwargs = settings["model_kwargs"]
-
-        with open(os.path.join(args.load, 'model_state_dict.pt'), 'rb') as f:
-            state_dict = torch.load(f)
-            model = PredictFromParticleEmbedding(Transform, **model_kwargs)
-            model.load_state_dict(state_dict)
-
+        model = load_model(args.load)
         if args.restart:
             args.step_size = settings["step_size"]
 
@@ -193,25 +205,13 @@ def train():
         ''' VALIDATION '''
     '''----------------------------------------------------------------------- '''
     def callback(iteration, model):
-        def sendmail(from_who, to, msg):
-            s = smtplib.SMTP('localhost')
-            s.sendmail(from_who, [to], msg)
-            s.quit()
+
         def save_everything():
             with open(os.path.join(model_dir, 'model_state_dict.pt'), 'wb') as f:
                 torch.save(best_model_state_dict, f)
 
             with open(os.path.join(model_dir, 'settings.pickle'), "wb") as f:
                 pickle.dump(settings, f)
-
-            emailing = False
-            if emailing:
-                with open(os.path.join(model_dir, 'log.txt'), 'r') as f:
-                    msg = f.read()
-                    sendmail('isaachenrion@gmail.com', 'isaachenrion@gmail.com', msg)
-
-
-
 
         if iteration % 25 == 0:
             model.eval()
@@ -251,14 +251,14 @@ def train():
                 best_model = copy.deepcopy(model)
                 save_everything()
 
-            logging.info(
-                "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f"
-                "\troc_auc(valid)=%.4f\tbest_roc_auc(valid)=%.4f" % (
+            msg = "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f\troc_auc(valid)=%.4f\tbest_roc_auc(valid)=%.4f" % (
                     iteration,
                     train_loss,
                     valid_loss,
                     roc_auc,
-                    best_score[0]))
+                    best_score[0])
+            logging.info(msg)
+
 
     ''' TRAINING '''
     '''----------------------------------------------------------------------- '''
@@ -283,7 +283,15 @@ def train():
 
         scheduler.step()
         settings['step_size'] = scheduler.get_lr()
+    logging.info("FINISHED TRAINING")
+    if args.emailing:
+        with open(logfile, "r") as f:
+            msg = MIMEText(f.read())
+            msg['Subject'] = 'Job finished (PID = {})'.format(pid)
+            msg['From'] = source_email
+            msg["To"] = target_email
 
+            send_msg(msg)
 
 
 
