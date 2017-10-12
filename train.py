@@ -187,7 +187,7 @@ def train():
 
     n_batches = int(np.ceil(len(X_train) / args.batch_size))
     best_score = [-np.inf]  # yuck, but works
-    best_model_state_dict = copy.deepcopy(model.state_dict)
+    best_model_state_dict = copy.deepcopy(model.state_dict())
 
     def loss(y_pred, y):
         l = log_loss(y, y_pred.squeeze(1)).mean()

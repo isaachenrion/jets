@@ -35,6 +35,6 @@ def load_model(filename):
         with open(os.path.join(filename, 'settings.pickle'), "wb") as f:
             pickle.dump(settings, f)
         with open(os.path.join(filename, 'model_state_dict.pt'), 'wb') as f:
-            state_dict = model.state_dict
+            state_dict = model.state_dict()
             torch.save(state_dict, f)
     return model
