@@ -60,7 +60,7 @@ def evaluate_models(X, y, w, model_filenames, batch_size=64):
             logging.info("Loading %s" % filename),
             model = load_model(filename)
             logging.info("FILE LOADED! {}".format(filename))
-            work = False
+            work = True
             if work:
                 model.eval()
 
