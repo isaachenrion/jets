@@ -112,12 +112,12 @@ class GRNNTransformGated(nn.Module):
         down_embeddings = [None for _ in range(len(levels))]
 
         self.recursive_embedding(up_embeddings, levels, children, n_inners, contents)
-        if False or self.n_iters > 0:
+        if False:# or self.n_iters > 0:
             for _ in range(self.n_iters):
                 self.down_the_tree(states, up_embeddings, down_embeddings, levels, children, n_inners)
                 self.up_the_tree(states, up_embeddings, down_embeddings, levels, children, n_inners)
 
-        if True or self.n_iters == 0:
+        if True:# or self.n_iters == 0:
             return up_embeddings[0].view((len(jets), -1))
         else:
             return torch.cat(
