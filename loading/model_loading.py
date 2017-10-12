@@ -2,20 +2,31 @@ import os
 import pickle
 import torch
 import logging
+from architectures import PredictFromParticleEmbedding
 def load_model(filename):
     try:
         with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
             settings = pickle.load(f)
             Transform = settings["transform"]
-            Predict = settings["predict"]
-            model_kwargs = settings["model_kwargs"]
+            try:
+                Predict = settings["predict"]
+            except KeyError:
+                Predict = PredictFromParticleEmbedding # hack
+            try:
+                model_kwargs = settings["model_kwargs"] 
+            except KeyError:
+                model_kwargs = { # hack
+                'n_features': 7,
+                'n_hidden': 40,
+                'bn': False
+                }
 
         with open(os.path.join(filename, 'model_state_dict.pt'), 'rb') as f:
             state_dict = torch.load(f)
             model = Predict(Transform, **model_kwargs)
             model.load_state_dict(state_dict)
 
-    except (KeyError, AttributeError):
+    except FileNotFoundError:
         #import ipdb; ipdb.set_trace()
         # backwards compatibility
         torch_name = os.path.join(filename,'model.pt')
