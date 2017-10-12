@@ -141,7 +141,7 @@ def train():
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
     # Initialization
-    Predictor = PredictFromParticleEmbedding
+    Predict = PredictFromParticleEmbedding
     if args.load is None:
         Transform = TRANSFORMS[args.model_type]
         model_kwargs = {
