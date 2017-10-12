@@ -159,14 +159,13 @@ def main():
     ''' EMAIL RESULTS'''
     '''----------------------------------------------------------------------- '''
 
-    if args.emailing:
-        with open(logfile, "r") as f:
-            msg = MIMEText(f.read())
-            msg['Subject'] = 'Job finished (PID = {})'.format(pid)
-            msg['From'] = source_email
-            msg["To"] = target_email
+    with open(logfile, "r") as f:
+        msg = MIMEText(f.read())
+        msg['Subject'] = 'Job finished (PID = {})'.format(pid)
+        msg['From'] = source_email
+        msg["To"] = target_email
 
-            send_msg(msg)
+        send_msg(msg)
 
 if __name__ == '__main__':
     main()
