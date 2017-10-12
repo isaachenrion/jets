@@ -15,7 +15,7 @@ def load_model(filename):
             model = Predict(Transform, **model_kwargs)
             model.load_state_dict(state_dict)
 
-    except KeyError, AttributeError:
+    except (KeyError, AttributeError):
         #import ipdb; ipdb.set_trace()
         # backwards compatibility
         torch_name = os.path.join(filename,'model.pt')
