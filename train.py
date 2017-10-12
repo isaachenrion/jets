@@ -141,6 +141,7 @@ def train():
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
     # Initialization
+    Predictor = PredictFromParticleEmbedding
     if args.load is None:
         Transform = TRANSFORMS[args.model_type]
         model_kwargs = {
@@ -148,20 +149,24 @@ def train():
             'n_hidden': args.n_hidden,
             'bn': args.bn,
         }
-        if Transform in [MPNNTransform, GRNNTransformGated:
+        if Transform in [MPNNTransform, GRNNTransformGated]:
             model_kwargs['n_iters'] = args.n_iters
-        model = PredictFromParticleEmbedding(Transform, **model_kwargs)
-
+        model = Predict(Transform, **model_kwargs)
+        settings = {"transform": Transform, "predict": Predict, "model_kwargs": model_kwargs}
     else:
+        with open(os.path.join(args.load, 'settings.pickle'), "rb") as f:
+            settings = pickle.load(f, encoding='latin-1')
+            Transform = settings["transform"]
+            Predict = settings["predict"]
+            model_kwargs = settings["model_kwargs"]
+
         with open(os.path.join(args.load, 'model_state_dict.pt'), 'rb') as f:
             state_dict = torch.load(f)
+            model = PredictFromParticleEmbedding(Transform, **model_kwargs)
             model.load_state_dict(state_dict)
 
         if args.restart:
-            with open(os.path.join(args.load, 'settings.pickle'), "rb") as f:
-                settings = pickle.load(f, encoding='latin-1')
             args.step_size = settings["step_size"]
-            Transform = settings["transform"]
 
     logging.warning(model)
     out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))
@@ -175,11 +180,10 @@ def train():
 
     optimizer = Adam(model.parameters(), lr=args.step_size)
     scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
-    settings = {}
 
     n_batches = int(np.ceil(len(X_train) / args.batch_size))
     best_score = [-np.inf]  # yuck, but works
-    best_model = copy.deepcopy(model)
+    best_model_state_dict = copy.deepcopy(model.state_dict)
 
     def loss(y_pred, y):
         l = log_loss(y, y_pred.squeeze(1)).mean()
@@ -194,8 +198,8 @@ def train():
             s.sendmail(from_who, [to], msg)
             s.quit()
         def save_everything():
-            with open(os.path.join(model_dir, 'model.pt'), 'wb') as f:
-                torch.save(best_model, f)
+            with open(os.path.join(model_dir, 'model_state_dict.pt'), 'wb') as f:
+                torch.save(best_model_state_dict, f)
 
             with open(os.path.join(model_dir, 'settings.pickle'), "wb") as f:
                 pickle.dump(settings, f)
