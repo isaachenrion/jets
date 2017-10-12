@@ -14,6 +14,7 @@ from analysis.rocs import build_rocs
 
 from analysis.plotting import plot_rocs
 from analysis.plotting import plot_show
+from analysis.plotting import plot_save
 
 ''' ARGUMENTS '''
 '''----------------------------------------------------------------------- '''
@@ -27,7 +28,8 @@ parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("-b", "--batch_size", type=int, default=64)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-p", "--plot", action="store_true")
-parser.add_argument("-r", "--report_only", action="store_true")
+parser.add_argument("-o", "--remove_outliers", action="store_true")
+parser.add_argument("-l", "--load_rocs", type=str, default=None)
 
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
@@ -80,15 +82,19 @@ def main():
 
     ''' BUILD ROCS '''
     '''----------------------------------------------------------------------- '''
-    if not args.report_only:
-        for data_path in data_paths:
-            for leaf_model_path in leaf_model_paths:
-                model_path = os.path.join(MODELS_DIR, leaf_model_path)
+
+    for data_path in data_paths:
+        for leaf_model_path in leaf_model_paths:
+            model_path = os.path.join(MODELS_DIR, leaf_model_path)
+            if args.load_rocs is None:
                 r, f, t = build_rocs(data_path, data_path, model_path, DATA_DIR, args.n_test, args.batch_size)
-                #import ipdb; ipdb.set_trace()
-                absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(leaf_model_path.split('/')), data_path))
-                with open(absolute_roc_path, "wb") as fd:
-                    pickle.dump((r, f, t), fd)
+            else:
+                previous_absolute_roc_path = os.path.join(REPORTS_DIR, args.load_rocs, "rocs-{}-{}.pickle".format("-".join(leaf_model_path.split('/')), data_path))
+                with open(previous_absolute_roc_path, "rb") as fd:
+                    r, f, t = pickle.load(fd)
+            absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(leaf_model_path.split('/')), data_path))
+            with open(absolute_roc_path, "wb") as fd:
+                pickle.dump((r, f, t), fd)
 
     ''' PLOT ROCS '''
     '''----------------------------------------------------------------------- '''
@@ -102,13 +108,16 @@ def main():
             with open(absolute_roc_path, "rb") as fd:
                 r, f, t = pickle.load(fd)
 
-            r, f, t = remove_outliers(r, f, t)
+            if args.remove_outliers:
+                r, f, t = remove_outliers(r, f, t)
 
             report_score(r, f, t, label=label)
             plot_rocs(r, f, t, label=label, color=color)
 
     figure_filename = os.path.join(report_dir, 'rocs.png')
-    plot_show(figure_filename)
+    plot_save(figure_filename)
+    if args.plot:
+        plot_show()
 
 if __name__ == '__main__':
     main()

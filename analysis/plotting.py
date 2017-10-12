@@ -24,7 +24,7 @@ def plot_rocs(rocs, fprs, tprs, label="", color="r", show_all=False):
     plt.plot(base_tpr, mean_inv_fprs, color,
              label="%s" % label)
 
-def plot_show(filename=None):
+def plot_save(filename):
     plt.xlabel("Signal efficiency")
     plt.ylabel("1 / Background efficiency")
     plt.xlim([0.1, 1.0])
@@ -36,4 +36,5 @@ def plot_show(filename=None):
     if filename:
         plt.savefig(filename)
 
+def plot_show():
     plt.show()
