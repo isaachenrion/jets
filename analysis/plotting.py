@@ -3,6 +3,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 plt.rcParams["figure.figsize"] = (6, 6)
 
+from scipy import interp
+
 import numpy as np
 
 def plot_rocs(rocs, fprs, tprs, label="", color="r", show_all=False):

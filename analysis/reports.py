@@ -20,7 +20,7 @@ def remove_outliers(rocs, fprs, tprs):
 
     robust_mean = np.mean([scores[i] for i in range(len(scores)) if p25 <= scores[i] <= p75])
     robust_std = np.std([scores[i] for i in range(len(scores)) if p25 <= scores[i] <= p75])
-    
+
 
     indices = [i for i in range(len(scores)) if robust_mean - 3*robust_std <= scores[i] <= robust_mean + 3*robust_std]
 
@@ -46,7 +46,7 @@ def report_score(rocs, fprs, tprs, label, latex=False, input="particles", short=
     mean_inv_fprs = inv_fprs.mean(axis=0)
 
     if not latex:
-        logging.info("%32s\tROC AUC = %.4f+-%.2f\t(1/FPR @ TPR=0.5) = %.2f+-%.2f" %  (label,
+        logging.info("%32s\tROC AUC = %.4f+-%.5f\t(1/FPR @ TPR=0.5) = %.2f+-%.2f" %  (label,
                                                                        np.mean(rocs),
                                                                        np.std(rocs),
                                                                        np.mean(inv_fprs[:, 225]),
