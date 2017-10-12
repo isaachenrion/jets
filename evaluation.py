@@ -27,6 +27,7 @@ parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("-b", "--batch_size", type=int, default=64)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-p", "--plot", action="store_true")
+parser.add_argument("-r", "--report_only", action="store_true")
 
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
@@ -67,24 +68,24 @@ def main():
 
     ''' BUILD ROCS '''
     '''----------------------------------------------------------------------- '''
-    with open(args.model_list_filename, "r") as f:
-        leaf_model_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
+    if not args.report_only:
+        with open(args.model_list_filename, "r") as f:
+            leaf_model_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
 
-    with open(args.data_list_filename, "r") as f:
-        data_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
+        with open(args.data_list_filename, "r") as f:
+            data_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
 
-    logging.info("DATA PATHS\n{}".format("\n".join(data_paths)))
-    logging.info("LEAF MODEL PATHS\n{}".format("\n".join(leaf_model_paths)))
+        logging.info("DATA PATHS\n{}".format("\n".join(data_paths)))
+        logging.info("LEAF MODEL PATHS\n{}".format("\n".join(leaf_model_paths)))
 
-    for data_path in data_paths:
-        for leaf_model_path in leaf_model_paths:
-            model_path = os.path.join(MODELS_DIR, leaf_model_path)
-            r, f, t = build_rocs(data_path, data_path, model_path, DATA_DIR, args.n_test, args.batch_size)
-            #import ipdb; ipdb.set_trace()
-            absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(leaf_model_path.split('/')), data_path))
-            with open(absolute_roc_path, "wb") as fd:
-                pickle.dump((r, f, t), fd)
-
+        for data_path in data_paths:
+            for leaf_model_path in leaf_model_paths:
+                model_path = os.path.join(MODELS_DIR, leaf_model_path)
+                r, f, t = build_rocs(data_path, data_path, model_path, DATA_DIR, args.n_test, args.batch_size)
+                #import ipdb; ipdb.set_trace()
+                absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(leaf_model_path.split('/')), data_path))
+                with open(absolute_roc_path, "wb") as fd:
+                    pickle.dump((r, f, t), fd)
 
     ''' PLOT ROCS '''
     '''----------------------------------------------------------------------- '''
