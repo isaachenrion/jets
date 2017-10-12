@@ -112,8 +112,8 @@ def main():
 
             logging.info('Building ROCs for models trained on {}'.format(data_path))
             tf = load_tf(DATA_DIR, "{}-train.pickle".format(data_path))
-            data = load_test(tf, DATA_DIR, "{}-valid.pickle".format(data_path), args.n_test)
-            #data = load_test(tf, DATA_DIR, "{}-test.pickle".format(data_path), args.n_test)
+            #data = load_test(tf, DATA_DIR, "{}-valid.pickle".format(data_path), args.n_test)
+            data = load_test(tf, DATA_DIR, "{}-test.pickle".format(data_path), args.n_test)
 
             for model_path in model_paths:
                 logging.info('\tBuilding ROCs for instances of {}'.format(model_paths))
