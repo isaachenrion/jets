@@ -66,18 +66,21 @@ def main():
     for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
     logging.warning("\tPID = {}".format(os.getpid()))
 
+    ''' GET RELATIVE PATHS TO DATA AND MODELS '''
+    '''----------------------------------------------------------------------- '''
+    with open(args.model_list_filename, "r") as f:
+        leaf_model_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
+
+    with open(args.data_list_filename, "r") as f:
+        data_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
+
+    logging.info("DATA PATHS\n{}".format("\n".join(data_paths)))
+    logging.info("LEAF MODEL PATHS\n{}".format("\n".join(leaf_model_paths)))
+
+
     ''' BUILD ROCS '''
     '''----------------------------------------------------------------------- '''
     if not args.report_only:
-        with open(args.model_list_filename, "r") as f:
-            leaf_model_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
-
-        with open(args.data_list_filename, "r") as f:
-            data_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
-
-        logging.info("DATA PATHS\n{}".format("\n".join(data_paths)))
-        logging.info("LEAF MODEL PATHS\n{}".format("\n".join(leaf_model_paths)))
-
         for data_path in data_paths:
             for leaf_model_path in leaf_model_paths:
                 model_path = os.path.join(MODELS_DIR, leaf_model_path)
