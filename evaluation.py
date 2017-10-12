@@ -80,7 +80,7 @@ def main():
         for leaf_model_path in leaf_model_paths:
             model_path = os.path.join(MODELS_DIR, leaf_model_path)
             r, f, t = build_rocs(data_path, data_path, model_path, DATA_DIR, args.n_test, args.batch_size)
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(leaf_model_path.split('/')), data_path))
             with open(absolute_roc_path, "wb") as fd:
                 pickle.dump((r, f, t), fd)
