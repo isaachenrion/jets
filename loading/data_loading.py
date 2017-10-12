@@ -11,7 +11,7 @@ from architectures.preprocessing import sequentialize_by_pt
 from architectures.preprocessing import randomize
 from architectures.preprocessing import rewrite_content
 
-def load_data(data_dir, filename):
+def load_raw_data(data_dir, filename):
     path_to_preprocessed = os.path.join(data_dir, 'preprocessed', filename)
 
     if not os.path.exists(path_to_preprocessed):
@@ -19,7 +19,6 @@ def load_data(data_dir, filename):
         with open(os.path.join(data_dir, 'raw', filename), mode="rb") as fd:
             X, y = pickle.load(fd, encoding='latin-1')
         y = np.array(y)
-
         X = [extract(permute_by_pt(rewrite_content(jet))) for jet in X]
         with open(path_to_preprocessed, mode="wb") as fd:
             pickle.dump((X, y), fd)
@@ -48,18 +47,25 @@ def load_tf(data_dir, filename):
 
     return tf
 
-
-def load_test(tf, data_dir, filename_test, n_test=-1, cropping=True):
-    logging.warning("Loading test data: {}".format(filename_test))
-
-    X, y = load_data(data_dir, filename_test)
-
-    #X = [rewrite_content(jet) for jet in X]
-    #X = [extract(permute_by_pt(jet)) for jet in X]
+def load_data(tf, data_dir, filename, n):
+    X, y = load_raw_data(data_dir, filename)
     for jet in X:
         jet["content"] = tf.transform(jet["content"])
+    if n > 0:
+        X = X[:n]
+        y = y[:n]
+    logging.warning("Loaded data: {}".format(filename))
+    logging.warning("\tX size = %d" % len(X))
+    logging.warning("\ty size = %d" % len(y))
+    return X, y
+
+def load_test(tf, data_dir, filename_test, n_test=-1, cropping=True):
+    X, y = load_data(tf, data_dir, filename_test, -1)
 
     if not cropping:
+        if n > 0:
+            X = X[:n]
+            y = y[:n]
         return X, y
 
     # Cropping
@@ -71,8 +77,6 @@ def load_test(tf, data_dir, filename_test, n_test=-1, cropping=True):
     y = y_
     y = np.array(y)
 
-    logging.warning("\tX size = %d" % len(X))
-    logging.warning("\ty size = %d" % len(y))
 
     # Weights for flatness in pt
     w = np.zeros(len(y))
@@ -96,5 +100,9 @@ def load_test(tf, data_dir, filename_test, n_test=-1, cropping=True):
     X = X[:n_test]
     y = y[:n_test]
     w = w[:n_test]
+
+    logging.warning("\tAfter cropping: X size = %d" % len(X))
+    logging.warning("\tAfter cropping: y size = %d" % len(y))
+
 
     return X, y, w

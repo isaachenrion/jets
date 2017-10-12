@@ -7,6 +7,9 @@ import argparse
 import datetime
 import sys
 
+import smtplib
+from email.mime.text import MIMEText
+
 from loading import load_tf
 from loading import load_test
 
@@ -33,6 +36,10 @@ parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-p", "--plot", action="store_true")
 parser.add_argument("-o", "--remove_outliers", action="store_true")
 parser.add_argument("-l", "--load_rocs", type=str, default=None)
+
+# email
+parser.add_argument("--username", type=str, default="results74207281")
+parser.add_argument("--password", type=str, default="deeplearning")
 
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
@@ -69,7 +76,21 @@ def main():
         root.addHandler(ch)
 
     for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
-    logging.warning("\tPID = {}".format(os.getpid()))
+    pid = os.getpid()
+    logging.warning("\tPID = {}".format(pid))
+
+    ''' EMAIL '''
+    '''----------------------------------------------------------------------- '''
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server = smtplib.SMTP('smtp.gmail.com:587')
+    server.ehlo()
+    server.starttls()
+    server.login(args.username, args.password)
+    source_email = args.username + "@gmail.com"
+    target_email = "henrion@nyu.edu"
+
+    def send_msg(msg):
+        server.send_message(msg)
 
     ''' GET RELATIVE PATHS TO DATA AND MODELS '''
     '''----------------------------------------------------------------------- '''
@@ -90,7 +111,8 @@ def main():
 
             logging.info('Building ROCs for models trained on {}'.format(data_path))
             tf = load_tf(DATA_DIR, "{}-train.pickle".format(data_path))
-            data = load_test(tf, DATA_DIR, "{}-test.pickle".format(data_path), args.n_test)
+            data = load_test(tf, DATA_DIR, "{}-valid.pickle".format(data_path), args.n_test)
+            #data = load_test(tf, DATA_DIR, "{}-test.pickle".format(data_path), args.n_test)
 
             for model_path in model_paths:
                 logging.info('\tBuilding ROCs for instances of {}'.format(model_paths))
@@ -133,6 +155,18 @@ def main():
     plot_save(figure_filename)
     if args.plot:
         plot_show()
+
+    ''' EMAIL RESULTS'''
+    '''----------------------------------------------------------------------- '''
+
+    if args.emailing:
+        with open(logfile, "r") as f:
+            msg = MIMEText(f.read())
+            msg['Subject'] = 'Job finished (PID = {})'.format(pid)
+            msg['From'] = source_email
+            msg["To"] = target_email
+
+            send_msg(msg)
 
 if __name__ == '__main__':
     main()

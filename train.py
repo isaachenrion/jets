@@ -14,6 +14,7 @@ import time
 import sys
 import os
 import argparse
+
 import smtplib
 from email.mime.text import MIMEText
 
@@ -48,8 +49,9 @@ from loading import load_model
 '''----------------------------------------------------------------------- '''
 parser = argparse.ArgumentParser(description='Jets')
 
-parser.add_argument("-f", "--f_tr", type=str, default='antikt-kt-train.pickle')
-parser.add_argument("-n", "--n_tr", type=int, default=-1)
+parser.add_argument("-f", "--filename", type=str, default='antikt-kt')
+parser.add_argument("-n", "--n_train", type=int, default=-1)
+parser.add_argument("--n_valid", type=int, default=-1)
 parser.add_argument("-m", "--model_type", type=int, default=0)
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
@@ -70,7 +72,6 @@ parser.add_argument("-i", "--n_iters", type=int, default=1)
 # email
 parser.add_argument("--username", type=str, default="results74207281")
 parser.add_argument("--password", type=str, default="deeplearning")
-parser.add_argument("--emailing", action='store_true', default=False)
 
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
@@ -141,24 +142,15 @@ def train():
 
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
-    logging.warning("Loading data...")
-    X, y = load_data(DATA_DIR, args.f_tr)
-    tf = load_tf(DATA_DIR, args.f_tr)
-
-    for jet in X:
-        jet["content"] = tf.transform(jet["content"])
-
-
-    if args.n_tr > 0:
-        indices = torch.randperm(len(X)).numpy()[:args.n_tr]
-        X = [X[i] for i in indices]
-        y = y[indices]
-
-    logging.warning("\tX size = %d" % len(X))
-    logging.warning("\ty size = %d" % len(y))
-    logging.warning("Splitting into train and validation...")
-
-    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=min(5000, len(X) // 5))
+    tf = load_tf(DATA_DIR, "{}-train.pickle".format(args.filename))
+    X_train, y_train = load_data(tf, DATA_DIR, "{}-train.pickle".format(args.filename), args.n_train)
+    try:
+        X_valid, y_valid = load_data(tf, DATA_DIR, "{}-valid.pickle".format(args.filename), args.n_valid)
+    except FileNotFoundError:
+        X_valid, y_valid = X_train[:5000], y_train[:5000]
+        with open(os.path.join(DATA_DIR, "preprocessed/{}-valid.pickle".format(args.filename)), 'wb') as f:
+            pickle.dump((X_valid, y_valid), f)
+        X_valid, y_valid = load_data(tf, DATA_DIR, "{}-valid.pickle".format(args.filename), args.n_valid)
 
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
@@ -284,14 +276,14 @@ def train():
         scheduler.step()
         settings['step_size'] = scheduler.get_lr()
     logging.info("FINISHED TRAINING")
-    if args.emailing:
-        with open(logfile, "r") as f:
-            msg = MIMEText(f.read())
-            msg['Subject'] = 'Job finished (PID = {})'.format(pid)
-            msg['From'] = source_email
-            msg["To"] = target_email
 
-            send_msg(msg)
+    with open(logfile, "r") as f:
+        msg = MIMEText(f.read())
+        msg['Subject'] = 'Job finished (PID = {})'.format(pid)
+        msg['From'] = source_email
+        msg["To"] = target_email
+
+        send_msg(msg)
 
 
 
