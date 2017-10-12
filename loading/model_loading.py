@@ -16,7 +16,7 @@ def load_model(filename):
             model.load_state_dict(state_dict)
 
     except KeyError:
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
         # backwards compatibility
         torch_name = os.path.join(filename,'model.pt')
         with open(torch_name, 'rb') as f:
@@ -28,6 +28,10 @@ def load_model(filename):
             settings = pickle.load(f)
             settings['transform'] = model.transform.__class__
             settings["predict"] = model.__class__
+            model_kwargs = {'n_features': 7,
+            'n_hidden': 40,
+            'bn': False}
+            settings["model_kwargs"] = model_kwargs
         with open(os.path.join(filename, 'settings.pickle'), "wb") as f:
             pickle.dump(settings, f)
         with open(os.path.join(filename, 'model_state_dict.pt'), 'wb') as f:
