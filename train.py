@@ -222,7 +222,8 @@ def train():
             yy, yy_pred = [], []
             for i in range(len(X_valid) // args.batch_size):
                 X, y = X_train[offset:offset+args.batch_size], y_train[offset:offset+args.batch_size]
-                tl = unwrap(loss(model(wrap_X(X)), wrap(y))); train_loss.append(tl)
+                X = wrap_X(X); y = wrap(y);
+                tl = unwrap(loss(model(X), y)); train_loss.append(tl)
 
                 X, y = X_valid[offset:offset+args.batch_size], y_valid[offset:offset+args.batch_size]
                 y_pred = model(wrap_X(X))
