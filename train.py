@@ -12,6 +12,7 @@ import time
 import sys
 import os
 import argparse
+import gc
 
 import smtplib
 from email.mime.text import MIMEText
@@ -289,6 +290,7 @@ def train():
                 l.backward()
                 optimizer.step()
                 callback(j, model)
+                gc.collect()
 
             scheduler.step()
             settings['step_size'] = scheduler.get_lr()
