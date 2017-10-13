@@ -13,7 +13,7 @@ def load_model(filename):
             except KeyError:
                 Predict = PredictFromParticleEmbedding # hack
             try:
-                model_kwargs = settings["model_kwargs"] 
+                model_kwargs = settings["model_kwargs"]
             except KeyError:
                 model_kwargs = { # hack
                 'n_features': 7,
@@ -24,7 +24,7 @@ def load_model(filename):
         with open(os.path.join(filename, 'model_state_dict.pt'), 'rb') as f:
             state_dict = torch.load(f)
             model = Predict(Transform, **model_kwargs)
-            model.load_state_dict(state_dict)
+            model.load_state_dict(state_dict())
 
     except FileNotFoundError:
         #import ipdb; ipdb.set_trace()
