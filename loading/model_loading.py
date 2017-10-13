@@ -24,7 +24,10 @@ def load_model(filename):
         with open(os.path.join(filename, 'model_state_dict.pt'), 'rb') as f:
             state_dict = torch.load(f)
             model = Predict(Transform, **model_kwargs)
-            model.load_state_dict(state_dict())
+            try:
+                model.load_state_dict(state_dict)
+            except AttributeError:
+                model.load_state_dict(state_dict())
 
     except FileNotFoundError:
         #import ipdb; ipdb.set_trace()
