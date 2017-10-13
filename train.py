@@ -299,10 +299,10 @@ def train():
             send_msg(msg, subject)
 
 
-    ''' INTERRUPT '''
-    '''----------------------------------------------------------------------- '''
 
     except (KeyboardInterrupt, SystemExit) as e:
+        ''' INTERRUPT '''
+        '''----------------------------------------------------------------------- '''
         logging.warning(e)
         logging.warning("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\nJOB INTERRUPTED")
         with open(logfile, "r") as f:
