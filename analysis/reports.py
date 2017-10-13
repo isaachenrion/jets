@@ -19,8 +19,6 @@ def remove_outliers(rocs, fprs, tprs):
 
     robust_mean = np.mean([scores[i] for i in range(len(scores)) if p25 <= scores[i] <= p75])
     robust_std = np.std([scores[i] for i in range(len(scores)) if p25 <= scores[i] <= p75])
-
-
     indices = [i for i in range(len(scores)) if robust_mean - 3*robust_std <= scores[i] <= robust_mean + 3*robust_std]
 
     new_r, new_f, new_t = [], [], []

@@ -2,8 +2,6 @@
 import torch
 from torch.autograd import Variable
 from torch.optim import Adam, lr_scheduler
-#torch.utils.backcompat.broadcast_warning.enabled = True
-
 import click
 import copy
 import numpy as np
@@ -18,7 +16,6 @@ import argparse
 import smtplib
 from email.mime.text import MIMEText
 
-from sklearn.cross_validation import train_test_split
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import RobustScaler
@@ -156,11 +153,12 @@ def train():
     n_valid = min(5000, args.n_train // 2)
     idx_valid = idx_valid[:n_valid]
 
-    X_valid, y_valid = X[idx_valid], y[idx_valid]
-    #import ipdb; ipdb.set_trace()
+    X_valid, y_valid, w_valid = X[idx_valid], y[idx_valid], w[idx_valid]
 
     X_train = X[idx_train]
     y_train = y[idx_train]
+
+    logging.info('Train size = {}, Validation size = {}'.format(len(X_train), len(X_valid)))
 
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
@@ -249,6 +247,13 @@ def train():
             roc_auc = roc_auc_score(yy, yy_pred)
             fpr, tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
             inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
+            if np.isnan(inv_fpr):
+                out_str = "Inv_fpr is NaN!\n"
+                out_str += "fpr = {}\n".format(fpr)
+                out_str += "tpr = {}\n".format(tpr)
+                out_str += "y = {}\n".format(yy)
+                out_str += "y_pred = {}\n".format(yy_pred)
+                raise ValueError(out_str)
             model.train()
 
             if inv_fpr > best_score[0]:
@@ -256,7 +261,6 @@ def train():
                 best_model_state_dict = copy.deepcopy(model.state_dict())
                 save_everything()
 
-            #best_roc_auc(valid)=%.4f\t
             msg = "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f\troc_auc(valid)=%.4f\t1/FPR@TPR=0.5(valid)=%.4f\tbest-1/FPR@TPR=0.5(valid)=%.4f" % (
                     iteration,
                     train_loss,
@@ -284,8 +288,6 @@ def train():
                 l = loss(model(wrap_X(X)), wrap(y))
                 l.backward()
                 optimizer.step()
-                #X = unwrap_X(X_var); y = unwrap(y_var)
-
                 callback(j, model)
 
             scheduler.step()
