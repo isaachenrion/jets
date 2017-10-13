@@ -26,7 +26,7 @@ def unwrap(y):
 
 def wrap_X(X):
     for jet in X:
-        jet['content'] = wrap(jet_["content"])
+        jet['content'] = wrap(jet["content"])
     #X = copy.copy(X_)
     #for i, (jet, jet_) in enumerate(X, X_):
     #    jet['content'] = wrap(jet_["content"])
