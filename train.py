@@ -222,32 +222,35 @@ def train():
             yy, yy_pred = [], []
             for i in range(len(X_valid) // args.batch_size):
                 idx = slice(offset, offset+args.batch_size)
-                X, y = X_train[idx], y_train[idx]
-                X = wrap_X(X); y = wrap(y);
-                try:
-                    tl = unwrap(loss(model(X), y)); train_loss.append(tl)
-                except RuntimeError:
-                    import ipdb; ipdb.set_trace()
-                X_train[idx] = unwrap_X(X)
+                Xt, yt = X_train[idx], y_train[idx]
+                #X = wrap_X(X); y = wrap(y);
+                X_var = wrap_X(Xt); y_var = wrap(yt)
+                tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
+                X = unwrap_X(X_var); y = unwrap(y_var)
 
-                X, y = X_valid[idx], y_valid[idx]
-                y_pred = model(wrap_X(X))
-                vl = unwrap(loss(y_pred, wrap(y))); valid_loss.append(vl)
+                X_var = wrap_X(Xv); y_var = wrap(yv)
+                y_pred = model(X_var)
+                vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
+                X = unwrap_X(X_var); y = unwrap(y_var); y_pred = unwrap(y_pred)
+
                 yy.append(y); yy_pred.append(unwrap(y_pred))
-                X_valid[idx] = unwrap_X(X)
+                #X_valid[idx] = unwrap_X(X)
 
                 offset+=args.batch_size
 
             # last batch
             X, y = X_train[offset:], y_train[offset:]
-            X = wrap_X(X); y = wrap(y);
-            tl = unwrap(loss(model(X), y)); train_loss.append(tl)
-            X_train[offset:] = unwrap_X(X)
+            X_var = wrap_X(Xt); y_var = wrap(yt)
+            tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
+            X = unwrap_X(X_var); y = unwrap(y_var)
 
             X, y = X_valid[offset:], y_valid[offset:]
-            y_pred = model(wrap_X(X))
-            vl = unwrap(loss(y_pred, wrap(y))); valid_loss.append(vl)
-            X_valid[offset:] = unwrap_X(X)
+            X_var = wrap_X(Xv); y_var = wrap(yv)
+            y_pred = model(X_var)
+            vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
+            X = unwrap_X(X_var); y = unwrap(y_var); y_pred = unwrap(y_pred)
+
+            #X_valid[offset:] = unwrap_X(X)
 
             yy.append(y); yy_pred.append(unwrap(y_pred))
             train_loss = np.mean(np.array(train_loss))
@@ -297,11 +300,11 @@ def train():
                 start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
                 idx = slice(start, start+args.batch_size)
                 X, y = X_train[idx], y_train[idx]
-                l = loss(model(wrap_X(X)), wrap(y))
+                X_var = wrap_X(X); y_var = wrap(y)
+                l = loss(model(X_var), y_var)
                 l.backward()
                 optimizer.step()
-                callback(j, model)
-                X_train[idx] = unwrap_X(X)
+                X = unwrap_X(X_var); y = unwrap(y_var)
                 gc.collect()
 
             scheduler.step()
