@@ -223,7 +223,10 @@ def train():
             for i in range(len(X_valid) // args.batch_size):
                 X, y = X_train[offset:offset+args.batch_size], y_train[offset:offset+args.batch_size]
                 X = wrap_X(X); y = wrap(y);
-                tl = unwrap(loss(model(X), y)); train_loss.append(tl)
+                try:
+                    tl = unwrap(loss(model(X), y)); train_loss.append(tl)
+                except RuntimeError:
+                    import ipdb; ipdb.set_trace()
 
                 X, y = X_valid[offset:offset+args.batch_size], y_valid[offset:offset+args.batch_size]
                 y_pred = model(wrap_X(X))
@@ -283,6 +286,7 @@ def train():
             logging.info("step_size = %.8f" % args.step_size)
 
             for j in range(n_batches):
+
                 model.train()
                 optimizer.zero_grad()
                 start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
