@@ -8,8 +8,6 @@ while [ "$1" != "" ]; do
                                 ;;
         -s | --seed )           seed=$1
                                 ;;
-        * )                     usage
-                                exit 1
     esac
     shift
 done
