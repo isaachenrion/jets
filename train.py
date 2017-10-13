@@ -221,19 +221,20 @@ def train():
             offset = 0; train_loss = []; valid_loss = []
             yy, yy_pred = [], []
             for i in range(len(X_valid) // args.batch_size):
-                X, y = X_train[offset:offset+args.batch_size], y_train[offset:offset+args.batch_size]
+                idx = offset:offset+args.batch_size
+                X, y = X_train[], y_train[idx]
                 X = wrap_X(X); y = wrap(y);
                 try:
                     tl = unwrap(loss(model(X), y)); train_loss.append(tl)
                 except RuntimeError:
                     import ipdb; ipdb.set_trace()
-                del X, y
+                X[idx] = unwrap(X)
 
-                X, y = X_valid[offset:offset+args.batch_size], y_valid[offset:offset+args.batch_size]
+                X, y = X_valid[idx], y_valid[idx]
                 y_pred = model(wrap_X(X))
                 vl = unwrap(loss(y_pred, wrap(y))); valid_loss.append(vl)
                 yy.append(y); yy_pred.append(unwrap(y_pred))
-                del X, y
+                X[idx] = unwrap(X)
 
                 offset+=args.batch_size
 
@@ -241,12 +242,14 @@ def train():
             X, y = X_train[offset:], y_train[offset:]
             X = wrap_X(X); y = wrap(y);
             tl = unwrap(loss(model(X), y)); train_loss.append(tl)
+            X[offset:] = unwrap(X)
 
             X, y = X_valid[offset:], y_valid[offset:]
             y_pred = model(wrap_X(X))
             vl = unwrap(loss(y_pred, wrap(y))); valid_loss.append(vl)
-            yy.append(y); yy_pred.append(unwrap(y_pred))
+            X[offset:] = unwrap(X)
 
+            yy.append(y); yy_pred.append(unwrap(y_pred))
             train_loss = np.mean(np.array(train_loss))
             valid_loss = np.mean(np.array(valid_loss))
             yy = np.concatenate(yy, 0)
@@ -298,7 +301,7 @@ def train():
                 l.backward()
                 optimizer.step()
                 callback(j, model)
-                del X, y
+                X[idx] = unwrap(X)
                 gc.collect()
 
             scheduler.step()
