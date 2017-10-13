@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser(description='Jets')
 
 parser.add_argument("-d", "--data_list_filename", type=str, default='evaldatasets.txt')
 parser.add_argument("-n", "--n_test", type=int, default=-1)
-parser.add_argument("-s", "--set", action='store_true')
+parser.add_argument("-s", "--set", type=str, default='valid')
 parser.add_argument("-m", "--model_list_filename", type=str, default='evalmodels.txt')
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("-b", "--batch_size", type=int, default=64)
