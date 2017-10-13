@@ -228,13 +228,13 @@ def train():
                     tl = unwrap(loss(model(X), y)); train_loss.append(tl)
                 except RuntimeError:
                     import ipdb; ipdb.set_trace()
-                X[idx] = unwrap(X)
+                X_train[idx] = unwrap(X)
 
                 X, y = X_valid[idx], y_valid[idx]
                 y_pred = model(wrap_X(X))
                 vl = unwrap(loss(y_pred, wrap(y))); valid_loss.append(vl)
                 yy.append(y); yy_pred.append(unwrap(y_pred))
-                X[idx] = unwrap(X)
+                X_valid[idx] = unwrap(X)
 
                 offset+=args.batch_size
 
@@ -242,12 +242,12 @@ def train():
             X, y = X_train[offset:], y_train[offset:]
             X = wrap_X(X); y = wrap(y);
             tl = unwrap(loss(model(X), y)); train_loss.append(tl)
-            X[offset:] = unwrap(X)
+            X_train[offset:] = unwrap(X)
 
             X, y = X_valid[offset:], y_valid[offset:]
             y_pred = model(wrap_X(X))
             vl = unwrap(loss(y_pred, wrap(y))); valid_loss.append(vl)
-            X[offset:] = unwrap(X)
+            X_valid[offset:] = unwrap(X)
 
             yy.append(y); yy_pred.append(unwrap(y_pred))
             train_loss = np.mean(np.array(train_loss))
@@ -301,7 +301,7 @@ def train():
                 l.backward()
                 optimizer.step()
                 callback(j, model)
-                X[idx] = unwrap(X)
+                X_train[idx] = unwrap(X)
                 gc.collect()
 
             scheduler.step()
