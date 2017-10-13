@@ -240,7 +240,7 @@ def train():
 
             if roc_auc > best_score[0]:
                 best_score[0] = roc_auc
-                best_model = copy.deepcopy(model)
+                best_model_state_dict = copy.deepcopy(model.state_dict())
                 save_everything()
 
             msg = "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f\troc_auc(valid)=%.4f\tbest_roc_auc(valid)=%.4f" % (
