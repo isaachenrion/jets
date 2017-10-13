@@ -223,19 +223,23 @@ def train():
             yy, yy_pred = [], []
             for i in range(len(X_valid) // args.batch_size):
                 X, y = X_train[offset:offset+args.batch_size], y_train[offset:offset+args.batch_size]
-                X_v = wrap_X(X); y_v = wrap(y)
-                tl = unwrap(loss(model(X_v), y_v)); train_loss.append(tl)
-                #X = unwrap_X(X); y = unwrap(y)
+                tl = unwrap(loss(model(wrap_X(X)), wrap(y))); train_loss.append(tl)
 
                 X, y = X_valid[offset:offset+args.batch_size], y_valid[offset:offset+args.batch_size]
-                X_v = wrap_X(X); y_v = wrap(y)
-                y_pred = model(X_v)
-                vl = loss(y_pred, y_v)
-                vl = unwrap(vl); valid_loss.append(vl)
-                #X = unwrap_X(X); y = unwrap(y); y_pred = unwrap(y_pred)
+                y_pred = model(wrap_X(X))
+                vl = unwrap(loss(y_pred, wrap(y))); valid_loss.append(vl)
                 yy.append(y); yy_pred.append(unwrap(y_pred))
 
                 offset+=args.batch_size
+
+            # last batch
+            X, y = X_train[offset:], y_train[offset:]
+            tl = unwrap(loss(model(wrap_X(X)), wrap(y))); train_loss.append(tl)
+
+            X, y = X_valid[offset:], y_valid[offset:]
+            y_pred = model(wrap_X(X))
+            vl = unwrap(loss(y_pred, wrap(y))); valid_loss.append(vl)
+            yy.append(y); yy_pred.append(unwrap(y_pred))
 
             train_loss = np.mean(np.array(train_loss))
             valid_loss = np.mean(np.array(valid_loss))
@@ -277,8 +281,7 @@ def train():
                 start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
                 idx = slice(start, start+args.batch_size)
                 X, y = X_train[idx], y_train[idx]
-                X_v = wrap_X(X); y_v = wrap(y)
-                l = loss(model(X_v), y_v)
+                l = loss(model(wrap_X(X)), wrap(y))
                 l.backward()
                 optimizer.step()
                 #X = unwrap_X(X_var); y = unwrap(y_var)
@@ -292,6 +295,11 @@ def train():
             msg = MIMEText(f.read())
             subject = 'JOB FINISHED (PID = {}, GPU = {})'.format(pid, args.gpu)
             send_msg(msg, subject)
+
+
+    ''' INTERRUPT '''
+    '''----------------------------------------------------------------------- '''
+
     except (KeyboardInterrupt, SystemExit) as e:
         logging.warning(e)
         logging.warning("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\nJOB INTERRUPTED")
