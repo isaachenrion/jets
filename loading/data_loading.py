@@ -51,22 +51,15 @@ def load_data(tf, data_dir, filename, n):
     for jet in X:
         jet["content"] = tf.transform(jet["content"])
     if n > 0:
-        X = X[:n]
-        y = y[:n]
+        indices = np.random.permutation(len(X))[:n]
+        X = np.array(X)[indices]
+        y = y[indices]
     logging.warning("Loaded data: {}".format(filename))
     logging.warning("\tX size = %d" % len(X))
     logging.warning("\ty size = %d" % len(y))
     return X, y
 
-def load_test(tf, data_dir, filename_test, n_test=-1, cropping=True):
-    X, y = load_data(tf, data_dir, filename_test, -1)
-
-    if not cropping:
-        if n > 0:
-            X = X[:n]
-            y = y[:n]
-        return X, y
-
+def crop(X, y):
     # Cropping
     logging.warning("Cropping...")
     X_ = [j for j in X if 250 < j["pt"] < 300 and 50 < j["mass"] < 110]
@@ -96,12 +89,25 @@ def load_test(tf, data_dir, filename_test, n_test=-1, cropping=True):
     inv_w /= inv_w.sum()
     w[y==1] = inv_w
 
+    return X, y, w
+
+def load_test(tf, data_dir, filename_test, n_test=-1, cropping=True):
+    X, y = load_data(tf, data_dir, filename_test, -1)
+
+    if not cropping:
+        if n_test > 0:
+            indices = np.random.permutation(len(X))[:n_test]
+            X = X[indices]
+            y = y[indices]
+        return X, y
+
+    X, y, w = crop(X, y)
+
     X = X[:n_test]
     y = y[:n_test]
     w = w[:n_test]
 
     logging.warning("\tAfter cropping: X size = %d" % len(X))
     logging.warning("\tAfter cropping: y size = %d" % len(y))
-
 
     return X, y, w

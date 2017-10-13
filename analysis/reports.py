@@ -3,7 +3,6 @@ import numpy as np
 
 from scipy import interp
 
-
 def remove_outliers(rocs, fprs, tprs):
     inv_fprs = []
     base_tpr = np.linspace(0.05, 1, 476)

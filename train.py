@@ -19,13 +19,13 @@ import smtplib
 from email.mime.text import MIMEText
 
 from sklearn.cross_validation import train_test_split
+from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import RobustScaler
 
 from architectures.preprocessing import rewrite_content
 from architectures.preprocessing import permute_by_pt
 from architectures.preprocessing import extract
-
 from architectures.preprocessing import wrap
 from architectures.preprocessing import unwrap
 from architectures.preprocessing import wrap_X
@@ -39,9 +39,13 @@ from architectures import RelNNTransformConnected
 from architectures import MPNNTransform
 from architectures import PredictFromParticleEmbedding
 
+from analysis.rocs import inv_fpr_at_tpr_equals_half
+from analysis.reports import report_score
+
 from loggers import StatsLogger
 
 from loading import load_data
+from loading import crop
 from loading import load_tf
 from loading import load_model
 
@@ -120,15 +124,18 @@ def train():
 
     ''' EMAIL '''
     '''----------------------------------------------------------------------- '''
-    server = smtplib.SMTP('smtp.gmail.com:587')
-    server.ehlo()
-    server.starttls()
-    server.login(args.username, args.password)
-    source_email = args.username + "@gmail.com"
-    target_email = "henrion@nyu.edu"
+    def send_msg(msg, subject):
+        server = smtplib.SMTP('smtp.gmail.com:587')
+        server.ehlo()
+        server.starttls()
+        server.login(args.username, args.password)
 
-    def send_msg(msg):
+        msg['Subject'] = subject
+        msg['From'] = args.username + "@gmail.com"
+        msg["To"] = "henrion@nyu.edu"
         server.send_message(msg)
+        logging.info("SENT EMAIL")
+        server.close()
 
     ''' CUDA '''
     '''----------------------------------------------------------------------- '''
@@ -142,15 +149,13 @@ def train():
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
     tf = load_tf(DATA_DIR, "{}-train.pickle".format(args.filename))
-    X_train, y_train = load_data(tf, DATA_DIR, "{}-train.pickle".format(args.filename), args.n_train)
-    try:
-        X_valid, y_valid = load_data(tf, DATA_DIR, "{}-valid.pickle".format(args.filename), args.n_valid)
-    except FileNotFoundError:
-        X_train, y_train = load_data(tf, DATA_DIR, "{}-train.pickle".format(args.filename), -1)
-        X_valid, y_valid = X_train[:5000], y_train[:5000]
-        with open(os.path.join(DATA_DIR, "preprocessed/{}-valid.pickle".format(args.filename)), 'wb') as f:
-            pickle.dump((X_valid, y_valid), f)
-        X_valid, y_valid = load_data(tf, DATA_DIR, "{}-valid.pickle".format(args.filename), args.n_valid)
+    X, y = load_data(tf, DATA_DIR, "{}-train.pickle".format(args.filename), args.n_train)
+
+    n_valid = min(5000, args.n_train // 2)
+    X_train, y_train = X[n_valid:], y[n_valid:]
+    X_valid, y_valid = X_train[:n_valid], y_train[:n_valid]
+    X_valid, y_valid, w_valid = crop(X_valid, y_valid)
+
 
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
@@ -187,6 +192,7 @@ def train():
 
     n_batches = int(np.ceil(len(X_train) / args.batch_size))
     best_score = [-np.inf]  # yuck, but works
+    #best_roc_auc = [-np.inf]
     best_model_state_dict = copy.deepcopy(model.state_dict())
 
     def loss(y_pred, y):
@@ -230,60 +236,66 @@ def train():
             yy = np.concatenate(yy, 0)
             yy_pred = np.concatenate(yy_pred, 0)
 
-            try:
-                roc_auc = roc_auc_score(yy, yy_pred)
-            except ValueError as e:
-                logging.warning('Batch {}'.format(iteration))
-                logging.warning(e)
-                roc_auc = -np.inf
+            roc_auc = roc_auc_score(yy, yy_pred)
+            fpr, tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
+            inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
             model.train()
 
-            if roc_auc > best_score[0]:
-                best_score[0] = roc_auc
+            if inv_fpr > best_score[0]:
+                best_score[0] = inv_fpr
                 best_model_state_dict = copy.deepcopy(model.state_dict())
                 save_everything()
 
-            msg = "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f\troc_auc(valid)=%.4f\tbest_roc_auc(valid)=%.4f" % (
+            #best_roc_auc(valid)=%.4f\t
+            msg = "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f\troc_auc(valid)=%.4f\t1/FPR@TPR=0.5(valid)=%.4f\tbest-1/FPR@TPR=0.5(valid)=%.4f" % (
                     iteration,
                     train_loss,
                     valid_loss,
                     roc_auc,
+                    inv_fpr,
                     best_score[0])
             logging.info(msg)
 
 
     ''' TRAINING '''
     '''----------------------------------------------------------------------- '''
-    logging.warning("Training...")
-    for i in range(args.n_epochs):
-        logging.info("epoch = %d" % i)
-        logging.info("step_size = %.8f" % args.step_size)
+    try:
+        logging.warning("Training...")
+        for i in range(args.n_epochs):
+            logging.info("epoch = %d" % i)
+            logging.info("step_size = %.8f" % args.step_size)
 
-        for j in range(n_batches):
-            model.train()
-            optimizer.zero_grad()
-            start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
-            idx = slice(start, start+args.batch_size)
-            X, y = X_train[idx], y_train[idx]
-            X_var = wrap_X(X); y_var = wrap(y)
-            l = loss(model(X_var), y_var)
-            l.backward()
-            optimizer.step()
-            X = unwrap_X(X_var); y = unwrap(y_var)
+            for j in range(n_batches):
+                model.train()
+                optimizer.zero_grad()
+                start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
+                idx = slice(start, start+args.batch_size)
+                X, y = X_train[idx], y_train[idx]
+                X_var = wrap_X(X); y_var = wrap(y)
+                l = loss(model(X_var), y_var)
+                l.backward()
+                optimizer.step()
+                X = unwrap_X(X_var); y = unwrap(y_var)
 
-            callback(j, model)
+                callback(j, model)
 
-        scheduler.step()
-        settings['step_size'] = scheduler.get_lr()
-    logging.info("FINISHED TRAINING")
+            scheduler.step()
+            settings['step_size'] = scheduler.get_lr()
+        logging.info("FINISHED TRAINING")
+        with open(logfile, "r") as f:
+            msg = MIMEText(f.read())
+            subject = 'JOB FINISHED (PID = {}, GPU = {})'.format(pid, args.gpu)
+            send_msg(msg, subject)
+    except (KeyboardInterrupt, SystemExit):
+        logging.warning("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\nJOB INTERRUPTED")
+        with open(logfile, "r") as f:
+            msg = MIMEText(f.read())
+            subject = 'JOB INTERRUPTED (PID = {}, GPU = {})'.format(pid, args.gpu)
+            send_msg(msg, subject)
 
-    with open(logfile, "r") as f:
-        msg = MIMEText(f.read())
-        msg['Subject'] = 'Job finished (PID = {})'.format(pid)
-        msg['From'] = source_email
-        msg["To"] = target_email
 
-        send_msg(msg)
+
+
 
 
 
