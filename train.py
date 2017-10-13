@@ -222,7 +222,7 @@ def train():
             yy, yy_pred = [], []
             for i in range(len(X_valid) // args.batch_size):
                 idx = slice(offset, offset+args.batch_size)
-                X, y = X_train[], y_train[idx]
+                X, y = X_train[idx], y_train[idx]
                 X = wrap_X(X); y = wrap(y);
                 try:
                     tl = unwrap(loss(model(X), y)); train_loss.append(tl)
