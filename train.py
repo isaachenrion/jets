@@ -221,7 +221,7 @@ def train():
             offset = 0; train_loss = []; valid_loss = []
             yy, yy_pred = [], []
             for i in range(len(X_valid) // args.batch_size):
-                idx = offset:offset+args.batch_size
+                idx = slice(offset, offset+args.batch_size)
                 X, y = X_train[], y_train[idx]
                 X = wrap_X(X); y = wrap(y);
                 try:
