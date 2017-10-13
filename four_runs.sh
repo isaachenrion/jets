@@ -14,7 +14,7 @@ done
 
 for VARIABLE in 0 1 2 3
 do
-        python train.py -g $VARIABLE -s -i $iterations -m $model_type --seed ($VARIABLE*1000 + $seed) &
+        python train.py -g $VARIABLE -s -i $iterations -m $model_type --seed ($VARIABLE \* 1000 + $seed) &
         disown %1
         sleep 5
 
