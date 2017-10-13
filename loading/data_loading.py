@@ -34,7 +34,7 @@ def load_tf(data_dir, filename):
     path_to_tf = os.path.join(data_dir, 'tf', 'TF-' + filename)
     if not os.path.exists(path_to_tf):
         logging.warning("Computing TF from {}".format(filename))
-        X, _ = load_raw_data(os.path.join(data_dir, 'preprocessed', filename))
+        X, _ = load_raw_data(data_dir, filename)
         tf = RobustScaler().fit(np.vstack([jet["content"] for jet in X]))
         with open(path_to_tf, "wb") as f:
             pickle.dump(tf, f)
