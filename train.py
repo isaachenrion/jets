@@ -153,7 +153,7 @@ def train():
     n_valid = min(5000, args.n_train // 2)
     idx_valid = idx_valid[:n_valid]
 
-    X_valid, y_valid, w_valid = X[idx_valid], y[idx_valid], w[idx_valid]
+    X_valid, y_valid, w_valid = X[idx_valid], y[idx_valid], w_valid[idx_valid]
 
     X_train = X[idx_train]
     y_train = y[idx_train]
@@ -297,8 +297,6 @@ def train():
             msg = MIMEText(f.read())
             subject = 'JOB FINISHED (PID = {}, GPU = {})'.format(pid, args.gpu)
             send_msg(msg, subject)
-
-
 
     except (KeyboardInterrupt, SystemExit) as e:
         ''' INTERRUPT '''
