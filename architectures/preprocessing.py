@@ -25,18 +25,14 @@ def unwrap(y):
 
 
 def wrap_X(X_):
-    X = copy.deepcopy(X_)
-    for i, (jet, jet_) in enumerate(zip(X, X_)):
-        jet["content"] = wrap(jet_["content"])
-        X[i] = jet
+    X = copy.copy(X_)
+    for i, (jet, jet_) in enumerate(X, X_):
+        jet['content'] = wrap(jet_["content"])
     return X
 
 def unwrap_X(X):
-    #X = copy.deepcopy(X_wrap)
-    #X_new = []
     for jet in X:
         jet["content"] = unwrap(jet["content"])
-        #X_new.append(jet)
     return X
 
 
