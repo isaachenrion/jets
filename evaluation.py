@@ -28,9 +28,8 @@ parser = argparse.ArgumentParser(description='Jets')
 
 parser.add_argument("-d", "--data_list_filename", type=str, default='evaldatasets.txt')
 parser.add_argument("-n", "--n_test", type=int, default=-1)
-parser.add_argument("-t", "--test", action='store_true')
+parser.add_argument("-s", "--set", action='store_true')
 parser.add_argument("-m", "--model_list_filename", type=str, default='evalmodels.txt')
-parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("-b", "--batch_size", type=int, default=64)
 parser.add_argument("-g", "--gpu", type=int, default=0)
@@ -44,7 +43,7 @@ parser.add_argument("--password", type=str, default="deeplearning")
 
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
-
+args.silent = not args.verbose
 
 ''' CONSTANTS '''
 '''----------------------------------------------------------------------- '''
@@ -113,13 +112,15 @@ def main():
 
             logging.info('Building ROCs for models trained on {}'.format(data_path))
             tf = load_tf(DATA_DIR, "{}-train.pickle".format(data_path))
-            if args.test:
+            if args.set == 'test':
                 data = load_test(tf, DATA_DIR, "{}-test.pickle".format(data_path), args.n_test)
-            else:
+            elif args.set == 'valid':
                 data = load_test(tf, DATA_DIR, "{}-valid.pickle".format(data_path), args.n_test)
+            elif args.set == 'train':
+                data = load_test(tf, DATA_DIR, "{}-train.pickle".format(data_path), args.n_test)
 
             for model_path in model_paths:
-                logging.info('\tBuilding ROCs for instances of {}'.format(model_paths))
+                logging.info('\tBuilding ROCs for instances of {}'.format(model_path))
                 r, f, t = build_rocs(data, os.path.join(MODELS_DIR, model_path), args.batch_size)
 
                 absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))

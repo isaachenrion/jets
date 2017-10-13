@@ -69,7 +69,6 @@ def evaluate_models(X, y, w, model_filenames, batch_size=64):
 def build_rocs(data, model_path, batch_size):
     X, y, w = data
     model_filenames = [os.path.join(model_path, fn) for fn in os.listdir(model_path)]
-    logging.debug(model_filenames)
     rocs, fprs, tprs = evaluate_models(X, y, w, model_filenames, batch_size)
 
     return rocs, fprs, tprs
