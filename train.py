@@ -233,7 +233,8 @@ def train():
 
             # last batch
             X, y = X_train[offset:], y_train[offset:]
-            tl = unwrap(loss(model(wrap_X(X)), wrap(y))); train_loss.append(tl)
+            X = wrap_X(X); y = wrap(y);
+            tl = unwrap(loss(model(X), y)); train_loss.append(tl)
 
             X, y = X_valid[offset:], y_valid[offset:]
             y_pred = model(wrap_X(X))
