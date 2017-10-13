@@ -12,28 +12,32 @@ def wrap(y, dtype='float'):
          y_wrap = y_wrap.long()
     if torch.cuda.is_available():
         y_wrap = y_wrap.cuda()
+    #y = y_wrap
     return y_wrap
 
-def unwrap(y_wrap):
-    if y_wrap.is_cuda:
-        y = y_wrap.cpu().data.numpy()
+def unwrap(y):
+    if y.is_cuda:
+        y_unwrap = y.cpu().data.numpy()
     else:
-        y = y_wrap.data.numpy()
-    return y
+        y_unwrap = y.data.numpy()
 
-def wrap_X(X):
-    X_wrap = copy.deepcopy(X)
-    for jet in X_wrap:
-        jet["content"] = wrap(jet["content"])
-    return X_wrap
+    return y_unwrap
 
-def unwrap_X(X_wrap):
+
+def wrap_X(X_):
+    X = copy.deepcopy(X_)
+    for i, (jet, jet_) in enumerate(zip(X, X_)):
+        jet["content"] = wrap(jet_["content"])
+        X[i] = jet
+    return X
+
+def unwrap_X(X):
     #X = copy.deepcopy(X_wrap)
-    X_new = []
-    for jet in X_wrap:
+    #X_new = []
+    for jet in X:
         jet["content"] = unwrap(jet["content"])
-        X_new.append(jet)
-    return X_new
+        #X_new.append(jet)
+    return X
 
 
 

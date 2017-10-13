@@ -149,13 +149,18 @@ def train():
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
     tf = load_tf(DATA_DIR, "{}-train.pickle".format(args.filename))
-    X, y = load_data(tf, DATA_DIR, "{}-train.pickle".format(args.filename), args.n_train)
+    X, y = load_data(tf, DATA_DIR, "{}-train.pickle".format(args.filename), -1)
 
+    idx_valid, w_valid = crop(X, y, return_indices=True)
+    idx_train = [i for i, x in enumerate(X) if i not in idx_valid][:args.n_train]
     n_valid = min(5000, args.n_train // 2)
-    X_train, y_train = X[n_valid:], y[n_valid:]
-    X_valid, y_valid = X_train[:n_valid], y_train[:n_valid]
-    X_valid, y_valid, w_valid = crop(X_valid, y_valid)
+    idx_valid = idx_valid[:n_valid]
 
+    X_valid, y_valid = X[idx_valid], y[idx_valid]
+    #import ipdb; ipdb.set_trace()
+
+    X_train = X[idx_train]
+    y_train = y[idx_train]
 
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
@@ -217,17 +222,18 @@ def train():
             offset = 0; train_loss = []; valid_loss = []
             yy, yy_pred = [], []
             for i in range(len(X_valid) // args.batch_size):
-                Xt, yt = X_train[offset:offset+args.batch_size], y_train[offset:offset+args.batch_size]
-                X_var = wrap_X(Xt); y_var = wrap(yt)
-                tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
-                X = unwrap_X(X_var); y = unwrap(y_var)
+                X, y = X_train[offset:offset+args.batch_size], y_train[offset:offset+args.batch_size]
+                X_v = wrap_X(X); y_v = wrap(y)
+                tl = unwrap(loss(model(X_v), y_v)); train_loss.append(tl)
+                #X = unwrap_X(X); y = unwrap(y)
 
-                Xv, yv = X_valid[offset:offset+args.batch_size], y_valid[offset:offset+args.batch_size]
-                X_var = wrap_X(Xv); y_var = wrap(yv)
-                y_pred = model(X_var)
-                vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
-                X = unwrap_X(X_var); y = unwrap(y_var); y_pred = unwrap(y_pred)
-                yy.append(y); yy_pred.append(y_pred)
+                X, y = X_valid[offset:offset+args.batch_size], y_valid[offset:offset+args.batch_size]
+                X_v = wrap_X(X); y_v = wrap(y)
+                y_pred = model(X_v)
+                vl = loss(y_pred, y_v)
+                vl = unwrap(vl); valid_loss.append(vl)
+                #X = unwrap_X(X); y = unwrap(y); y_pred = unwrap(y_pred)
+                yy.append(y); yy_pred.append(unwrap(y_pred))
 
                 offset+=args.batch_size
 
@@ -271,11 +277,11 @@ def train():
                 start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
                 idx = slice(start, start+args.batch_size)
                 X, y = X_train[idx], y_train[idx]
-                X_var = wrap_X(X); y_var = wrap(y)
-                l = loss(model(X_var), y_var)
+                X_v = wrap_X(X); y_v = wrap(y)
+                l = loss(model(X_v), y_v)
                 l.backward()
                 optimizer.step()
-                X = unwrap_X(X_var); y = unwrap(y_var)
+                #X = unwrap_X(X_var); y = unwrap(y_var)
 
                 callback(j, model)
 
@@ -286,7 +292,8 @@ def train():
             msg = MIMEText(f.read())
             subject = 'JOB FINISHED (PID = {}, GPU = {})'.format(pid, args.gpu)
             send_msg(msg, subject)
-    except (KeyboardInterrupt, SystemExit):
+    except (KeyboardInterrupt, SystemExit) as e:
+        logging.warning(e)
         logging.warning("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\nJOB INTERRUPTED")
         with open(logfile, "r") as f:
             msg = MIMEText(f.read())
