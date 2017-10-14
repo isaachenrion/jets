@@ -237,7 +237,7 @@ def train():
                 vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
                 X = unwrap_X(X_var); y = unwrap(y_var); y_pred = unwrap(y_pred)
 
-                yy.append(y); yy_pred.append(unwrap(y_pred))
+                yy.append(y); yy_pred.append(y_pred)
                 #X_valid[idx] = unwrap_X(X)
 
                 offset+=args.batch_size
@@ -253,10 +253,8 @@ def train():
             y_pred = model(X_var)
             vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
             X = unwrap_X(X_var); y = unwrap(y_var); y_pred = unwrap(y_pred)
-
-            #X_valid[offset:] = unwrap_X(X)
-
-            yy.append(y); yy_pred.append(unwrap(y_pred))
+            yy.append(y); yy_pred.append(y_pred)
+            
             train_loss = np.mean(np.array(train_loss))
             valid_loss = np.mean(np.array(valid_loss))
             yy = np.concatenate(yy, 0)
