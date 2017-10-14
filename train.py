@@ -185,7 +185,7 @@ def train():
     logging.warning("Splitting into train and validation...")
 
     X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=min(5000, len(X) // 5))
-    X_valid, y_valid, w_valid = crop(X_valid, y_valid)
+    #X_valid, y_valid, w_valid = crop(X_valid, y_valid)
     logging.warning("\ttrain size = %d" % len(X_train))
     logging.warning("\tvalid size = %d" % len(X_valid))
 
@@ -295,10 +295,11 @@ def train():
             yy_pred = np.concatenate(yy_pred, 0)
 
             roc_auc = roc_auc_score(yy, yy_pred)
-            fpr, tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
-            inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
-            if np.isnan(inv_fpr):
-                logging.warning("NaN in 1/FPR\n"+out_str)
+            inv_fpr = 0
+            #fpr, tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
+            #inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
+            #if np.isnan(inv_fpr):
+            #    logging.warning("NaN in 1/FPR\n"+out_str)
             model.train()
 
             if roc_auc > best_score[0]:
