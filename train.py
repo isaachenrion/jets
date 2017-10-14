@@ -171,7 +171,7 @@ def train():
     '''
     logging.warning("Loading data...")
     tf = load_tf(DATA_DIR, "{}-train.pickle".format(args.filename))
-    X, y = load_raw_data(DATA_DIR, "{}-train.pickle".format(args.filename), -1)
+    X, y = load_raw_data(DATA_DIR, "{}-train.pickle".format(args.filename))
 
     for jet in X:
         jet["content"] = tf.transform(jet["content"])
