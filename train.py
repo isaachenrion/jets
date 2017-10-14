@@ -17,6 +17,8 @@ import gc
 import smtplib
 from email.mime.text import MIMEText
 
+
+from sklearn.cross_validation import train_test_split
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import RobustScaler
@@ -146,6 +148,7 @@ def train():
 
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
+    '''
     tf = load_tf(DATA_DIR, "{}-train.pickle".format(args.filename))
     X, y = load_data(tf, DATA_DIR, "{}-train.pickle".format(args.filename), -1)
 
@@ -164,6 +167,26 @@ def train():
     y_train = y[idx_train]
 
     logging.info('Train size = {}, Validation size = {}'.format(len(X_train), len(X_valid)))
+    '''
+    logging.warning("Loading data...")
+    tf = load_tf(DATA_DIR, "{}-train.pickle".format(args.filename))
+    X, y = load_data(tf, DATA_DIR, "{}-train.pickle".format(args.filename), -1)
+
+    for jet in X:
+        jet["content"] = tf.transform(jet["content"])
+
+
+    if args.n_train > 0:
+        indices = torch.randperm(len(X)).numpy()[:args.n_train]
+        X = [X[i] for i in indices]
+        y = y[indices]
+
+    logging.warning("Splitting into train and validation...")
+
+    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=min(5000, len(X) // 5))
+    X_valid, y_valid, w_valid = crop(X_valid, y_valid)
+    logging.warning("\ttrain size = %d" % len(X_train))
+    logging.warning("\tvalid size = %d" % len(X_valid))
 
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
