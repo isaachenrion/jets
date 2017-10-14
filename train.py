@@ -309,6 +309,7 @@ def train():
                 l.backward()
                 optimizer.step()
                 X = unwrap_X(X_var); y = unwrap(y_var)
+                callback(j, model)
                 gc.collect()
 
             scheduler.step()
