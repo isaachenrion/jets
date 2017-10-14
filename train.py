@@ -45,6 +45,7 @@ from loggers import StatsLogger
 
 from loading import load_data
 from loading import load_tf
+from loading import crop
 
 ''' ARGUMENTS '''
 '''----------------------------------------------------------------------- '''
