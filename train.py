@@ -273,7 +273,7 @@ def train():
             logging.info(
                 "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f"
                 "\troc_auc(valid)=%.4f\tbest_roc_auc(valid)=%.4f"
-                "\t(1/fpr @ tpr=0.5)(valid) = " % (
+                "\t(1/fpr @ tpr=0.5)(valid) = %.4f" % (
                     iteration,
                     train_loss,
                     valid_loss,
