@@ -45,6 +45,7 @@ from analysis.reports import report_score
 from loggers import StatsLogger
 
 from loading import load_data
+from loading import load_raw_data
 from loading import crop
 from loading import load_tf
 from loading import load_model
