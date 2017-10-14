@@ -15,7 +15,7 @@ import argparse
 import gc
 
 import smtplib
-
+from email.mime.text import MIMEText
 
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import roc_curve
