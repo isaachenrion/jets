@@ -165,6 +165,8 @@ def train():
     logging.warning("Splitting into train and validation...")
 
     X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=args.n_valid)
+
+    X_valid, y_valid, w_valid = crop(X_valid, y_valid)
     logging.warning("\ttrain size = %d" % len(X_train))
     logging.warning("\tvalid size = %d" % len(X_valid))
 
@@ -258,7 +260,8 @@ def train():
             yy = np.concatenate(yy, 0)
             yy_pred = np.concatenate(yy_pred, 0)
 
-            roc_auc = roc_auc_score(yy, yy_pred)
+            roc_auc = roc_auc_score(yy, yy_pred, sample_weight=w_valid)
+
             model.train()
 
             if roc_auc > best_score[0]:
@@ -273,6 +276,15 @@ def train():
                     valid_loss,
                     roc_auc,
                     best_score[0]))
+
+            # 1/fpr
+            fpr, tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
+            inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
+
+            if np.isnan(inv_fpr):
+                logging.warning("NaN in 1/FPR\n"+out_str)
+
+            logging.info("1/FPR @ TPR = 0.5: {}".format(inv_fpr))
     ''' TRAINING '''
     '''----------------------------------------------------------------------- '''
     try:
@@ -302,8 +314,7 @@ def train():
 
 
         ''' EVALUATION OF 1/FPR
-        '''
-        X_valid, y_valid, w_valid = crop(X_valid, y_valid)
+
 
         offset = 0
         yy, yy_pred = [], []
@@ -318,18 +329,14 @@ def train():
 
         yy = np.concatenate(yy, 0)
         yy_pred = np.concatenate(yy_pred, 0)
-        fpr, tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
-        inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
-        logging.info("1/FPR @ TPR = 0.5: {}".format(inv_fpr))
-        if np.isnan(inv_fpr):
-            logging.warning("NaN in 1/FPR\n"+out_str)
-
+        '''
         ''' SEND AN EMAIL
         '''
         with open(logfile, "r") as f:
             msg = MIMEText(f.read())
             subject = 'JOB FINISHED (PID = {}, GPU = {})'.format(pid, args.gpu)
             send_msg(msg, subject)
+
 
     except (KeyboardInterrupt, SystemExit) as e:
         ''' INTERRUPT '''
