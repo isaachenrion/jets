@@ -53,7 +53,7 @@ parser = argparse.ArgumentParser(description='Jets')
 
 parser.add_argument("-f", "--filename", type=str, default='antikt-kt')
 parser.add_argument("-n", "--n_train", type=int, default=-1)
-parser.add_argument("--n_valid", type=int, default=-1)
+parser.add_argument("--n_valid", type=int, default=5000)
 parser.add_argument("-m", "--model_type", type=int, default=0)
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
@@ -77,6 +77,7 @@ parser.add_argument("--password", type=str, default="deeplearning")
 
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
+if args.n_train
 
 ''' LOOKUP TABLES '''
 '''----------------------------------------------------------------------- '''
@@ -163,7 +164,7 @@ def train():
 
     logging.warning("Splitting into train and validation...")
 
-    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=min(5000, len(X) // 5))
+    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=args.n_valid)
     logging.warning("\ttrain size = %d" % len(X_train))
     logging.warning("\tvalid size = %d" % len(X_valid))
 
@@ -304,6 +305,8 @@ def train():
         '''
         X_valid, y_valid, w_valid = crop(X_valid, y_valid)
 
+        offset = 0
+        yy, yy_pred = [], []
         for i in range(len(X_valid) // args.batch_size):
             idx = slice(offset, offset+args.batch_size)
             Xv, yv = X_valid[idx], y_valid[idx]
