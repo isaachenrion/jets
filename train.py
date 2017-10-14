@@ -279,15 +279,15 @@ def train():
                 out_str += "tpr = {}\n".format(tpr)
                 out_str += "y = {}\n".format(yy)
                 out_str += "y_pred = {}\n".format(yy_pred)
-                raise ValueError(out_str)
+                logging.warning("NaN in 1/FPR\n"+out_str)
             model.train()
 
-            if inv_fpr > best_score[0]:
-                best_score[0] = inv_fpr
+            if roc_auc > best_score[0]:
+                best_score[0] = roc_auc
                 best_model_state_dict = copy.deepcopy(model.state_dict())
                 save_everything()
 
-            msg = "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f\troc_auc(valid)=%.4f\t1/FPR@TPR=0.5(valid)=%.4f\tbest-1/FPR@TPR=0.5(valid)=%.4f" % (
+            msg = "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f\troc_auc(valid)=%.4f\t1/FPR@TPR=0.5(valid)=%.4f\tbest_roc_auc(valid)=%.4f" % (
                     iteration,
                     train_loss,
                     valid_loss,
