@@ -159,7 +159,7 @@ def train():
 
 
     X_valid, y_valid, w_valid = X[idx_valid], y[idx_valid], w_valid[idx_valid]
-
+    X_valid, y_valid, w_valid = copy.deepcopy(X_valid), copy.deepcopy(y_valid), copy.deepcopy(w_valid)
     X_train = X[idx_train]
     y_train = y[idx_train]
 
@@ -231,11 +231,18 @@ def train():
                 tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
                 X = unwrap_X(X_var); y = unwrap(y_var)
 
-                Xv, yv = X_valid[idx], y_valid[idx]
+                #Xv, yv = X_valid[idx], y_valid[idx]
+                #X_var = wrap_X(Xv); y_var = wrap(yv)
+                #y_pred = model(X_var)
+                #vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
+                #X = unwrap_X(X_var); y = unwrap(y_var); y_pred = unwrap(y_pred)
+
+                Xv, yv = X_valid[offset:offset+args.batch_size], y_valid[offset:offset+args.batch_size]
                 X_var = wrap_X(Xv); y_var = wrap(yv)
                 y_pred = model(X_var)
                 vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
-                X = unwrap_X(X_var); y = unwrap(y_var); y_pred = unwrap(y_pred)
+                Xv = unwrap_X(X_var); yv = unwrap(y_var); y_pred = unwrap(y_pred)
+                #yy.append(y); yy_pred.append(y_pred)
 
                 yy.append(y); yy_pred.append(y_pred)
                 #X_valid[idx] = unwrap_X(X)
@@ -243,18 +250,21 @@ def train():
                 offset+=args.batch_size
 
             # last batch
-            Xt, yt = X_train[offset:], y_train[offset:]
-            X_var = wrap_X(Xt); y_var = wrap(yt)
-            tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
-            X = unwrap_X(X_var); y = unwrap(y_var)
+            if len(X_train[offset:]) > 0:
+                Xt, yt = X_train[offset:], y_train[offset:]
+                X_var = wrap_X(Xt); y_var = wrap(yt)
+                tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
+                X = unwrap_X(X_var); y = unwrap(y_var)
 
-            Xv, yv = X_valid[offset:], y_valid[offset:]
-            X_var = wrap_X(Xv); y_var = wrap(yv)
-            y_pred = model(X_var)
-            vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
-            X = unwrap_X(X_var); y = unwrap(y_var); y_pred = unwrap(y_pred)
-            yy.append(y); yy_pred.append(y_pred)
-            
+            if len(X_valid[offset:]) > 0:
+                Xv, yv = X_valid[offset:], y_valid[offset:]
+                X_var = wrap_X(Xv); y_var = wrap(yv)
+                y_pred = model(X_var)
+                vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
+                X = unwrap_X(X_var); y = unwrap(y_var); y_pred = unwrap(y_pred)
+                yy.append(y); yy_pred.append(y_pred)
+            #except:
+
             train_loss = np.mean(np.array(train_loss))
             valid_loss = np.mean(np.array(valid_loss))
             yy = np.concatenate(yy, 0)
