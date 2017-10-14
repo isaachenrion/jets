@@ -227,11 +227,11 @@ def train():
             for i in range(len(X_valid) // args.batch_size):
                 idx = slice(offset, offset+args.batch_size)
                 Xt, yt = X_train[idx], y_train[idx]
-                #X = wrap_X(X); y = wrap(y);
                 X_var = wrap_X(Xt); y_var = wrap(yt)
                 tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
                 X = unwrap_X(X_var); y = unwrap(y_var)
 
+                Xv, yv = X_valid[idx], y_valid[idx]
                 X_var = wrap_X(Xv); y_var = wrap(yv)
                 y_pred = model(X_var)
                 vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
@@ -243,12 +243,12 @@ def train():
                 offset+=args.batch_size
 
             # last batch
-            X, y = X_train[offset:], y_train[offset:]
+            Xt, yt = X_train[offset:], y_train[offset:]
             X_var = wrap_X(Xt); y_var = wrap(yt)
             tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
             X = unwrap_X(X_var); y = unwrap(y_var)
 
-            X, y = X_valid[offset:], y_valid[offset:]
+            Xv, yv = X_valid[offset:], y_valid[offset:]
             X_var = wrap_X(Xv); y_var = wrap(yv)
             y_pred = model(X_var)
             vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
