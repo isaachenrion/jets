@@ -28,7 +28,6 @@ def wrap_X(X):
     return X_wrap
 
 def unwrap_X(X_wrap):
-    #X = copy.deepcopy(X_wrap)
     X_new = []
     for jet in X_wrap:
         jet["content"] = unwrap(jet["content"])

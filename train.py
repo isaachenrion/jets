@@ -170,7 +170,7 @@ def train():
     '''
     logging.warning("Loading data...")
     tf = load_tf(DATA_DIR, "{}-train.pickle".format(args.filename))
-    X, y = load_data(tf, DATA_DIR, "{}-train.pickle".format(args.filename), -1)
+    X, y = load_raw_data(DATA_DIR, "{}-train.pickle".format(args.filename), -1)
 
     for jet in X:
         jet["content"] = tf.transform(jet["content"])
@@ -235,9 +235,9 @@ def train():
     '''----------------------------------------------------------------------- '''
     def callback(iteration, model):
 
-        def save_everything():
+        def save_everything(model):
             with open(os.path.join(model_dir, 'model_state_dict.pt'), 'wb') as f:
-                torch.save(best_model_state_dict, f)
+                torch.save(model.state_dict(), f)
 
             with open(os.path.join(model_dir, 'settings.pickle'), "wb") as f:
                 pickle.dump(settings, f)
@@ -302,8 +302,8 @@ def train():
 
             if roc_auc > best_score[0]:
                 best_score[0] = roc_auc
-                best_model_state_dict = copy.deepcopy(model.state_dict())
-                save_everything()
+                #best_model_state_dict = copy.deepcopy()
+                save_everything(model)
 
             msg = "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f\troc_auc(valid)=%.4f\t1/FPR@TPR=0.5(valid)=%.4f\tbest_roc_auc(valid)=%.4f" % (
                     iteration,
@@ -335,8 +335,8 @@ def train():
                 l.backward()
                 optimizer.step()
                 X = unwrap_X(X_var); y = unwrap(y_var)
+
                 callback(j, model)
-                gc.collect()
 
             scheduler.step()
             settings['step_size'] = scheduler.get_lr()
