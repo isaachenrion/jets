@@ -77,7 +77,7 @@ parser.add_argument("--password", type=str, default="deeplearning")
 
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
-if args.n_train <= 5 * args.n_valid:
+if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
 
 ''' LOOKUP TABLES '''
