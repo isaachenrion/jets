@@ -146,26 +146,6 @@ def train():
 
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
-    '''
-    tf = load_tf(DATA_DIR, "{}-train.pickle".format(args.filename))
-    X, y = load_data(tf, DATA_DIR, "{}-train.pickle".format(args.filename), -1)
-
-    idx_valid, w_valid = crop(X, y, return_indices=True)
-    if args.n_train > 0:
-        n_valid = args.n_train // 2
-    else:
-        n_valid = 5000
-    idx_valid = idx_valid[:n_valid]
-    idx_train = [i for i, x in enumerate(X) if i not in idx_valid][:args.n_train]
-
-
-    X_valid, y_valid, w_valid = X[idx_valid], y[idx_valid], w_valid[idx_valid]
-    X_valid, y_valid, w_valid = copy.deepcopy(X_valid), copy.deepcopy(y_valid), copy.deepcopy(w_valid)
-    X_train = X[idx_train]
-    y_train = y[idx_train]
-
-    logging.info('Train size = {}, Validation size = {}'.format(len(X_train), len(X_valid)))
-    '''
     logging.warning("Loading data...")
     tf = load_tf(DATA_DIR, "{}-train.pickle".format(args.filename))
     X, y = load_data(DATA_DIR, "{}-train.pickle".format(args.filename))
@@ -249,15 +229,6 @@ def train():
             with open(os.path.join(model_dir, 'settings.pickle'), "wb") as f:
                 pickle.dump(settings, f)
 
-            emailing = False
-            if emailing:
-                with open(os.path.join(model_dir, 'log.txt'), 'r') as f:
-                    msg = f.read()
-                    sendmail('isaachenrion@gmail.com', 'isaachenrion@gmail.com', msg)
-
-
-
-
         if iteration % 25 == 0:
             model.eval()
 
@@ -289,19 +260,18 @@ def train():
                 offset+=args.batch_size
 
             # last batch
-            if len(X_train[offset:]) > 0:
-                Xt, yt = X_train[offset:], y_train[offset:]
-                X_var = wrap_X(Xt); y_var = wrap(yt)
-                tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
-                X = unwrap_X(X_var); y = unwrap(y_var)
-
-            if len(X_valid[offset:]) > 0:
-                Xv, yv = X_valid[offset:], y_valid[offset:]
-                X_var = wrap_X(Xv); y_var = wrap(yv)
-                y_pred = model(X_var)
-                vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
-                X = unwrap_X(X_var); y = unwrap(y_var); y_pred = unwrap(y_pred)
-                yy.append(y); yy_pred.append(y_pred)
+            #if len(X_train[offset:]) > 0:
+            #    Xt, yt = X_train[offset:], y_train[offset:]
+            #    X_var = wrap_X(Xt); y_var = wrap(yt)
+            #    tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
+            #    X = unwrap_X(X_var); y = unwrap(y_var)
+            #if len(X_valid[offset:]) > 0:
+            #    Xv, yv = X_valid[offset:], y_valid[offset:]
+            #    X_var = wrap_X(Xv); y_var = wrap(yv)
+            #    y_pred = model(X_var)
+            #    vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
+            #    X = unwrap_X(X_var); y = unwrap(y_var); y_pred = unwrap(y_pred)
+            #    yy.append(y); yy_pred.append(y_pred)
             #except:
 
             train_loss = np.mean(np.array(train_loss))
