@@ -13,6 +13,8 @@ from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 from sklearn.utils import check_random_state
 
+
+
 from architectures.recursive_net import GRNNTransformSimple
 from architectures.relation_net import RelNNTransformConnected
 from architectures.message_net import MPNNTransform
@@ -37,8 +39,7 @@ def evaluate_models(X, y, w, model_filenames, batch_size=64):
         if 'DS_Store' not in filename:
             logging.info("\t\tLoading %s" % filename),
             model = load_model(filename)
-            if torch.cuda.is_available():
-                model.cuda()
+            #logging.info("FILE LOADED! {}".format(filename))
             work = True
             if work:
                 model.eval()

@@ -34,6 +34,7 @@ class DTNNMessage(Message):
             self.combo_wx = nn.Linear(self.message_dim, self.message_dim, bias=False)
 
     def _forward_with_edge(self, vertices, edges):
+
         message = self.combo_wx(self.vertex_wx_plus_b(vertices) * self.edge_wx_plus_b(edges))
         return message
 

@@ -11,7 +11,7 @@ from architectures.preprocessing import sequentialize_by_pt
 from architectures.preprocessing import randomize
 from architectures.preprocessing import rewrite_content
 
-def load_raw_data(data_dir, filename):
+def load_data(data_dir, filename):
     path_to_preprocessed = os.path.join(data_dir, 'preprocessed', filename)
 
     if not os.path.exists(path_to_preprocessed):
@@ -46,7 +46,7 @@ def load_tf(data_dir, filename):
 
     return tf
 
-def load_data(tf, data_dir, filename, n):
+def _load_data(tf, data_dir, filename, n):
     X, y = load_raw_data(data_dir, filename)
     X = np.array(X)
     y = np.array(y)
@@ -93,8 +93,13 @@ def crop(X, y, return_indices=False):
         return indices, w
     return X_, y_, w
 
-def load_test(tf, data_dir, filename_test, n_test=-1, cropping=True):
-    X, y = load_data(tf, data_dir, filename_test, -1)
+def load_test(tf, data_dir, filename, n_test=-1, cropping=True):
+    X, y = load_data(data_dir, filename)
+    tf = load_tf(data_dir, "{}-train.pickle".format(filename))
+
+    for jet in X:
+        jet["content"] = tf.transform(jet["content"])
+
 
     if not cropping:
         if n_test > 0:

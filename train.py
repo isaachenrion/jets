@@ -15,7 +15,6 @@ import argparse
 import gc
 
 import smtplib
-from email.mime.text import MIMEText
 
 
 from sklearn.cross_validation import train_test_split
@@ -45,10 +44,7 @@ from analysis.reports import report_score
 from loggers import StatsLogger
 
 from loading import load_data
-from loading import load_raw_data
-from loading import crop
 from loading import load_tf
-from loading import load_model
 
 ''' ARGUMENTS '''
 '''----------------------------------------------------------------------- '''
@@ -104,8 +100,7 @@ def train():
 
     ''' LOGGING '''
     '''----------------------------------------------------------------------- '''
-    logfile = os.path.join(model_dir, 'log.txt')
-    logging.basicConfig(level=logging.DEBUG, filename=logfile, filemode="a+",
+    logging.basicConfig(level=logging.DEBUG, filename=os.path.join(model_dir, 'log.txt'), filemode="a+",
                         format="%(asctime)-15s %(message)s")
     if not args.silent:
         root = logging.getLogger()
@@ -120,6 +115,7 @@ def train():
         root.addHandler(ch)
 
     for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
+
     pid = os.getpid()
     logging.warning("\tPID = {}".format(pid))
 
@@ -171,7 +167,7 @@ def train():
     '''
     logging.warning("Loading data...")
     tf = load_tf(DATA_DIR, "{}-train.pickle".format(args.filename))
-    X, y = load_raw_data(DATA_DIR, "{}-train.pickle".format(args.filename))
+    X, y = load_data(DATA_DIR, "{}-train.pickle".format(args.filename))
 
     for jet in X:
         jet["content"] = tf.transform(jet["content"])
@@ -205,7 +201,17 @@ def train():
         model = Predict(Transform, **model_kwargs)
         settings = {"transform": Transform, "predict": Predict, "model_kwargs": model_kwargs}
     else:
-        model = load_model(args.load)
+        with open(os.path.join(args.load, 'settings.pickle'), "rb") as f:
+            settings = pickle.load(f, encoding='latin-1')
+            Transform = settings["transform"]
+            Predict = settings["predict"]
+            model_kwargs = settings["model_kwargs"]
+
+        with open(os.path.join(args.load, 'model_state_dict.pt'), 'rb') as f:
+            state_dict = torch.load(f)
+            model = PredictFromParticleEmbedding(Transform, **model_kwargs)
+            model.load_state_dict(state_dict)
+
         if args.restart:
             args.step_size = settings["step_size"]
 
@@ -235,13 +241,21 @@ def train():
         ''' VALIDATION '''
     '''----------------------------------------------------------------------- '''
     def callback(iteration, model):
-
         def save_everything(model):
             with open(os.path.join(model_dir, 'model_state_dict.pt'), 'wb') as f:
                 torch.save(model.state_dict(), f)
 
             with open(os.path.join(model_dir, 'settings.pickle'), "wb") as f:
                 pickle.dump(settings, f)
+
+            emailing = False
+            if emailing:
+                with open(os.path.join(model_dir, 'log.txt'), 'r') as f:
+                    msg = f.read()
+                    sendmail('isaachenrion@gmail.com', 'isaachenrion@gmail.com', msg)
+
+
+
 
         if iteration % 25 == 0:
             model.eval()
@@ -307,16 +321,14 @@ def train():
                 #best_model_state_dict = copy.deepcopy()
                 save_everything(model)
 
-            msg = "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f\troc_auc(valid)=%.4f\t1/FPR@TPR=0.5(valid)=%.4f\tbest_roc_auc(valid)=%.4f" % (
+            logging.info(
+                "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f"
+                "\troc_auc(valid)=%.4f\tbest_roc_auc(valid)=%.4f" % (
                     iteration,
                     train_loss,
                     valid_loss,
                     roc_auc,
-                    inv_fpr,
-                    best_score[0])
-            logging.info(msg)
-
-
+                    best_score[0]))
     ''' TRAINING '''
     '''----------------------------------------------------------------------- '''
     try:
@@ -357,11 +369,6 @@ def train():
             msg = MIMEText(f.read())
             subject = 'JOB INTERRUPTED (PID = {}, GPU = {})'.format(pid, args.gpu)
             send_msg(msg, subject)
-
-
-
-
-
 
 
 

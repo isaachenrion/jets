@@ -7,11 +7,16 @@ import argparse
 import datetime
 import sys
 
+<<<<<<< HEAD
 import smtplib
 from email.mime.text import MIMEText
 
 from loading import load_tf
 from loading import load_test
+=======
+from data_loading import load_tf
+from data_loading import load_test
+>>>>>>> parent of c14e00d... added emailing! all models working. CHECKPOINT
 
 from analysis.reports import report_score
 from analysis.reports import remove_outliers
