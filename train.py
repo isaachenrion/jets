@@ -164,7 +164,6 @@ def train():
     logging.warning("Splitting into train and validation...")
 
     X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=min(5000, len(X) // 5))
-    #X_valid, y_valid, w_valid = crop(X_valid, y_valid)
     logging.warning("\ttrain size = %d" % len(X_train))
     logging.warning("\tvalid size = %d" % len(X_valid))
 
@@ -303,6 +302,8 @@ def train():
 
         ''' EVALUATION OF 1/FPR
         '''
+        X_valid, y_valid, w_valid = crop(X_valid, y_valid)
+        
         for i in range(len(X_valid) // args.batch_size):
             idx = slice(offset, offset+args.batch_size)
             Xv, yv = X_valid[idx], y_valid[idx]
@@ -326,7 +327,7 @@ def train():
             msg = MIMEText(f.read())
             subject = 'JOB FINISHED (PID = {}, GPU = {})'.format(pid, args.gpu)
             send_msg(msg, subject)
-            
+
     except (KeyboardInterrupt, SystemExit) as e:
         ''' INTERRUPT '''
         '''----------------------------------------------------------------------- '''
