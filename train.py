@@ -297,11 +297,6 @@ def train():
             fpr, tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
             inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
             if np.isnan(inv_fpr):
-                out_str = "Inv_fpr is NaN!\n"
-                out_str += "fpr = {}\n".format(fpr)
-                out_str += "tpr = {}\n".format(tpr)
-                out_str += "y = {}\n".format(yy)
-                out_str += "y_pred = {}\n".format(yy_pred)
                 logging.warning("NaN in 1/FPR\n"+out_str)
             model.train()
 
