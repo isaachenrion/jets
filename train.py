@@ -164,7 +164,7 @@ def train():
     logging.warning("Splitting into train and validation...")
 
     X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=min(5000, len(X) // 5))
-    X_valid, y_valid, w_valid = crop(X_valid, y_valid)
+    #X_valid, y_valid, w_valid = crop(X_valid, y_valid)
     logging.warning("\ttrain size = %d" % len(X_train))
     logging.warning("\tvalid size = %d" % len(X_valid))
 
@@ -248,7 +248,7 @@ def train():
                 y_pred = model(X_var)
                 vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
                 Xv = unwrap_X(X_var); yv = unwrap(y_var); y_pred = unwrap(y_pred)
-                yy.append(y); yy_pred.append(y_pred)
+                yy.append(yv); yy_pred.append(y_pred)
 
                 offset+=args.batch_size
 
@@ -259,27 +259,20 @@ def train():
             yy_pred = np.concatenate(yy_pred, 0)
 
             roc_auc = roc_auc_score(yy, yy_pred, sample_weight=w_valid)
-            fpr, tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
-            inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
-            if np.isnan(inv_fpr):
-                logging.warning("NaN in 1/FPR\n"+out_str)
             model.train()
 
             if roc_auc > best_score[0]:
                 best_score[0] = roc_auc
-                #best_model_state_dict = copy.deepcopy()
                 save_everything(model)
 
             logging.info(
                 "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f"
-                "\troc_auc(valid)=%.4f\tbest_roc_auc(valid)=%.4f"
-                "\t(1/fpr @ tpr=0.5)(valid) = %.4f" % (
+                "\troc_auc(valid)=%.4f\tbest_roc_auc(valid)=%.4f" % (
                     iteration,
                     train_loss,
                     valid_loss,
                     roc_auc,
-                    best_score[0],
-                    inv_fpr))
+                    best_score[0]))
     ''' TRAINING '''
     '''----------------------------------------------------------------------- '''
     try:
@@ -306,11 +299,34 @@ def train():
             scheduler.step()
             settings['step_size'] = scheduler.get_lr()
         logging.info("FINISHED TRAINING")
+
+
+        ''' EVALUATION OF 1/FPR
+        '''
+        for i in range(len(X_valid) // args.batch_size):
+            idx = slice(offset, offset+args.batch_size)
+            Xv, yv = X_valid[idx], y_valid[idx]
+            X_var = wrap_X(Xv);
+            y_pred = model(X_var)
+            Xv = unwrap_X(X_var);y_pred = unwrap(y_pred)
+            yy.append(yv); yy_pred.append(y_pred)
+            offset+=args.batch_size
+
+        yy = np.concatenate(yy, 0)
+        yy_pred = np.concatenate(yy_pred, 0)
+        fpr, tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
+        inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
+        logging.info("1/FPR @ TPR = 0.5: {}".format(inv_fpr))
+        if np.isnan(inv_fpr):
+            logging.warning("NaN in 1/FPR\n"+out_str)
+
+        ''' SEND AN EMAIL
+        '''
         with open(logfile, "r") as f:
             msg = MIMEText(f.read())
             subject = 'JOB FINISHED (PID = {}, GPU = {})'.format(pid, args.gpu)
             send_msg(msg, subject)
-
+            
     except (KeyboardInterrupt, SystemExit) as e:
         ''' INTERRUPT '''
         '''----------------------------------------------------------------------- '''
