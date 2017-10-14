@@ -151,7 +151,10 @@ def train():
 
     idx_valid, w_valid = crop(X, y, return_indices=True)
     idx_train = [i for i, x in enumerate(X) if i not in idx_valid][:args.n_train]
-    n_valid = min(5000, args.n_train // 2)
+    if args.n_train > 0:
+        n_valid = min(args.n_train // 2)
+    else:
+        n_valid = 5000
     idx_valid = idx_valid[:n_valid]
 
     X_valid, y_valid, w_valid = X[idx_valid], y[idx_valid], w_valid[idx_valid]
