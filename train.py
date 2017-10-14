@@ -257,7 +257,7 @@ def train():
             yy = np.concatenate(yy, 0)
             yy_pred = np.concatenate(yy_pred, 0)
 
-            roc_auc = roc_auc_score(yy, yy_pred, sample_weight=w_valid)
+            roc_auc = roc_auc_score(yy, yy_pred)
             model.train()
 
             if roc_auc > best_score[0]:
@@ -303,7 +303,7 @@ def train():
         ''' EVALUATION OF 1/FPR
         '''
         X_valid, y_valid, w_valid = crop(X_valid, y_valid)
-        
+
         for i in range(len(X_valid) // args.batch_size):
             idx = slice(offset, offset+args.batch_size)
             Xv, yv = X_valid[idx], y_valid[idx]
