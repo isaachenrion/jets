@@ -63,6 +63,7 @@ parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("--debug", action='store_true', default=False)
 parser.add_argument("-r", "--restart", action='store_true', default=False)
+parser.add_argument("--add_cropped", action='store_true', default=False)
 parser.add_argument("--bn", action='store_true', default=False)
 parser.add_argument("--n_features", type=int, default=7)
 parser.add_argument("--n_hidden", type=int, default=40)
@@ -211,10 +212,11 @@ def train():
     X_valid, y_valid, cropped_indices, w_valid = crop(X_valid_uncropped, y_valid_uncropped, return_cropped_indices=True)
 
     # add cropped indices to training data
-    X_train.extend([x for i, x in enumerate(X_valid_uncropped) if i in cropped_indices])
-    y_train = [y for y in y_train]
-    y_train.extend([y for i, y in enumerate(y_valid_uncropped) if i in cropped_indices])
-    y_train = np.array(y_train)
+    if args.add_cropped:
+        X_train.extend([x for i, x in enumerate(X_valid_uncropped) if i in cropped_indices])
+        y_train = [y for y in y_train]
+        y_train.extend([y for i, y in enumerate(y_valid_uncropped) if i in cropped_indices])
+        y_train = np.array(y_train)
     logging.warning("\tfinal train size = %d" % len(X_train))
     logging.warning("\tfinal valid size = %d" % len(X_valid))
 
