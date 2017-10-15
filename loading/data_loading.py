@@ -61,10 +61,12 @@ def _load_data(tf, data_dir, filename, n):
     logging.warning("\ty size = %d" % len(y))
     return X, y
 
-def crop(X, y, return_indices=False):
+def crop(X, y, return_cropped_indices=False):
     # Cropping
     logging.warning("Cropping...")
     indices = [i for i, j in enumerate(X) if 250 < j["pt"] < 300 and 50 < j["mass"] < 110]
+    cropped_indices = [i for i, j in enumerate(X) if i not in indices]
+    logging.warning("{} (selected) + {} (cropped) = {}".format(len(indices), len(cropped_indices), (len(indices) + len(cropped_indices))))
     X_ = [j for j in X if 250 < j["pt"] < 300 and 50 < j["mass"] < 110]
     y_ = [y[i] for i, j in enumerate(X) if 250 < j["pt"] < 300 and 50 < j["mass"] < 110]
 
@@ -89,8 +91,8 @@ def crop(X, y, return_indices=False):
     inv_w /= inv_w.sum()
     w[y_==1] = inv_w
 
-    if return_indices:
-        return indices, w
+    if return_cropped_indices:
+        return X_, y_, cropped_indices, w
     return X_, y_, w
 
 def load_test(tf, data_dir, filename, n_test=-1, cropping=True):

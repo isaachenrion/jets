@@ -53,7 +53,7 @@ parser = argparse.ArgumentParser(description='Jets')
 
 parser.add_argument("-f", "--filename", type=str, default='antikt-kt')
 parser.add_argument("-n", "--n_train", type=int, default=-1)
-parser.add_argument("--n_valid", type=int, default=5000)
+parser.add_argument("--n_valid", type=int, default=27000)
 parser.add_argument("-m", "--model_type", type=int, default=0)
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
@@ -172,11 +172,19 @@ def train():
 
     logging.warning("Splitting into train and validation...")
 
-    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=args.n_valid)
+    X_train, X_valid_uncropped, y_train, y_valid_uncropped = train_test_split(X, y, test_size=args.n_valid)
+    logging.warning("\traw train size = %d" % len(X_train))
+    logging.warning("\traw valid size = %d" % len(X_valid_uncropped))
 
-    X_valid, y_valid, w_valid = crop(X_valid, y_valid)
-    logging.warning("\ttrain size = %d" % len(X_train))
-    logging.warning("\tvalid size = %d" % len(X_valid))
+    X_valid, y_valid, cropped_indices, w_valid = crop(X_valid_uncropped, y_valid_uncropped, return_cropped_indices=True)
+    
+    # add cropped indices to training data
+    X_train.extend([x for i, x in enumerate(X_valid_uncropped) if i in cropped_indices])
+    y_train = [y for y in y_train]
+    y_train.extend([y for i, y in enumerate(y_valid_uncropped) if i in cropped_indices])
+    y_train = np.array(y_train)
+    logging.warning("\tfinal train size = %d" % len(X_train))
+    logging.warning("\tfinal valid size = %d" % len(X_valid))
 
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
