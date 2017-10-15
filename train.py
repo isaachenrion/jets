@@ -314,7 +314,7 @@ def train():
 
                 callback(j, model)
 
-            scheduler.step()
+            scheduler.step(l)
             settings['step_size'] = scheduler.get_lr()
         logging.info("FINISHED TRAINING")
 
