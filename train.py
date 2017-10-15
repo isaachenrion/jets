@@ -11,6 +11,7 @@ import datetime
 import time
 import sys
 import os
+import signal
 import argparse
 import gc
 
@@ -383,6 +384,13 @@ def train():
         '''----------------------------------------------------------------------- '''
         summary_email(last_non_empty_out_str, model, interrupted=True)
         raise SystemExit
+    finally:
+        def signal_term_handler(signal, frame):
+            logging.info('KILLED')
+            summary_email(last_non_empty_out_str, model, interrupted=True)
+            sys.exit(0)
+
+        signal.signal(signal.SIGTERM, signal_term_handler)
 
 if __name__ == "__main__":
     train()
