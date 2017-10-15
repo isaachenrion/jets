@@ -185,7 +185,13 @@ def train():
         if Transform in [MPNNTransform, GRNNTransformGated]:
             model_kwargs['n_iters'] = args.n_iters
         model = Predict(Transform, **model_kwargs)
-        settings = {"transform": Transform, "predict": Predict, "model_kwargs": model_kwargs}
+        settings = {
+            "transform": Transform,
+            "predict": Predict,
+            "model_kwargs": model_kwargs,
+            "step_size": args.step_size,
+            "args": args,
+            }
     else:
         with open(os.path.join(args.load, 'settings.pickle'), "rb") as f:
             settings = pickle.load(f, encoding='latin-1')
@@ -212,11 +218,11 @@ def train():
     '''----------------------------------------------------------------------- '''
 
     optimizer = Adam(model.parameters(), lr=args.step_size)
-    scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
+    #scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
+    scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
 
     n_batches = int(np.ceil(len(X_train) / args.batch_size))
     best_score = [-np.inf]  # yuck, but works
-    #best_roc_auc = [-np.inf]
     best_model_state_dict = copy.deepcopy(model.state_dict())
 
     def loss(y_pred, y):
@@ -263,21 +269,6 @@ def train():
 
             roc_auc = roc_auc_score(yy, yy_pred, sample_weight=w_valid)
 
-            model.train()
-
-            if roc_auc > best_score[0]:
-                best_score[0] = roc_auc
-                save_everything(model)
-
-            logging.info(
-                "%5d\t~loss(train)=%.4f\tloss(valid)=%.4f"
-                "\troc_auc(valid)=%.4f\tbest_roc_auc(valid)=%.4f" % (
-                    iteration,
-                    train_loss,
-                    valid_loss,
-                    roc_auc,
-                    best_score[0]))
-
             # 1/fpr
             fpr, tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
             inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
@@ -285,14 +276,29 @@ def train():
             if np.isnan(inv_fpr):
                 logging.warning("NaN in 1/FPR\n"+out_str)
 
-            logging.info("1/FPR @ TPR = 0.5: {}".format(inv_fpr))
+            if inv_fpr > best_score[0]:
+                best_score[0] = inv_fpr
+                save_everything(model)
+
+            logging.info(
+                "{:5d}\t~loss(train)={:.4f}\tloss(valid)={:.4f}\troc_auc(valid)={:.4f}".format(
+                    iteration,
+                    train_loss,
+                    valid_loss,
+                    roc_auc,))
+
+            logging.info("\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.2f}".format(inv_fpr, best_score[0]))
+
+            scheduler.step(valid_loss)
+            model.train()
+
     ''' TRAINING '''
     '''----------------------------------------------------------------------- '''
     try:
         logging.warning("Training...")
         for i in range(args.n_epochs):
             logging.info("epoch = %d" % i)
-            logging.info("step_size = %.8f" % args.step_size)
+            logging.info("step_size = %.8f" % settings['step_size'])
 
             for j in range(n_batches):
 
@@ -314,23 +320,6 @@ def train():
         logging.info("FINISHED TRAINING")
 
 
-        ''' EVALUATION OF 1/FPR
-
-
-        offset = 0
-        yy, yy_pred = [], []
-        for i in range(len(X_valid) // args.batch_size):
-            idx = slice(offset, offset+args.batch_size)
-            Xv, yv = X_valid[idx], y_valid[idx]
-            X_var = wrap_X(Xv);
-            y_pred = model(X_var)
-            Xv = unwrap_X(X_var);y_pred = unwrap(y_pred)
-            yy.append(yv); yy_pred.append(y_pred)
-            offset+=args.batch_size
-
-        yy = np.concatenate(yy, 0)
-        yy_pred = np.concatenate(yy_pred, 0)
-        '''
         ''' SEND AN EMAIL
         '''
         with open(logfile, "r") as f:
