@@ -15,7 +15,11 @@ import argparse
 import gc
 
 import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
+from email.utils import COMMASPACE, formatdate
+from email import encoders
 
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import roc_curve
@@ -82,7 +86,9 @@ if args.debug:
     args.n_hidden = 1
     args.bs = 9
     args.verbose = True
-    args.epochs = 5
+    args.n_epochs = 3
+    args.n_train = 1000
+
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
@@ -131,20 +137,46 @@ def train():
     pid = os.getpid()
     logging.warning("\tPID = {}".format(pid))
     logging.warning("\tTraining on GPU: {}".format(torch.cuda.is_available()))
+
     ''' EMAIL '''
     '''----------------------------------------------------------------------- '''
-    def send_msg(msg, subject):
+    global out_str
+    out_str = "GOT NOTHING"
+    def send_msg(text, subject, attachments=None):
+
+        msg = MIMEMultipart()
+        msg['From'] = args.username + "@gmail.com"
+        msg['To'] = "henrion@nyu.edu"
+        msg['Date'] = formatdate(localtime = True)
+        msg['Subject'] = subject
+
+        msg.attach(MIMEText(text))
+
+        if attachments is not None:
+            for f in attachments:
+                part = MIMEBase('application', "octet-stream")
+                part.set_payload( open(f,"rb").read() )
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', 'attachment; filename="{0}"'.format(os.path.basename(f)))
+                msg.attach(part)
+
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.ehlo()
         server.starttls()
         server.login(args.username, args.password)
-
-        msg['Subject'] = subject
-        msg['From'] = args.username + "@gmail.com"
-        msg["To"] = "henrion@nyu.edu"
-        server.send_message(msg)
-        logging.info("SENT EMAIL")
+        server.sendmail(args.username + "@gmail.com", "henrion@nyu.edu", msg.as_string())
         server.close()
+        logging.info("SENT EMAIL")
+
+    def summary_email(out_str, model, interrupted):
+
+        status = "INTERRUPTED" if interrupted else "COMPLETED"
+        subject = 'JOB {} (Logfile = {}, PID = {}, GPU = {})'.format(status, logfile, pid, args.gpu)
+        attachments = [logfile]
+        text = ""
+        text += "{}\n".format(model)
+        text += "{}".format(out_str)
+        send_msg(text, subject, attachments)
 
     ''' CUDA '''
     '''----------------------------------------------------------------------- '''
@@ -177,7 +209,7 @@ def train():
     logging.warning("\traw valid size = %d" % len(X_valid_uncropped))
 
     X_valid, y_valid, cropped_indices, w_valid = crop(X_valid_uncropped, y_valid_uncropped, return_cropped_indices=True)
-    
+
     # add cropped indices to training data
     X_train.extend([x for i, x in enumerate(X_valid_uncropped) if i in cropped_indices])
     y_train = [y for y in y_train]
@@ -248,6 +280,7 @@ def train():
         ''' VALIDATION '''
     '''----------------------------------------------------------------------- '''
     def callback(iteration, model):
+        out_str = None
         def save_everything(model):
             with open(os.path.join(model_dir, 'model_state_dict.pt'), 'wb') as f:
                 torch.save(model.state_dict(), f)
@@ -289,23 +322,23 @@ def train():
             inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
 
             if np.isnan(inv_fpr):
-                logging.warning("NaN in 1/FPR\n"+out_str)
+                logging.warning("NaN in 1/FPR\n")
 
             if inv_fpr > best_score[0]:
                 best_score[0] = inv_fpr
                 save_everything(model)
 
-            logging.info(
-                "{:5d}\t~loss(train)={:.4f}\tloss(valid)={:.4f}\troc_auc(valid)={:.4f}".format(
+            out_str = "{:5d}\t~loss(train)={:.4f}\tloss(valid)={:.4f}\troc_auc(valid)={:.4f}".format(
                     iteration,
                     train_loss,
                     valid_loss,
-                    roc_auc,))
+                    roc_auc,)
 
-            logging.info("\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.2f}".format(inv_fpr, best_score[0]))
+            out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.2f}".format(inv_fpr, best_score[0])
 
             scheduler.step(valid_loss)
             model.train()
+        return out_str
 
     ''' TRAINING '''
     '''----------------------------------------------------------------------- '''
@@ -328,32 +361,26 @@ def train():
                 optimizer.step()
                 X = unwrap_X(X_var); y = unwrap(y_var)
 
-                callback(j, model)
+                out_str = callback(j, model)
+
+                if out_str is not None:
+                    last_non_empty_out_str = out_str
+                    logging.info(out_str)
 
             scheduler.step()
             settings['step_size'] = scheduler.get_lr()[0]
         logging.info("FINISHED TRAINING")
 
 
-        ''' SEND AN EMAIL
-        '''
-        with open(logfile, "r") as f:
-            msg = MIMEText(f.read())
-            subject = 'JOB FINISHED (Logfile = {}, PID = {}, GPU = {})'.format(logfile, pid, args.gpu)
-            send_msg(msg, subject)
+        summary_email(last_non_empty_out_str, model, interrupted=False)
+
 
 
     except (KeyboardInterrupt, SystemExit) as e:
         ''' INTERRUPT '''
         '''----------------------------------------------------------------------- '''
-        logging.warning(e)
-        logging.warning("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\nJOB INTERRUPTED")
-        with open(logfile, "r") as f:
-            msg = MIMEText(f.read())
-            subject = 'JOB INTERRUPTED (Logfile = {}, PID = {}, GPU = {})'.format(logfile, pid, args.gpu)
-            send_msg(msg, subject)
-
-
+        summary_email(last_non_empty_out_str, model, interrupted=True)
+        raise SystemExit
 
 if __name__ == "__main__":
     train()
