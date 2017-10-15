@@ -57,7 +57,7 @@ parser.add_argument("--n_valid", type=int, default=5000)
 parser.add_argument("-m", "--model_type", type=int, default=0)
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
-#parser.add_argument("-p", "--preprocess", action='store_true', default=False)
+parser.add_argument("--debug", action='store_true', default=False)
 parser.add_argument("-r", "--restart", action='store_true', default=False)
 parser.add_argument("--bn", action='store_true', default=False)
 parser.add_argument("--n_features", type=int, default=7)
@@ -65,20 +65,28 @@ parser.add_argument("--n_hidden", type=int, default=40)
 parser.add_argument("-e", "--n_epochs", type=int, default=25)
 parser.add_argument("-b", "--batch_size", type=int, default=64)
 parser.add_argument("-a", "--step_size", type=float, default=0.0005)
-parser.add_argument("-d", "--decay", type=float, default=.9)
+parser.add_argument("-d", "--decay", type=float, default=.97)
 parser.add_argument("--seed", type=int, default=1)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-l", "--load", type=str, default=None)
 parser.add_argument("-i", "--n_iters", type=int, default=1)
+
 
 # email
 parser.add_argument("--username", type=str, default="results74207281")
 parser.add_argument("--password", type=str, default="deeplearning")
 
 args = parser.parse_args()
+
+if args.debug:
+    args.n_hidden = 1
+    args.bs = 9
+    args.verbose = True
+    args.epochs = 5
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
+
 
 ''' LOOKUP TABLES '''
 '''----------------------------------------------------------------------- '''
@@ -217,8 +225,8 @@ def train():
     '''----------------------------------------------------------------------- '''
 
     optimizer = Adam(model.parameters(), lr=args.step_size)
-    #scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
-    scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
+    scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
+    #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
 
     n_batches = int(np.ceil(len(X_train) / args.batch_size))
     best_score = [-np.inf]  # yuck, but works
@@ -314,8 +322,8 @@ def train():
 
                 callback(j, model)
 
-            scheduler.step(l)
-            settings['step_size'] = scheduler.get_lr()
+            scheduler.step()
+            settings['step_size'] = scheduler.get_lr()[0]
         logging.info("FINISHED TRAINING")
 
 
