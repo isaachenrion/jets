@@ -368,7 +368,7 @@ def train():
                     logging.info(out_str)
 
             scheduler.step()
-            settings['step_size'] = scheduler.get_lr()[0]
+            settings['step_size'] = args.step_size * (args.decay) ** (i + 1)
         logging.info("FINISHED TRAINING")
 
 
