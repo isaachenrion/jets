@@ -117,13 +117,12 @@ def train():
         formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
         ch.setFormatter(formatter)
         root.addHandler(ch)
-
+    logging.info("Logfile at {}".format(logfile))
     for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
 
     pid = os.getpid()
     logging.warning("\tPID = {}".format(pid))
     logging.warning("\tTraining on GPU: {}".format(torch.cuda.is_available()))
-
     ''' EMAIL '''
     '''----------------------------------------------------------------------- '''
     def send_msg(msg, subject):
@@ -324,7 +323,7 @@ def train():
         '''
         with open(logfile, "r") as f:
             msg = MIMEText(f.read())
-            subject = 'JOB FINISHED (PID = {}, GPU = {})'.format(pid, args.gpu)
+            subject = 'JOB FINISHED (Logfile = {}, PID = {}, GPU = {})'.format(logfile, pid, args.gpu)
             send_msg(msg, subject)
 
 
@@ -335,7 +334,7 @@ def train():
         logging.warning("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\nJOB INTERRUPTED")
         with open(logfile, "r") as f:
             msg = MIMEText(f.read())
-            subject = 'JOB INTERRUPTED (PID = {}, GPU = {})'.format(pid, args.gpu)
+            subject = 'JOB INTERRUPTED (Logfile = {}, PID = {}, GPU = {})'.format(logfile, pid, args.gpu)
             send_msg(msg, subject)
 
 
