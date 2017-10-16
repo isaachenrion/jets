@@ -193,7 +193,7 @@ def batch_leaves(jets):
         queue = [(jet["root_id"] + offset, -1)]
 
         while len(queue) > 0:
-            node, parent, is_left, depth = queue.pop(0)
+            node, parent = queue.pop(0)
             # Inner node
             if jet_children[node, 0] == -1:
                 inners.append(node)
