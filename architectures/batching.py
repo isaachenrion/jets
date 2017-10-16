@@ -170,42 +170,44 @@ def batch_leaves(jets):
     #
     # jet_contents: array of shape [n_nodes, n_features]
     #     jet_contents[node_id] is the feature vector of node_id
-    jet_children = []
 
-    offset = 0
+    batch_outers = []
 
     for j, jet in enumerate(jets):
         tree = np.copy(jet["tree"])
-        tree[tree != -1] += offset
+        inners = []   # Inner nodes at level i
+        outers = []   # Outer nodes at level i
 
-        jet_children.append(tree)
-        offset += len(tree)
-
-    jet_children = np.vstack(jet_children)
-    jet_contents = torch.cat([jet["content"] for jet in jets], 0)
-    n_nodes = offset
-
-    inners = []   # Inner nodes at level i
-    outers = []   # Outer nodes at level i
-    offset = 0
-
-    for jet in jets:
-        queue = [(jet["root_id"] + offset, -1)]
+        queue = [(jet["root_id"], -1)]
 
         while len(queue) > 0:
             node, parent = queue.pop(0)
             # Inner node
-            if jet_children[node, 0] == -1:
+            if tree[node, 0] != -1:
                 inners.append(node)
-                queue.append((jet_children[node, 0], node))
-                queue.append((jet_children[node, 1], node))
+                queue.append((tree[node, 0], node))
+                queue.append((tree[node, 1], node))
 
             # Outer node
             else:
                 outers.append(node)
-        offset += len(jet["tree"])
-    leaves = jet_contents[outers]
-    return outers
+        batch_outers.append(outers)
+    jet_contents = [jet['content'] for jet in jets]
+    #import ipdb; ipdb.set_trace()
+    leaves = [torch.stack([jet[i] for i in outers], 0) for jet, outers in zip(jet_contents, batch_outers)]
+
+    biggest_jet_size = max(len(jet) for jet in leaves)
+    jets_padded = []
+    for jet in leaves:
+        if jet.size()[0] < biggest_jet_size:
+            zeros = Variable(torch.zeros(biggest_jet_size - jet.size()[0], jet.size()[1]))
+            if torch.cuda.is_available(): zeros = zeros.cuda()
+            jets_padded.append(torch.cat((jet, zeros), 0))
+        else:
+            jets_padded.append(jet)
+    jets_padded = torch.stack(jets_padded, 0)
+    return jets_padded
+
 
 
 def batch_parents(jets):
