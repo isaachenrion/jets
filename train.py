@@ -56,31 +56,45 @@ from loading import crop
 '''----------------------------------------------------------------------- '''
 parser = argparse.ArgumentParser(description='Jets')
 
+# data args
 parser.add_argument("-f", "--filename", type=str, default='antikt-kt')
 parser.add_argument("-n", "--n_train", type=int, default=-1)
 parser.add_argument("--n_valid", type=int, default=27000)
-parser.add_argument("-m", "--model_type", type=int, default=0)
-parser.add_argument("-s", "--silent", action='store_true', default=False)
-parser.add_argument("-v", "--verbose", action='store_true', default=False)
-parser.add_argument("--debug", action='store_true', default=False)
-parser.add_argument("-r", "--restart", action='store_true', default=False)
 parser.add_argument("--add_cropped", action='store_true', default=False)
-parser.add_argument("--bn", action='store_true', default=False)
+
+# general model args
+parser.add_argument("-m", "--model_type", type=int, default=0)
 parser.add_argument("--n_features", type=int, default=7)
 parser.add_argument("--n_hidden", type=int, default=40)
-parser.add_argument("-e", "--n_epochs", type=int, default=25)
+
+# logging args
+parser.add_argument("-s", "--silent", action='store_true', default=False)
+parser.add_argument("-v", "--verbose", action='store_true', default=False)
+
+# loading previous models args
+parser.add_argument("-l", "--load", type=str, default=None)
+parser.add_argument("-r", "--restart", action='store_true', default=False)
+
+# training args
+parser.add_argument("-e", "--n_epochs", type=int, default=50)
 parser.add_argument("-b", "--batch_size", type=int, default=64)
 parser.add_argument("-a", "--step_size", type=float, default=0.0005)
-parser.add_argument("-d", "--decay", type=float, default=.97)
+parser.add_argument("-d", "--decay", type=float, default=.912)
+
+# computing args
 parser.add_argument("--seed", type=int, default=1)
 parser.add_argument("-g", "--gpu", type=int, default=0)
-parser.add_argument("-l", "--load", type=str, default=None)
-parser.add_argument("-i", "--n_iters", type=int, default=1)
 
+# MPNN
+parser.add_argument("--leaves", action='store_true')
+parser.add_argument("-i", "--n_iters", type=int, default=1)
 
 # email
 parser.add_argument("--username", type=str, default="results74207281")
 parser.add_argument("--password", type=str, default="deeplearning")
+
+# debugging
+parser.add_argument("--debug", action='store_true', default=False)
 
 args = parser.parse_args()
 
@@ -230,10 +244,10 @@ def train():
         model_kwargs = {
             'n_features': args.n_features,
             'n_hidden': args.n_hidden,
-            'bn': args.bn,
         }
         if Transform in [MPNNTransform, GRNNTransformGated]:
             model_kwargs['n_iters'] = args.n_iters
+            model_kwargs['leaves'] = args.leaves
         model = Predict(Transform, **model_kwargs)
         settings = {
             "transform": Transform,

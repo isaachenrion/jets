@@ -157,6 +157,56 @@ def batch(jets):
 
     return (levels, level_children[:, [0, 2]], n_inners, contents)
 
+def batch_leaves(jets):
+    # Batch the recursive activations across all nodes of a same level
+    # !!! Assume that jets have at least one inner node.
+    #     Leads to off-by-one errors otherwise :(
+
+    # Reindex node IDs over all jets
+    #
+    # jet_children: array of shape [n_nodes, 2]
+    #     jet_children[node_id, 0] is the node_id of the left child of node_id
+    #     jet_children[node_id, 1] is the node_id of the right child of node_id
+    #
+    # jet_contents: array of shape [n_nodes, n_features]
+    #     jet_contents[node_id] is the feature vector of node_id
+    jet_children = []
+
+    offset = 0
+
+    for j, jet in enumerate(jets):
+        tree = np.copy(jet["tree"])
+        tree[tree != -1] += offset
+
+        jet_children.append(tree)
+        offset += len(tree)
+
+    jet_children = np.vstack(jet_children)
+    jet_contents = torch.cat([jet["content"] for jet in jets], 0)
+    n_nodes = offset
+
+    inners = []   # Inner nodes at level i
+    outers = []   # Outer nodes at level i
+    offset = 0
+
+    for jet in jets:
+        queue = [(jet["root_id"] + offset, -1)]
+
+        while len(queue) > 0:
+            node, parent, is_left, depth = queue.pop(0)
+            # Inner node
+            if jet_children[node, 0] == -1:
+                inners.append(node)
+                queue.append((jet_children[node, 0], node))
+                queue.append((jet_children[node, 1], node))
+
+            # Outer node
+            else:
+                outers.append(node)
+        offset += len(jet["tree"])
+    leaves = jet_contents[outers]
+    return outers
+
 
 def batch_parents(jets):
     # Batch the recursive activations across all nodes of a same level
