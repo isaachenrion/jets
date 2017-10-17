@@ -16,12 +16,9 @@ import argparse
 import shutil
 import gc
 
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email.mime.text import MIMEText
-from email.utils import COMMASPACE, formatdate
-from email import encoders
+from utils import Emailer
+from utils import get_logfile
+from utils import SignalHandler
 
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import roc_curve
@@ -73,8 +70,8 @@ parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
 
 # loading previous models args
-parser.add_argument("-l", "--load", "model directory from which we load a state_dict", type=str, default=None)
-parser.add_argument("-r", "--restart", help="restart a loaded model from where it left off" action='store_true', default=False)
+parser.add_argument("-l", "--load", help="model directory from which we load a state_dict", type=str, default=None)
+parser.add_argument("-r", "--restart", help="restart a loaded model from where it left off", action='store_true', default=False)
 
 # training args
 parser.add_argument("-e", "--n_epochs", type=int, default=25)
@@ -93,10 +90,10 @@ parser.add_argument("-i", "--n_iters", type=int, default=1)
 # email
 parser.add_argument("--sender", type=str, default="results74207281@gmail.com")
 parser.add_argument("--password", type=str, default="deeplearning")
-parser.add_argument("--recipient", type=str, default="henrion@nyu.edu")
+parser.add_argument("--recipient", type=str, default=None)
 
 # debugging
-parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb" action='store_true', default=False)
+parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
 
 args = parser.parse_args()
 
@@ -114,18 +111,19 @@ if args.n_train <= 5 * args.n_valid and args.n_train > 0:
 
 ''' LOOKUP TABLES AND CONSTANTS '''
 '''----------------------------------------------------------------------- '''
-MODELS_DIR = 'models'
-DATA_DIR = 'data/w-vs-qcd/pickles'
-MODEL_TYPES = ['RelationNet', 'RecNN-simple', 'RecNN-gated', 'MPNN']
-TRANSFORMS = [
+args.MODELS_DIR = 'models'
+args.DATA_DIR = 'data/w-vs-qcd/pickles'
+args.MODEL_TYPES = ['RelationNet', 'RecNN-simple', 'RecNN-gated', 'MPNN']
+args.TRANSFORMS = [
     RelNNTransformConnected,
     GRNNTransformSimple,
     GRNNTransformGated,
     MPNNTransform,
 ]
 
-def train():
-
+def train(args):
+    pid = os.getpid()
+    results_strings = []
     ''' CUDA AND RANDOM SEED '''
     '''----------------------------------------------------------------------- '''
     np.random.seed(args.seed)
@@ -137,118 +135,41 @@ def train():
 
     ''' CREATE MODEL DIRECTORY '''
     '''----------------------------------------------------------------------- '''
-    model_type = MODEL_TYPES[args.model_type]
+    model_type = args.MODEL_TYPES[args.model_type]
     dt = datetime.datetime.now()
     filename_model = '{}/{}-{}/{:02d}-{:02d}-{:02d}'.format(model_type, dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
-    model_dir = os.path.join(MODELS_DIR, filename_model)
-    os.makedirs(model_dir)
+    exp_dir = os.path.join(args.MODELS_DIR, filename_model)
+    os.makedirs(exp_dir)
 
-    ''' SET UP LOGGERS '''
+    ''' SET UP LOGGING '''
     '''----------------------------------------------------------------------- '''
-    logfile = os.path.join(model_dir, 'log.txt')
-    logging.basicConfig(level=logging.DEBUG, filename=logfile, filemode="a+",
-                        format="%(asctime)-15s %(message)s")
-    if not args.silent:
-        root = logging.getLogger()
-        root.setLevel(logging.DEBUG)
-        ch = logging.StreamHandler(sys.stdout)
-        if args.verbose:
-            ch.setLevel(logging.INFO)
-        else:
-            ch.setLevel(logging.WARNING)
-        formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-        ch.setFormatter(formatter)
-        root.addHandler(ch)
+    logfile = get_logfile(exp_dir, args.silent, args.verbose)
 
-    ''' EMAIL '''
+    ''' SIGNAL HANDLER '''
     '''----------------------------------------------------------------------- '''
-    def send_msg(text, subject, attachments=None):
-
-        msg = MIMEMultipart()
-        msg['From'] = args.sender
-        msg['To'] = args.recipient if args.recipient is not None else args.sender
-        msg['Date'] = formatdate(localtime = True)
-        msg['Subject'] = subject
-
-        msg.attach(MIMEText(text))
-
-        if attachments is not None:
-            for f in attachments:
-                part = MIMEBase('application', "octet-stream")
-                part.set_payload( open(f,"rb").read() )
-                encoders.encode_base64(part)
-                part.add_header('Content-Disposition', 'attachment; filename="{0}"'.format(os.path.basename(f)))
-                msg.attach(part)
-
-        server = smtplib.SMTP('smtp.gmail.com:587')
-        server.ehlo()
-        server.starttls()
-        server.login(args.sender, args.password)
-        server.sendmail(args.sender, args.recipient, msg.as_string())
-        server.close()
-        logging.info("SENT EMAIL")
-
-    def summary_email(out_str, model, type):
-        subject = 'JOB {} (Logfile = {}, PID = {}, GPU = {})'.format(type, logfile, pid, args.gpu)
-        attachments = [logfile]
-        text = ""
-        text += "{}\n".format(model)
-        text += "{}".format(out_str)
-        send_msg(text, subject, attachments)
-
-    ''' SIGNAL HANDLING '''
-    '''----------------------------------------------------------------------- '''
-    last_non_empty_out_str = None
-
-    def cleanup(need_input=False):
-        answer = None if need_input else "y"
-        while answer not in ["", "y", "Y", "n", "N"]:
-            answer = input('Cleanup? (Y/n)\n')
-            if answer in ["", "y", "Y"]:
-                shutil.rmtree(model_dir)
-
-    def timestring():
-        dt = datetime.datetime.now()
-        d = "{}-{} at {:02d}:{:02d}:{:02d}".format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
-        return d
-
-    def signal_term_handler(signal, frame):
-        d = timestring()
-        logging.info('KILLED on {}'.format(d))
-        if last_non_empty_out_str is not None:
-            summary_email(last_non_empty_out_str, model, type='KILLED')
-        else:
-            summary_email("TOTAL FAILURE", d, type="FAILURE")
-        cleanup(need_input=args.gpu<0)
-        sys.exit(0)
-
-    def signal_int_handler(signal, frame):
-        d = timestring()
-        logging.info('INTERRUPTED on {}'.format(timestring()))
-        if last_non_empty_out_str is not None:
-            summary_email(last_non_empty_out_str, model, type='INTERRUPTED')
-        else:
-            summary_email("TOTAL FAILURE", d, type="FAILURE")
-        cleanup(need_input=args.gpu<0)
-        sys.exit(0)
-
-    signal.signal(signal.SIGTERM, signal_term_handler)
-    signal.signal(signal.SIGINT, signal_int_handler)
+    signal_handler = SignalHandler(
+                            emailer=Emailer(args.sender, args.password, args.recipient),
+                            logfile=logfile,
+                            exp_dir=exp_dir,
+                            need_input=(args.gpu>=0),
+                            subject_string='(Logfile = {}, PID = {}, GPU = {})'.format(logfile, pid, args.gpu),
+                            monitor_strings=results_strings,
+                            model=None
+                            )
 
     ''' RECORD SETTINGS '''
     '''----------------------------------------------------------------------- '''
     logging.info("Logfile at {}".format(logfile))
     for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
 
-    pid = os.getpid()
     logging.warning("\tPID = {}".format(pid))
     logging.warning("\tTraining on GPU: {}".format(torch.cuda.is_available()))
 
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
     logging.warning("Loading data...")
-    tf = load_tf(DATA_DIR, "{}-train.pickle".format(args.filename))
-    X, y = load_data(DATA_DIR, "{}-train.pickle".format(args.filename))
+    tf = load_tf(args.DATA_DIR, "{}-train.pickle".format(args.filename))
+    X, y = load_data(args.DATA_DIR, "{}-train.pickle".format(args.filename))
 
     for jet in X:
         jet["content"] = tf.transform(jet["content"])
@@ -281,7 +202,7 @@ def train():
     # Initialization
     Predict = PredictFromParticleEmbedding
     if args.load is None:
-        Transform = TRANSFORMS[args.model_type]
+        Transform = args.TRANSFORMS[args.model_type]
         model_kwargs = {
             'n_features': args.n_features,
             'n_hidden': args.n_hidden,
@@ -318,6 +239,7 @@ def train():
 
     if torch.cuda.is_available():
         model.cuda()
+    signal_handler.set_model(model)
 
     ''' OPTIMIZER AND LOSS '''
     '''----------------------------------------------------------------------- '''
@@ -340,10 +262,10 @@ def train():
     def callback(iteration, model):
         out_str = None
         def save_everything(model):
-            with open(os.path.join(model_dir, 'model_state_dict.pt'), 'wb') as f:
+            with open(os.path.join(exp_dir, 'model_state_dict.pt'), 'wb') as f:
                 torch.save(model.state_dict(), f)
 
-            with open(os.path.join(model_dir, 'settings.pickle'), "wb") as f:
+            with open(os.path.join(exp_dir, 'settings.pickle'), "wb") as f:
                 pickle.dump(settings, f)
 
         if iteration % 25 == 0:
@@ -422,18 +344,18 @@ def train():
             out_str = callback(j, model)
 
             if out_str is not None:
-                last_non_empty_out_str = out_str
+                results_strings.append(out_str)
                 logging.info(out_str)
 
         scheduler.step()
         settings['step_size'] = args.step_size * (args.decay) ** (i + 1)
     logging.info("FINISHED TRAINING")
+    signal_handler.job_completed()
 
 
-    summary_email(last_non_empty_out_str, model, type='finished')
 
 
 
 
 if __name__ == "__main__":
-    train()
+    train(args)
