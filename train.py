@@ -16,9 +16,7 @@ import argparse
 import shutil
 import gc
 
-from utils import Emailer
-from utils import get_logfile
-from utils import SignalHandler
+from utils import ExperimentHandler
 
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import roc_curve
@@ -90,7 +88,7 @@ parser.add_argument("-i", "--n_iters", type=int, default=1)
 # email
 parser.add_argument("--sender", type=str, default="results74207281@gmail.com")
 parser.add_argument("--password", type=str, default="deeplearning")
-parser.add_argument("--recipient", type=str, default=None)
+parser.add_argument("--recipient", type=str, default="henrion@nyu.edu")
 
 # debugging
 parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
@@ -121,49 +119,11 @@ args.TRANSFORMS = [
     MPNNTransform,
 ]
 
+
 def train(args):
-    pid = os.getpid()
-    results_strings = []
-    ''' CUDA AND RANDOM SEED '''
-    '''----------------------------------------------------------------------- '''
-    np.random.seed(args.seed)
-    if torch.cuda.is_available():
-        torch.cuda.device(args.gpu)
-        torch.cuda.manual_seed(args.seed)
-    else:
-        torch.manual_seed(args.seed)
-
-    ''' CREATE MODEL DIRECTORY '''
-    '''----------------------------------------------------------------------- '''
     model_type = args.MODEL_TYPES[args.model_type]
-    dt = datetime.datetime.now()
-    filename_model = '{}/{}-{}/{:02d}-{:02d}-{:02d}'.format(model_type, dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
-    exp_dir = os.path.join(args.MODELS_DIR, filename_model)
-    os.makedirs(exp_dir)
-
-    ''' SET UP LOGGING '''
-    '''----------------------------------------------------------------------- '''
-    logfile = get_logfile(exp_dir, args.silent, args.verbose)
-
-    ''' SIGNAL HANDLER '''
-    '''----------------------------------------------------------------------- '''
-    signal_handler = SignalHandler(
-                            emailer=Emailer(args.sender, args.password, args.recipient),
-                            logfile=logfile,
-                            exp_dir=exp_dir,
-                            need_input=(args.gpu>=0),
-                            subject_string='(Logfile = {}, PID = {}, GPU = {})'.format(logfile, pid, args.gpu),
-                            monitor_strings=results_strings,
-                            model=None
-                            )
-
-    ''' RECORD SETTINGS '''
-    '''----------------------------------------------------------------------- '''
-    logging.info("Logfile at {}".format(logfile))
-    for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
-
-    logging.warning("\tPID = {}".format(pid))
-    logging.warning("\tTraining on GPU: {}".format(torch.cuda.is_available()))
+    eh = ExperimentHandler(args, model_type)
+    signal_handler = eh.signal_handler
 
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
@@ -262,10 +222,10 @@ def train(args):
     def callback(iteration, model):
         out_str = None
         def save_everything(model):
-            with open(os.path.join(exp_dir, 'model_state_dict.pt'), 'wb') as f:
+            with open(os.path.join(eh.exp_dir, 'model_state_dict.pt'), 'wb') as f:
                 torch.save(model.state_dict(), f)
 
-            with open(os.path.join(exp_dir, 'settings.pickle'), "wb") as f:
+            with open(os.path.join(eh.exp_dir, 'settings.pickle'), "wb") as f:
                 pickle.dump(settings, f)
 
         if iteration % 25 == 0:
@@ -344,7 +304,7 @@ def train(args):
             out_str = callback(j, model)
 
             if out_str is not None:
-                results_strings.append(out_str)
+                signal_handler.results_strings.append(out_str)
                 logging.info(out_str)
 
         scheduler.step()

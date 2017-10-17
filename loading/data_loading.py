@@ -38,7 +38,7 @@ def load_tf(data_dir, filename):
     path_to_tf = os.path.join(data_dir, 'tf', 'TF-' + filename)
     if not os.path.exists(path_to_tf):
         logging.warning("Computing TF from {}".format(filename))
-        X, _ = load_raw_data(data_dir, filename)
+        X, _ = load_data(data_dir, filename)
         tf = RobustScaler().fit(np.vstack([jet["content"] for jet in X]))
         with open(path_to_tf, "wb") as f:
             pickle.dump(tf, f)
@@ -101,7 +101,7 @@ def crop(X, y, return_cropped_indices=False):
 
 def load_test(tf, data_dir, filename, n_test=-1, cropping=True):
     X, y = load_data(data_dir, filename)
-    tf = load_tf(data_dir, "{}-train.pickle".format(filename))
+    #tf = load_tf(data_dir, "{}-train.pickle".format(filename))
 
     for jet in X:
         jet["content"] = tf.transform(jet["content"])

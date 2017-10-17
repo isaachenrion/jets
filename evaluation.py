@@ -7,16 +7,12 @@ import argparse
 import datetime
 import sys
 
-<<<<<<< HEAD
 import smtplib
 from email.mime.text import MIMEText
 
+from utils import ExperimentHandler
 from loading import load_tf
 from loading import load_test
-=======
-from data_loading import load_tf
-from data_loading import load_test
->>>>>>> parent of c14e00d... added emailing! all models working. CHECKPOINT
 
 from analysis.reports import report_score
 from analysis.reports import remove_outliers
@@ -35,21 +31,42 @@ parser.add_argument("-d", "--data_list_filename", type=str, default='evaldataset
 parser.add_argument("-n", "--n_test", type=int, default=-1)
 parser.add_argument("-s", "--set", type=str, default='valid')
 parser.add_argument("-m", "--model_list_filename", type=str, default='evalmodels.txt')
-parser.add_argument("-v", "--verbose", action='store_true', default=False)
-parser.add_argument("-b", "--batch_size", type=int, default=64)
-parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-p", "--plot", action="store_true")
 parser.add_argument("-o", "--remove_outliers", action="store_true")
 parser.add_argument("-l", "--load_rocs", type=str, default=None)
 
+# logging args
+parser.add_argument("-v", "--verbose", action='store_true', default=False)
+
+# training args
+parser.add_argument("-b", "--batch_size", type=int, default=64)
+
+# computing args
+parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=1)
+parser.add_argument("-g", "--gpu", type=int, default=-1)
+
+# MPNN
+parser.add_argument("--leaves", action='store_true')
+parser.add_argument("-i", "--n_iters", type=int, default=1)
+
 # email
-parser.add_argument("--username", type=str, default="results74207281")
+parser.add_argument("--sender", type=str, default="results74207281@gmail.com")
 parser.add_argument("--password", type=str, default="deeplearning")
+parser.add_argument("--recipient", type=str, default="henrion@nyu.edu")
+
+# debugging
+parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
+
 
 args = parser.parse_args()
+
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
 args.silent = not args.verbose
 
+if args.debug:
+    args.n_text = 1000
+    args.bs = 9
+    args.verbose = True
 ''' CONSTANTS '''
 '''----------------------------------------------------------------------- '''
 
@@ -58,45 +75,9 @@ MODELS_DIR = 'models'
 REPORTS_DIR = 'reports'
 
 def main():
-    ''' ADMIN '''
-    '''----------------------------------------------------------------------- '''
-    dt = datetime.datetime.now()
-    filename_report = '{}-{}/{:02d}-{:02d}-{:02d}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
-    report_dir = os.path.join(REPORTS_DIR, filename_report)
-    os.makedirs(report_dir)
 
-    ''' LOGGING '''
-    '''----------------------------------------------------------------------- '''
-    logfile = os.path.join(report_dir, 'log.txt')
-    logging.basicConfig(level=logging.DEBUG, filename=logfile, filemode="a+",
-                        format="%(asctime)-15s %(message)s")
-    if not args.silent:
-        root = logging.getLogger()
-        root.setLevel(logging.DEBUG)
-        ch = logging.StreamHandler(sys.stdout)
-        if args.verbose:
-            ch.setLevel(logging.INFO)
-        else:
-            ch.setLevel(logging.WARNING)
-        formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-        ch.setFormatter(formatter)
-        root.addHandler(ch)
-
-    for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
-    pid = os.getpid()
-    logging.warning("\tPID = {}".format(pid))
-
-    ''' EMAIL '''
-    '''----------------------------------------------------------------------- '''
-    server = smtplib.SMTP('smtp.gmail.com:587')
-    server.ehlo()
-    server.starttls()
-    server.login(args.username, args.password)
-    source_email = args.username + "@gmail.com"
-    target_email = "henrion@nyu.edu"
-
-    def send_msg(msg):
-        server.send_message(msg)
+    eh = ExperimentHandler(args, REPORTS_DIR)
+    signal_handler = eh.signal_handler
 
     ''' GET RELATIVE PATHS TO DATA AND MODELS '''
     '''----------------------------------------------------------------------- '''
@@ -128,7 +109,7 @@ def main():
                 logging.info('\tBuilding ROCs for instances of {}'.format(model_path))
                 r, f, t = build_rocs(data, os.path.join(MODELS_DIR, model_path), args.batch_size)
 
-                absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
+                absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
                 with open(absolute_roc_path, "wb") as fd:
                     pickle.dump((r, f, t), fd)
     else:
@@ -139,7 +120,7 @@ def main():
                 with open(previous_absolute_roc_path, "rb") as fd:
                     r, f, t = pickle.load(fd)
 
-                absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
+                absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
                 with open(absolute_roc_path, "wb") as fd:
                     pickle.dump((r, f, t), fd)
 
@@ -151,7 +132,7 @@ def main():
 
     for data_path in data_paths:
         for model_path, label, color in zip(model_paths, labels, colors):
-            absolute_roc_path = os.path.join(report_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
+            absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
             with open(absolute_roc_path, "rb") as fd:
                 r, f, t = pickle.load(fd)
 
@@ -161,21 +142,12 @@ def main():
             report_score(r, f, t, label=label)
             plot_rocs(r, f, t, label=label, color=color)
 
-    figure_filename = os.path.join(report_dir, 'rocs.png')
+    figure_filename = os.path.join(eh.exp_dir, 'rocs.png')
     plot_save(figure_filename)
     if args.plot:
         plot_show()
 
-    ''' EMAIL RESULTS'''
-    '''----------------------------------------------------------------------- '''
-
-    with open(logfile, "r") as f:
-        msg = MIMEText(f.read())
-        msg['Subject'] = 'Job finished (PID = {})'.format(pid)
-        msg['From'] = source_email
-        msg["To"] = target_email
-
-        send_msg(msg)
+    signal_handler.job_completed()
 
 if __name__ == '__main__':
     main()

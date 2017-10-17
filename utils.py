@@ -12,7 +12,8 @@ import sys
 import datetime
 import signal
 import shutil
-
+import numpy as np
+import torch
 def get_logfile(exp_dir, silent, verbose):
     logfile = os.path.join(exp_dir, 'log.txt')
     logging.basicConfig(level=logging.DEBUG, filename=logfile, filemode="a+",
@@ -76,15 +77,14 @@ def timestring():
     return d
 
 class SignalHandler:
-    def __init__(self, emailer=None, exp_dir=None, logfile=None, need_input=False, subject_string="", monitor_strings=None, model=None):
+    def __init__(self, emailer=None, exp_dir=None, logfile=None, need_input=False, subject_string="", model=None):
         self.emailer = emailer
-        self.monitor_strings = monitor_strings
+        self.results_strings = ["FAILURE: No results to print!"]
         self.need_input = need_input
         self.model = model
         self.logfile = logfile
         self.exp_dir = exp_dir
         self.subject_string = subject_string
-        self.no_result_string = "FAILURE: No results to print!"
 
         signal.signal(signal.SIGTERM, self.signal_term_handler)
         signal.signal(signal.SIGINT, self.signal_int_handler)
@@ -104,11 +104,7 @@ class SignalHandler:
         alert = 'KILLED on {}'.format(timestring())
         logging.warning(alert)
         subject = "Job {} {}".format("KILLED", self.subject_string)
-        if len(self.monitor_strings) > 0:
-            text = "{}\n{}\n{}".format(alert, self.monitor_strings[-1], self.model)
-        else:
-            text = "{}\n{}\n{}".format(alert, self.no_result_string, self.model)
-
+        text = "{}\n{}\n{}".format(alert, self.results_strings[-1], self.model)
         attachments = [self.logfile]
         self.emailer.send_msg(text, subject, attachments)
         self.cleanup()
@@ -119,11 +115,7 @@ class SignalHandler:
         alert = 'INTERRUPTED on {}'.format(timestring())
         logging.warning(alert)
         subject = "Job {} {}".format("INTERRUPTED", self.subject_string)
-        if len(self.monitor_strings) > 0:
-            text = "{}\n{}\n{}".format(alert, self.monitor_strings[-1], self.model)
-        else:
-            text = "{}\n{}\n{}".format(alert, self.no_result_string, self.model)
-
+        text = "{}\n{}\n{}".format(alert, self.results_strings[-1], self.model)
         attachments = [self.logfile]
         self.emailer.send_msg(text, subject, attachments)
         self.cleanup()
@@ -134,8 +126,59 @@ class SignalHandler:
         alert = 'Completed on {}'.format(timestring())
         logging.warning(alert)
         subject = "Job {} {}".format("Completed", self.subject_string)
-        text = "{}\n{}\n{}".format(alert, self.monitor_strings[-1], self.model)
+        text = "{}\n{}\n{}".format(alert, self.results_strings[-1], self.model)
         attachments = [self.logfile]
         self.emailer.send_msg(text, subject, attachments)
         self.cleanup()
         sys.exit(0)
+
+class ExperimentHandler:
+    def __init__(self, args, root_exp_dir):
+        pid = os.getpid()
+
+        ''' CUDA AND RANDOM SEED '''
+        '''----------------------------------------------------------------------- '''
+        np.random.seed(args.seed)
+        if torch.cuda.is_available():
+            torch.cuda.device(args.gpu)
+            torch.cuda.manual_seed(args.seed)
+        else:
+            torch.manual_seed(args.seed)
+
+        ''' CREATE MODEL DIRECTORY '''
+        '''----------------------------------------------------------------------- '''
+        #
+        dt = datetime.datetime.now()
+        filename_exp = '{}-{}/{:02d}-{:02d}-{:02d}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
+        exp_dir = os.path.join(root_exp_dir, filename_exp)
+        os.makedirs(exp_dir)
+
+        ''' SET UP LOGGING '''
+        '''----------------------------------------------------------------------- '''
+        logfile = get_logfile(exp_dir, args.silent, args.verbose)
+
+        ''' SIGNAL HANDLER '''
+        '''----------------------------------------------------------------------- '''
+        emailer=Emailer(args.sender, args.password, args.recipient)
+        signal_handler = SignalHandler(
+                                emailer=emailer,
+                                logfile=logfile,
+                                exp_dir=exp_dir,
+                                need_input=(args.gpu>=0),
+                                subject_string='(Logfile = {}, PID = {}, GPU = {})'.format(logfile, pid, args.gpu),
+                                model=None
+                                )
+
+        ''' RECORD SETTINGS '''
+        '''----------------------------------------------------------------------- '''
+        logging.info("Logfile at {}".format(logfile))
+        for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
+
+        logging.warning("\tPID = {}".format(pid))
+        logging.warning("\tRunning on GPU: {}".format(torch.cuda.is_available()))
+
+        self.logfile = logfile
+        self.emailer = emailer
+        self.signal_handler = signal_handler
+        self.exp_dir = exp_dir
+        self.pid = pid
