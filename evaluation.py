@@ -33,7 +33,7 @@ parser.add_argument("-s", "--set", type=str, default='valid')
 parser.add_argument("-m", "--model_list_filename", type=str, default='evalmodels.txt')
 parser.add_argument("-p", "--plot", action="store_true")
 parser.add_argument("-o", "--remove_outliers", action="store_true")
-parser.add_argument("-l", "--load_rocs", type=str, default=None)
+parser.add_argument("-l", "--load_rocs", type=str, default="isaachenrion@gmail.com")
 
 # logging args
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
