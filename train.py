@@ -93,7 +93,7 @@ parser.add_argument("-i", "--n_iters", type=int, default=1)
 # email
 parser.add_argument("--sender", type=str, default="results74207281@gmail.com")
 parser.add_argument("--password", type=str, default="deeplearning")
-parser.add_argument("--recipient", type=str, default=None)
+parser.add_argument("--recipient", type=str, default="henrion@nyu.edu")
 
 # debugging
 parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb" action='store_true', default=False)
@@ -166,7 +166,7 @@ def train():
 
         msg = MIMEMultipart()
         msg['From'] = args.sender
-        msg['To'] = args.recipient
+        msg['To'] = args.recipient if args.recipient is not None else args.sender
         msg['Date'] = formatdate(localtime = True)
         msg['Subject'] = subject
 
