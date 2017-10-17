@@ -52,7 +52,7 @@ parser.add_argument("-i", "--n_iters", type=int, default=1)
 # email
 parser.add_argument("--sender", type=str, default="results74207281@gmail.com")
 parser.add_argument("--password", type=str, default="deeplearning")
-parser.add_argument("--recipient", type=str, default="henrion@nyu.edu")
+parser.add_argument("--recipient", type=str, default=None)
 
 # debugging
 parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
@@ -123,7 +123,7 @@ def main():
                 absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
                 with open(absolute_roc_path, "wb") as fd:
                     pickle.dump((r, f, t), fd)
- 
+
     ''' PLOT ROCS '''
     '''----------------------------------------------------------------------- '''
 
