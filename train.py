@@ -122,7 +122,7 @@ args.TRANSFORMS = [
 
 def train(args):
     model_type = args.MODEL_TYPES[args.model_type]
-    eh = ExperimentHandler(args, model_type)
+    eh = ExperimentHandler(args, os.path.join(args.MODELS_DIR,model_type))
     signal_handler = eh.signal_handler
 
     ''' DATA '''
