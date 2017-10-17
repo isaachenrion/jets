@@ -10,7 +10,7 @@
 - scikit-learn
 
 ### Email results
-Change the --recipient default to your email address. Then you will get emails with results and logfiles. Otherwise you won't.
+Change the RECIPIENT default in constants.py to your email address. Then you will get emails with results and logfiles. Otherwise you won't.
 
 ### Data
 
