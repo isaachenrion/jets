@@ -193,7 +193,6 @@ def batch_leaves(jets):
                 outers.append(node)
         batch_outers.append(outers)
     jet_contents = [jet['content'] for jet in jets]
-    #import ipdb; ipdb.set_trace()
     leaves = [torch.stack([jet[i] for i in outers], 0) for jet, outers in zip(jet_contents, batch_outers)]
 
     biggest_jet_size = max(len(jet) for jet in leaves)

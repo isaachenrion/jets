@@ -11,8 +11,6 @@ class Readout(nn.Module):
         super().__init__()
         self.hidden_dim = hidden_dim
         self.target_dim = target_dim
-        self.activation = F.tanh
-
 
     def forward(self, h):
         pass
@@ -34,26 +32,11 @@ class DTNNReadout(Readout):
         x = x.mean(1)
         return x
 
-class FullyConnectedReadout(Readout):
-    def __init__(self, config):
-        super().__init__(config)
-        net = nn.Sequential(
-                nn.Linear(self.hidden_dim, self.readout_hidden_dim),
-                self.activation(),
-                nn.BatchNorm1d(self.readout_hidden_dim),
-                nn.Linear(self.readout_hidden_dim, self.target_dim),
-                )
-        self.net = net
-
-    def forward(self, h):
-        x = torch.mean(h, 1)
-        x = self.net(x)
-        return x
 
 class SetReadout(Readout):
     def __init__(self, config):
-        super().__init__(config)
-        self.set2vec = Set2Vec(self.hidden_dim, self.target_dim, config.readout_hidden_dim)
+        super().__init__(hidden_dim, target_dim)
+        self.set2vec = Set2Vec(hidden_dim, target_dim, hidden_dim)
 
     def forward(self, h):
         x = self.set2vec(h)

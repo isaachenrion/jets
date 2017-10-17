@@ -7,8 +7,12 @@ from .vertex_update import GRUUpdate
 from .readout import DTNNReadout
 from .message import DTNNMessage
 
+from .adjacency import AdaptiveAdjacencyMatrix
+from .adjacency import FullyConnectedAdjacencyMatrix
+from .adjacency import IdentityAdjacencyMatrix
+
 class MPNNTransform(nn.Module):
-    def __init__(self, n_features=None, n_hidden=None, n_iters=None, leaves=False):
+    def __init__(self, n_features=None, n_hidden=None, n_iters=None, leaves=False, adjacency_matrix=None):
         super().__init__()
         self.n_iters = n_iters
         self.leaves = leaves
@@ -17,7 +21,7 @@ class MPNNTransform(nn.Module):
         self.vertex_update = GRUUpdate(n_hidden, n_hidden, n_features)
         self.message = DTNNMessage(n_hidden, n_hidden, 0)
         self.readout = DTNNReadout(n_hidden, n_hidden)
-        self.edge_embedding = nn.Linear(n_hidden, 1)
+        self.adjacency_matrix = adjacency_matrix(n_hidden)
 
     def forward(self, jets):
         if self.leaves:
@@ -26,10 +30,7 @@ class MPNNTransform(nn.Module):
             jets = pad_batch(jets)
         h = self.activation(self.embedding(jets))
         for i in range(self.n_iters):
-            shp = h.size()
-            h_l = h.view(shp[0], shp[1], 1, shp[2])
-            h_r = h.view(shp[0], 1, shp[1], shp[2])
-            A = F.softmax(self.edge_embedding(h_l + h_r)).squeeze(-1)
+            A = self.adjacency_matrix(h)
             h = self.message_passing(h, jets, A)
         out = self.readout(h)
         return out
@@ -38,3 +39,16 @@ class MPNNTransform(nn.Module):
         message = self.activation(torch.matmul(A, self.message(h)))
         h = self.vertex_update(h, message, jets)
         return h
+
+class MPNNTransformAdaptive(MPNNTransform):
+    def __init__(self, **kwargs):
+        super().__init__(adjacency_matrix=AdaptiveAdjacencyMatrix, **kwargs)
+
+class MPNNTransformFullyConnected(MPNNTransform):
+    def __init__(self, **kwargs):
+        super().__init__(adjacency_matrix=FullyConnectedAdjacencyMatrix, **kwargs)
+
+
+class MPNNTransformIdentity(MPNNTransform):
+    def __init__(self, **kwargs):
+        super().__init__(adjacency_matrix=IdentityAdjacencyMatrix, **kwargs)

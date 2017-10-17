@@ -13,12 +13,6 @@ from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 from sklearn.utils import check_random_state
 
-
-
-from architectures.recursive_net import GRNNTransformSimple
-from architectures.relation_net import RelNNTransformConnected
-from architectures.message_net import MPNNTransform
-from architectures.predict import PredictFromParticleEmbedding
 from architectures.preprocessing import wrap, unwrap, wrap_X, unwrap_X
 
 from scipy import interp
@@ -33,7 +27,6 @@ def evaluate_models(X, y, w, model_filenames, batch_size=64):
     rocs = []
     fprs = []
     tprs = []
-
 
     for filename in model_filenames:
         if 'DS_Store' not in filename:

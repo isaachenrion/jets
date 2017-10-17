@@ -105,7 +105,7 @@ if args.n_train <= 5 * args.n_valid and args.n_train > 0:
 args.recipient = RECIPIENT
 
 def train(args):
-    model_type = MODEL_TYPES[args.model_type]
+    _, Transform, model_type = TRANSFORMS[args.model_type]
     eh = ExperimentHandler(args, os.path.join(MODELS_DIR,model_type))
     signal_handler = eh.signal_handler
 
@@ -146,14 +146,12 @@ def train(args):
     # Initialization
     Predict = PredictFromParticleEmbedding
     if args.load is None:
-        Transform = TRANSFORMS[args.model_type]
         model_kwargs = {
             'n_features': args.n_features,
             'n_hidden': args.n_hidden,
+            'n_iters': args.n_iters,
+            'leaves': args.leaves,
         }
-        if Transform in [MPNNTransform, GRNNTransformGated]:
-            model_kwargs['n_iters'] = args.n_iters
-            model_kwargs['leaves'] = args.leaves
         model = Predict(Transform, **model_kwargs)
         settings = {
             "transform": Transform,
