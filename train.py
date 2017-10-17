@@ -64,7 +64,7 @@ parser.add_argument("--n_valid", type=int, default=27000)
 parser.add_argument("--add_cropped", action='store_true', default=False)
 
 # general model args
-parser.add_argument("-m", "--model_type", type=int, default=0)
+parser.add_argument("-m", "--model_type", help="index of the model you want to train - look in the code for the model list", type=int, default=0)
 parser.add_argument("--n_features", type=int, default=7)
 parser.add_argument("--n_hidden", type=int, default=40)
 
@@ -73,8 +73,8 @@ parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
 
 # loading previous models args
-parser.add_argument("-l", "--load", type=str, default=None)
-parser.add_argument("-r", "--restart", action='store_true', default=False)
+parser.add_argument("-l", "--load", "model directory from which we load a state_dict", type=str, default=None)
+parser.add_argument("-r", "--restart", help="restart a loaded model from where it left off" action='store_true', default=False)
 
 # training args
 parser.add_argument("-e", "--n_epochs", type=int, default=25)
@@ -83,7 +83,7 @@ parser.add_argument("-a", "--step_size", type=float, default=0.001)
 parser.add_argument("-d", "--decay", type=float, default=.912)
 
 # computing args
-parser.add_argument("--seed", type=int, default=1)
+parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=1)
 parser.add_argument("-g", "--gpu", type=int, default=-1)
 
 # MPNN
@@ -96,7 +96,7 @@ parser.add_argument("--password", type=str, default="deeplearning")
 parser.add_argument("--recipient", type=str, default=None)
 
 # debugging
-parser.add_argument("--debug", action='store_true', default=False)
+parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb" action='store_true', default=False)
 
 args = parser.parse_args()
 
@@ -126,8 +126,9 @@ TRANSFORMS = [
 
 def train():
 
-    ''' CUDA '''
+    ''' CUDA AND RANDOM SEED '''
     '''----------------------------------------------------------------------- '''
+    np.random.seed(args.seed)
     if torch.cuda.is_available():
         torch.cuda.device(args.gpu)
         torch.cuda.manual_seed(args.seed)
