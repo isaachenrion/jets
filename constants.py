@@ -14,4 +14,5 @@ TRANSFORMS = [
     GRNNTransformGated,
     MPNNTransform,
 ]
-RECIPIENT = "henrion@nyu.edu"
+#RECIPIENT = "henrion@nyu.edu"
+RECIPIENT = None
