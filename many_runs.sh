@@ -11,12 +11,16 @@ while [ "$1" != "" ]; do
 done
 let 'total = N * 4'
 printf "Launching %s jobs with model type %s" $total $model_type
-
-for i {1 .. $N}
+COUNTER=0
+while [  $COUNTER -lt $N ];
 do
-        let 'SEED = i * 10000'
-        ./four_runs.sh -m $model_type -s $SEED
-        disown %1
-        sleep 5
+  let 'SEED = COUNTER * 10000'
+  ./four_runs.sh -m $model_type -s $SEED
+  disown %1
+  sleep 5
+  let COUNTER=COUNTER+1
+done
+do
+
 done
 printf 'Successfully launched all the jobs\n'
