@@ -10,11 +10,12 @@ while [ "$1" != "" ]; do
     esac
 done
 let 'total = N * 4'
-printf "Launching %s jobs with model type %s, base seed is %s\n" $model_type $total
+printf "Launching %s jobs with model type %s" $total $model_type
 
-for SEED {1 .. $N}
+for i {1 .. $N}
 do
-        ./four_runs.sh -m $model_type -n $N
+        let 'SEED = i * 10000'
+        ./four_runs.sh -m $model_type -s $SEED
         disown %1
         sleep 5
 done
