@@ -31,12 +31,10 @@ from architectures.preprocessing import unwrap
 from architectures.preprocessing import wrap_X
 from architectures.preprocessing import unwrap_X
 
+from constants import *
+
 from losses import log_loss
 
-from architectures import GRNNTransformGated
-from architectures import GRNNTransformSimple
-from architectures import RelNNTransformConnected
-from architectures import MPNNTransform
 from architectures import PredictFromParticleEmbedding
 
 from analysis.rocs import inv_fpr_at_tpr_equals_half
@@ -88,7 +86,6 @@ parser.add_argument("-i", "--n_iters", type=int, default=1)
 # email
 parser.add_argument("--sender", type=str, default="results74207281@gmail.com")
 parser.add_argument("--password", type=str, default="deeplearning")
-parser.add_argument("--recipient", type=str, default="isaachenrion@gmail.com")
 
 # debugging
 parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
@@ -105,31 +102,18 @@ if args.debug:
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
-
-
-''' LOOKUP TABLES AND CONSTANTS '''
-'''----------------------------------------------------------------------- '''
-args.MODELS_DIR = 'models'
-args.DATA_DIR = 'data/w-vs-qcd/pickles'
-args.MODEL_TYPES = ['RelationNet', 'RecNN-simple', 'RecNN-gated', 'MPNN']
-args.TRANSFORMS = [
-    RelNNTransformConnected,
-    GRNNTransformSimple,
-    GRNNTransformGated,
-    MPNNTransform,
-]
-
+args.recipient = RECIPIENT
 
 def train(args):
-    model_type = args.MODEL_TYPES[args.model_type]
-    eh = ExperimentHandler(args, model_type)
+    model_type = MODEL_TYPES[args.model_type]
+    eh = ExperimentHandler(args, os.path.join(MODELS_DIR,model_type))
     signal_handler = eh.signal_handler
 
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
     logging.warning("Loading data...")
-    tf = load_tf(args.DATA_DIR, "{}-train.pickle".format(args.filename))
-    X, y = load_data(args.DATA_DIR, "{}-train.pickle".format(args.filename))
+    tf = load_tf(DATA_DIR, "{}-train.pickle".format(args.filename))
+    X, y = load_data(DATA_DIR, "{}-train.pickle".format(args.filename))
 
     for jet in X:
         jet["content"] = tf.transform(jet["content"])
@@ -162,7 +146,7 @@ def train(args):
     # Initialization
     Predict = PredictFromParticleEmbedding
     if args.load is None:
-        Transform = args.TRANSFORMS[args.model_type]
+        Transform = TRANSFORMS[args.model_type]
         model_kwargs = {
             'n_features': args.n_features,
             'n_hidden': args.n_hidden,
