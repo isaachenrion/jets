@@ -10,17 +10,15 @@ while [ "$1" != "" ]; do
     esac
 done
 let 'total = N * 4'
-printf "Launching %s jobs with model type %s" $total $model_type
+printf "Launching %s jobs with model type %s\n" $total $model_type
 COUNTER=0
 while [  $COUNTER -lt $N ];
 do
   let 'SEED = COUNTER * 10000'
-  ./four_runs.sh -m $model_type -s $SEED
+  ./four_runs.sh -m $model_type -s $SEED &
   disown %1
-  sleep 5
+  sleep 1
   let COUNTER=COUNTER+1
 done
-do
 
-done
 printf 'Successfully launched all the jobs\n'
