@@ -14,6 +14,7 @@ import signal
 import shutil
 import numpy as np
 import torch
+
 def get_logfile(exp_dir, silent, verbose):
     logfile = os.path.join(exp_dir, 'log.txt')
     logging.basicConfig(level=logging.DEBUG, filename=logfile, filemode="a+",
@@ -30,15 +31,6 @@ def get_logfile(exp_dir, silent, verbose):
         ch.setFormatter(formatter)
         root.addHandler(ch)
     return logfile
-
-#def summary_email(out_str, model, sigtype):
-#    subject = 'JOB {} (Logfile = {}, PID = {}, GPU = {})'.format(sigtype, logfile, pid, args.gpu)
-#    subject_string = '(Logfile = {}, PID = {}, GPU = {})'.format(logfile, pid, args.gpu)
-#    attachments = [logfile]
-#    text = ""
-#    text += "{}\n".format(model)
-#    text += "{}".format(out_str)
-#    send_msg(text, subject, args.sender, args.password, args.recipient, attachments)
 
 class Emailer:
     def __init__(self, sender, password, recipient):
@@ -165,7 +157,7 @@ class ExperimentHandler:
                                 logfile=logfile,
                                 exp_dir=exp_dir,
                                 need_input=(args.gpu<0),
-                                subject_string='(Logfile = {}, PID = {}, GPU = {})'.format(logfile, pid, args.gpu),
+                                subject_string='{}(Logfile = {}, PID = {}, GPU = {})'.format("[DEBUG] " if args.debug else "", logfile, pid, args.gpu),
                                 model=None
                                 )
 
