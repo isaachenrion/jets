@@ -164,7 +164,7 @@ class ExperimentHandler:
                                 emailer=emailer,
                                 logfile=logfile,
                                 exp_dir=exp_dir,
-                                need_input=(args.gpu>=0),
+                                need_input=(args.gpu<0),
                                 subject_string='(Logfile = {}, PID = {}, GPU = {})'.format(logfile, pid, args.gpu),
                                 model=None
                                 )
