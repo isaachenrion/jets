@@ -13,6 +13,7 @@ import sys
 import os
 import signal
 import argparse
+import shutil
 import gc
 
 import smtplib
@@ -76,22 +77,23 @@ parser.add_argument("-l", "--load", type=str, default=None)
 parser.add_argument("-r", "--restart", action='store_true', default=False)
 
 # training args
-parser.add_argument("-e", "--n_epochs", type=int, default=50)
+parser.add_argument("-e", "--n_epochs", type=int, default=25)
 parser.add_argument("-b", "--batch_size", type=int, default=64)
-parser.add_argument("-a", "--step_size", type=float, default=0.0005)
+parser.add_argument("-a", "--step_size", type=float, default=0.001)
 parser.add_argument("-d", "--decay", type=float, default=.912)
 
 # computing args
 parser.add_argument("--seed", type=int, default=1)
-parser.add_argument("-g", "--gpu", type=int, default=0)
+parser.add_argument("-g", "--gpu", type=int, default=-1)
 
 # MPNN
 parser.add_argument("--leaves", action='store_true')
 parser.add_argument("-i", "--n_iters", type=int, default=1)
 
 # email
-parser.add_argument("--username", type=str, default="results74207281")
+parser.add_argument("--sender", type=str, default="results74207281@gmail.com")
 parser.add_argument("--password", type=str, default="deeplearning")
+parser.add_argument("--recipient", type=str, default="henrion@nyu.edu")
 
 # debugging
 parser.add_argument("--debug", action='store_true', default=False)
@@ -110,7 +112,7 @@ if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
 
 
-''' LOOKUP TABLES '''
+''' LOOKUP TABLES AND CONSTANTS '''
 '''----------------------------------------------------------------------- '''
 MODELS_DIR = 'models'
 DATA_DIR = 'data/w-vs-qcd/pickles'
@@ -123,7 +125,16 @@ TRANSFORMS = [
 ]
 
 def train():
-    ''' ADMIN '''
+
+    ''' CUDA '''
+    '''----------------------------------------------------------------------- '''
+    if torch.cuda.is_available():
+        torch.cuda.device(args.gpu)
+        torch.cuda.manual_seed(args.seed)
+    else:
+        torch.manual_seed(args.seed)
+
+    ''' CREATE MODEL DIRECTORY '''
     '''----------------------------------------------------------------------- '''
     model_type = MODEL_TYPES[args.model_type]
     dt = datetime.datetime.now()
@@ -131,7 +142,7 @@ def train():
     model_dir = os.path.join(MODELS_DIR, filename_model)
     os.makedirs(model_dir)
 
-    ''' LOGGING '''
+    ''' SET UP LOGGERS '''
     '''----------------------------------------------------------------------- '''
     logfile = os.path.join(model_dir, 'log.txt')
     logging.basicConfig(level=logging.DEBUG, filename=logfile, filemode="a+",
@@ -147,22 +158,14 @@ def train():
         formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
         ch.setFormatter(formatter)
         root.addHandler(ch)
-    logging.info("Logfile at {}".format(logfile))
-    for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
-
-    pid = os.getpid()
-    logging.warning("\tPID = {}".format(pid))
-    logging.warning("\tTraining on GPU: {}".format(torch.cuda.is_available()))
 
     ''' EMAIL '''
     '''----------------------------------------------------------------------- '''
-    global out_str
-    out_str = "GOT NOTHING"
     def send_msg(text, subject, attachments=None):
 
         msg = MIMEMultipart()
-        msg['From'] = args.username + "@gmail.com"
-        msg['To'] = "henrion@nyu.edu"
+        msg['From'] = args.sender
+        msg['To'] = args.recipient
         msg['Date'] = formatdate(localtime = True)
         msg['Subject'] = subject
 
@@ -179,29 +182,66 @@ def train():
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.ehlo()
         server.starttls()
-        server.login(args.username, args.password)
-        server.sendmail(args.username + "@gmail.com", "henrion@nyu.edu", msg.as_string())
+        server.login(args.sender, args.password)
+        server.sendmail(args.sender, args.recipient, msg.as_string())
         server.close()
         logging.info("SENT EMAIL")
 
-    def summary_email(out_str, model, interrupted):
-
-        status = "INTERRUPTED" if interrupted else "COMPLETED"
-        subject = 'JOB {} (Logfile = {}, PID = {}, GPU = {})'.format(status, logfile, pid, args.gpu)
+    def summary_email(out_str, model, type):
+        subject = 'JOB {} (Logfile = {}, PID = {}, GPU = {})'.format(type, logfile, pid, args.gpu)
         attachments = [logfile]
         text = ""
         text += "{}\n".format(model)
         text += "{}".format(out_str)
         send_msg(text, subject, attachments)
 
-    ''' CUDA '''
+    ''' SIGNAL HANDLING '''
     '''----------------------------------------------------------------------- '''
-    # set device and seed
-    if torch.cuda.is_available():
-        torch.cuda.device(args.gpu)
-        torch.cuda.manual_seed(args.seed)
-    else:
-        torch.manual_seed(args.seed)
+    last_non_empty_out_str = None
+
+    def cleanup(need_input=False):
+        answer = None if need_input else "y"
+        while answer not in ["", "y", "Y", "n", "N"]:
+            answer = input('Cleanup? (Y/n)\n')
+            if answer in ["", "y", "Y"]:
+                shutil.rmtree(model_dir)
+
+    def timestring():
+        dt = datetime.datetime.now()
+        d = "{}-{} at {:02d}:{:02d}:{:02d}".format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
+        return d
+
+    def signal_term_handler(signal, frame):
+        d = timestring()
+        logging.info('KILLED on {}'.format(d))
+        if last_non_empty_out_str is not None:
+            summary_email(last_non_empty_out_str, model, type='KILLED')
+        else:
+            summary_email("TOTAL FAILURE", d, type="FAILURE")
+        cleanup(need_input=args.gpu<0)
+        sys.exit(0)
+
+    def signal_int_handler(signal, frame):
+        d = timestring()
+        logging.info('INTERRUPTED on {}'.format(timestring()))
+        if last_non_empty_out_str is not None:
+            summary_email(last_non_empty_out_str, model, type='INTERRUPTED')
+        else:
+            summary_email("TOTAL FAILURE", d, type="FAILURE")
+        cleanup(need_input=args.gpu<0)
+        sys.exit(0)
+
+    signal.signal(signal.SIGTERM, signal_term_handler)
+    signal.signal(signal.SIGINT, signal_int_handler)
+
+    ''' RECORD SETTINGS '''
+    '''----------------------------------------------------------------------- '''
+    logging.info("Logfile at {}".format(logfile))
+    for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
+
+    pid = os.getpid()
+    logging.warning("\tPID = {}".format(pid))
+    logging.warning("\tTraining on GPU: {}".format(torch.cuda.is_available()))
 
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
@@ -359,52 +399,40 @@ def train():
 
     ''' TRAINING '''
     '''----------------------------------------------------------------------- '''
-    try:
-        logging.warning("Training...")
-        for i in range(args.n_epochs):
-            logging.info("epoch = %d" % i)
-            logging.info("step_size = %.8f" % settings['step_size'])
 
-            for j in range(n_batches):
+    logging.warning("Training...")
+    for i in range(args.n_epochs):
+        logging.info("epoch = %d" % i)
+        logging.info("step_size = %.8f" % settings['step_size'])
 
-                model.train()
-                optimizer.zero_grad()
-                start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
-                idx = slice(start, start+args.batch_size)
-                X, y = X_train[idx], y_train[idx]
-                X_var = wrap_X(X); y_var = wrap(y)
-                l = loss(model(X_var), y_var)
-                l.backward()
-                optimizer.step()
-                X = unwrap_X(X_var); y = unwrap(y_var)
+        for j in range(n_batches):
 
-                out_str = callback(j, model)
+            model.train()
+            optimizer.zero_grad()
+            start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
+            idx = slice(start, start+args.batch_size)
+            X, y = X_train[idx], y_train[idx]
+            X_var = wrap_X(X); y_var = wrap(y)
+            l = loss(model(X_var), y_var)
+            l.backward()
+            optimizer.step()
+            X = unwrap_X(X_var); y = unwrap(y_var)
 
-                if out_str is not None:
-                    last_non_empty_out_str = out_str
-                    logging.info(out_str)
+            out_str = callback(j, model)
 
-            scheduler.step()
-            settings['step_size'] = args.step_size * (args.decay) ** (i + 1)
-        logging.info("FINISHED TRAINING")
+            if out_str is not None:
+                last_non_empty_out_str = out_str
+                logging.info(out_str)
 
-
-        summary_email(last_non_empty_out_str, model, interrupted=False)
+        scheduler.step()
+        settings['step_size'] = args.step_size * (args.decay) ** (i + 1)
+    logging.info("FINISHED TRAINING")
 
 
+    summary_email(last_non_empty_out_str, model, type='finished')
 
-    except (KeyboardInterrupt, SystemExit) as e:
-        ''' INTERRUPT '''
-        '''----------------------------------------------------------------------- '''
-        summary_email(last_non_empty_out_str, model, interrupted=True)
-        raise SystemExit
-    finally:
-        def signal_term_handler(signal, frame):
-            logging.info('KILLED')
-            summary_email(last_non_empty_out_str, model, interrupted=True)
-            sys.exit(0)
 
-        signal.signal(signal.SIGTERM, signal_term_handler)
+
 
 if __name__ == "__main__":
     train()
