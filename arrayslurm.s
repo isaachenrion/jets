@@ -11,16 +11,21 @@
 ##SBATCH --gres=gpu:1
 
 module purge
-SRCDIR=$HOME/jets
-DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
-cd $SRCDIR
+
+SRCDIR=$HOME/jetscd $SRCDIR
 source activate jets
-model_type=5
-COUNTER=$SLURM_ARRAY_TASK_ID
-let 'SEED = COUNTER * 10000'
+
+## variables
+DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
+MODEL_TYPE=5
+EPOCHS=2
+N=1000
+GPU=1
+let 'SEED = SLURM_ARRAY_TASK_ID * 10000'
+
 ##qprintf 'python train.py --data_dir %s -m %s --seed %s -v -g 1 &\n' $DATA_DIR $model_type $SEED
 ##python train.py --data_dir $DATA_DIR -m $model_type --seed $SEED -g 1 &
-python train.py -v -m 5 --data_dir $DATA_DIR -g 1 -e 2 -n 10000 &
+python train.py -v -m $MODEL_TYPE --data_dir $DATA_DIR -g $GPU -e $EPOCHS -n $N &
 disown %1
 sleep 5
 
