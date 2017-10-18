@@ -205,14 +205,15 @@ def train(args):
 
             ''' VALIDATION '''
         '''----------------------------------------------------------------------- '''
+        def save_everything(model):
+            with open(os.path.join(eh.exp_dir, 'model_state_dict.pt'), 'wb') as f:
+                torch.save(model.state_dict(), f)
+
+            with open(os.path.join(eh.exp_dir, 'settings.pickle'), "wb") as f:
+                pickle.dump(settings, f)
+
         def callback(iteration, model):
             out_str = None
-            def save_everything(model):
-                with open(os.path.join(eh.exp_dir, 'model_state_dict.pt'), 'wb') as f:
-                    torch.save(model.state_dict(), f)
-
-                with open(os.path.join(eh.exp_dir, 'settings.pickle'), "wb") as f:
-                    pickle.dump(settings, f)
 
             if iteration % 25 == 0:
                 model.eval()
@@ -294,6 +295,8 @@ def train(args):
 
             scheduler.step()
             settings['step_size'] = args.step_size * (args.decay) ** (i + 1)
+
+        save_everything(model)
         logging.info("FINISHED TRAINING")
         signal_handler.completed()
     except Exception as e:

@@ -89,7 +89,9 @@ class SignalHandler:
         while answer not in ["", "y", "Y", "n", "N"]:
             answer = input('Cleanup? (Y/n)\n')
             if answer in ["", "y", "Y"]:
-                os.system("rm -rf {}".format(self.exp_dir))
+                logging.info("Deleting {}".format(self.exp_dir))
+                os.system("rm {}/*".format(self.exp_dir))
+                os.system("rm {}".format(self.exp_dir))
 
     def signal_handler(self, signal):
         d = timestring()
@@ -139,7 +141,7 @@ class ExperimentHandler:
         ''' SET UP LOGGING '''
         '''----------------------------------------------------------------------- '''
         logfile = get_logfile(exp_dir, args.silent, args.verbose)
-        
+
         ''' SIGNAL HANDLER '''
         '''----------------------------------------------------------------------- '''
         emailer=Emailer(args.sender, args.password, args.recipient)
