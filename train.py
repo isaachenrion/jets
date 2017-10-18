@@ -302,6 +302,7 @@ def train(args):
         logging.info("FINISHED TRAINING")
         signal_handler.completed()
     except Exception as e:
+        logging.warning(e)
         signal_handler.crashed()
         raise e
 

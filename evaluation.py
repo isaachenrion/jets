@@ -150,6 +150,7 @@ def main():
 
         signal_handler.completed()
     except Exception as e:
+        logging.warning(e)
         signal_handler.crashed()
         raise e
 

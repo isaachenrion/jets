@@ -173,5 +173,5 @@ class ExperimentHandler:
         self.pid = pid
 
     def usage(self):
-        os.system('ps u -p {} | awk "{sum=sum+$6}; END {print sum/1024}"'.format(self.pid))
+        #os.system('ps u -p {} | awk "{sum=sum+$6}; END {print sum/1024}"'.format(self.pid))
         return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
