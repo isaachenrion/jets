@@ -88,10 +88,10 @@ class SignalHandler:
         answer = None if self.need_input else "y"
         while answer not in ["", "y", "Y", "n", "N"]:
             answer = input('Cleanup? (Y/n)\n')
-            if answer in ["", "y", "Y"]:
-                logging.info("Deleting {}".format(self.exp_dir))
-                os.system("rm {}/*".format(self.exp_dir))
-                os.system("rm {}".format(self.exp_dir))
+        if answer in ["", "y", "Y"]:
+            logging.info("Deleting {}".format(self.exp_dir))
+            os.system("rm {}/*".format(self.exp_dir))
+            os.system("rm {}".format(self.exp_dir))
 
     def signal_handler(self, signal, cleanup=True):
         d = timestring()
