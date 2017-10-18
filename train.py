@@ -99,10 +99,8 @@ if args.debug:
     args.n_epochs = 3
     args.n_train = 1000
 
-try:
-    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
-except Error:
-    pass
+os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
+
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
 args.recipient = RECIPIENT
