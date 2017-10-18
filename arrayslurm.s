@@ -8,7 +8,7 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-user=henrion@nyu.edu
 #SBATCH --output=slurm_%j.out
-#SBATCH --gres=gpu:1
+##SBATCH --gres=gpu:1
 
 module purge
 SRCDIR=$HOME/jets
