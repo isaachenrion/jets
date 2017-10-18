@@ -18,7 +18,7 @@ import gc
 
 from utils import ExperimentHandler
 
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import RobustScaler
@@ -52,6 +52,7 @@ parser = argparse.ArgumentParser(description='Jets')
 
 # data args
 parser.add_argument("-f", "--filename", type=str, default='antikt-kt')
+parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_train", type=int, default=-1)
 parser.add_argument("--n_valid", type=int, default=27000)
 parser.add_argument("--add_cropped", action='store_true', default=False)
@@ -112,8 +113,8 @@ def train(args):
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
     logging.warning("Loading data...")
-    tf = load_tf(DATA_DIR, "{}-train.pickle".format(args.filename))
-    X, y = load_data(DATA_DIR, "{}-train.pickle".format(args.filename))
+    tf = load_tf(args.data_dir, "{}-train.pickle".format(args.filename))
+    X, y = load_data(args.data_dir, "{}-train.pickle".format(args.filename))
 
     for jet in X:
         jet["content"] = tf.transform(jet["content"])

@@ -10,7 +10,12 @@
 #SBATCH --output=slurm_%j.out
 
 module purge
-##SRCDIR='/misc/kcgscratch1/ChoGroup/isaac/jets'
-##RUNDIR=$SRCDIR
+
+module load python3/intel/3.6.3
+module load pytorch/0.2.0_1
+module load scikit-learn/intel/0.18.1
 jets
-./many_runs.sh -m 5 -n 1
+chmod +x ./slurm_run.sh
+./slurm_run.sh -d $SCRATCH -m 5 -n 1
+
+##93YFYhK7DfH8
