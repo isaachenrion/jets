@@ -89,7 +89,7 @@ class SignalHandler:
         while answer not in ["", "y", "Y", "n", "N"]:
             answer = input('Cleanup? (Y/n)\n')
             if answer in ["", "y", "Y"]:
-                shutil.rmtree(self.exp_dir)
+                os.system("rm -rf {}".format(self.exp_dir))
 
     def signal_term_handler(self, signal, frame):
         d = timestring()
