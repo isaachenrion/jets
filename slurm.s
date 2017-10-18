@@ -11,9 +11,9 @@
 ##SBATCH --array=1-10
 
 module purge
-SRCDIR = $HOME/jets
+SRCDIR=$HOME/jets
 cd $SRCDIR
-jets
+source jets activate
 ##module load python3/intel/3.6.3
 ##module load pytorch/0.2.0_1
 ##module load scikit-learn/intel/0.18.1
