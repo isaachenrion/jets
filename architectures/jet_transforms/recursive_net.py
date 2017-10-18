@@ -9,7 +9,7 @@ from .nn_utils import AnyBatchGRUCell
 from .nn_utils import BiDirectionalTreeGRU
 
 class GRNNTransformSimple(nn.Module):
-    def __init__(self, n_features=None, n_hidden=None, bn=None):
+    def __init__(self, n_features=None, n_hidden=None,**kwargs):
         super().__init__()
 
         activation_string = 'relu'
@@ -21,11 +21,6 @@ class GRNNTransformSimple(nn.Module):
         gain = nn.init.calculate_gain(activation_string)
         nn.init.xavier_uniform(self.fc_u.weight, gain=gain)
         nn.init.orthogonal(self.fc_h.weight, gain=gain)
-
-        self.bn = bn
-        if bn:
-            self.bn_u = nn.BatchNorm1d(n_hidden)
-            self.bn_h = nn.BatchNorm1d(n_hidden)
 
 
     def forward(self, jets):
@@ -45,8 +40,6 @@ class GRNNTransformSimple(nn.Module):
                 outer = []
 
             u_k = self.fc_u(contents[j])
-            if self.bn:
-                u_k = self.bn_u(u_k)
             u_k = self.activation(u_k)
 
 
@@ -58,7 +51,6 @@ class GRNNTransformSimple(nn.Module):
 
                 h = torch.cat((h_L, h_R, u_k[:n_inners[j]]), 1)
                 h = self.fc_h(h)
-                if self.bn: h = self.bn_h(h)
                 h = self.activation(h)
 
                 try:
@@ -73,7 +65,7 @@ class GRNNTransformSimple(nn.Module):
 
 
 class GRNNTransformGated(nn.Module):
-    def __init__(self, n_features=None, n_hidden=None, bn=None, n_iters=0):
+    def __init__(self, n_features=None, n_hidden=None, n_iters=0, **kwargs):
         super().__init__()
         self.n_hidden = n_hidden
         self.n_iters = n_iters
@@ -95,13 +87,6 @@ class GRNNTransformGated(nn.Module):
         if self.n_iters > 0:
             self.down_root = nn.Linear(n_hidden, n_hidden)
             self.down_gru = AnyBatchGRUCell(n_hidden, n_hidden)
-
-        self.bn = bn
-        if self.bn:
-            self.bn_u = nn.BatchNorm1d(n_hidden)
-            self.bn_h = nn.BatchNorm1d(n_hidden)
-            self.bn_z = nn.BatchNorm1d(4 * n_hidden)
-            self.bn_r = nn.BatchNorm1d(3 * n_hidden)
 
 
     def forward(self, jets, return_states=False):
