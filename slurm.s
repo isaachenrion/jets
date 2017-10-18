@@ -12,7 +12,7 @@
 
 module purge
 SRCDIR=$HOME/jets
-DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles/
+DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
 cd $SRCDIR
 source activate jets
 model_type=5
