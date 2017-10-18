@@ -149,7 +149,7 @@ def main():
             plot_show()
 
         signal_handler.completed()
-    except Error as e:
+    except Exception as e:
         signal_handler.crashed()
         raise e
 

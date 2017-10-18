@@ -296,7 +296,7 @@ def train(args):
             settings['step_size'] = args.step_size * (args.decay) ** (i + 1)
         logging.info("FINISHED TRAINING")
         signal_handler.completed()
-    except Error as e:
+    except Exception as e:
         signal_handler.crashed()
         raise e
 
