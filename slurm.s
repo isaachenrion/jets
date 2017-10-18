@@ -14,7 +14,6 @@ module purge
 SRCDIR=$HOME/jets
 cd $SRCDIR
 source activate jets
-chmod +x ./slurm_run.sh
 ./slurm_run.sh -d $SCRATCH -m 5 -n 3
 
 ##93YFYhK7DfH8
