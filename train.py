@@ -106,6 +106,7 @@ if args.n_train <= 5 * args.n_valid and args.n_train > 0:
 args.recipient = RECIPIENT
 
 def train(args):
+    logging.info("Doing admin...")
     _, Transform, model_type = TRANSFORMS[args.model_type]
     eh = ExperimentHandler(args, os.path.join(MODELS_DIR,model_type))
     signal_handler = eh.signal_handler
@@ -145,6 +146,7 @@ def train(args):
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
     # Initialization
+    logging.info("Initializing model...")
     Predict = PredictFromParticleEmbedding
     if args.load is None:
         model_kwargs = {
@@ -186,7 +188,7 @@ def train(args):
 
     ''' OPTIMIZER AND LOSS '''
     '''----------------------------------------------------------------------- '''
-
+    logging.info("Building optimizer...")
     optimizer = Adam(model.parameters(), lr=args.step_size)
     scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
     #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
@@ -265,7 +267,6 @@ def train(args):
 
     ''' TRAINING '''
     '''----------------------------------------------------------------------- '''
-
     logging.warning("Training...")
     for i in range(args.n_epochs):
         logging.info("epoch = %d" % i)

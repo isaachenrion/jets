@@ -167,7 +167,7 @@ class ExperimentHandler:
         for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
 
         logging.warning("\tPID = {}".format(pid))
-        logging.warning("\tRunning on GPU: {}".format(torch.cuda.is_available()))
+        logging.warning("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
 
         self.logfile = logfile
         self.emailer = emailer
