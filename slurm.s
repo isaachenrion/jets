@@ -2,7 +2,7 @@
 #SBATCH --nodes=4
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=1:00:00
+#SBATCH --time=01:00:00
 #SBATCH --mem-per-cpu=6GB
 #SBATCH --job-name=jets-experiment
 #SBATCH --mail-type=END
@@ -12,8 +12,9 @@
 
 module purge
 SRCDIR=$HOME/jets
+DATA_DIR=$SCRATCH/data
 cd $SRCDIR
 source activate jets
-./slurm_run.sh -d $SCRATCH -m 5 -n 3
+./slurm_run.sh -d $DATA_DIR -m 5 -n 3
 
-##93YFYhK7DfH8
+##
