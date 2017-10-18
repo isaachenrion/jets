@@ -32,6 +32,7 @@ do
   sleep 1
   let COUNTER=COUNTER+1
 done
+
 ##./slurm_run.sh -d $DATA_DIR -m 5 -n 3
 
 ##
