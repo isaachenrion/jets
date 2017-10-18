@@ -18,8 +18,9 @@ source activate jets
 model_type=5
 COUNTER=$SLURM_ARRAY_TASK_ID
 let 'SEED = COUNTER * 10000'
-printf 'python train.py --data_dir %s -m %s --seed %s -v -g 1 &\n' $DATA_DIR $model_type $SEED
-python train.py --data_dir $DATA_DIR -m $model_type --seed $SEED -g 1 &
+##printf 'python train.py --data_dir %s -m %s --seed %s -v -g 1 &\n' $DATA_DIR $model_type $SEED
+##python train.py --data_dir $DATA_DIR -m $model_type --seed $SEED -g 1 &
+python train.py -v -m 5 --data_dir $DATA_DIR -g 1 -e 2 -n 1000
 disown %1
 sleep 5
 
