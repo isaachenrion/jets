@@ -25,7 +25,7 @@ do
   printf 'Running with seed = %s\n' $SEED
   python train.py --debug --data_dir $DATA_DIR  -v -m $model_type --seed $SEED &
   disown %1
-  sleep 1
+  sleep 3
   let COUNTER=COUNTER+1
 done
 
