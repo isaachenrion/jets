@@ -12,7 +12,7 @@
 
 module purge
 SRCDIR=$HOME/jets
-DATA_DIR=$SCRATCH/data
+DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles/
 cd $SRCDIR
 source activate jets
 ./slurm_run.sh -d $DATA_DIR -m 5 -n 3

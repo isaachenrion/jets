@@ -22,11 +22,11 @@ while [  $COUNTER -lt $N ];
 do
   let 'SEED = COUNTER * 10000'
   printf 'Running with seed = %s\n' $SEED
-  $testfile='ztest_'
-  $out='.out'
-  $testfile=$testfile$SEED
-  $testfile=$testfile$out
-  mkdir $testfile
+  #testfile='ztest_'
+  #out='.out'
+  #$testfile=$testfile$SEED
+  #$testfile=$testfile$out
+  #mkdir $testfile
   python train.py --debug --data_dir $DATA_DIR -b $batch_size --step_size $step_size --decay $decay -e $n_epochs -v -m $model_type --seed $SEED &
   disown %1
   sleep 1
