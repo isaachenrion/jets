@@ -2,7 +2,6 @@
 import torch
 from torch.autograd import Variable
 from torch.optim import Adam, lr_scheduler
-import click
 import copy
 import numpy as np
 import logging
