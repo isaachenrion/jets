@@ -18,7 +18,7 @@ source activate jets
 DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
 MODEL_TYPE=5
 EPOCHS=2
-N=1000
+N=10000
 GPU=1
 let 'SEED = SLURM_ARRAY_TASK_ID * 10000'
 
