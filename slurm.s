@@ -13,7 +13,7 @@
 module purge
 SRCDIR=$HOME/jets
 cd $SRCDIR
-source jets activate
+source activate jets
 ##module load python3/intel/3.6.3
 ##module load pytorch/0.2.0_1
 ##module load scikit-learn/intel/0.18.1
