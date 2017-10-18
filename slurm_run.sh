@@ -22,7 +22,7 @@ while [  $COUNTER -lt $N ];
 do
   let 'SEED = COUNTER * 10000'
   printf 'Running with seed = %s\n' $SEED
-  python train.py --debug --data_dir $DATA_DIR -b $batch_size --step_size $step_size --decay $decay -e $n_epochs -s -m $model_type --seed $seed &
+  python train.py --debug --data_dir $DATA_DIR -b $batch_size --step_size $step_size --decay $decay -e $n_epochs -v -m $model_type --seed $seed &
   disown %1
   sleep 1
   let COUNTER=COUNTER+1
