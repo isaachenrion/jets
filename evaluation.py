@@ -76,78 +76,82 @@ REPORTS_DIR = 'reports'
 
 def main():
 
-    eh = ExperimentHandler(args, REPORTS_DIR)
-    signal_handler = eh.signal_handler
+    try:
+        eh = ExperimentHandler(args, REPORTS_DIR)
+        signal_handler = eh.signal_handler
 
-    ''' GET RELATIVE PATHS TO DATA AND MODELS '''
-    '''----------------------------------------------------------------------- '''
-    with open(args.model_list_filename, "r") as f:
-        model_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
+        ''' GET RELATIVE PATHS TO DATA AND MODELS '''
+        '''----------------------------------------------------------------------- '''
+        with open(args.model_list_filename, "r") as f:
+            model_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
 
-    with open(args.data_list_filename, "r") as f:
-        data_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
+        with open(args.data_list_filename, "r") as f:
+            data_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
 
-    logging.info("DATA PATHS\n{}".format("\n".join(data_paths)))
-    logging.info("MODEL PATHS\n{}".format("\n".join(model_paths)))
+        logging.info("DATA PATHS\n{}".format("\n".join(data_paths)))
+        logging.info("MODEL PATHS\n{}".format("\n".join(model_paths)))
 
 
-    ''' BUILD ROCS '''
-    '''----------------------------------------------------------------------- '''
-    if args.load_rocs is None:
+        ''' BUILD ROCS '''
+        '''----------------------------------------------------------------------- '''
+        if args.load_rocs is None:
+            for data_path in data_paths:
+
+                logging.info('Building ROCs for models trained on {}'.format(data_path))
+                tf = load_tf(DATA_DIR, "{}-train.pickle".format(data_path))
+                if args.set == 'test':
+                    data = load_test(tf, DATA_DIR, "{}-test.pickle".format(data_path), args.n_test)
+                elif args.set == 'valid':
+                    data = load_test(tf, DATA_DIR, "{}-valid.pickle".format(data_path), args.n_test)
+                elif args.set == 'train':
+                    data = load_test(tf, DATA_DIR, "{}-train.pickle".format(data_path), args.n_test)
+
+                for model_path in model_paths:
+                    logging.info('\tBuilding ROCs for instances of {}'.format(model_path))
+                    r, f, t = build_rocs(data, os.path.join(MODELS_DIR, model_path), args.batch_size)
+
+                    absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
+                    with open(absolute_roc_path, "wb") as fd:
+                        pickle.dump((r, f, t), fd)
+        else:
+            for data_path in data_paths:
+                for model_path in model_paths:
+
+                    previous_absolute_roc_path = os.path.join(REPORTS_DIR, args.load_rocs, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
+                    with open(previous_absolute_roc_path, "rb") as fd:
+                        r, f, t = pickle.load(fd)
+
+                    absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
+                    with open(absolute_roc_path, "wb") as fd:
+                        pickle.dump((r, f, t), fd)
+
+        ''' PLOT ROCS '''
+        '''----------------------------------------------------------------------- '''
+
+        labels = model_paths
+        colors = ['c', 'm', 'y', 'k']
+
         for data_path in data_paths:
-
-            logging.info('Building ROCs for models trained on {}'.format(data_path))
-            tf = load_tf(DATA_DIR, "{}-train.pickle".format(data_path))
-            if args.set == 'test':
-                data = load_test(tf, DATA_DIR, "{}-test.pickle".format(data_path), args.n_test)
-            elif args.set == 'valid':
-                data = load_test(tf, DATA_DIR, "{}-valid.pickle".format(data_path), args.n_test)
-            elif args.set == 'train':
-                data = load_test(tf, DATA_DIR, "{}-train.pickle".format(data_path), args.n_test)
-
-            for model_path in model_paths:
-                logging.info('\tBuilding ROCs for instances of {}'.format(model_path))
-                r, f, t = build_rocs(data, os.path.join(MODELS_DIR, model_path), args.batch_size)
-
+            for model_path, label, color in zip(model_paths, labels, colors):
                 absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
-                with open(absolute_roc_path, "wb") as fd:
-                    pickle.dump((r, f, t), fd)
-    else:
-        for data_path in data_paths:
-            for model_path in model_paths:
-
-                previous_absolute_roc_path = os.path.join(REPORTS_DIR, args.load_rocs, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
-                with open(previous_absolute_roc_path, "rb") as fd:
+                with open(absolute_roc_path, "rb") as fd:
                     r, f, t = pickle.load(fd)
 
-                absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
-                with open(absolute_roc_path, "wb") as fd:
-                    pickle.dump((r, f, t), fd)
+                if args.remove_outliers:
+                    r, f, t = remove_outliers(r, f, t)
 
-    ''' PLOT ROCS '''
-    '''----------------------------------------------------------------------- '''
+                report_score(r, f, t, label=label)
+                plot_rocs(r, f, t, label=label, color=color)
 
-    labels = model_paths
-    colors = ['c', 'm', 'y', 'k']
+        figure_filename = os.path.join(eh.exp_dir, 'rocs.png')
+        plot_save(figure_filename)
+        if args.plot:
+            plot_show()
 
-    for data_path in data_paths:
-        for model_path, label, color in zip(model_paths, labels, colors):
-            absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
-            with open(absolute_roc_path, "rb") as fd:
-                r, f, t = pickle.load(fd)
-
-            if args.remove_outliers:
-                r, f, t = remove_outliers(r, f, t)
-
-            report_score(r, f, t, label=label)
-            plot_rocs(r, f, t, label=label, color=color)
-
-    figure_filename = os.path.join(eh.exp_dir, 'rocs.png')
-    plot_save(figure_filename)
-    if args.plot:
-        plot_show()
-
-    signal_handler.job_completed()
+        signal_handler.completed()
+    except Error as e:
+        signal_handler.crashed()
+        raise e
 
 if __name__ == '__main__':
     main()

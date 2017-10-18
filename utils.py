@@ -78,8 +78,8 @@ class SignalHandler:
         self.exp_dir = exp_dir
         self.subject_string = subject_string
 
-        signal.signal(signal.SIGTERM, self.signal_term_handler)
-        signal.signal(signal.SIGINT, self.signal_int_handler)
+        signal.signal(signal.SIGTERM, self.killed)
+        signal.signal(signal.SIGINT, self.interrupted)
 
     def set_model(self, model):
         self.model = model
@@ -91,38 +91,29 @@ class SignalHandler:
             if answer in ["", "y", "Y"]:
                 os.system("rm -rf {}".format(self.exp_dir))
 
-    def signal_term_handler(self, signal, frame):
+    def signal_handler(self, signal):
         d = timestring()
-        alert = 'KILLED on {}'.format(timestring())
+        alert = '{} on {}'.format(signal, timestring())
         logging.warning(alert)
-        subject = "Job {} {}".format("KILLED", self.subject_string)
+        subject = "Job {} {}".format(signal, self.subject_string)
         text = "{}\n{}\n{}".format(alert, self.results_strings[-1], self.model)
         attachments = [self.logfile]
         self.emailer.send_msg(text, subject, attachments)
         self.cleanup()
         sys.exit(0)
 
-    def signal_int_handler(self, signal, frame):
-        d = timestring()
-        alert = 'INTERRUPTED on {}'.format(timestring())
-        logging.warning(alert)
-        subject = "Job {} {}".format("INTERRUPTED", self.subject_string)
-        text = "{}\n{}\n{}".format(alert, self.results_strings[-1], self.model)
-        attachments = [self.logfile]
-        self.emailer.send_msg(text, subject, attachments)
-        self.cleanup()
-        sys.exit(0)
+    def killed(self, signal, frame):
+        self.signal_handler(signal='KILLED')
 
-    def job_completed(self):
-        d = timestring()
-        alert = 'Completed on {}'.format(timestring())
-        logging.warning(alert)
-        subject = "Job {} {}".format("Completed", self.subject_string)
-        text = "{}\n{}\n{}".format(alert, self.results_strings[-1], self.model)
-        attachments = [self.logfile]
-        self.emailer.send_msg(text, subject, attachments)
-        self.cleanup()
-        sys.exit(0)
+    def interrupted(self, signal, frame):
+        self.signal_handler(signal='INTERRUPTED')
+
+    def completed(self):
+        self.signal_handler(signal='COMPLETED')
+
+    def crashed(self):
+        self.signal_handler(signal='CRASHED')
+
 
 class ExperimentHandler:
     def __init__(self, args, root_exp_dir):
