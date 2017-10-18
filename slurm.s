@@ -23,7 +23,7 @@ while [  $COUNTER -lt $N ];
 do
   let 'SEED = COUNTER * 10000'
   printf 'Running with seed = %s\n' $SEED
-  python train.py --debug --data_dir $DATA_DIR  -v -m $model_type --seed $SEED &
+  python train.py --debug --data_dir $DATA_DIR  -v -m $model_type --seed $SEED -g 1 &
   disown %1
   sleep 5
   let COUNTER=COUNTER+1
