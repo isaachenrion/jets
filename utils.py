@@ -93,7 +93,7 @@ class SignalHandler:
                 os.system("rm {}/*".format(self.exp_dir))
                 os.system("rm {}".format(self.exp_dir))
 
-    def signal_handler(self, signal):
+    def signal_handler(self, signal, cleanup=True):
         d = timestring()
         alert = '{} on {}'.format(signal, timestring())
         logging.warning(alert)
@@ -101,7 +101,8 @@ class SignalHandler:
         text = "{}\n{}\n{}".format(alert, self.results_strings[-1], self.model)
         attachments = [self.logfile]
         self.emailer.send_msg(text, subject, attachments)
-        self.cleanup()
+        if cleanup:
+            self.cleanup()
         sys.exit(0)
 
     def killed(self, signal, frame):
@@ -111,7 +112,7 @@ class SignalHandler:
         self.signal_handler(signal='INTERRUPTED')
 
     def completed(self):
-        self.signal_handler(signal='COMPLETED')
+        self.signal_handler(signal='COMPLETED', cleanup=False)
 
     def crashed(self):
         self.signal_handler(signal='CRASHED')
@@ -135,6 +136,8 @@ class ExperimentHandler:
         #
         dt = datetime.datetime.now()
         filename_exp = '{}-{}/{:02d}-{:02d}-{:02d}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
+        if args.debug:
+            filename_exp += '-DEBUG'
         exp_dir = os.path.join(root_exp_dir, filename_exp)
         os.makedirs(exp_dir)
 
