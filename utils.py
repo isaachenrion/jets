@@ -139,7 +139,7 @@ class ExperimentHandler:
         ''' SET UP LOGGING '''
         '''----------------------------------------------------------------------- '''
         logfile = get_logfile(exp_dir, args.silent, args.verbose)
-
+        
         ''' SIGNAL HANDLER '''
         '''----------------------------------------------------------------------- '''
         emailer=Emailer(args.sender, args.password, args.recipient)

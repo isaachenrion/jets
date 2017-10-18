@@ -107,7 +107,7 @@ args.recipient = RECIPIENT
 
 def train(args):
     try:
-        logging.info("Doing admin...")
+        #logging.info("Doing admin...")
         _, Transform, model_type = TRANSFORMS[args.model_type]
         eh = ExperimentHandler(args, os.path.join(MODELS_DIR,model_type))
         signal_handler = eh.signal_handler
