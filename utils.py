@@ -91,7 +91,7 @@ class SignalHandler:
         if answer in ["", "y", "Y"]:
             logging.info("Deleting {}".format(self.exp_dir))
             os.system("rm {}/*".format(self.exp_dir))
-            os.system("rm {}".format(self.exp_dir))
+            os.system("rm -r {}".format(self.exp_dir))
 
     def signal_handler(self, signal, cleanup=True):
         d = timestring()
