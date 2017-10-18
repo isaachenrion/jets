@@ -15,6 +15,24 @@ SRCDIR=$HOME/jets
 DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles/
 cd $SRCDIR
 source activate jets
-./slurm_run.sh -d $DATA_DIR -m 5 -n 3
+model_type=5
+N=3
+batch_size=64
+step_size=0.001
+decay=0.912
+n_epochs=25
+COUNTER=0
+printf 'N = %s, Model = %s, DATA_DIR = %s\n' $N $model_type $DATA_DIR
+while [  $COUNTER -lt $N ];
+do
+  let 'SEED = COUNTER * 10000'
+  printf 'Running with seed = %s\n' $SEED
+  python train.py --debug --data_dir $DATA_DIR -b $batch_size --step_size $step_size --decay $decay -e $n_epochs -v -m $model_type --seed $SEED &
+  disown %1
+  sleep 1
+  let COUNTER=COUNTER+1
+done
+
+##./slurm_run.sh -d $DATA_DIR -m 5 -n 3
 
 ##
