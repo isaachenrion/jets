@@ -14,6 +14,7 @@ import signal
 import shutil
 import numpy as np
 import torch
+import resource
 
 def get_logfile(exp_dir, silent, verbose):
     logfile = os.path.join(exp_dir, 'log.txt')
@@ -170,3 +171,7 @@ class ExperimentHandler:
         self.signal_handler = signal_handler
         self.exp_dir = exp_dir
         self.pid = pid
+
+    def usage(self):
+        os.system('ps u -p {} | awk "{sum=sum+$6}; END {print sum/1024}"'.format(self.pid))
+        return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
