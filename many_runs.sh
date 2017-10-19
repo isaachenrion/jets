@@ -17,7 +17,7 @@ do
   let 'SEED = COUNTER * 10000'
   ./four_runs.sh -m $model_type -s $SEED &
   disown %1
-  sleep 1
+  sleep 3
   let COUNTER=COUNTER+1
 done
 
