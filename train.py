@@ -119,8 +119,8 @@ def train(args):
         X, y = load_data(args.data_dir, "{}-train.pickle".format(args.filename))
 
         logging.warning("Memory usage = {}".format(eh.usage()))
-        for jet in X:
-            jet["content"] = tf.transform(jet["content"])
+        #for jet in X:
+        #    jet["content"] = tf.transform(jet["content"])
 
         logging.warning("After transform: memory usage = {}".format(eh.usage()))
 
