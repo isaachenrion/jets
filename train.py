@@ -77,7 +77,7 @@ parser.add_argument("-d", "--decay", type=float, default=.912)
 
 # computing args
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=1)
-parser.add_argument("-g", "--gpu", type=int, default=-1)
+parser.add_argument("-g", "--gpu", type=str, default="")
 
 # MPNN
 parser.add_argument("--leaves", action='store_true')
@@ -99,7 +99,7 @@ if args.debug:
     args.n_epochs = 3
     args.n_train = 1000
 
-os.environ['CUDA_VISIBLE_DEVICES'] = "" #str(args.gpu)
+os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
@@ -120,8 +120,6 @@ def train(args):
 
         logging.warning("Memory usage = {}".format(0))#eh.usage()))
         for ij, jet in enumerate(X):
-            logging.warning("{} Memory usage = {}".format(ij,0))# eh.usage()))
-            logging.flush()
             jet["content"] = tf.transform(jet["content"])
 
         logging.warning("After transform: memory usage = {}".format(eh.usage()))
