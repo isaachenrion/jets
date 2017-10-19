@@ -1,4 +1,5 @@
 import csv
+
 class StatsLogger:
     def __init__(self, filename, headers):
         self.filename = filename + '.csv'

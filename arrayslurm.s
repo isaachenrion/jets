@@ -3,7 +3,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=5
 #SBATCH --time=01:00:00
-#SBATCH --mem=200GB
+#SBATCH --mem=20GB
 #SBATCH --job-name=jets-experiment
 #SBATCH --mail-type=END
 #SBATCH --mail-user=henrion@nyu.edu
@@ -18,7 +18,7 @@ source activate jets
 DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
 MODEL_TYPE=5
 EPOCHS=2
-N=10000
+N=1000
 GPU=1
 let 'SEED = SLURM_ARRAY_TASK_ID * 10000'
 

@@ -17,9 +17,9 @@ n_epochs=25
 for VARIABLE in 0 1 2 3
 do
         let 'seed = VARIABLE + base_seed'
-        python train.py -b $batch_size --step_size $step_size --decay $decay -e $n_epochs --leaves -g $VARIABLE -s -m $model_type --seed $seed &
+        python train.py -b $batch_size --step_size $step_size --decay $decay -e $n_epochs -g $VARIABLE -s -m $model_type --seed $seed &
         disown %1
-        sleep 3
+        sleep 2
 
 done
 printf 'Successfully started all jobs\n'

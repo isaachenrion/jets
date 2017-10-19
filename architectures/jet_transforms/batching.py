@@ -207,6 +207,24 @@ def batch_leaves(jets):
     jets_padded = torch.stack(jets_padded, 0)
     return jets_padded
 
+def trees_as_adjacency_matrices(jets):
+    def tree_as_adjacency_matrix(jet):
+        tree = np.copy(jet['tree'])
+        A = np.zeros((len(tree), len(tree)))
+        for i in range(1, len(tree) + 1):
+            query = np.where(tree == i)[0]
+            if len(query) > 0:
+                A[query, i] = 1
+        return A
+
+    max_tree_size = max([len(jet['tree']) for jet in jets])
+    A_batch = np.zeros((len(jets), max_tree_size, max_tree_size))
+
+    for i, jet in enumerate(jets):
+        A = tree_as_adjacency_matrix(jet)
+        A_batch[i, 0:A.shape[0], 0:A.shape[1]] = A
+
+    return A_batch
 
 
 def batch_parents(jets):

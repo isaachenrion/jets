@@ -16,6 +16,9 @@ import numpy as np
 import torch
 import resource
 
+from monitors import *
+from loggers import StatsLogger
+
 def get_logfile(exp_dir, silent, verbose):
     logfile = os.path.join(exp_dir, 'log.txt')
     logging.basicConfig(level=logging.DEBUG, filename=logfile, filemode="a+",
@@ -78,7 +81,7 @@ class SignalHandler:
         self.logfile = logfile
         self.exp_dir = exp_dir
         self.subject_string = subject_string
-
+        self.done = False
         signal.signal(signal.SIGTERM, self.killed)
         signal.signal(signal.SIGINT, self.interrupted)
 
@@ -113,6 +116,7 @@ class SignalHandler:
         self.signal_handler(signal='INTERRUPTED')
 
     def completed(self):
+        self.done = True
         self.signal_handler(signal='COMPLETED', cleanup=False)
 
     def crashed(self):
@@ -157,6 +161,11 @@ class ExperimentHandler:
                                 subject_string='{}(Logfile = {}, PID = {}, GPU = {})'.format("[DEBUGGING] " if args.debug else "", logfile, pid, args.gpu),
                                 model=None
                                 )
+        ''' STATS LOGGER '''
+        '''----------------------------------------------------------------------- '''
+        #self.monitor_fns = {'roc_auc': roc_auc, 'inv_fpr': inv_fpr}
+        #self.statsfile = os.path.join(exp_dir, 'stats')
+        #self.stats_logger = StatsLogger(self.statsfile, headers=self.monitor_fns.keys())
 
         ''' RECORD SETTINGS '''
         '''----------------------------------------------------------------------- '''
@@ -175,3 +184,12 @@ class ExperimentHandler:
     def usage(self):
         #os.system('ps u -p {} | awk "{sum=sum+$6}; END {print sum/1024}"'.format(self.pid))
         return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+
+    def log(self, yy, yy_pred, **kwargs):
+        stats_dict = {}
+        for fn_name, fn in self.monitor_fns.items():
+            stats_dict[fn_name] = fn(yy, yy_pred, **kwargs)
+        self.stats_logger.log(stats_dict)
+
+    def finished(self):
+        self.stats_logger.close()

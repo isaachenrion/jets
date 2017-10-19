@@ -50,21 +50,6 @@ def load_tf(data_dir, filename):
 
     return tf
 
-def _load_data(tf, data_dir, filename, n):
-    X, y = load_raw_data(data_dir, filename)
-    X = np.array(X)
-    y = np.array(y)
-    for jet in X:
-        jet["content"] = tf.transform(jet["content"])
-    if n > 0:
-        indices = np.random.permutation(len(X))[:n]
-        X = X[indices]
-        y = y[indices]
-    logging.warning("Loaded data: {}".format(filename))
-    logging.warning("\tX size = %d" % len(X))
-    logging.warning("\ty size = %d" % len(y))
-    return X, y
-
 def crop(X, y, return_cropped_indices=False):
     # Cropping
     logging.warning("Cropping...")

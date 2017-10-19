@@ -1,8 +1,10 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.autograd import Variable
 
 from ..batching import pad_batch, batch, batch_leaves
+from ..batching import trees_as_adjacency_matrices
 from .vertex_update import GRUUpdate
 from .readout import DTNNReadout
 from .message import DTNNMessage
@@ -68,3 +70,21 @@ class MPNNTransformIdentity(MPNNTransform):
         message = self.activation(self.message(h))
         h = self.vertex_update(h, message, jets)
         return h
+
+class MPNNTransformClusterTree(MPNNTransform):
+    def __init__(self, **kwargs):
+        super().__init__(adjacency_matrix=None, **kwargs)
+
+    def forward(self, jets):
+        A = Variable(torch.from_numpy(trees_as_adjacency_matrices(jets))).float()
+        if torch.cuda.is_available(): A = A.cuda()
+
+        if self.leaves:
+            jets = batch_leaves(jets)
+        else:
+            jets = pad_batch(jets)
+        h = self.activation(self.embedding(jets))
+        for i in range(self.n_iters):
+            h = self.message_passing(h, jets, A)
+        out = self.readout(h)
+        return out

@@ -253,6 +253,8 @@ def train(args):
                 if np.isnan(inv_fpr):
                     logging.warning("NaN in 1/FPR\n")
 
+                #eh.log(yy, yy_pred, w_valid=w_valid)
+
                 if inv_fpr > best_score[0]:
                     best_score[0] = inv_fpr
                     save_everything(model)
@@ -301,9 +303,10 @@ def train(args):
         save_everything(model)
         logging.info("FINISHED TRAINING")
         signal_handler.completed()
-    except Exception as e:
+    except SystemExit as e:
         logging.warning(e)
-        signal_handler.crashed()
+        if not signal_handler.done:
+            signal_handler.crashed()
         raise e
 
 

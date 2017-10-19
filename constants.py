@@ -5,6 +5,7 @@ from architectures import RelNNTransformConnected
 from architectures import MPNNTransformAdaptive
 from architectures import MPNNTransformFullyConnected
 from architectures import MPNNTransformIdentity
+from architectures import MPNNTransformClusterTree
 
 ''' LOOKUP TABLES AND CONSTANTS '''
 '''----------------------------------------------------------------------- '''
@@ -17,6 +18,7 @@ TRANSFORMS = [
     (3, MPNNTransformAdaptive,'MPNN-adaptive'),
     (4, MPNNTransformFullyConnected,'MPNN-fc'),
     (5, MPNNTransformIdentity,'MPNN-id'),
+    (6, MPNNTransformClusterTree,'MPNN-tree'),
 ]
 RECIPIENT = "henrion@nyu.edu"
 #RECIPIENT = None
