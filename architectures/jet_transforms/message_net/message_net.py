@@ -21,7 +21,11 @@ class MPNNTransform(nn.Module):
         self.vertex_update = GRUUpdate(n_hidden, n_hidden, n_features)
         self.message = DTNNMessage(n_hidden, n_hidden, 0)
         self.readout = DTNNReadout(n_hidden, n_hidden)
-        self.adjacency_matrix = adjacency_matrix(n_hidden)
+        if adjacency_matrix is not None:
+            self.adjacency_matrix = adjacency_matrix(n_hidden)
+        else:
+            def nullfn(x): return None
+            self.adjacency_matrix = nullfn
 
     def forward(self, jets):
         if self.leaves:
@@ -46,9 +50,21 @@ class MPNNTransformAdaptive(MPNNTransform):
 
 class MPNNTransformFullyConnected(MPNNTransform):
     def __init__(self, **kwargs):
-        super().__init__(adjacency_matrix=FullyConnectedAdjacencyMatrix, **kwargs)
+        super().__init__(adjacency_matrix=None, **kwargs)
 
+    def message_passing(self, h, jets, A):
+        shp = h.size()
+        dist_msg = self.message(h).sum(1, keepdim=True).repeat(1, shp[1], 1)
+        message = self.activation(dist_msg)
+        h = self.vertex_update(h, message, jets)
+        return h
 
 class MPNNTransformIdentity(MPNNTransform):
     def __init__(self, **kwargs):
-        super().__init__(adjacency_matrix=IdentityAdjacencyMatrix, **kwargs)
+        super().__init__(adjacency_matrix=None, **kwargs)
+
+    def message_passing(self, h, jets, A):
+        shp = h.size()
+        message = self.activation(self.message(h))
+        h = self.vertex_update(h, message, jets)
+        return h
