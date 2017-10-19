@@ -21,12 +21,11 @@ DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
 MODEL_TYPE=5
 EPOCHS=2
 N=1000
-GPU=
 let 'SEED = SLURM_ARRAY_TASK_ID * 10000'
 
 ##qprintf 'python train.py --data_dir %s -m %s --seed %s -v -g 1 &\n' $DATA_DIR $model_type $SEED
 ##python train.py --data_dir $DATA_DIR -m $model_type --seed $SEED -g 1 &
-python train.py -v -m $MODEL_TYPE --data_dir $DATA_DIR -g $GPU -e $EPOCHS -n $N &
+python train.py -v -m $MODEL_TYPE --data_dir $DATA_DIR  -e $EPOCHS -n $N &
 disown %1
 sleep 5
 
