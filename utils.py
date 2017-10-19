@@ -157,7 +157,7 @@ class ExperimentHandler:
                                 emailer=emailer,
                                 logfile=logfile,
                                 exp_dir=exp_dir,
-                                need_input=(args.gpu<0),
+                                need_input=True,
                                 subject_string='{}(Logfile = {}, PID = {}, GPU = {})'.format("[DEBUGGING] " if args.debug else "", logfile, pid, args.gpu),
                                 model=None
                                 )

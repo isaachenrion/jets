@@ -104,7 +104,6 @@ os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
 args.recipient = RECIPIENT
-
 def train(args):
     try:
         #logging.info("Doing admin...")
