@@ -123,7 +123,7 @@ def train(args):
             jet["content"] = tf.transform(jet["content"])
 
         logging.warning("After transform: memory usage = {}".format(eh.usage()))
-        logging.flush()
+        #logging.flush()
 
         if args.n_train > 0:
             indices = torch.randperm(len(X)).numpy()[:args.n_train]
