@@ -8,10 +8,12 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-user=henrion@nyu.edu
 #SBATCH --output=slurm_%j.out
+#SBATCH --error=slurm_%j.err
 
 module purge
 
-SRCDIR=$HOME/jetscd $SRCDIR
+SRCDIR=$HOME/jets
+cd $SRCDIR
 source activate jets
 
 ## variables
