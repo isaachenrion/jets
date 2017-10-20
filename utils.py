@@ -163,9 +163,12 @@ class ExperimentHandler:
                                 )
         ''' STATS LOGGER '''
         '''----------------------------------------------------------------------- '''
-        #self.monitor_fns = {'roc_auc': roc_auc, 'inv_fpr': inv_fpr}
-        #self.statsfile = os.path.join(exp_dir, 'stats')
-        #self.stats_logger = StatsLogger(self.statsfile, headers=self.monitor_fns.keys())
+        roc_auc = ROCAUC()
+        inv_fpr = InvFPR()
+        best_inv_fpr = Best(inv_fpr)
+        self.monitors = [roc_auc, inv_fpr, best_inv_fpr]
+        self.statsfile = os.path.join(exp_dir, 'stats')
+        self.stats_logger = StatsLogger(self.statsfile, headers=[m.name for m in self.monitors])
 
         ''' RECORD SETTINGS '''
         '''----------------------------------------------------------------------- '''
@@ -185,10 +188,10 @@ class ExperimentHandler:
         #os.system('ps u -p {} | awk "{sum=sum+$6}; END {print sum/1024}"'.format(self.pid))
         return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
-    def log(self, yy, yy_pred, **kwargs):
+    def log(self, **kwargs):
         stats_dict = {}
-        for fn_name, fn in self.monitor_fns.items():
-            stats_dict[fn_name] = fn(yy, yy_pred, **kwargs)
+        for monitor in self.monitors:
+            stats_dict[monitor.name] = monitor(**kwargs)
         self.stats_logger.log(stats_dict)
 
     def finished(self):

@@ -252,7 +252,7 @@ def train(args):
                 if np.isnan(inv_fpr):
                     logging.warning("NaN in 1/FPR\n")
 
-                #eh.log(yy, yy_pred, w_valid=w_valid)
+                eh.log(yy=yy, yy_pred=yy_pred, w_valid=w_valid)
 
                 if inv_fpr > best_score[0]:
                     best_score[0] = inv_fpr
