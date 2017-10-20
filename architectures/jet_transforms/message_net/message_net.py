@@ -6,7 +6,7 @@ from torch.autograd import Variable
 from ..batching import pad_batch, batch, batch_leaves
 from ..batching import trees_as_adjacency_matrices
 from .vertex_update import GRUUpdate
-from .readout import DTNNReadout
+from .readout import DTNNReadout, SetReadout
 from .message import DTNNMessage
 
 from .adjacency import AdaptiveAdjacencyMatrix
@@ -88,3 +88,9 @@ class MPNNTransformClusterTree(MPNNTransform):
             h = self.message_passing(h, jets, A)
         out = self.readout(h)
         return out
+
+class MPNNTransformSet2Set(MPNNTransform):
+    def __init__(self, **kwargs):
+        super().__init__(adjacency_matrix=AdaptiveAdjacencyMatrix, **kwargs)
+        n_hidden = kwargs['n_hidden']
+        self.readout = SetReadout(n_hidden, n_hidden)

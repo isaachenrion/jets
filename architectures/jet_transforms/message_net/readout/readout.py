@@ -34,7 +34,7 @@ class DTNNReadout(Readout):
 
 
 class SetReadout(Readout):
-    def __init__(self, config):
+    def __init__(self, hidden_dim, target_dim):
         super().__init__(hidden_dim, target_dim)
         self.set2vec = Set2Vec(hidden_dim, target_dim, hidden_dim)
 

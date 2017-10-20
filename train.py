@@ -107,7 +107,6 @@ if args.n_train <= 5 * args.n_valid and args.n_train > 0:
 args.recipient = RECIPIENT
 def train(args):
     try:
-        #logging.info("Doing admin...")
         _, Transform, model_type = TRANSFORMS[args.model_type]
         eh = ExperimentHandler(args, os.path.join(MODELS_DIR,model_type))
         signal_handler = eh.signal_handler
@@ -118,12 +117,11 @@ def train(args):
         tf = load_tf(args.data_dir, "{}-train.pickle".format(args.filename))
         X, y = load_data(args.data_dir, "{}-train.pickle".format(args.filename))
 
-        logging.warning("Memory usage = {}".format(0))#eh.usage()))
+        #logging.warning("Memory usage = {}".format(0))
         for ij, jet in enumerate(X):
             jet["content"] = tf.transform(jet["content"])
 
-        logging.warning("After transform: memory usage = {}".format(eh.usage()))
-        #logging.flush()
+        #logging.warning("After transform: memory usage = {}".format(eh.usage()))
 
         if args.n_train > 0:
             indices = torch.randperm(len(X)).numpy()[:args.n_train]
