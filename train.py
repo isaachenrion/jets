@@ -64,6 +64,7 @@ parser.add_argument("--n_hidden", type=int, default=40)
 # logging args
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
+parser.add_argument("--eval_every", type=int, default=25)
 
 # loading previous models args
 parser.add_argument("-l", "--load", help="model directory from which we load a state_dict", type=str, default=None)
@@ -206,17 +207,9 @@ def train(args):
 
             ''' VALIDATION '''
         '''----------------------------------------------------------------------- '''
-        def save_everything(model):
-            with open(os.path.join(eh.exp_dir, 'model_state_dict.pt'), 'wb') as f:
-                torch.save(model.state_dict(), f)
+        def callback(epoch, iteration, model):
 
-            with open(os.path.join(eh.exp_dir, 'settings.pickle'), "wb") as f:
-                pickle.dump(settings, f)
-
-        def callback(iteration, model):
-            out_str = None
-
-            if iteration % 25 == 0:
+            if iteration % args.eval_every == 0:
                 model.eval()
 
                 offset = 0; train_loss = []; valid_loss = []
@@ -237,48 +230,37 @@ def train(args):
 
                     offset+=args.batch_size
 
-
                 train_loss = np.mean(np.array(train_loss))
                 valid_loss = np.mean(np.array(valid_loss))
                 yy = np.concatenate(yy, 0)
                 yy_pred = np.concatenate(yy_pred, 0)
 
-                roc_auc = roc_auc_score(yy, yy_pred, sample_weight=w_valid)
-
-                # 1/fpr
-                fpr, tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
-                inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
-
-                if np.isnan(inv_fpr):
-                    logging.warning("NaN in 1/FPR\n")
-
-                eh.log(yy=yy, yy_pred=yy_pred, w_valid=w_valid)
-
-                if inv_fpr > best_score[0]:
-                    best_score[0] = inv_fpr
-                    save_everything(model)
-
-                out_str = "{:5d}\t~loss(train)={:.4f}\tloss(valid)={:.4f}\troc_auc(valid)={:.4f}".format(
-                        iteration,
-                        train_loss,
-                        valid_loss,
-                        roc_auc,)
-
-                out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.2f}".format(inv_fpr, best_score[0])
+                logdict = dict(
+                    epoch=epoch,
+                    iteration=iteration,
+                    yy=yy,
+                    yy_pred=yy_pred,
+                    w_valid=w_valid,
+                    train_loss=train_loss,
+                    valid_loss=valid_loss,
+                    settings=settings,
+                    model=model
+                )
+                eh.log(**logdict)
 
                 scheduler.step(valid_loss)
                 model.train()
-            return out_str
 
         ''' TRAINING '''
         '''----------------------------------------------------------------------- '''
         logging.warning("Training...")
+        iteration=1
         for i in range(args.n_epochs):
             logging.info("epoch = %d" % i)
             logging.info("step_size = %.8f" % settings['step_size'])
 
-            for j in range(n_batches):
-
+            for _ in range(n_batches):
+                iteration += 1
                 model.train()
                 optimizer.zero_grad()
                 start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
@@ -290,23 +272,18 @@ def train(args):
                 optimizer.step()
                 X = unwrap_X(X_var); y = unwrap(y_var)
 
-                out_str = callback(j, model)
-
-                if out_str is not None:
-                    signal_handler.results_strings.append(out_str)
-                    logging.info(out_str)
+                callback(i, iteration, model)
 
             scheduler.step()
             settings['step_size'] = args.step_size * (args.decay) ** (i + 1)
 
-        save_everything(model)
-        logging.info("FINISHED TRAINING")
-        signal_handler.completed()
+        eh.finished()
+
     except SystemExit as e:
         logging.warning(e)
         if not signal_handler.done:
             signal_handler.crashed()
-        raise e
+        sys.exit()
 
 
 if __name__ == "__main__":

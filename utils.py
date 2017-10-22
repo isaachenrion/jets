@@ -12,6 +12,7 @@ import sys
 import datetime
 import signal
 import shutil
+import pickle
 import numpy as np
 import torch
 import resource
@@ -107,7 +108,6 @@ class SignalHandler:
         self.emailer.send_msg(text, subject, attachments)
         if cleanup:
             self.cleanup()
-        sys.exit(0)
 
     def killed(self, signal, frame):
         self.signal_handler(signal='KILLED')
@@ -125,7 +125,7 @@ class SignalHandler:
 
 class ExperimentHandler:
     def __init__(self, args, root_exp_dir):
-        pid = os.getpid()
+        self.pid = os.getpid()
 
         ''' CUDA AND RANDOM SEED '''
         '''----------------------------------------------------------------------- '''
@@ -143,22 +143,24 @@ class ExperimentHandler:
         filename_exp = '{}-{}/{:02d}-{:02d}-{:02d}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
         if args.debug:
             filename_exp += '-DEBUG'
-        exp_dir = os.path.join(root_exp_dir, filename_exp)
-        os.makedirs(exp_dir)
+        self.exp_dir = os.path.join(root_exp_dir, filename_exp)
+        os.makedirs(self.exp_dir)
 
         ''' SET UP LOGGING '''
         '''----------------------------------------------------------------------- '''
-        logfile = get_logfile(exp_dir, args.silent, args.verbose)
+        self.logfile = get_logfile(self.exp_dir, args.silent, args.verbose)
+        logging.info(self.logfile)
+        logging.info(self.exp_dir)
 
         ''' SIGNAL HANDLER '''
         '''----------------------------------------------------------------------- '''
-        emailer=Emailer(args.sender, args.password, args.recipient)
-        signal_handler = SignalHandler(
-                                emailer=emailer,
-                                logfile=logfile,
-                                exp_dir=exp_dir,
+        self.emailer=Emailer(args.sender, args.password, args.recipient)
+        self.signal_handler = SignalHandler(
+                                emailer=self.emailer,
+                                logfile=self.logfile,
+                                exp_dir=self.exp_dir,
                                 need_input=True,
-                                subject_string='{}(Logfile = {}, PID = {}, GPU = {})'.format("[DEBUGGING] " if args.debug else "", logfile, pid, args.gpu),
+                                subject_string='{}(Logfile = {}, PID = {}, GPU = {})'.format("[DEBUGGING] " if args.debug else "", self.logfile, self.pid, args.gpu),
                                 model=None
                                 )
         ''' STATS LOGGER '''
@@ -166,33 +168,61 @@ class ExperimentHandler:
         roc_auc = ROCAUC()
         inv_fpr = InvFPR()
         best_inv_fpr = Best(inv_fpr)
-        self.monitors = [roc_auc, inv_fpr, best_inv_fpr]
-        self.statsfile = os.path.join(exp_dir, 'stats')
+        epoch_counter = Regurgitate('epoch')
+        batch_counter = Regurgitate('iteration')
+        valid_loss = Regurgitate('valid_loss')
+        train_loss = Regurgitate('train_loss')
+        model_file = os.path.join(self.exp_dir, 'model_state_dict.pt')
+        settings_file = os.path.join(self.exp_dir, 'settings.pickle')
+        self.saver = Saver(best_inv_fpr, model_file, settings_file)
+        self.monitors = [
+            epoch_counter,
+            batch_counter,
+            roc_auc,
+            inv_fpr,
+            best_inv_fpr,
+            valid_loss,
+            train_loss,
+            self.saver,
+        ]
+        self.statsfile = os.path.join(self.exp_dir, 'stats')
         self.stats_logger = StatsLogger(self.statsfile, headers=[m.name for m in self.monitors])
+        self.monitors = {m.name: m for m in self.monitors}
 
         ''' RECORD SETTINGS '''
         '''----------------------------------------------------------------------- '''
-        logging.info("Logfile at {}".format(logfile))
+        logging.info("Logfile at {}".format(self.logfile))
         for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
 
-        logging.warning("\tPID = {}".format(pid))
+        logging.warning("\tPID = {}".format(self.pid))
         logging.warning("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
 
-        self.logfile = logfile
-        self.emailer = emailer
-        self.signal_handler = signal_handler
-        self.exp_dir = exp_dir
-        self.pid = pid
+
 
     def usage(self):
-        #os.system('ps u -p {} | awk "{sum=sum+$6}; END {print sum/1024}"'.format(self.pid))
         return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
     def log(self, **kwargs):
         stats_dict = {}
-        for monitor in self.monitors:
-            stats_dict[monitor.name] = monitor(**kwargs)
+        for name, monitor in self.monitors.items():
+            stats_dict[name] = monitor(**kwargs)
         self.stats_logger.log(stats_dict)
 
+        if np.isnan(self.monitors['inv_fpr'].value):
+            logging.warning("NaN in 1/FPR\n")
+
+        out_str = "{:5d}\t~loss(train)={:.4f}\tloss(valid)={:.4f}\troc_auc(valid)={:.4f}".format(
+                kwargs['iteration'],
+                kwargs['train_loss'],
+                kwargs['valid_loss'],
+                self.monitors['roc_auc'].value)
+
+        out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.2f}".format(self.monitors['inv_fpr'].value, self.monitors['best_inv_fpr'].value)
+        self.signal_handler.results_strings.append(out_str)
+        logging.info(out_str)
+
     def finished(self):
+        logging.info("FINISHED TRAINING")
+        logging.info("Results in {}".format(self.exp_dir))
+        self.signal_handler.completed()
         self.stats_logger.close()

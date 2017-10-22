@@ -19,6 +19,8 @@ class MPNNTransform(nn.Module):
         self.n_iters = n_iters
         self.leaves = leaves
         self.activation = F.tanh
+        self.n_hidden = n_hidden
+        self.n_features = n_features
         self.embedding = nn.Linear(n_features, n_hidden)
         self.vertex_update = GRUUpdate(n_hidden, n_hidden, n_features)
         self.message = DTNNMessage(n_hidden, n_hidden, 0)
@@ -89,8 +91,19 @@ class MPNNTransformClusterTree(MPNNTransform):
         out = self.readout(h)
         return out
 
+class _MPNNTransformSet2Set(MPNNTransform): # NOT IN USE
+    def __init__(self, **kwargs):
+        super().__init__(adjacency_matrix=AdaptiveAdjacencyMatrix, **kwargs)
+        self.readout = SetReadout(self.n_hidden, self.n_hidden)
+
 class MPNNTransformSet2Set(MPNNTransform):
     def __init__(self, **kwargs):
         super().__init__(adjacency_matrix=AdaptiveAdjacencyMatrix, **kwargs)
-        n_hidden = kwargs['n_hidden']
-        self.readout = SetReadout(n_hidden, n_hidden)
+        self.vertex_update = GRUUpdate(2*self.n_hidden, self.n_hidden, self.n_features)
+
+
+    def message_passing(self, h, jets, A):
+        message = self.activation(torch.matmul(A, self.message(h)))
+        h_mean = h.mean(1, keepdim=True).expand_as(h)
+        h = self.vertex_update(h, torch.cat((message, h_mean), 2), jets)
+        return h
