@@ -54,7 +54,7 @@ parser.add_argument("-f", "--filename", type=str, default='antikt-kt')
 parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_train", type=int, default=-1)
 parser.add_argument("--n_valid", type=int, default=27000)
-parser.add_argument("--add_cropped", action='store_true', default=False)
+parser.add_argument("--dont_add_cropped", action='store_true', default=False)
 
 # general model args
 parser.add_argument("-m", "--model_type", help="index of the model you want to train - look in the code for the model list", type=int, default=0)
@@ -138,7 +138,7 @@ def train(args):
         X_valid, y_valid, cropped_indices, w_valid = crop(X_valid_uncropped, y_valid_uncropped, return_cropped_indices=True)
 
         # add cropped indices to training data
-        if args.add_cropped:
+        if not args.dont_add_cropped:
             X_train.extend([x for i, x in enumerate(X_valid_uncropped) if i in cropped_indices])
             y_train = [y for y in y_train]
             y_train.extend([y for i, y in enumerate(y_valid_uncropped) if i in cropped_indices])
