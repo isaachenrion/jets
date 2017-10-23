@@ -94,6 +94,8 @@ def main(args):
         state_dict = torch.load(f)
         model = Predict(Transform, **model_kwargs)
         model.load_state_dict(state_dict)
+    if torch.cuda.is_available():
+        model.cuda()
 
     ''' GET MATRICES '''
     '''----------------------------------------------------------------------- '''
