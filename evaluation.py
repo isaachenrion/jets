@@ -23,6 +23,8 @@ from analysis.plotting import plot_rocs
 from analysis.plotting import plot_show
 from analysis.plotting import plot_save
 
+from constants import *
+
 ''' ARGUMENTS '''
 '''----------------------------------------------------------------------- '''
 parser = argparse.ArgumentParser(description='Jets')
@@ -67,13 +69,6 @@ if args.debug:
     args.n_text = 1000
     args.bs = 9
     args.verbose = True
-''' CONSTANTS '''
-'''----------------------------------------------------------------------- '''
-
-DATA_DIR = 'data/w-vs-qcd/pickles'
-MODELS_DIR = 'models'
-REPORTS_DIR = 'reports'
-
 def main():
 
     try:

@@ -1,4 +1,3 @@
-
 import torch
 from torch.autograd import Variable
 from torch.optim import Adam, lr_scheduler
@@ -131,7 +130,7 @@ def train(args):
 
         logging.warning("Splitting into train and validation...")
 
-        X_train, X_valid_uncropped, y_train, y_valid_uncropped = train_test_split(X, y, test_size=args.n_valid)
+        X_train, X_valid_uncropped, y_train, y_valid_uncropped = train_test_split(X, y, test_size=args.n_valid, random_state=0)
         logging.warning("\traw train size = %d" % len(X_train))
         logging.warning("\traw valid size = %d" % len(X_valid_uncropped))
 
@@ -253,6 +252,7 @@ def train(args):
 
         ''' TRAINING '''
         '''----------------------------------------------------------------------- '''
+        eh.save(model, settings)
         logging.warning("Training...")
         iteration=1
         for i in range(args.n_epochs):

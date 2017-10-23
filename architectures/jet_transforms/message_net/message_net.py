@@ -31,7 +31,7 @@ class MPNNTransform(nn.Module):
             def nullfn(x): return None
             self.adjacency_matrix = nullfn
 
-    def forward(self, jets):
+    def forward(self, jets, return_extras=False):
         if self.leaves:
             jets = batch_leaves(jets)
         else:
@@ -41,7 +41,9 @@ class MPNNTransform(nn.Module):
             A = self.adjacency_matrix(h)
             h = self.message_passing(h, jets, A)
         out = self.readout(h)
-        return out
+        if return_extras:
+            return out, A
+        return out, None
 
     def message_passing(self, h, jets, A):
         message = self.activation(torch.matmul(A, self.message(h)))

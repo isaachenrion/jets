@@ -23,4 +23,5 @@ TRANSFORMS = [
     (7, MPNNTransformSet2Set, 'MPNN/set')
 ]
 RECIPIENT = "henrion@nyu.edu"
+REPORTS_DIR = "reports"
 #RECIPIENT = None

@@ -221,6 +221,9 @@ class ExperimentHandler:
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)
 
+    def save(self, model, settings):
+        self.saver.save(model, settings)
+
     def finished(self):
         logging.info("FINISHED TRAINING")
         logging.info("Results in {}".format(self.exp_dir))
