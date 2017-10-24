@@ -33,7 +33,8 @@ printf 'N = %s, Model = %s, DATA_DIR = %s\n' $N $MODEL_TYPE $DATA_DIR
 while [  $COUNTER -lt $N_RUNS ];
 do
   let 'SEED = COUNTER * 10000'
-  python train.py -b $BATCH_SIZE -v -m $MODEL_TYPE --data_dir $DATA_DIR  -e $EPOCHS -n $N -g $GPU &
+  ##python train.py -b $BATCH_SIZE -v -m $MODEL_TYPE --data_dir $DATA_DIR  -e $EPOCHS -n $N -g $GPU &
+  python dummy.py
   disown %1
   sleep 5
   let COUNTER=COUNTER+1
