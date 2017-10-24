@@ -3,7 +3,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --time=01:00:00
-#SBATCH --mem=10GB
+#SBATCH --mem=20GB
 #SBATCH --job-name=jets-experiment
 #SBATCH --mail-type=END
 #SBATCH --mail-user=henrion@nyu.edu
@@ -19,7 +19,7 @@ cd $SRCDIR
 source activate jets
 
 DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
-MODEL_TYPE=3
+MODEL_TYPE=7
 EPOCHS=2
 N=-1
 N_RUNS=1
