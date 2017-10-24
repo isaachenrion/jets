@@ -7,7 +7,7 @@ import logging
 import pickle
 import datetime
 import time
-import sys
+import sys; print('here!!!!!', file=sys.stderr)
 import os
 import signal
 import argparse
