@@ -40,8 +40,9 @@ class PaddedMatrixSoftmax(nn.Module):
             if size < matrix.size()[1]:
                 mask[i, size:, :].fill_(0)
                 mask[i, :, size:].fill_(0)
-
-        S = S * Variable(mask)
+        mask = Variable(mask)
+        if torch.cuda.is_available(): mask = mask.cuda()
+        S = S * mask
         Z = S.sum(2, keepdim=True) + 1e-10
         S = S / Z
         S = S.squeeze(-1)
