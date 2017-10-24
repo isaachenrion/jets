@@ -3,7 +3,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --time=01:00:00
-#SBATCH --mem=20GB
+#SBATCH --mem=200GB
 #SBATCH --job-name=jets-experiment
 #SBATCH --mail-type=END
 #SBATCH --mail-user=henrion@nyu.edu
