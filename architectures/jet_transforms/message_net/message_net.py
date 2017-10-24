@@ -10,38 +10,36 @@ from .readout import DTNNReadout, SetReadout
 from .message import DTNNMessage
 
 from .adjacency import AdaptiveAdjacencyMatrix
-from .adjacency import FullyConnectedAdjacencyMatrix
-from .adjacency import IdentityAdjacencyMatrix
 
 class MPNNTransform(nn.Module):
-    def __init__(self, n_features=None, n_hidden=None, n_iters=None, leaves=False, adjacency_matrix=None):
+    def __init__(self, features=None, hidden=None, iters=None, leaves=False, adjacency_matrix=None):
         super().__init__()
-        self.n_iters = n_iters
+        self.iters = iters
         self.leaves = leaves
         self.activation = F.tanh
-        self.n_hidden = n_hidden
-        self.n_features = n_features
-        self.embedding = nn.Linear(n_features, n_hidden)
-        self.vertex_update = GRUUpdate(n_hidden, n_hidden, n_features)
-        self.message = DTNNMessage(n_hidden, n_hidden, 0)
-        self.readout = DTNNReadout(n_hidden, n_hidden)
+        self.hidden = hidden
+        self.features = features
+        self.embedding = nn.Linear(features, hidden)
+        self.vertex_update = GRUUpdate(hidden, hidden, features)
+        self.message = DTNNMessage(hidden, hidden, 0)
+        self.readout = DTNNReadout(hidden, hidden)
         if adjacency_matrix is not None:
-            self.adjacency_matrix = adjacency_matrix(n_hidden)
+            self.adjacency_matrix = adjacency_matrix(hidden)
         else:
             def nullfn(x): return None
             self.adjacency_matrix = nullfn
 
-    def forward(self, jets, return_extras=False):
+    def forward(self, jets, returextras=False):
         if self.leaves:
             jets = batch_leaves(jets)
         else:
             jets = pad_batch(jets)
         h = self.activation(self.embedding(jets))
-        for i in range(self.n_iters):
+        for i in range(self.iters):
             A = self.adjacency_matrix(h)
             h = self.message_passing(h, jets, A)
         out = self.readout(h)
-        if return_extras:
+        if returextras:
             return out, A
         return out, None
 
@@ -88,7 +86,7 @@ class MPNNTransformClusterTree(MPNNTransform):
         else:
             jets = pad_batch(jets)
         h = self.activation(self.embedding(jets))
-        for i in range(self.n_iters):
+        for i in range(self.iters):
             h = self.message_passing(h, jets, A)
         out = self.readout(h)
         return out
@@ -96,12 +94,12 @@ class MPNNTransformClusterTree(MPNNTransform):
 class _MPNNTransformSet2Set(MPNNTransform): # NOT IN USE
     def __init__(self, **kwargs):
         super().__init__(adjacency_matrix=AdaptiveAdjacencyMatrix, **kwargs)
-        self.readout = SetReadout(self.n_hidden, self.n_hidden)
+        self.readout = SetReadout(self.hidden, self.hidden)
 
 class MPNNTransformSet2Set(MPNNTransform):
     def __init__(self, **kwargs):
         super().__init__(adjacency_matrix=AdaptiveAdjacencyMatrix, **kwargs)
-        self.vertex_update = GRUUpdate(2*self.n_hidden, self.n_hidden, self.n_features)
+        self.vertex_update = GRUUpdate(2*self.hidden, self.hidden, self.features)
 
 
     def message_passing(self, h, jets, A):

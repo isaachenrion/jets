@@ -5,15 +5,15 @@ import torch.nn.functional as F
 from .batching import pad_batch, batch
 
 class RelNNTransformConnected(nn.Module):
-    def __init__(self, n_features=None, n_hidden=None, **kwargs):
+    def __init__(self, features=None, hidden=None, **kwargs):
         super().__init__()
 
         activation_string = 'relu'
         self.activation = getattr(F, activation_string)
 
-        self.fc_u = nn.Linear(n_features, n_hidden)
-        self.fc_u1 = nn.Linear(n_hidden, n_hidden)
-        self.fc_edge =nn.Linear(n_hidden, n_hidden)
+        self.fc_u = nn.Linear(features, hidden)
+        self.fc_u1 = nn.Linear(hidden, hidden)
+        self.fc_edge =nn.Linear(hidden, hidden)
 
         gain = nn.init.calculate_gain(activation_string)
         nn.init.xavier_uniform(self.fc_u.weight, gain=gain)

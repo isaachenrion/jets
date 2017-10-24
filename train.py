@@ -57,8 +57,8 @@ parser.add_argument("--dont_add_cropped", action='store_true', default=False)
 
 # general model args
 parser.add_argument("-m", "--model_type", help="index of the model you want to train - look in the code for the model list", type=int, default=0)
-parser.add_argument("--n_features", type=int, default=7)
-parser.add_argument("--n_hidden", type=int, default=40)
+parser.add_argument("--features", type=int, default=7)
+parser.add_argument("--hidden", type=int, default=40)
 
 # logging args
 parser.add_argument("-s", "--silent", action='store_true', default=False)
@@ -70,7 +70,7 @@ parser.add_argument("-l", "--load", help="model directory from which we load a s
 parser.add_argument("-r", "--restart", help="restart a loaded model from where it left off", action='store_true', default=False)
 
 # training args
-parser.add_argument("-e", "--n_epochs", type=int, default=25)
+parser.add_argument("-e", "--epochs", type=int, default=25)
 parser.add_argument("-b", "--batch_size", type=int, default=64)
 parser.add_argument("-a", "--step_size", type=float, default=0.001)
 parser.add_argument("-d", "--decay", type=float, default=.912)
@@ -80,8 +80,8 @@ parser.add_argument("--seed", help="Random seed used in torch and numpy", type=i
 parser.add_argument("-g", "--gpu", type=str, default="")
 
 # MPNN
-parser.add_argument("--no_leaves", action='store_true')
-parser.add_argument("-i", "--n_iters", type=int, default=1)
+parser.add_argument("--not_leaves", action='store_true')
+parser.add_argument("-i", "--iters", type=int, default=1)
 
 # email
 parser.add_argument("--sender", type=str, default="results74207281@gmail.com")
@@ -93,11 +93,13 @@ parser.add_argument("--debug", help="sets everything small for fast model debugg
 args = parser.parse_args()
 
 if args.debug:
-    args.n_hidden = 1
+    args.hidden = 1
     args.bs = 9
     args.verbose = True
-    args.n_epochs = 3
+    args.epochs = 3
     args.n_train = 1000
+    args.seed = 1
+    args.eval_every = 10
 
 if args.gpu != "":
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
@@ -105,7 +107,7 @@ if args.gpu != "":
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
 args.recipient = RECIPIENT
-args.leaves = not args.no_leaves
+args.leaves = not args.not_leaves
 def train(args):
     try:
         _, Transform, model_type = TRANSFORMS[args.model_type]
@@ -119,8 +121,8 @@ def train(args):
         X, y = load_data(args.data_dir, "{}-train.pickle".format(args.filename))
 
         #logging.warning("Memory usage = {}".format(0))
-        #for ij, jet in enumerate(X):
-        #    jet["content"] = tf.transform(jet["content"])
+        for ij, jet in enumerate(X):
+            jet["content"] = tf.transform(jet["content"])
 
         #logging.warning("After transform: memory usage = {}".format(eh.usage()))
 
@@ -153,9 +155,9 @@ def train(args):
         Predict = PredictFromParticleEmbedding
         if args.load is None:
             model_kwargs = {
-                'n_features': args.n_features,
-                'n_hidden': args.n_hidden,
-                'n_iters': args.n_iters,
+                'features': args.features,
+                'hidden': args.hidden,
+                'iters': args.iters,
                 'leaves': args.leaves,
             }
             model = Predict(Transform, **model_kwargs)
@@ -256,7 +258,7 @@ def train(args):
         eh.save(model, settings)
         logging.warning("Training...")
         iteration=1
-        for i in range(args.n_epochs):
+        for i in range(args.epochs):
             logging.info("epoch = %d" % i)
             logging.info("step_size = %.8f" % settings['step_size'])
 

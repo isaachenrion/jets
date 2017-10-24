@@ -3,16 +3,16 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class PredictFromParticleEmbedding(nn.Module):
-    def __init__(self, particle_transform=None, n_features=None, n_hidden=None, **kwargs):
+    def __init__(self, particle_transform=None, features=None, hidden=None, **kwargs):
         super().__init__()
-        self.transform = particle_transform(n_features=n_features, n_hidden=n_hidden, **kwargs)
+        self.transform = particle_transform(features=features, hidden=hidden, **kwargs)
 
         activation_string = 'relu'
         self.activation = getattr(F, activation_string)
 
-        self.fc1 = nn.Linear(n_hidden, n_hidden)
-        self.fc2 = nn.Linear(n_hidden, n_hidden)
-        self.fc3 = nn.Linear(n_hidden, 1)
+        self.fc1 = nn.Linear(hidden, hidden)
+        self.fc2 = nn.Linear(hidden, hidden)
+        self.fc3 = nn.Linear(hidden, 1)
 
         gain = nn.init.calculate_gain(activation_string)
         nn.init.xavier_uniform(self.fc1.weight, gain=gain)

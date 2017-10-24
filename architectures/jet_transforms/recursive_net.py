@@ -9,14 +9,14 @@ from .nn_utils import AnyBatchGRUCell
 from .nn_utils import BiDirectionalTreeGRU
 
 class GRNNTransformSimple(nn.Module):
-    def __init__(self, n_features=None, n_hidden=None,**kwargs):
+    def __init__(self, features=None, hidden=None,**kwargs):
         super().__init__()
 
         activation_string = 'relu'
         self.activation = getattr(F, activation_string)
 
-        self.fc_u = nn.Linear(n_features, n_hidden)
-        self.fc_h = nn.Linear(3 * n_hidden, n_hidden)
+        self.fc_u = nn.Linear(features, hidden)
+        self.fc_h = nn.Linear(3 * hidden, hidden)
 
         gain = nn.init.calculate_gain(activation_string)
         nn.init.xavier_uniform(self.fc_u.weight, gain=gain)
@@ -65,18 +65,18 @@ class GRNNTransformSimple(nn.Module):
 
 
 class GRNNTransformGated(nn.Module):
-    def __init__(self, n_features=None, n_hidden=None, n_iters=0, **kwargs):
+    def __init__(self, features=None, hidden=None, iters=0, **kwargs):
         super().__init__()
-        self.n_hidden = n_hidden
-        self.n_iters = n_iters
-        activation_string = 'relu' if n_iters == 0 else 'tanh'
+        self.hidden = hidden
+        self.iters = iters
+        activation_string = 'relu' if iters == 0 else 'tanh'
         self.activation = getattr(F, activation_string)
 
 
-        self.fc_u = nn.Linear(n_features, n_hidden)
-        self.fc_h = nn.Linear(3 * n_hidden, n_hidden)
-        self.fc_z = nn.Linear(4 * n_hidden, 4 * n_hidden)
-        self.fc_r = nn.Linear(3 * n_hidden, 3 * n_hidden)
+        self.fc_u = nn.Linear(features, hidden)
+        self.fc_h = nn.Linear(3 * hidden, hidden)
+        self.fc_z = nn.Linear(4 * hidden, 4 * hidden)
+        self.fc_r = nn.Linear(3 * hidden, 3 * hidden)
 
         gain = nn.init.calculate_gain(activation_string)
         nn.init.xavier_uniform(self.fc_u.weight, gain=gain)
@@ -84,9 +84,9 @@ class GRNNTransformGated(nn.Module):
         nn.init.xavier_uniform(self.fc_z.weight, gain=gain)
         nn.init.xavier_uniform(self.fc_r.weight, gain=gain)
 
-        if self.n_iters > 0:
-            self.down_root = nn.Linear(n_hidden, n_hidden)
-            self.down_gru = AnyBatchGRUCell(n_hidden, n_hidden)
+        if self.iters > 0:
+            self.down_root = nn.Linear(hidden, hidden)
+            self.down_gru = AnyBatchGRUCell(hidden, hidden)
 
 
     def forward(self, jets, return_states=False):
@@ -99,7 +99,7 @@ class GRNNTransformGated(nn.Module):
 
         self.recursive_embedding(up_embeddings, levels, children, n_inners, contents)
 
-        if True:# or self.n_iters == 0:
+        if True:# or self.iters == 0:
             return up_embeddings[0].view((len(jets), -1))
         else:
             return torch.cat(
@@ -111,7 +111,7 @@ class GRNNTransformGated(nn.Module):
 
     def recursive_embedding(self, up_embeddings, levels, children, n_inners, contents):
         n_levels = len(levels)
-        n_hidden = self.n_hidden
+        hidden = self.hidden
 
         for i, nodes in enumerate(levels[::-1]):
             j = n_levels - 1 - i
@@ -152,10 +152,10 @@ class GRNNTransformGated(nn.Module):
 
                 z = self.fc_z(torch.cat((h_H, hhu), -1))
 
-                z_H = z[:, :n_hidden]               # new activation
-                z_L = z[:, n_hidden:2*n_hidden]     # left activation
-                z_R = z[:, 2*n_hidden:3*n_hidden]   # right activation
-                z_N = z[:, 3*n_hidden:]             # local state
+                z_H = z[:, :hidden]               # new activation
+                z_L = z[:, hidden:2*hidden]     # left activation
+                z_R = z[:, 2*hidden:3*hidden]   # right activation
+                z_N = z[:, 3*hidden:]             # local state
                 z = torch.stack([z_H,z_L,z_R,z_N], 2)
                 z = F.softmax(z)
 

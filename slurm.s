@@ -21,7 +21,7 @@ DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
 MODEL_TYPE=3
 EPOCHS=2
 N=1000
-N_RUNS=1
+N_RUNS=2
 COUNTER=0
 
 printf 'N = %s, Model = %s, DATA_DIR = %s\n' $N $MODEL_TYPE $DATA_DIR
