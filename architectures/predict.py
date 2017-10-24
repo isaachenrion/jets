@@ -31,7 +31,7 @@ class PredictFromParticleEmbedding(nn.Module):
         h = self.activation(h)
 
         h = F.sigmoid(self.fc3(h))
-        if kwargs.pop('return_extras'):
+        if kwargs.pop('return_extras', False):
             return h, extras
         else:
             return h
