@@ -80,7 +80,7 @@ parser.add_argument("--seed", help="Random seed used in torch and numpy", type=i
 parser.add_argument("-g", "--gpu", type=str, default="")
 
 # MPNN
-parser.add_argument("--leaves", action='store_true')
+parser.add_argument("--no_leaves", action='store_true')
 parser.add_argument("-i", "--n_iters", type=int, default=1)
 
 # email
@@ -105,6 +105,7 @@ if args.gpu != "":
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
 args.recipient = RECIPIENT
+args.leaves = not args.no_leaves
 def train(args):
     try:
         _, Transform, model_type = TRANSFORMS[args.model_type]

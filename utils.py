@@ -130,7 +130,7 @@ class ExperimentHandler:
         ''' CUDA AND RANDOM SEED '''
         '''----------------------------------------------------------------------- '''
         np.random.seed(args.seed)
-        if torch.cuda.is_available():
+        if args.gpu != "" and torch.cuda.is_available():
             torch.cuda.device(args.gpu)
             torch.cuda.manual_seed(args.seed)
         else:
