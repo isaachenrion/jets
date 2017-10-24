@@ -20,7 +20,7 @@ source activate jets
 
 DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
 MODEL_TYPE=7
-EPOCHS=2
+EPOCHS=25
 N=-1
 N_RUNS=1
 GPU=0
