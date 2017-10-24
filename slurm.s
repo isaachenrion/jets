@@ -28,7 +28,7 @@ COUNTER=0
 BATCH_SIZE=10
 
 printf 'CUDA VISIBLE DEVICES : %s\n' $CUDA_VISIBLE_DEVICES
-nvidia-smi &
+##nvidia-smi &
 printf 'N = %s, Model = %s, DATA_DIR = %s\n' $N $MODEL_TYPE $DATA_DIR
 while [  $COUNTER -lt $N_RUNS ];
 do
