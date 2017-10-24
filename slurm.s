@@ -21,11 +21,11 @@ source activate jets
 DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
 MODEL_TYPE=7
 EPOCHS=25
-N=-1
+N=1000
 N_RUNS=1
 GPU=0
 COUNTER=0
-BATCH_SIZE=64
+BATCH_SIZE=10
 
 printf 'N = %s, Model = %s, DATA_DIR = %s\n' $N $MODEL_TYPE $DATA_DIR
 while [  $COUNTER -lt $N_RUNS ];
