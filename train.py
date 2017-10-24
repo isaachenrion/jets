@@ -189,6 +189,7 @@ def train(args):
 
         if torch.cuda.is_available():
             model.cuda()
+        logging.warning("Moved model to GPU")
         signal_handler.set_model(model)
 
         ''' OPTIMIZER AND LOSS '''
