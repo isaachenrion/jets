@@ -189,6 +189,9 @@ def train(args):
 
         if torch.cuda.is_available():
             logging.warning("Moving model to GPU")
+            for k in range(15):
+                time.sleep(1)
+                logging.info('{} seconds'.format(k+1))
             model.cuda()
 
         logging.warning("Moved model to GPU")
