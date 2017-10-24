@@ -204,14 +204,18 @@ def batch_leaves(jets):
     for jet in leaves:
         if jet.size()[0] < biggest_jet_size:
             padding = torch.zeros(biggest_jet_size - jet.size()[0], jet.size()[1])
+            padding = torch.cat((padding, torch.zeros(padding.size()[0], 1)), 1)
             padding = Variable(padding)
             if torch.cuda.is_available(): padding = padding.cuda()
-            padding = torch.cat((padding, torch.zeros(padding.size()[0], 1)), 1)
-            jet = torch.cat((jet, torch.ones(jet.size()[0], 1)), 1)
+            ones = torch.ones(jet.size()[0], 1)
+            if torch.cuda.is_available(): ones = ones.cuda()
+            jet = torch.cat((jet, ones), 1)
             jets_padded.append(torch.cat((jet, padding), 0))
 
         else:
-            jet = torch.cat((jet, torch.ones(jet.size()[0], 1)), 1)
+            ones = torch.ones(jet.size()[0], 1)
+            if torch.cuda.is_available(): ones = ones.cuda()
+            jet = torch.cat((jet, ones), 1)
             jets_padded.append(jet)
     jets_padded = torch.stack(jets_padded, 0)
     return jets_padded, original_sizes

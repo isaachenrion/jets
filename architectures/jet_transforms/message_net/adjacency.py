@@ -32,7 +32,7 @@ class PaddedMatrixSoftmax(nn.Module):
                 values 1, ..., M. The softmax is taken over each row of the
                 matrix, and the padded values have been assigned probability 0.
         '''
-        matrix_max = torch.max(matrix, 2, keepdim=True)
+        matrix_max, _ = torch.max(matrix, 2, keepdim=True)
         exp_matrix = torch.exp(matrix - matrix_max)
         S = exp_matrix / torch.sum(exp_matrix, 2, keepdim=True)
         mask = torch.ones(matrix.size())
