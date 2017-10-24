@@ -21,7 +21,7 @@ DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
 MODEL_TYPE=3
 EPOCHS=2
 N=1000
-N_RUNS=2
+N_RUNS=1
 COUNTER=0
 
 printf 'N = %s, Model = %s, DATA_DIR = %s\n' $N $MODEL_TYPE $DATA_DIR
@@ -30,7 +30,7 @@ do
   let 'SEED = COUNTER * 10000'
   python train.py -v -m $MODEL_TYPE --data_dir $DATA_DIR  -e $EPOCHS -n $N &
   disown %1
-  sleep 5
+  sleep 10
   let COUNTER=COUNTER+1
 done
 
