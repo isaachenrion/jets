@@ -35,3 +35,7 @@ class PredictFromParticleEmbedding(nn.Module):
             return h, extras
         else:
             return h
+
+#Huang Eisen shh419
+
+#Chow Justin jhc612
