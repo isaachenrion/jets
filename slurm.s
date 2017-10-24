@@ -23,13 +23,14 @@ MODEL_TYPE=3
 EPOCHS=2
 N=1000
 N_RUNS=1
+GPU=0
 COUNTER=0
 
 printf 'N = %s, Model = %s, DATA_DIR = %s\n' $N $MODEL_TYPE $DATA_DIR
 while [  $COUNTER -lt $N_RUNS ];
 do
   let 'SEED = COUNTER * 10000'
-  python train.py -v -m $MODEL_TYPE --data_dir $DATA_DIR  -e $EPOCHS -n $N &
+  python train.py -v -m $MODEL_TYPE --data_dir $DATA_DIR  -e $EPOCHS -n $N -g $GPU &
   disown %1
   sleep 10
   let COUNTER=COUNTER+1
