@@ -120,11 +120,11 @@ def train(args):
         tf = load_tf(args.data_dir, "{}-train.pickle".format(args.filename))
         X, y = load_data(args.data_dir, "{}-train.pickle".format(args.filename))
 
-        #logging.warning("Memory usage = {}".format(0))
-        for ij, jet in enumerate(X):
-            jet["content"] = tf.transform(jet["content"])
+        logging.warning("Memory usage = {}".format(0))
+        #for ij, jet in enumerate(X):
+        #    jet["content"] = tf.transform(jet["content"])
 
-        #logging.warning("After transform: memory usage = {}".format(eh.usage()))
+        logging.warning("After transform: memory usage = {}".format(eh.usage()))
 
         if args.n_train > 0:
             indices = torch.randperm(len(X)).numpy()[:args.n_train]
