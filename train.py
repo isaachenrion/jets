@@ -121,8 +121,12 @@ def train(args):
         X, y = load_data(args.data_dir, "{}-train.pickle".format(args.filename))
 
         logging.warning("Memory usage = {}".format(0))
-        #for ij, jet in enumerate(X):
-        #    jet["content"] = tf.transform(jet["content"])
+        for k in range(15):
+            time.sleep(1)
+            logging.info('{} seconds'.format(k+1))
+
+        for ij, jet in enumerate(X):
+            jet["content"] = tf.transform(jet["content"])
 
         logging.warning("After transform: memory usage = {}".format(eh.usage()))
 
@@ -189,7 +193,7 @@ def train(args):
 
         if torch.cuda.is_available():
             logging.warning("Moving model to GPU")
-            for k in range(15):
+            for k in range(30):
                 time.sleep(1)
                 logging.info('{} seconds'.format(k+1))
             model.cuda()
