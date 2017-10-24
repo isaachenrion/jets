@@ -8,9 +8,12 @@ def pad_batch(jets):
     jets_padded = []
     for jet in jet_contents:
         if jet.size()[0] < biggest_jet_size:
-            zeros = Variable(torch.zeros(biggest_jet_size - jet.size()[0], jet.size()[1]))
-            if torch.cuda.is_available(): zeros = zeros.cuda()
-            jets_padded.append(torch.cat((jet, zeros), 0))
+            padding = torch.zeros(biggest_jet_size - jet.size()[0], jet.size()[1])
+            padding = Variable(padding)
+            if torch.cuda.is_available(): padding = padding.cuda()
+            padding = torch.cat((padding, torch.zeros(padding.size()[0], 1)), 1)
+            jet = torch.cat((jet, torch.ones(jet.size()[0], 1)), 1)
+            jets_padded.append(torch.cat((jet, padding), 0))
         else:
             jets_padded.append(jet)
     jets_padded = torch.stack(jets_padded, 0)
@@ -196,16 +199,22 @@ def batch_leaves(jets):
     leaves = [torch.stack([jet[i] for i in outers], 0) for jet, outers in zip(jet_contents, batch_outers)]
 
     biggest_jet_size = max(len(jet) for jet in leaves)
+    original_sizes = [len(jet) for jet in leaves]
     jets_padded = []
     for jet in leaves:
         if jet.size()[0] < biggest_jet_size:
-            zeros = Variable(torch.zeros(biggest_jet_size - jet.size()[0], jet.size()[1]))
-            if torch.cuda.is_available(): zeros = zeros.cuda()
-            jets_padded.append(torch.cat((jet, zeros), 0))
+            padding = torch.zeros(biggest_jet_size - jet.size()[0], jet.size()[1])
+            padding = Variable(padding)
+            if torch.cuda.is_available(): padding = padding.cuda()
+            padding = torch.cat((padding, torch.zeros(padding.size()[0], 1)), 1)
+            jet = torch.cat((jet, torch.ones(jet.size()[0], 1)), 1)
+            jets_padded.append(torch.cat((jet, padding), 0))
+
         else:
+            jet = torch.cat((jet, torch.ones(jet.size()[0], 1)), 1)
             jets_padded.append(jet)
     jets_padded = torch.stack(jets_padded, 0)
-    return jets_padded
+    return jets_padded, original_sizes
 
 def trees_as_adjacency_matrices(jets):
     def tree_as_adjacency_matrix(jet):

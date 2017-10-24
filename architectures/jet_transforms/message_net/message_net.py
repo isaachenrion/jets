@@ -19,8 +19,8 @@ class MPNNTransform(nn.Module):
         self.activation = F.tanh
         self.hidden = hidden
         self.features = features
-        self.embedding = nn.Linear(features, hidden)
-        self.vertex_update = GRUUpdate(hidden, hidden, features)
+        self.embedding = nn.Linear(features + 1, hidden)
+        self.vertex_update = GRUUpdate(hidden, hidden, features + 1)
         self.message = DTNNMessage(hidden, hidden, 0)
         self.readout = DTNNReadout(hidden, hidden)
         if adjacency_matrix is not None:
@@ -31,12 +31,12 @@ class MPNNTransform(nn.Module):
 
     def forward(self, jets, returextras=False):
         if self.leaves:
-            jets = batch_leaves(jets)
+            jets, original_sizes = batch_leaves(jets)
         else:
             jets = pad_batch(jets)
         h = self.activation(self.embedding(jets))
         for i in range(self.iters):
-            A = self.adjacency_matrix(h)
+            A = self.adjacency_matrix(h, original_sizes)
             h = self.message_passing(h, jets, A)
         out = self.readout(h)
         if returextras:
