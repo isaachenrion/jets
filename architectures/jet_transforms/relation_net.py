@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .batching import pad_batch, batch
+from .batching import pad_batch, batch_leaves
 
 class RelNNTransformConnected(nn.Module):
     def __init__(self, features=None, hidden=None, **kwargs):
@@ -11,7 +11,7 @@ class RelNNTransformConnected(nn.Module):
         activation_string = 'relu'
         self.activation = getattr(F, activation_string)
 
-        self.fc_u = nn.Linear(features, hidden)
+        self.fc_u = nn.Linear(features + 1, hidden)
         self.fc_u1 = nn.Linear(hidden, hidden)
         self.fc_edge =nn.Linear(hidden, hidden)
 
@@ -34,7 +34,7 @@ class RelNNTransformConnected(nn.Module):
 
 
     def forward(self, jets):
-        jets_padded = pad_batch(jets)
+        jets_padded, _ = batch_leaves(jets)
         jet_contents = [jet["content"] for jet in jets]
         jet_sizes = [len(jet['content']) for jet in jets]
 
@@ -47,4 +47,4 @@ class RelNNTransformConnected(nn.Module):
         h = torch.tanh(self.fc_edge(x_l + x_r))
         output = h.view(shp[0], shp[1] * shp[1], -1).mean(1)
 
-        return output
+        return output, None
