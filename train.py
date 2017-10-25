@@ -117,22 +117,25 @@ def train(args):
         ''' DATA '''
         '''----------------------------------------------------------------------- '''
         logging.warning("Loading data...")
-        for k in range(15):
-            time.sleep(1)
-            logging.info('before load tf: {} seconds'.format(k+1))
+        if args.debug:
+            for k in range(15):
+                time.sleep(1)
+                logging.info('before load tf: {} seconds'.format(k+1))
 
         tf = load_tf(args.data_dir, "{}-train.pickle".format(args.filename))
 
-        for k in range(15):
-            time.sleep(1)
-            logging.info('before load_data: {} seconds'.format(k+1))
+        if args.debug:
+            for k in range(15):
+                time.sleep(1)
+                logging.info('before load_data: {} seconds'.format(k+1))
 
         X, y = load_data(args.data_dir, "{}-train.pickle".format(args.filename))
 
         logging.warning("Memory usage = {}".format(0))
-        for k in range(15):
-            time.sleep(1)
-            logging.info('before tf transform: {} seconds'.format(k+1))
+        if args.debug:
+            for k in range(15):
+                time.sleep(1)
+                logging.info('before tf transform: {} seconds'.format(k+1))
 
         for ij, jet in enumerate(X):
             jet["content"] = tf.transform(jet["content"])
@@ -202,9 +205,10 @@ def train(args):
 
         if torch.cuda.is_available():
             logging.warning("Moving model to GPU")
-            for k in range(30):
-                time.sleep(1)
-                logging.info('{} seconds'.format(k+1))
+            if args.debug:
+                for k in range(30):
+                    time.sleep(1)
+                    logging.info('{} seconds'.format(k+1))
             model.cuda()
 
         logging.warning("Moved model to GPU")
