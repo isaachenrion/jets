@@ -26,7 +26,7 @@ class PaddedMatrixSoftmax(nn.Module):
         '''
         Inputs:
             matrix <- (batch_size) * M * M tensor that has been padded
-            original_sizes <- list of length batch_size, containing the original sizes before padding
+            mask <- (batch_size * M * M) with zeros to mask out the fictitious nodes
         Output:
             S <- (batch_size) * M * M tensor, where S[n, i] is a probability distribution over the
                 values 1, ..., M. The softmax is taken over each row of the

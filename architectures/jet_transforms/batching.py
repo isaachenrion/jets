@@ -219,9 +219,9 @@ def batch_leaves(jets):
     jets_padded = torch.stack(jets_padded, 0)
 
     original_sizes = [len(jet) for jet in leaves]
-    mask = torch.ones(matrix.size())
+    mask = torch.ones(len(leaves), biggest_jet_size, biggest_jet_size)
     for i, size in enumerate(original_sizes):
-        if size < matrix.size()[1]:
+        if size < biggest_jet_size:
             mask[i, size:, :].fill_(0)
             mask[i, :, size:].fill_(0)
     mask = Variable(mask)
