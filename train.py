@@ -117,14 +117,14 @@ def train(args):
         ''' DATA '''
         '''----------------------------------------------------------------------- '''
         logging.warning("Loading data...")
-        if args.debug:
+        if args.debug and False:
             for k in range(15):
                 time.sleep(1)
                 logging.info('before load tf: {} seconds'.format(k+1))
 
         tf = load_tf(args.data_dir, "{}-train.pickle".format(args.filename))
 
-        if args.debug:
+        if args.debug and False:
             for k in range(15):
                 time.sleep(1)
                 logging.info('before load_data: {} seconds'.format(k+1))
@@ -132,7 +132,7 @@ def train(args):
         X, y = load_data(args.data_dir, "{}-train.pickle".format(args.filename))
 
         logging.warning("Memory usage = {}".format(0))
-        if args.debug:
+        if args.debug and False:
             for k in range(15):
                 time.sleep(1)
                 logging.info('before tf transform: {} seconds'.format(k+1))
@@ -205,7 +205,7 @@ def train(args):
 
         if torch.cuda.is_available():
             logging.warning("Moving model to GPU")
-            if args.debug:
+            if args.debug and False:
                 for k in range(30):
                     time.sleep(1)
                     logging.info('{} seconds'.format(k+1))

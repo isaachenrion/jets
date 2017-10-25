@@ -220,10 +220,10 @@ def batch_leaves(jets):
 
     original_sizes = [len(jet) for jet in leaves]
     mask = torch.ones(len(leaves), biggest_jet_size, biggest_jet_size)
-    #for i, size in enumerate(original_sizes):
-    #    if size < biggest_jet_size:
-    #        mask[i, size:, :].fill_(0)
-    #        mask[i, :, size:].fill_(0)
+    for i, size in enumerate(original_sizes):
+        if size < biggest_jet_size:
+            mask[i, size:, :].fill_(0)
+            mask[i, :, size:].fill_(0)
     mask = Variable(mask)
     if torch.cuda.is_available(): mask = mask.cuda()
 

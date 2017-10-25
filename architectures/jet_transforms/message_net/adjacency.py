@@ -39,4 +39,5 @@ class PaddedMatrixSoftmax(nn.Module):
         S = S * mask
         Z = S.sum(2, keepdim=True) + 1e-10
         S = S / Z
+        #import ipdb; ipdb.set_trace()
         return S
