@@ -199,7 +199,6 @@ def batch_leaves(jets):
     leaves = [torch.stack([jet[i] for i in outers], 0) for jet, outers in zip(jet_contents, batch_outers)]
 
     biggest_jet_size = max(len(jet) for jet in leaves)
-    original_sizes = [len(jet) for jet in leaves]
     jets_padded = []
     for jet in leaves:
         if jet.size()[0] < biggest_jet_size:
@@ -218,7 +217,17 @@ def batch_leaves(jets):
             jet = torch.cat((jet, ones), 1)
             jets_padded.append(jet)
     jets_padded = torch.stack(jets_padded, 0)
-    return jets_padded, original_sizes
+
+    original_sizes = [len(jet) for jet in leaves]
+    mask = torch.ones(matrix.size())
+    for i, size in enumerate(original_sizes):
+        if size < matrix.size()[1]:
+            mask[i, size:, :].fill_(0)
+            mask[i, :, size:].fill_(0)
+    mask = Variable(mask)
+    if torch.cuda.is_available(): mask = mask.cuda()
+
+    return jets_padded, mask
 
 def trees_as_adjacency_matrices(jets):
     def tree_as_adjacency_matrix(jet):

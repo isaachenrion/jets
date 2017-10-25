@@ -22,7 +22,7 @@ class PaddedMatrixSoftmax(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, matrix, original_sizes):
+    def forward(self, matrix, mask):
         '''
         Inputs:
             matrix <- (batch_size) * M * M tensor that has been padded
@@ -35,13 +35,7 @@ class PaddedMatrixSoftmax(nn.Module):
         matrix_max, _ = torch.max(matrix, 2, keepdim=True)
         exp_matrix = torch.exp(matrix - matrix_max)
         S = exp_matrix / torch.sum(exp_matrix, 2, keepdim=True)
-        mask = torch.ones(matrix.size())
-        for i, size in enumerate(original_sizes):
-            if size < matrix.size()[1]:
-                mask[i, size:, :].fill_(0)
-                mask[i, :, size:].fill_(0)
-        mask = Variable(mask)
-        if torch.cuda.is_available(): mask = mask.cuda()
+
         S = S * mask
         Z = S.sum(2, keepdim=True) + 1e-10
         S = S / Z

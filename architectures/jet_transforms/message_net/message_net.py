@@ -31,12 +31,12 @@ class MPNNTransform(nn.Module):
 
     def forward(self, jets, returextras=False):
         if self.leaves:
-            jets, original_sizes = batch_leaves(jets)
+            jets, mask = batch_leaves(jets)
         else:
             jets = pad_batch(jets)
         h = self.activation(self.embedding(jets))
         for i in range(self.iters):
-            A = self.adjacency_matrix(h, original_sizes)
+            A = self.adjacency_matrix(h, mask)
             h = self.message_passing(h, jets, A)
         out = self.readout(h)
         if returextras:
