@@ -13,9 +13,9 @@ class AdaptiveAdjacencyMatrix(nn.Module):
         shp = h.size()
         h_l = h.view(shp[0], shp[1], 1, shp[2])
         h_r = h.view(shp[0], 1, shp[1], shp[2])
-        A = self.edge_embedding(h_l + h_r)
-        #A = F.softmax(A).squeeze(-1)
-        A = self.softmax(A, original_sizes)
+        A = self.edge_embedding(h_l + h_r).squeeze(-1)
+        A = F.softmax(A).squeeze(-1)
+        #A = self.softmax(A, original_sizes)
         return A
 
 class PaddedMatrixSoftmax(nn.Module):
@@ -39,5 +39,4 @@ class PaddedMatrixSoftmax(nn.Module):
         S = S * mask
         Z = S.sum(2, keepdim=True) + 1e-10
         S = S / Z
-        S = S.squeeze(-1)
         return S
