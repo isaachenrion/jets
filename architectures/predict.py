@@ -22,7 +22,12 @@ class PredictFromParticleEmbedding(nn.Module):
 
 
     def forward(self, jets, **kwargs):
-        h, extras = self.transform(jets, **kwargs)
+        out_stuff = self.transform(jets, **kwargs)
+        return_extras = kwargs.pop('return_extras', False)
+        if return_extras:
+            h, extras = out_stuff
+        else:
+            h = out_stuff
 
         h = self.fc1(h)
         h = self.activation(h)
@@ -31,7 +36,7 @@ class PredictFromParticleEmbedding(nn.Module):
         h = self.activation(h)
 
         h = F.sigmoid(self.fc3(h))
-        if kwargs.pop('return_extras', False):
+        if return_extras:
             return h, extras
         else:
             return h
