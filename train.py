@@ -221,7 +221,7 @@ def train(args):
     scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
     #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
 
-    n_batches = int(np.ceil(len(X_train) / args.batch_size))
+    n_batches = int(len(X_train) // args.batch_size)
     best_score = [-np.inf]  # yuck, but works
     best_model_state_dict = copy.deepcopy(model.state_dict())
 
