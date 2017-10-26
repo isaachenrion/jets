@@ -288,7 +288,7 @@ def train(args):
         logging.info("epoch = %d" % i)
         logging.info("step_size = %.8f" % settings['step_size'])
         t0 = time.time()
-
+        print(n_batches)
         for _ in range(n_batches):
             iteration += 1
             print(1)
