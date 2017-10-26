@@ -90,13 +90,14 @@ class SignalHandler:
         self.model = model
 
     def cleanup(self):
-        answer = None if self.need_input else "y"
-        while answer not in ["", "y", "Y", "n", "N"]:
-            answer = input('Cleanup? (Y/n)\n')
-        if answer in ["", "y", "Y"]:
-            logging.info("Deleting {}".format(self.exp_dir))
-            os.system("rm {}/*".format(self.exp_dir))
-            os.system("rm -r {}".format(self.exp_dir))
+        pass
+        #answer = None if self.need_input else "y"
+        #while answer not in ["", "y", "Y", "n", "N"]:
+        #    answer = input('Cleanup? (Y/n)\n')
+        #if answer in ["", "y", "Y"]:
+        #    logging.info("Deleting {}".format(self.exp_dir))
+        #    os.system("rm {}/*".format(self.exp_dir))
+        #    os.system("rm -r {}".format(self.exp_dir))
 
     def signal_handler(self, signal, cleanup=True):
         d = timestring()
@@ -111,17 +112,20 @@ class SignalHandler:
 
     def killed(self, signal, frame):
         self.signal_handler(signal='KILLED')
+        sys.exit(0)
 
     def interrupted(self, signal, frame):
         self.signal_handler(signal='INTERRUPTED')
+        sys.exit(0)
 
     def completed(self):
         self.done = True
         self.signal_handler(signal='COMPLETED', cleanup=False)
+        sys.exit(0)
 
     def crashed(self):
         self.signal_handler(signal='CRASHED')
-
+        sys.exit(0)
 
 class ExperimentHandler:
     def __init__(self, args, root_exp_dir):

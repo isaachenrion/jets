@@ -94,7 +94,7 @@ args = parser.parse_args()
 
 if args.debug:
     args.hidden = 1
-    args.bs = 9
+    args.batch_size = 9
     args.verbose = True
     args.epochs = 3
     args.n_train = 1000
@@ -210,8 +210,8 @@ def train(args):
                 time.sleep(1)
                 logging.info('{} seconds'.format(k+1))
         model.cuda()
+        logging.warning("Moved model to GPU")
 
-    logging.warning("Moved model to GPU")
     signal_handler.set_model(model)
 
     ''' OPTIMIZER AND LOSS '''
