@@ -261,6 +261,8 @@ def train(args):
             yy = np.concatenate(yy, 0)
             yy_pred = np.concatenate(yy_pred, 0)
 
+            t1=time.time()
+            logging.info("Modeling validation data took {}s".format(t1-t0))
             logdict = dict(
                 epoch=epoch,
                 iteration=iteration,
@@ -276,9 +278,7 @@ def train(args):
 
             scheduler.step(valid_loss)
             model.train()
-            t1=time.time()
-            logging.info("Callback took {}s".format(t1 -t0))
-
+            
     ''' TRAINING '''
     '''----------------------------------------------------------------------- '''
     eh.save(model, settings)
