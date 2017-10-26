@@ -9,7 +9,6 @@
 #SBATCH --mail-user=henrion@nyu.edu
 #SBATCH --output=slurm_%j.out
 #SBATCH --error=slurm_%j.err
-#SBATCH --gres=gpu:1
 
 module purge
 
@@ -28,7 +27,6 @@ COUNTER=0
 BATCH_SIZE=10
 
 printf 'CUDA VISIBLE DEVICES : %s\n' $CUDA_VISIBLE_DEVICES
-##nvidia-smi &
 printf 'N = %s, Model = %s, DATA_DIR = %s\n' $N $MODEL_TYPE $DATA_DIR
 while [ $COUNTER -lt $N_RUNS ];
 do
