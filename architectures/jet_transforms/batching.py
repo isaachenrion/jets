@@ -198,34 +198,34 @@ def batch_leaves(jets):
     jet_contents = [jet['content'] for jet in jets]
     leaves = [torch.stack([jet[i] for i in outers], 0) for jet, outers in zip(jet_contents, batch_outers)]
 
-    biggest_jet_size = max(len(jet) for jet in leaves)
+    original_sizes = [len(jet) for jet in leaves]
+    biggest_jet_size = max(original_sizes)
+    mask = torch.ones(len(leaves), biggest_jet_size, biggest_jet_size)
+    if torch.cuda.is_available(): mask = mask.cuda()
+
     jets_padded = []
-    for jet in leaves:
-        if jet.size()[0] < biggest_jet_size:
-            padding = torch.zeros(biggest_jet_size - jet.size()[0], jet.size()[1])
+    for i, (size, jet) in enumerate(zip(original_sizes, leaves)):
+        if size < biggest_jet_size:
+            padding = torch.zeros(biggest_jet_size - size, jet.size()[1])
+            if torch.cuda.is_available(): padding = padding.cuda()
+
             padding = torch.cat((padding, torch.zeros(padding.size()[0], 1)), 1)
             padding = Variable(padding)
-            if torch.cuda.is_available(): padding = padding.cuda()
-            ones = torch.ones(jet.size()[0], 1)
+            ones = torch.ones(size, 1)
             if torch.cuda.is_available(): ones = ones.cuda()
             jet = torch.cat((jet, ones), 1)
-            jets_padded.append(torch.cat((jet, padding), 0))
-
+            jet = torch.cat((jet, padding), 0)
+            mask[i, size:, :].fill_(0)
+            mask[i, :, size:].fill_(0)
+            
         else:
-            ones = torch.ones(jet.size()[0], 1)
+            ones = torch.ones(size, 1)
             if torch.cuda.is_available(): ones = ones.cuda()
             jet = torch.cat((jet, ones), 1)
-            jets_padded.append(jet)
+        jets_padded.append(jet)
     jets_padded = torch.stack(jets_padded, 0)
 
-    original_sizes = [len(jet) for jet in leaves]
-    mask = torch.ones(len(leaves), biggest_jet_size, biggest_jet_size)
-    #for i, size in enumerate(original_sizes):
-    #    if size < biggest_jet_size:
-    #        mask[i, size:, :].fill_(0)
-    #        mask[i, :, size:].fill_(0)
     mask = Variable(mask)
-    if torch.cuda.is_available(): mask = mask.cuda()
 
     return jets_padded, mask
 

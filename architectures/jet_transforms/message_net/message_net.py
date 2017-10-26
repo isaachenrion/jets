@@ -23,7 +23,7 @@ class MPAdaptive(nn.Module):
         A = self.adjacency_matrix(h, mask)
         message = self.activation(torch.matmul(A, self.message(h)))
         h = self.vertex_update(h, message, jets)
-        return h
+        return h, A
 
 class MPIdentity(nn.Module):
     def __init__(self, features=None, hidden=None):
@@ -37,7 +37,7 @@ class MPIdentity(nn.Module):
         dist_msg = self.message(h).sum(1, keepdim=True).repeat(1, shp[1], 1)
         message = self.activation(dist_msg)
         h = self.vertex_update(h, message, jets)
-        return h
+        return h, None
 
 class MPFullyConnected(nn.Module):
     def __init__(self, features=None, hidden=None):
@@ -50,7 +50,7 @@ class MPFullyConnected(nn.Module):
         shp = h.size()
         message = self.activation(self.message(h))
         h = self.vertex_update(h, message, jets)
-        return h
+        return h, None
 
 class MPSet2Set(nn.Module):
     def __init__(self, features=None, hidden=None):
@@ -65,7 +65,7 @@ class MPSet2Set(nn.Module):
         message = self.activation(torch.matmul(A, self.message(h)))
         h_mean = h.mean(1, keepdim=True).expand_as(h)
         h = self.vertex_update(h, torch.cat((message, h_mean), 2), jets)
-        return h
+        return h, A
 
 class MPNNTransform(nn.Module):
     def __init__(self, features=None, hidden=None, iters=None, leaves=False, message_passing_layer=None):
@@ -79,18 +79,16 @@ class MPNNTransform(nn.Module):
         self.readout = DTNNReadout(hidden, hidden)
         self.mp_layers = nn.ModuleList([message_passing_layer(features, hidden) for i in range(iters)])
 
-    def forward(self, jets, return_extras=False):
+    def forward(self, jets, **kwargs):
         if self.leaves:
             jets, mask = batch_leaves(jets)
         else:
             jets = pad_batch(jets)
         h = self.activation(self.embedding(jets))
         for mp in self.mp_layers:
-            h = mp(h, jets, mask)
+            h, A = mp(h, jets, mask)
         out = self.readout(h)
-        if return_extras:
-            return out, A
-        return out, None
+        return out, A
 
 class MPNNTransformAdaptive(MPNNTransform):
     def __init__(self, **kwargs):

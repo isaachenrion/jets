@@ -33,9 +33,7 @@ args = parser.parse_args()
 
 def viz(AA, prefix):
     for i, A in enumerate(AA):
-        A_hard = np.where(A > 0.5, 1, 0)
-        plt.imsave(prefix + '-soft-' + str(i) + '.png', A)
-        plt.imsave(prefix + '-hard-' + str(i) + '.png', A_hard)
+        plt.imsave(prefix + str(i) + '.png', A)
 
 def get_matrices(model, X):
     X_var = wrap_X(X)
@@ -83,7 +81,6 @@ def main(args):
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
     # Initialization
-
     with open(os.path.join(MODELS_DIR, args.load, 'settings.pickle'), "rb") as f:
         settings = pickle.load(f, encoding='latin-1')
         Transform = settings["transform"]
