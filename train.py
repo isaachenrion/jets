@@ -234,7 +234,7 @@ def train(args):
     '''----------------------------------------------------------------------- '''
     def callback(epoch, iteration, model):
 
-        if iteration % (n_batches // 2) == 0:
+        if iteration % n_batches == 0:
             t0 = time.time()
             model.eval()
 
