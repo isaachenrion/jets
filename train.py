@@ -13,6 +13,7 @@ import signal
 import argparse
 import shutil
 import gc
+import psutil
 
 from utils import ExperimentHandler
 
@@ -290,6 +291,8 @@ def train(args):
         t0 = time.time()
         logging.info(n_batches)
         for _ in range(n_batches):
+            logging.info(psutil.cpu_percent())
+            logging.info(psutil.virtual_memory())
             iteration += 1
             logging.info(1)
             model.train()
