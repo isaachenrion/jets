@@ -101,8 +101,8 @@ if args.debug:
     args.seed = 1
     args.eval_every = 10
 
-if args.gpu != "":
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+
 
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
