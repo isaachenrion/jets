@@ -234,7 +234,7 @@ def train(args):
     '''----------------------------------------------------------------------- '''
     def callback(epoch, iteration, model):
 
-        if iteration % args.eval_every == 0:
+        if iteration % (n_batches // 2) == 0:
             t0 = time.time()
             model.eval()
 
@@ -247,7 +247,7 @@ def train(args):
                 tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
                 X = unwrap_X(X_var); y = unwrap(y_var)
 
-                Xv, yv = X_valid[offset:offset+args.batch_size], y_valid[offset:offset+args.batch_size]
+                Xv, yv = X_valid[idx], y_valid[idx]
                 X_var = wrap_X(Xv); y_var = wrap(yv)
                 y_pred = model(X_var)
                 vl = unwrap(loss(y_pred, y_var)); valid_loss.append(vl)
@@ -278,7 +278,7 @@ def train(args):
 
             scheduler.step(valid_loss)
             model.train()
-            
+
     ''' TRAINING '''
     '''----------------------------------------------------------------------- '''
     eh.save(model, settings)
