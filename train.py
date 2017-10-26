@@ -291,15 +291,25 @@ def train(args):
 
         for _ in range(n_batches):
             iteration += 1
+            print(1)
             model.train()
+            print(2)
             optimizer.zero_grad()
+            print(3)
             start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
+            print(4)
             idx = slice(start, start+args.batch_size)
+            print(5)
             X, y = X_train[idx], y_train[idx]
+            print(6)
             X_var = wrap_X(X); y_var = wrap(y)
+            print(7)
             l = loss(model(X_var), y_var)
+            print(8)
             l.backward()
+            print(9)
             optimizer.step()
+            print(10)
             X = unwrap_X(X_var); y = unwrap(y_var)
             callback(i, iteration, model)
         t1 = time.time()
