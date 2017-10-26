@@ -106,7 +106,6 @@ class MPNNTransformSet2Set(MPNNTransform):
     def __init__(self, **kwargs):
         super().__init__(message_passing_layer=MPSet2Set, **kwargs)
 
-
 class MPNNTransformClusterTree(MPNNTransform):
     def __init__(self, **kwargs):
         super().__init__(adjacency_matrix=None, **kwargs)
