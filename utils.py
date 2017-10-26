@@ -36,7 +36,7 @@ def get_logfile(exp_dir, silent, verbose):
         formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
         ch.setFormatter(formatter)
         root.addHandler(ch)
-    return logfile
+    return logfile, ch, root
 
 class Emailer:
     def __init__(self, sender, password, recipient):
@@ -154,7 +154,7 @@ class ExperimentHandler:
 
         ''' SET UP LOGGING '''
         '''----------------------------------------------------------------------- '''
-        self.logfile = get_logfile(self.exp_dir, args.silent, args.verbose)
+        self.logfile, self.ch, self.root = get_logfile(self.exp_dir, args.silent, args.verbose)
         logging.info(self.logfile)
         logging.info(self.exp_dir)
 
@@ -226,6 +226,8 @@ class ExperimentHandler:
         out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.2f}".format(self.monitors['inv_fpr'].value, self.monitors['best_inv_fpr'].value)
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)
+        self.ch.flush()
+        self.root.flush()
 
     def save(self, model, settings):
         self.saver.save(model, settings)
