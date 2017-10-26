@@ -235,6 +235,7 @@ def train(args):
     def callback(epoch, iteration, model):
 
         if iteration % args.eval_every == 0:
+            t0 = time.time()
             model.eval()
 
             offset = 0; train_loss = []; valid_loss = []
@@ -275,6 +276,8 @@ def train(args):
 
             scheduler.step(valid_loss)
             model.train()
+            t1=time.time()
+            logging.info("Callback took {}s".format(t1 -t0))
 
     ''' TRAINING '''
     '''----------------------------------------------------------------------- '''
@@ -286,6 +289,7 @@ def train(args):
         logging.info("step_size = %.8f" % settings['step_size'])
 
         for _ in range(n_batches):
+            t0 = time.time()
             iteration += 1
             model.train()
             optimizer.zero_grad()
@@ -297,7 +301,8 @@ def train(args):
             l.backward()
             optimizer.step()
             X = unwrap_X(X_var); y = unwrap(y_var)
-
+            t1 = time.time()
+            logging.info("Batch took {} seconds".format(t1-t0))
             callback(i, iteration, model)
 
         scheduler.step()
