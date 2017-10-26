@@ -24,3 +24,4 @@ do
 
 done
 printf 'Successfully started all jobs\n'
+python train.py -i $iters -b $batch_size --step_size $step_size --decay $decay -e $epochs -g $gpu -m $model_type --seed $seed &
