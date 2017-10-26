@@ -33,7 +33,7 @@ while [ $COUNTER -lt $N_RUNS ];
 do
   let 'SEED = COUNTER * 10000'
   python train.py --step_size $STEP_SIZE -b $BATCH_SIZE -v -m $MODEL_TYPE --data_dir $DATA_DIR  -e $EPOCHS -n $N -g $GPU &
-  disown %1
+  ##disown %1
   sleep 5
   let COUNTER=COUNTER+1
 done
