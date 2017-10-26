@@ -19,11 +19,14 @@ class MPAdaptive(nn.Module):
         self.message = DTNNMessage(hidden, hidden, 0)
         self.adjacency_matrix = AdaptiveAdjacencyMatrix(hidden)
 
-    def forward(self, h, jets, mask):
+    def forward(self, h, jets, mask, return_extras=False,):
         A = self.adjacency_matrix(h, mask)
         message = self.activation(torch.matmul(A, self.message(h)))
         h = self.vertex_update(h, message, jets)
-        return h, A
+        if return_extras:
+            return h, A
+        else:
+            return h
 
 class MPIdentity(nn.Module):
     def __init__(self, features=None, hidden=None):
@@ -32,12 +35,15 @@ class MPIdentity(nn.Module):
         self.vertex_update = GRUUpdate(hidden, hidden, features + 1)
         self.message = DTNNMessage(hidden, hidden, 0)
 
-    def forward(self, h, jets, mask):
+    def forward(self, h, jets, mask, return_extras=False,):
         shp = h.size()
         dist_msg = self.message(h).sum(1, keepdim=True).repeat(1, shp[1], 1)
         message = self.activation(dist_msg)
         h = self.vertex_update(h, message, jets)
-        return h, None
+        if return_extras:
+            return h, None
+        else:
+            return h
 
 class MPFullyConnected(nn.Module):
     def __init__(self, features=None, hidden=None):
@@ -46,11 +52,14 @@ class MPFullyConnected(nn.Module):
         self.vertex_update = GRUUpdate(hidden, hidden, features + 1)
         self.message = DTNNMessage(hidden, hidden, 0)
 
-    def forward(self, h, jets, mask):
+    def forward(self, h, jets, mask, return_extras=False,):
         shp = h.size()
         message = self.activation(self.message(h))
         h = self.vertex_update(h, message, jets)
-        return h, None
+        if return_extras:
+            return h, None
+        else:
+            return h
 
 class MPSet2Set(nn.Module):
     def __init__(self, features=None, hidden=None):
@@ -60,12 +69,15 @@ class MPSet2Set(nn.Module):
         self.message = DTNNMessage(hidden, hidden, 0)
         self.adjacency_matrix = AdaptiveAdjacencyMatrix(hidden)
 
-    def forward(self, h, jets, mask):
+    def forward(self, h, jets, mask, return_extras=False,):
         A = self.adjacency_matrix(h, mask)
         message = self.activation(torch.matmul(A, self.message(h)))
         h_mean = h.mean(1, keepdim=True).expand_as(h)
         h = self.vertex_update(h, torch.cat((message, h_mean), 2), jets)
-        return h, A
+        if return_extras:
+            return h, A
+        else:
+            return h
 
 class MPNNTransform(nn.Module):
     def __init__(self, features=None, hidden=None, iters=None, leaves=False, message_passing_layer=None):
@@ -79,16 +91,22 @@ class MPNNTransform(nn.Module):
         self.readout = DTNNReadout(hidden, hidden)
         self.mp_layers = nn.ModuleList([message_passing_layer(features, hidden) for i in range(iters)])
 
-    def forward(self, jets, **kwargs):
+    def forward(self, jets, return_extras=False, **kwargs):
         if self.leaves:
             jets, mask = batch_leaves(jets)
         else:
             jets = pad_batch(jets)
         h = self.activation(self.embedding(jets))
         for mp in self.mp_layers:
-            h, A = mp(h, jets, mask)
+            if return_extras:
+                h, A = mp(h, jets, mask, return_extras=True)
+            else:
+                h= mp(h, jets, mask, return_extras=False)
         out = self.readout(h)
-        return out, A
+        if return_extras:
+            return out, A
+        else:
+            return out
 
 class MPNNTransformAdaptive(MPNNTransform):
     def __init__(self, **kwargs):

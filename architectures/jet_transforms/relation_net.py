@@ -47,4 +47,4 @@ class RelNNTransformConnected(nn.Module):
         h = torch.tanh(self.fc_edge(x_l + x_r))
         output = h.view(shp[0], shp[1] * shp[1], -1).mean(1)
 
-        return output, None
+        return output
