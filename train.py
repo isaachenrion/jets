@@ -287,9 +287,9 @@ def train(args):
     for i in range(args.epochs):
         logging.info("epoch = %d" % i)
         logging.info("step_size = %.8f" % settings['step_size'])
+        t0 = time.time()
 
         for _ in range(n_batches):
-            t0 = time.time()
             iteration += 1
             model.train()
             optimizer.zero_grad()
@@ -301,9 +301,9 @@ def train(args):
             l.backward()
             optimizer.step()
             X = unwrap_X(X_var); y = unwrap(y_var)
-            t1 = time.time()
-            logging.info("Batch took {} seconds".format(t1-t0))
             callback(i, iteration, model)
+        t1 = time.time()
+        logging.info("Epoch took {} seconds".format(t1-t0))
 
         scheduler.step()
         settings['step_size'] = args.step_size * (args.decay) ** (i + 1)
