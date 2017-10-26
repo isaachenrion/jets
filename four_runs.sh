@@ -10,7 +10,7 @@ while [ "$1" != "" ]; do
     esac
 done
 printf "Launching a job on each GPU with model type %s, base seed is %s\n" $model_type $base_seed
-batch_size=256
+batch_size=100
 step_size=0.001
 decay=0.96
 epochs=100
