@@ -25,7 +25,7 @@ N_RUNS=1
 GPU=0
 COUNTER=0
 BATCH_SIZE=10
-STEP_SIZE=0.00
+STEP_SIZE=0.001
 
 printf 'CUDA VISIBLE DEVICES : %s\n' $CUDA_VISIBLE_DEVICES
 printf 'N = %s, Model = %s, DATA_DIR = %s\n' $N $MODEL_TYPE $DATA_DIR
@@ -37,7 +37,3 @@ do
   sleep 5
   let COUNTER=COUNTER+1
 done
-
-##./slurm_run.sh -d $DATA_DIR -m 5 -n 3
-#########
-##

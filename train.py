@@ -138,8 +138,8 @@ def train(args):
             time.sleep(1)
             logging.info('before tf transform: {} seconds'.format(k+1))
 
-    #for ij, jet in enumerate(X):
-    #    jet["content"] = tf.transform(jet["content"])
+    for ij, jet in enumerate(X):
+        jet["content"] = tf.transform(jet["content"])
 
     logging.warning("After transform: memory usage = {}".format(eh.usage()))
 
