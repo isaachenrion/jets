@@ -33,42 +33,7 @@ def unwrap_X(X_wrap):
         jet["content"] = unwrap(jet["content"])
         X_new.append(jet)
     return X_new
-'''
-def wrap(y, dtype='float'):
-    y_wrap = Variable(torch.from_numpy(y))
-    if dtype=='float':
-        y_wrap = y_wrap.float()
-    elif dtype == 'long':
-         y_wrap = y_wrap.long()
-    if torch.cuda.is_available():
-        y_wrap = y_wrap.cuda()
-    #y = y_wrap
-    return y_wrap
-
-def unwrap(y):
-    if y.is_cuda:
-        y_unwrap = y.cpu().data.numpy()
-    else:
-        y_unwrap = y.data.numpy()
-
-    return y_unwrap
-
-
-def wrap_X(X):
-    for jet in X:
-        jet['content'] = wrap(jet["content"])
-    #X = copy.copy(X_)
-    #for i, (jet, jet_) in enumerate(X, X_):
-    #    jet['content'] = wrap(jet_["content"])
-    return X
-
-def unwrap_X(X):
-    for jet in X:
-        jet["content"] = unwrap(jet["content"])
-    return X
-
-'''
-
+    
 # Data loading related
 
 def load_from_pickle(filename, n_jets):
