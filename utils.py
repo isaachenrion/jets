@@ -209,7 +209,6 @@ class ExperimentHandler:
         return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
     def log(self, **kwargs):
-        t0 = time.time()
         stats_dict = {}
         for name, monitor in self.monitors.items():
             stats_dict[name] = monitor(**kwargs)
@@ -227,8 +226,6 @@ class ExperimentHandler:
         out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.2f}".format(self.monitors['inv_fpr'].value, self.monitors['best_inv_fpr'].value)
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)
-        t1 = time.time()
-        logging.info("Logging took {}s".format(t1-t0))
 
     def save(self, model, settings):
         self.saver.save(model, settings)
