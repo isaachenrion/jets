@@ -19,7 +19,7 @@ do
         let 'seed = VARIABLE + base_seed'
         python train.py -b $batch_size --step_size $step_size --decay $decay -e $n_epochs -g $VARIABLE -s -m $model_type --seed $seed &
         disown %1
-        sleep 5
+        sleep 30
 
 done
 printf 'Successfully started all jobs\n'
