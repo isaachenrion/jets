@@ -14,7 +14,7 @@ batch_size=100
 step_size=0.001
 decay=0.96
 epochs=100
-iters=3
+iters=1
 for VARIABLE in 0 1 2 3
 do
         let 'seed = VARIABLE + base_seed'
