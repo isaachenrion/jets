@@ -134,7 +134,6 @@ def train(args):
     logging.warning("\traw valid size = %d" % len(X_valid_uncropped))
 
     X_valid, y_valid, cropped_indices, w_valid = crop(X_valid_uncropped, y_valid_uncropped, return_cropped_indices=True)
-
     # add cropped indices to training data
     if not args.dont_add_cropped:
         X_train.extend([x for i, x in enumerate(X_valid_uncropped) if i in cropped_indices])
@@ -244,7 +243,7 @@ def train(args):
                 iteration=iteration,
                 yy=yy,
                 yy_pred=yy_pred,
-                w_valid=w_valid,
+                w_valid=w_valid[:len(yy_pred)],
                 train_loss=train_loss,
                 valid_loss=valid_loss,
                 settings=settings,
