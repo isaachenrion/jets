@@ -9,7 +9,7 @@ done
 ###-s | --seed )           shift
 ###                        base_seed=$1
 ###                        shift;;
-printf "Launching a job on each GPU with model type %s, base seed is %s\n" $model_type $base_seed
+printf "Launching a job on each GPU with model type %s" $model_type
 batch_size=100
 step_size=0.001
 decay=0.94
