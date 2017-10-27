@@ -12,8 +12,8 @@ done
 printf "Launching a job on each GPU with model type %s, base seed is %s\n" $model_type $base_seed
 batch_size=100
 step_size=0.001
-decay=0.96
-epochs=100
+decay=0.94
+epochs=50
 iters=1
 for VARIABLE in 0 1 2 3
 do
@@ -24,4 +24,3 @@ do
 
 done
 printf 'Successfully started all jobs\n'
-python train.py -i $iters -b $batch_size --step_size $step_size --decay $decay -e $epochs -g $gpu -m $model_type --seed $seed &
