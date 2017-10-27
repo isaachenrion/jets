@@ -10,7 +10,7 @@
 #SBATCH --output=slurm_%j.out
 #SBATCH --error=slurm_%j.err
 ##SBATCH --gres=gpu:1
-#SBATCH --array=1-1
+#SBATCH --array=1-10
 module purge
 
 SRCDIR=$HOME/jets
