@@ -64,17 +64,16 @@ parser.add_argument("--hidden", type=int, default=40)
 # logging args
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
-parser.add_argument("--eval_every", type=int, default=25)
 
 # loading previous models args
 parser.add_argument("-l", "--load", help="model directory from which we load a state_dict", type=str, default=None)
 parser.add_argument("-r", "--restart", help="restart a loaded model from where it left off", action='store_true', default=False)
 
 # training args
-parser.add_argument("-e", "--epochs", type=int, default=25)
-parser.add_argument("-b", "--batch_size", type=int, default=64)
+parser.add_argument("-e", "--epochs", type=int, default=100)
+parser.add_argument("-b", "--batch_size", type=int, default=100)
 parser.add_argument("-a", "--step_size", type=float, default=0.001)
-parser.add_argument("-d", "--decay", type=float, default=.912)
+parser.add_argument("-d", "--decay", type=float, default=.96)
 
 # computing args
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=1)
@@ -100,7 +99,6 @@ if args.debug:
     args.epochs = 3
     args.n_train = 1000
     args.seed = 1
-    args.eval_every = 10
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
@@ -118,30 +116,11 @@ def train(args):
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
     logging.warning("Loading data...")
-    if args.debug and False:
-        for k in range(15):
-            time.sleep(1)
-            logging.info('before load tf: {} seconds'.format(k+1))
 
     tf = load_tf(args.data_dir, "{}-train.pickle".format(args.filename))
-
-    if args.debug and False:
-        for k in range(15):
-            time.sleep(1)
-            logging.info('before load_data: {} seconds'.format(k+1))
-
     X, y = load_data(args.data_dir, "{}-train.pickle".format(args.filename))
-
-    logging.warning("Memory usage = {}".format(0))
-    if args.debug and False:
-        for k in range(15):
-            time.sleep(1)
-            logging.info('before tf transform: {} seconds'.format(k+1))
-
     for ij, jet in enumerate(X):
         jet["content"] = tf.transform(jet["content"])
-
-    logging.warning("After transform: memory usage = {}".format(eh.usage()))
 
     if args.n_train > 0:
         indices = torch.randperm(len(X)).numpy()[:args.n_train]
@@ -206,10 +185,6 @@ def train(args):
 
     if torch.cuda.is_available():
         logging.warning("Moving model to GPU")
-        if args.debug and False:
-            for k in range(30):
-                time.sleep(1)
-                logging.info('{} seconds'.format(k+1))
         model.cuda()
         logging.warning("Moved model to GPU")
 
@@ -289,30 +264,17 @@ def train(args):
         logging.info("epoch = %d" % i)
         logging.info("step_size = %.8f" % settings['step_size'])
         t0 = time.time()
-        #debug logging.info(n_batches)
         for _ in range(n_batches):
-            #debug logging.info(psutil.cpu_percent())
-            #debug logging.info(psutil.virtual_memory())
             iteration += 1
-            #debug logging.info(1)
             model.train()
-            #debug logging.info(2)
             optimizer.zero_grad()
-            #debug logging.info(3)
             start = torch.round(torch.rand(1) * (len(X_train) - args.batch_size)).numpy()[0].astype(np.int32)
-            #debug logging.info(4)
             idx = slice(start, start+args.batch_size)
-            #debug logging.info(5)
             X, y = X_train[idx], y_train[idx]
-            #debug logging.info(6)
             X_var = wrap_X(X); y_var = wrap(y)
-            #debug logging.info(7)
             l = loss(model(X_var), y_var)
-            #debug logging.info(8)
             l.backward()
-            #debug logging.info(9)
             optimizer.step()
-            #debug logging.info(10)
             X = unwrap_X(X_var); y = unwrap(y_var)
             callback(i, iteration, model)
         t1 = time.time()
