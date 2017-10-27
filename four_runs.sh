@@ -4,21 +4,21 @@ while [ "$1" != "" ]; do
         -m | --model_type )     shift
                                 model_type=$1
                                 shift;;
-        -s | --seed )           shift
-                                base_seed=$1
-                                shift;;
     esac
 done
+###-s | --seed )           shift
+###                        base_seed=$1
+###                        shift;;
 printf "Launching a job on each GPU with model type %s, base seed is %s\n" $model_type $base_seed
 batch_size=100
 step_size=0.001
 decay=0.94
 epochs=50
-iters=1
+iters=3
 for VARIABLE in 0 1 2 3
 do
         let 'seed = VARIABLE + base_seed'
-        python train.py -i $iters -b $batch_size --step_size $step_size --decay $decay -e $epochs -g $VARIABLE -s -m $model_type --seed $seed &
+        python train.py -i $iters -b $batch_size --step_size $step_size --decay $decay -e $epochs -g $VARIABLE -s -m $model_type &
         disown %1
         sleep 30
 
