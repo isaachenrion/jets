@@ -64,6 +64,7 @@ parser.add_argument("--hidden", type=int, default=40)
 # logging args
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
+parser.add_argument("--extra_tag", type=int, default=0)
 
 # loading previous models args
 parser.add_argument("-l", "--load", help="model directory from which we load a state_dict", type=str, default=None)
