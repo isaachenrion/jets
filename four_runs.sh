@@ -9,12 +9,12 @@ done
 ###-s | --seed )           shift
 ###                        base_seed=$1
 ###                        shift;;
-printf "Launching a job on each GPU with model type %s" $model_type
+printf "Launching a job on each GPU with model type %s\n" $model_type
 batch_size=100
 step_size=0.001
 decay=0.94
 epochs=50
-iters=2
+iters=1
 for VARIABLE in 0 1 2 3
 do
         let 'seed = VARIABLE + base_seed'
