@@ -70,7 +70,7 @@ parser.add_argument("-l", "--load", help="model directory from which we load a s
 parser.add_argument("-r", "--restart", help="restart a loaded model from where it left off", action='store_true', default=False)
 
 # training args
-parser.add_argument("-e", "--epochs", type=int, default=100)
+parser.add_argument("-e", "--epochs", type=int, default=50)
 parser.add_argument("-b", "--batch_size", type=int, default=100)
 parser.add_argument("-a", "--step_size", type=float, default=0.001)
 parser.add_argument("-d", "--decay", type=float, default=.94)
