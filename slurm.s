@@ -19,7 +19,7 @@ cd $SRCDIR
 source activate jets
 
 DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
-MODEL_TYPE=3
+MODEL_TYPE=5
 EPOCHS=50
 N=-1
 ITERS=2
