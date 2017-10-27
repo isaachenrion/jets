@@ -7,13 +7,12 @@ import logging
 import pickle
 import datetime
 import time
-import sys; logging.info('here!!!!!', file=sys.stderr)
+import sys
 import os
 import signal
 import argparse
 import shutil
 import gc
-import psutil
 
 from utils import ExperimentHandler
 
