@@ -22,10 +22,11 @@ DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
 MODEL_TYPE=7
 EPOCHS=100
 N=-1
+ITERS=5
 GPU=0
 BATCH_SIZE=100
 STEP_SIZE=0.001
 let 'SEED=SLURM_ARRAY_TASK_ID * 1000'
 printf 'CUDA VISIBLE DEVICES : %s\n' $CUDA_VISIBLE_DEVICES
 printf 'N = %s, Model = %s, DATA_DIR = %s\n' $N $MODEL_TYPE $DATA_DIR
-python train.py --step_size $STEP_SIZE -b $BATCH_SIZE -v -m $MODEL_TYPE --data_dir $DATA_DIR  -e $EPOCHS -n $N -g $GPU --seed $SEED
+python train.py --iters $ITERS --step_size $STEP_SIZE -b $BATCH_SIZE -v -m $MODEL_TYPE --data_dir $DATA_DIR  -e $EPOCHS -n $N -g $GPU --seed $SEED
