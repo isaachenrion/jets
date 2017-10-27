@@ -76,7 +76,7 @@ parser.add_argument("-a", "--step_size", type=float, default=0.001)
 parser.add_argument("-d", "--decay", type=float, default=.94)
 
 # computing args
-parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=1)
+parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)
 parser.add_argument("-g", "--gpu", type=str, default="")
 
 # MPNN

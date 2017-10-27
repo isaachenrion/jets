@@ -134,13 +134,19 @@ class ExperimentHandler:
 
         ''' CUDA AND RANDOM SEED '''
         '''----------------------------------------------------------------------- '''
+        if args.gpu != "" and torch.cuda.is_available():
+            torch.cuda.device(args.gpu)
+
+        if args.seed is None:
+            torch.seed()
+            args.seed = torch.initial_seed()
+
         np.random.seed(args.seed)
         if args.gpu != "" and torch.cuda.is_available():
             torch.cuda.device(args.gpu)
             torch.cuda.manual_seed(args.seed)
         else:
             torch.manual_seed(args.seed)
-            pass
 
         ''' CREATE MODEL DIRECTORY '''
         '''----------------------------------------------------------------------- '''
