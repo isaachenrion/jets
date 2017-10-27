@@ -5,7 +5,7 @@
 #SBATCH --time=30:00:00
 #SBATCH --mem=30GB
 #SBATCH --job-name=jets-experiment
-#SBATCH --mail-type=END
+#SBATCH --mail-type=ALL
 #SBATCH --mail-user=henrion@nyu.edu
 #SBATCH --output=slurm_%j.out
 #SBATCH --error=slurm_%j.err
