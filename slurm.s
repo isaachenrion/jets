@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --nodes=4
+#SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=10
 #SBATCH --time=30:00:00
 #SBATCH --mem=30GB
 #SBATCH --job-name=jets-experiment
@@ -9,7 +9,7 @@
 #SBATCH --mail-user=henrion@nyu.edu
 #SBATCH --output=slurm_%j.out
 #SBATCH --error=slurm_%j.err
-##SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:1
 #SBATCH --array=1-10
 module purge
 
