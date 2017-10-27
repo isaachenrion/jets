@@ -138,9 +138,11 @@ class ExperimentHandler:
             torch.cuda.device(args.gpu)
 
         if args.seed is None:
-            args.seed = torch.initial_seed()
+            args.seed = np.random.randint(0, 2**16 - 1)
+            #args.seed = torch.initial_seed()
+        #import ipdb; ipdb.set_trace()
+        np.random.seed(args.seed)
 
-        np.random.seed(abs(args.seed // 16))
         if args.gpu != "" and torch.cuda.is_available():
             torch.cuda.device(args.gpu)
             torch.cuda.manual_seed(args.seed)
