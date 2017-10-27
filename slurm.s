@@ -29,4 +29,5 @@ STEP_SIZE=0.001
 let 'SEED=SLURM_ARRAY_TASK_ID * 1000'
 printf 'CUDA VISIBLE DEVICES : %s\n' $CUDA_VISIBLE_DEVICES
 printf 'N = %s, Model = %s, DATA_DIR = %s\n' $N $MODEL_TYPE $DATA_DIR
+sleep 5
 python train.py --iters $ITERS --step_size $STEP_SIZE -b $BATCH_SIZE -v -m $MODEL_TYPE --data_dir $DATA_DIR  -e $EPOCHS -n $N -g $GPU --seed $SEED
