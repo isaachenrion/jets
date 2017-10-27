@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --nodes=1
+#SBATCH --nodes=4
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --time=30:00:00
@@ -19,7 +19,7 @@ cd $SRCDIR
 source activate jets
 
 DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
-MODEL_TYPE=5
+MODEL_TYPE=1
 EPOCHS=50
 N=-1
 ITERS=1
