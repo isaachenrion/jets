@@ -138,7 +138,6 @@ class ExperimentHandler:
             torch.cuda.device(args.gpu)
 
         if args.seed is None:
-            torch.seed()
             args.seed = torch.initial_seed()
 
         np.random.seed(args.seed)
