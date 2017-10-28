@@ -9,7 +9,7 @@
 #SBATCH --mail-user=henrion@nyu.edu
 #SBATCH --output=slurm_%j.out
 #SBATCH --error=slurm_%j.err
-##SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:1
 #SBATCH --array=1-10
 module purge
 
@@ -19,10 +19,10 @@ cd $SRCDIR
 source activate jets
 
 DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
-MODEL_TYPE=5
-EPOCHS=20
+MODEL_TYPE=7
+EPOCHS=50
 N=-1
-ITERS=1
+ITERS=3
 GPU=0
 BATCH_SIZE=100
 STEP_SIZE=0.001
