@@ -10,7 +10,7 @@
 #SBATCH --output=slurm_%j.out
 #SBATCH --error=slurm_%j.err
 ##SBATCH --gres=gpu:1
-#SBATCH --array=1-10
+#SBATCH --array=1-9
 module purge
 
 SRCDIR=$HOME/jets
@@ -22,7 +22,7 @@ DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
 MODEL_TYPE=5
 EPOCHS=50
 N=-1
-ITERS=1
+ITERS=2
 GPU=0
 BATCH_SIZE=100
 STEP_SIZE=0.001
