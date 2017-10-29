@@ -1,4 +1,6 @@
 #MPNN/Oct-10
 #RecNN-gated/Oct-10
-RecNN-simple/evaltest
+#RecNN-simple/evaltest
 #RelationNet/Oct-10
+mpnn/vanilla/1
+mpnn/vanilla/2

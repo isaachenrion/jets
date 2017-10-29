@@ -11,6 +11,7 @@ from architectures import MPNNTransformSet2Set
 ''' LOOKUP TABLES AND CONSTANTS '''
 '''----------------------------------------------------------------------- '''
 MODELS_DIR = 'models'
+FINISHED_MODELS_DIR = 'finished_models'
 DATA_DIR = 'data/w-vs-qcd/pickles'
 TRANSFORMS = [
     (0, RelNNTransformConnected, 'RelationNet'),
@@ -24,4 +25,5 @@ TRANSFORMS = [
 ]
 RECIPIENT = "henrion@nyu.edu"
 REPORTS_DIR = "reports"
+
 #RECIPIENT = None
