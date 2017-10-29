@@ -10,7 +10,7 @@
 #SBATCH --output=slurm_%j.out
 #SBATCH --error=slurm_%j.err
 ##SBATCH --gres=gpu:1
-#SBATCH --array=1-9
+#SBATCH --array=1-12
 module purge
 
 SRCDIR=$HOME/jets
@@ -22,12 +22,12 @@ DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
 MODEL_TYPE=5
 EPOCHS=50
 N=-1
-ITERS=2
+ITERS=3
 GPU=0
 BATCH_SIZE=100
 STEP_SIZE=0.001
 EXTRA_TAG=$SLURM_ARRAY_TASK_ID
-##MODEL_DIR=$SRCDIR/models/MPNN/set/Oct-26/ 
+##MODEL_DIR=$SRCDIR/models/MPNN/set/Oct-26/
 ##MODEL_DIR=$MODEL_DIR$SLURM_ARRAY_TASK_ID
 ##let 'SEED=SLURM_ARRAY_TASK_ID * 1000'
 printf 'CUDA VISIBLE DEVICES : %s\n' $CUDA_VISIBLE_DEVICES
