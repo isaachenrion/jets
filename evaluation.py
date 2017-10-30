@@ -32,11 +32,11 @@ from constants import *
 '''----------------------------------------------------------------------- '''
 parser = argparse.ArgumentParser(description='Jets')
 
-parser.add_argument("-d", "--data_list_filename", type=str, default='evaldatasets.txt')
+parser.add_argument("-f", "--filename", type=str, default='antikt-kt')
 parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_test", type=int, default=-1)
 parser.add_argument("-s", "--set", type=str, default='test')
-parser.add_argument("-m", "--model_list_filename", type=str, default='evalmodels.txt')
+parser.add_argument("-m", "--root_model_dir", type=str, default=None)
 parser.add_argument("-p", "--plot", action="store_true")
 parser.add_argument("-o", "--remove_outliers", action="store_true")
 parser.add_argument("-l", "--load_rocs", type=str, default=None)
@@ -71,19 +71,21 @@ if args.debug:
     args.batch_size = 9
     args.verbose = True
 args.root_exp_dir = REPORTS_DIR
-args.pileup = True if 'pileup' in args.filename else False 
+args.pileup = True if 'pileup' in args.filename else False
 def main():
 
     eh = ExperimentHandler(args)
 
     ''' GET RELATIVE PATHS TO DATA AND MODELS '''
     '''----------------------------------------------------------------------- '''
-    with open(args.model_list_filename, "r") as f:
-        model_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
+    #with open(args.model_list_filename, "r") as f:
+    #    model_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
+    model_paths = [args.root_model_dir]
 
-    with open(args.data_list_filename, "r") as f:
-        data_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
+    #with open(args.data_list_filename, "r") as f:
+    #    data_paths = [l.strip('\n') for l in f.readlines() if l[0] != '#']
 
+    data_paths = [args.filename]
     logging.info("DATA PATHS\n{}".format("\n".join(data_paths)))
     logging.info("MODEL PATHS\n{}".format("\n".join(model_paths)))
 
@@ -107,14 +109,6 @@ def main():
             X_test, y_test, cropped_indices, w_test = crop(X, y, return_cropped_indices=True, pileup=args.pileup)
 
             data = (X_test, y_test, w_test)
-
-            #if args.set == 'test':
-            #    data = load_test(tf, DATA_DIR, "{}-test.pickle".format(data_path), args.n_test)
-            #elif args.set == 'valid':
-            #    data = load_test(tf, DATA_DIR, "{}-valid.pickle".format(data_path), args.n_test)
-            #elif args.set == 'train':
-            #    data = load_test(tf, DATA_DIR, "{}-train.pickle".format(data_path), args.n_test)
-
             for model_path in model_paths:
                 logging.info('\tBuilding ROCs for instances of {}'.format(model_path))
                 r, f, t = build_rocs(data, os.path.join(FINISHED_MODELS_DIR, model_path), args.batch_size)

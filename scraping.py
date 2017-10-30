@@ -10,11 +10,13 @@ def scrape_results(model_dir):
             reader = csv.DictReader(f)
             lines = [l for l in reader]
             if i == 0:
-                headers = lines[0]
-                model_str = '-'.join(fn.split('/')) + '-summary'
+                headers = ['model'] + list(lines[0].keys())
+                model_str = '-'.join(fn.split('/')[:-1]) + '-summary'
                 results_dir = os.path.join(REPORTS_DIR, model_str)
                 sl = StatsLogger(results_dir, headers)
-            sl.log(lines[-1])
+            sd = lines[-1]
+            sd['model'] = fn.split('/')[-1]
+            sl.log(sd)
 
 def main():
     base = 'finished_models'
