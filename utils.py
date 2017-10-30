@@ -254,7 +254,7 @@ class ExperimentHandler:
 
 class EvaluationExperimentHandler(ExperimentHandler):
     def __init__(self, args):
-        super(),__init__(args)
+        super().__init__(args)
 
     def setup_stats_logger(self, args):
         ''' STATS LOGGER '''
