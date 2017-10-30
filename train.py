@@ -114,7 +114,7 @@ if args.pileup:
     args.filename = 'antikt-kt-pileup25-new'
 def train(args):
 
-    eh = ExperimentHandler(args, root_exp_dir)
+    eh = ExperimentHandler(args)
 
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
