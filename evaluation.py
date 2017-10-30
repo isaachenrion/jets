@@ -31,6 +31,7 @@ from constants import *
 parser = argparse.ArgumentParser(description='Jets')
 
 parser.add_argument("-d", "--data_list_filename", type=str, default='evaldatasets.txt')
+parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_test", type=int, default=-1)
 parser.add_argument("-s", "--set", type=str, default='test')
 parser.add_argument("-m", "--model_list_filename", type=str, default='evalmodels.txt')
@@ -90,7 +91,7 @@ def main():
         for data_path in data_paths:
 
             logging.info('Building ROCs for models trained on {}'.format(data_path))
-            tf = load_tf(DATA_DIR, "{}-train.pickle".format(data_path))
+            tf = load_tf(args.data_dir, "{}-train.pickle".format(data_path))
             X, y = load_data(args.data_dir, "{}-{}.pickle".format(args.filename, args.set))
             for ij, jet in enumerate(X):
                 jet["content"] = tf.transform(jet["content"])
