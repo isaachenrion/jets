@@ -13,6 +13,7 @@ from email.mime.text import MIMEText
 from utils import ExperimentHandler
 from loading import load_tf
 from loading import load_test
+from loading import load_data
 
 from analysis.reports import report_score
 from analysis.reports import remove_outliers
