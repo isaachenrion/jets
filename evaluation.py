@@ -63,7 +63,7 @@ parser.add_argument("--debug", help="sets everything small for fast model debugg
 
 
 args = parser.parse_args()
-
+ 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 args.silent = not args.verbose
 if args.debug:
