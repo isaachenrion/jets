@@ -6,7 +6,7 @@ from sklearn.metrics import roc_auc_score
 
 import torch
 import pickle
-
+from scipy import interp
 
 def inv_fpr_at_tpr_equals_half(tpr, fpr):
     base_tpr = np.linspace(0.05, 1, 476)
