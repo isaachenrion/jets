@@ -6,7 +6,7 @@ import logging
 import argparse
 import datetime
 import sys
-import torch 
+import torch
 
 import smtplib
 from email.mime.text import MIMEText
@@ -70,10 +70,11 @@ if args.debug:
     args.n_text = 1000
     args.batch_size = 9
     args.verbose = True
+args.root_exp_dir = REPORTS_DIR
+args.pileup = True if 'pileup' in args.filename else False 
 def main():
 
-    eh = ExperimentHandler(args, REPORTS_DIR)
-    signal_handler = eh.signal_handler
+    eh = ExperimentHandler(args)
 
     ''' GET RELATIVE PATHS TO DATA AND MODELS '''
     '''----------------------------------------------------------------------- '''
@@ -103,7 +104,7 @@ def main():
                 X = [X[i] for i in indices]
                 y = y[indices]
 
-            X_test, y_test, cropped_indices, w_test = crop(X, y, return_cropped_indices=True)
+            X_test, y_test, cropped_indices, w_test = crop(X, y, return_cropped_indices=True, pileup=args.pileup)
 
             data = (X_test, y_test, w_test)
 
@@ -156,7 +157,7 @@ def main():
     if args.plot:
         plot_show()
 
-    signal_handler.completed()
+    eh.finished()
 
 if __name__ == '__main__':
     main()

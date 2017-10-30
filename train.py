@@ -54,6 +54,7 @@ parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_train", type=int, default=-1)
 parser.add_argument("--n_valid", type=int, default=27000)
 parser.add_argument("--dont_add_cropped", action='store_true', default=False)
+#parser.add_argument("--pileup", action='store_true', default=False)
 
 # general model args
 parser.add_argument("-m", "--model_type", help="index of the model you want to train - look in the code for the model list", type=int, default=0)
@@ -107,11 +108,12 @@ if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
 args.recipient = RECIPIENT
 args.leaves = not args.not_leaves
+args.root_exp_dir = os.path.join(MODELS_DIR,model_type)
+args.pileup = True if 'pileup' in args.filename else False 
 def train(args):
 
     _, Transform, model_type = TRANSFORMS[args.model_type]
-    eh = ExperimentHandler(args, os.path.join(MODELS_DIR,model_type))
-    signal_handler = eh.signal_handler
+    eh = ExperimentHandler(args, root_exp_dir)
 
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
@@ -133,7 +135,7 @@ def train(args):
     logging.warning("\traw train size = %d" % len(X_train))
     logging.warning("\traw valid size = %d" % len(X_valid_uncropped))
 
-    X_valid, y_valid, cropped_indices, w_valid = crop(X_valid_uncropped, y_valid_uncropped, return_cropped_indices=True)
+    X_valid, y_valid, cropped_indices, w_valid = crop(X_valid_uncropped, y_valid_uncropped, return_cropped_indices=True, pileup=args.pileup)
     # add cropped indices to training data
     if not args.dont_add_cropped:
         X_train.extend([x for i, x in enumerate(X_valid_uncropped) if i in cropped_indices])
@@ -187,7 +189,7 @@ def train(args):
         model.cuda()
         logging.warning("Moved model to GPU")
 
-    signal_handler.set_model(model)
+    eh.signal_handler.set_model(model)
 
     ''' OPTIMIZER AND LOSS '''
     '''----------------------------------------------------------------------- '''

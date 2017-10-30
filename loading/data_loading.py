@@ -50,14 +50,18 @@ def load_tf(data_dir, filename):
 
     return tf
 
-def crop(X, y, return_cropped_indices=False):
+def crop(X, y, return_cropped_indices=False, pileup=False):
     # Cropping
     logging.warning("Cropping...")
-    indices = [i for i, j in enumerate(X) if 250 < j["pt"] < 300 and 50 < j["mass"] < 110]
+    if pileup:
+        pt_min, pt_max, m_min, m_max = 300, 365, 150, 220
+    else:
+        pt_min, pt_max, m_min, m_max = 250, 300, 50, 110
+    indices = [i for i, j in enumerate(X) if pt_min < j["pt"] < pt_max and m_min < j["mass"] < m_max]
     cropped_indices = [i for i, j in enumerate(X) if i not in indices]
     logging.warning("{} (selected) + {} (cropped) = {}".format(len(indices), len(cropped_indices), (len(indices) + len(cropped_indices))))
-    X_ = [j for j in X if 250 < j["pt"] < 300 and 50 < j["mass"] < 110]
-    y_ = [y[i] for i, j in enumerate(X) if 250 < j["pt"] < 300 and 50 < j["mass"] < 110]
+    X_ = [j for j in X if pt_min < j["pt"] < pt_max and m_min < j["mass"] < m_max]
+    y_ = [y[i] for i, j in enumerate(X) if pt_min < j["pt"] < pt_max and m_min < j["mass"] < m_max]
 
     y_ = np.array(y_)
 
@@ -84,6 +88,7 @@ def crop(X, y, return_cropped_indices=False):
         return X_, y_, cropped_indices, w
     return X_, y_, w
 
+### DEPRECATED
 def load_test(tf, data_dir, filename, n_test=-1, cropping=True):
     X, y = load_data(data_dir, filename)
     #tf = load_tf(data_dir, "{}-train.pickle".format(filename))
