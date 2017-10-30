@@ -147,6 +147,7 @@ def main():
                     roc = eh.monitors['roc_auc'].value
                     fpr = eh.monitors['roc_curve'].fpr
                     tpr = eh.monitors['roc_curve'].tpr
+                    inv_fpr = eh.monitors['inv_fpr'].value
                     rocs.append(roc)
                     fprs.append(fpr)
                     tprs.append(tpr)
