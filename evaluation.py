@@ -12,8 +12,9 @@ from email.mime.text import MIMEText
 
 from utils import ExperimentHandler
 from loading import load_tf
-from loading import load_test
+#from loading import load_test
 from loading import load_data
+from loading import crop
 
 from analysis.reports import report_score
 from analysis.reports import remove_outliers
@@ -92,7 +93,7 @@ def main():
 
             logging.info('Building ROCs for models trained on {}'.format(data_path))
             tf = load_tf(args.data_dir, "{}-train.pickle".format(data_path))
-            X, y = load_data(args.data_dir, "{}-{}.pickle".format(args.filename, args.set))
+            X, y = load_data(args.data_dir, "{}-{}.pickle".format(data_path, args.set))
             for ij, jet in enumerate(X):
                 jet["content"] = tf.transform(jet["content"])
 
