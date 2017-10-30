@@ -108,11 +108,11 @@ if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
 args.recipient = RECIPIENT
 args.leaves = not args.not_leaves
-_, Transform, model_type = TRANSFORMS[args.model_type]
-args.root_exp_dir = os.path.join(MODELS_DIR,model_type)
 if args.pileup:
     args.filename = 'antikt-kt-pileup25-new'
 def train(args):
+    _, Transform, model_type = TRANSFORMS[args.model_type]
+    args.root_exp_dir = os.path.join(MODELS_DIR,model_type)
 
     eh = ExperimentHandler(args)
 
