@@ -32,6 +32,8 @@ def evaluate_models(X, y, w, model_filenames, batch_size=64):
         if 'DS_Store' not in filename:
             logging.info("\t\tLoading %s" % filename),
             model = load_model(filename)
+            if torch.cuda.is_available():
+                model.cuda()
             #logging.info("FILE LOADED! {}".format(filename))
             work = True
             if work:
