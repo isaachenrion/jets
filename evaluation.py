@@ -157,7 +157,7 @@ def main():
 
                     logging.info("\t\t\tROC AUC = {:.4f}, 1/FPR = {:.4f}".format(roc, inv_fpr))
 
-        logging.info("\t\tMean ROC AUC = {:.4f} Mean 1/FPR = {:.4f}".format(np.mean(rocs), np.mean(inv_fprs))
+        logging.info("\t\tMean ROC AUC = {:.4f} Mean 1/FPR = {:.4f}".format(np.mean(rocs), np.mean(inv_fprs)))
 
         return rocs, fprs, tprs, inv_fprs
 
