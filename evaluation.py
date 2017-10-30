@@ -90,12 +90,25 @@ def main():
 
             logging.info('Building ROCs for models trained on {}'.format(data_path))
             tf = load_tf(DATA_DIR, "{}-train.pickle".format(data_path))
-            if args.set == 'test':
-                data = load_test(tf, DATA_DIR, "{}-test.pickle".format(data_path), args.n_test)
-            elif args.set == 'valid':
-                data = load_test(tf, DATA_DIR, "{}-valid.pickle".format(data_path), args.n_test)
-            elif args.set == 'train':
-                data = load_test(tf, DATA_DIR, "{}-train.pickle".format(data_path), args.n_test)
+            X, y = load_data(args.data_dir, "{}-{}.pickle".format(args.filename, args.set))
+            for ij, jet in enumerate(X):
+                jet["content"] = tf.transform(jet["content"])
+
+            if args.n_test > 0:
+                indices = torch.randperm(len(X)).numpy()[:args.n_test]
+                X = [X[i] for i in indices]
+                y = y[indices]
+
+            X_test, y_test, cropped_indices, w_test = crop(X, y, return_cropped_indices=True)
+
+            data = (X_test, y_test, w_test)
+
+            #if args.set == 'test':
+            #    data = load_test(tf, DATA_DIR, "{}-test.pickle".format(data_path), args.n_test)
+            #elif args.set == 'valid':
+            #    data = load_test(tf, DATA_DIR, "{}-valid.pickle".format(data_path), args.n_test)
+            #elif args.set == 'train':
+            #    data = load_test(tf, DATA_DIR, "{}-train.pickle".format(data_path), args.n_test)
 
             for model_path in model_paths:
                 logging.info('\tBuilding ROCs for instances of {}'.format(model_path))
