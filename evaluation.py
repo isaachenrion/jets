@@ -41,6 +41,7 @@ parser.add_argument("-m", "--root_model_dir", type=str, default=None)
 parser.add_argument("-p", "--plot", action="store_true")
 parser.add_argument("-o", "--remove_outliers", action="store_true")
 parser.add_argument("-l", "--load_rocs", type=str, default=None)
+parser.add_argument("--latex", type=str, default=None)
 
 # logging args
 parser.add_argument("-v", "--verbose", action='store_true', default=False)

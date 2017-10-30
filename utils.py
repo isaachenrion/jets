@@ -255,6 +255,7 @@ class ExperimentHandler:
 class EvaluationExperimentHandler(ExperimentHandler):
     def __init__(self, args):
         super().__init__(args)
+        self.latex = args.latex
 
     def setup_stats_logger(self, args):
         ''' STATS LOGGER '''
