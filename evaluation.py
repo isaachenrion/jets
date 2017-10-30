@@ -146,8 +146,8 @@ def main():
                     #rocs.append(roc_auc_score(y, yy_pred, sample_weight=w))
                     #fpr, tpr, _ = roc_curve(y, yy_pred, sample_weight=w)
                     roc = eh.monitors['roc_auc'].value
-                    fpr = eh.monitors['roc_curve'].fpr
-                    tpr = eh.monitors['roc_curve'].tpr
+                    fpr = eh.monitors['roc_curve'].value[0]
+                    tpr = eh.monitors['roc_curve'].value[1]
                     inv_fpr = eh.monitors['inv_fpr'].value
                     rocs.append(roc)
                     fprs.append(fpr)

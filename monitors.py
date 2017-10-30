@@ -40,6 +40,7 @@ class ROCCurve(Monitor):
 
     def call(self, yy=None, yy_pred=None, w_valid=None, **kwargs):
         self.fpr, self.tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
+        return (self.fpr, self.tpr)
 
 class InvFPR(Monitor):
     def __init__(self):
