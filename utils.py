@@ -159,7 +159,7 @@ class ExperimentHandler:
         '''----------------------------------------------------------------------- '''
         #
         dt = datetime.datetime.now()
-        filename_exp = '{}-{}/{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.extra_tag)
+        filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.extra_tag)
         if args.debug:
             filename_exp += '-DEBUG'
         self.exp_dir = os.path.join(args.root_exp_dir, filename_exp)

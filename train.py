@@ -82,7 +82,7 @@ parser.add_argument("-g", "--gpu", type=str, default="")
 
 # MPNN
 parser.add_argument("--not_leaves", action='store_true')
-parser.add_argument("-i", "--iters", type=int, default=1)
+parser.add_argument("-i", "--iters", type=str, default=0)
 
 # email
 parser.add_argument("--sender", type=str, default="results74207281@gmail.com")
@@ -112,7 +112,7 @@ if args.pileup:
     args.filename = 'antikt-kt-pileup25-new'
 def train(args):
     _, Transform, model_type = TRANSFORMS[args.model_type]
-    args.root_exp_dir = os.path.join(MODELS_DIR,model_type)
+    args.root_exp_dir = os.path.join(MODELS_DIR,model_type, args.iters)
 
     eh = ExperimentHandler(args)
 
