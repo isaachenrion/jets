@@ -20,7 +20,7 @@ from loading import crop
 from analysis.reports import report_score
 from analysis.reports import remove_outliers
 
-from analysis.rocs import build_rocs
+#from analysis.rocs import build_rocs
 
 from analysis.plotting import plot_rocs
 from analysis.plotting import plot_show
