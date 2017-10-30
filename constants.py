@@ -17,7 +17,7 @@ TRANSFORMS = [
     (0, RelNNTransformConnected, 'relation'),
     (1, GRNNTransformSimple,'recnn/simple'),
     (2, GRNNTransformGated,'recnn/gated'),
-    (3, MPNNTransformAdaptive,'mpnn/adaptive'),
+    (3, MPNNTransformAdaptive,'mpnn/vanilla'),
     (4, MPNNTransformFullyConnected,'mpnn/fc'),
     (5, MPNNTransformIdentity,'mpnn/id'),
     (6, MPNNTransformClusterTree,'mpnn/tree'),
