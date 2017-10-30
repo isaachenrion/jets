@@ -56,7 +56,7 @@ def evaluate_models(X, y, w, model_filenames, batch_size=64):
                 y_pred = np.squeeze(np.concatenate(y_pred, 0), 1)
 
                 # Roc
-                import ipdb; ipdb.set_trace()
+                #import ipdb; ipdb.set_trace()
                 rocs.append(roc_auc_score(y, y_pred, sample_weight=w))
                 fpr, tpr, _ = roc_curve(y, y_pred, sample_weight=w)
 
