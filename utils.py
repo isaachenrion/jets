@@ -289,8 +289,9 @@ class EvaluationExperimentHandler(ExperimentHandler):
     def log(self, **kwargs):
         stats_dict = {}
         for name, monitor in self.monitors.items():
+            monitor_value = monitor(**kwargs)
             if monitor.scalar:
-                stats_dict[name] = monitor(**kwargs)
+                stats_dict[name] = monitor_value
         self.stats_logger.log(stats_dict)
 
         if not self.latex:

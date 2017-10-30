@@ -15,6 +15,7 @@ def inv_fpr_at_tpr_equals_half(tpr, fpr):
 
 class Monitor:
     def __init__(self, name):
+        self.value = None
         self.name = name
         self.scalar = True
 
