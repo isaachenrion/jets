@@ -3,14 +3,20 @@ import numpy as np
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 
-from analysis.rocs import inv_fpr_at_tpr_equals_half
 
 import torch
 import pickle
 
+
+def inv_fpr_at_tpr_equals_half(tpr, fpr):
+    base_tpr = np.linspace(0.05, 1, 476)
+    inv_fpr = interp(base_tpr, tpr, 1. / fpr)
+    return np.mean(inv_fpr[225])
+
 class Monitor:
     def __init__(self, name):
         self.name = name
+        self.scalar = True
 
     def __call__(self, **kwargs):
         self.value = self.call(**kwargs)
@@ -25,6 +31,15 @@ class ROCAUC(Monitor):
 
     def call(self, yy=None, yy_pred=None, w_valid=None, **kwargs):
         return roc_auc_score(yy, yy_pred, sample_weight=w_valid)
+
+class ROCCurve(Monitor):
+    def __init__(self):
+        super().__init__('roc_curve')
+        self.scalar = False
+        self.fpr, self.tpr = None, None
+
+    def call(self, yy=None, yy_pred=None, w_valid=None, **kwargs):
+        self.fpr, self.tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
 
 class InvFPR(Monitor):
     def __init__(self):

@@ -142,12 +142,15 @@ def main():
                     )
                     eh.log(**logdict)
 
-                    rocs.append(roc_auc_score(y, yy_pred, sample_weight=w))
-                    fpr, tpr, _ = roc_curve(y, yy_pred, sample_weight=w)
-
+                    #rocs.append(roc_auc_score(y, yy_pred, sample_weight=w))
+                    #fpr, tpr, _ = roc_curve(y, yy_pred, sample_weight=w)
+                    roc = eh.monitors['roc_auc'].value
+                    fpr = eh.monitors['roc_curve'].fpr
+                    tpr = eh.monitors['roc_curve'].tpr
+                    rocs.append(roc)
                     fprs.append(fpr)
                     tprs.append(tpr)
-                    inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
+                    #inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
 
                     logging.info("\t\t\tROC AUC = {:.4f}, 1/FPR = {:.4f}".format(rocs[-1], inv_fpr))
 

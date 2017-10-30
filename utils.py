@@ -262,6 +262,7 @@ class EvaluationExperimentHandler(ExperimentHandler):
         '''----------------------------------------------------------------------- '''
         roc_auc = ROCAUC()
         inv_fpr = InvFPR()
+        roc_curve = ROCCurve()
         #best_inv_fpr = Best(inv_fpr)
         model_counter = Regurgitate('model')
         #batch_counter = Regurgitate('iteration')
@@ -275,13 +276,14 @@ class EvaluationExperimentHandler(ExperimentHandler):
             #batch_counter,
             roc_auc,
             inv_fpr,
+            roc_curve,
             #best_inv_fpr,
             #valid_loss,
             #train_loss,
             #self.saver,
         ]
         self.statsfile = os.path.join(self.exp_dir, 'stats')
-        self.stats_logger = StatsLogger(self.statsfile, headers=[m.name for m in self.monitors])
+        self.stats_logger = StatsLogger(self.statsfile, headers=[m.name for m in self.monitors if m.scalar])
         self.monitors = {m.name: m for m in self.monitors}
 
     def log(self, **kwargs):
