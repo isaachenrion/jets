@@ -257,6 +257,17 @@ class EvaluationExperimentHandler(ExperimentHandler):
         super().__init__(args)
         self.latex = args.latex
 
+    def model_directory(self, args):
+        ''' CREATE MODEL DIRECTORY '''
+        '''----------------------------------------------------------------------- '''
+        #
+        #dt = datetime.datetime.now()
+        filename_exp = '{}'.format(args.root_model_dir)
+        if args.debug:
+            filename_exp += '-DEBUG'
+        self.exp_dir = os.path.join(args.root_exp_dir, filename_exp)
+        os.makedirs(self.exp_dir)
+
     def setup_stats_logger(self, args):
         ''' STATS LOGGER '''
         '''----------------------------------------------------------------------- '''
