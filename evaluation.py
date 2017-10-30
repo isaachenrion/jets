@@ -16,6 +16,7 @@ from loading import load_tf
 #from loading import load_test
 from loading import load_data
 from loading import crop
+from loading import load_model
 
 from analysis.reports import report_score
 from analysis.reports import remove_outliers
