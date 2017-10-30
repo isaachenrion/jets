@@ -54,7 +54,7 @@ parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_train", type=int, default=-1)
 parser.add_argument("--n_valid", type=int, default=27000)
 parser.add_argument("--dont_add_cropped", action='store_true', default=False)
-#parser.add_argument("--pileup", action='store_true', default=False)
+parser.add_argument("-p", "--pileup", action='store_true', default=False)
 
 # general model args
 parser.add_argument("-m", "--model_type", help="index of the model you want to train - look in the code for the model list", type=int, default=0)
@@ -109,7 +109,8 @@ if args.n_train <= 5 * args.n_valid and args.n_train > 0:
 args.recipient = RECIPIENT
 args.leaves = not args.not_leaves
 args.root_exp_dir = os.path.join(MODELS_DIR,model_type)
-args.pileup = True if 'pileup' in args.filename else False 
+if args.pileup:
+    args.filename = 'antikt-kt-pileup25-new'
 def train(args):
 
     _, Transform, model_type = TRANSFORMS[args.model_type]
