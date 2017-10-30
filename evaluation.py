@@ -132,7 +132,7 @@ def main():
                         #iteration=iteration,
                         yy=yy,
                         yy_pred=yy_pred,
-                        w_valid=w_valid[:len(yy_pred)],
+                        w_valid=w[:len(yy_pred)],
                         #w_valid=w_valid,
                         #train_loss=train_loss,
                         #valid_loss=valid_loss,
