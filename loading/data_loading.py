@@ -69,7 +69,7 @@ def crop(X, y, return_cropped_indices=False, pileup=False):
     w = np.zeros(len(y_))
 
     X0 = [X_[i] for i in range(len(y_)) if y_[i] == 0]
-    pdf, edges = np.histogram([j["pt"] for j in X0], density=True, range=[250, 300], bins=50)
+    pdf, edges = np.histogram([j["pt"] for j in X0], density=True, range=[pt_min, pt_max], bins=50)
     pts = [j["pt"] for j in X0]
     indices = np.searchsorted(edges, pts) - 1
     inv_w = 1. / pdf[indices]
@@ -77,7 +77,7 @@ def crop(X, y, return_cropped_indices=False, pileup=False):
     w[y_==0] = inv_w
 
     X1 = [X_[i] for i in range(len(y_)) if y_[i] == 1]
-    pdf, edges = np.histogram([j["pt"] for j in X1], density=True, range=[250, 300], bins=50)
+    pdf, edges = np.histogram([j["pt"] for j in X1], density=True, range=[pt_min, pt_max], bins=50)
     pts = [j["pt"] for j in X1]
     indices = np.searchsorted(edges, pts) - 1
     inv_w = 1. / pdf[indices]
