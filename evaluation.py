@@ -11,7 +11,7 @@ import torch
 import smtplib
 from email.mime.text import MIMEText
 
-from utils import ExperimentHandler
+from utils import EvaluationExperimentHandler
 from loading import load_tf
 #from loading import load_test
 from loading import load_data
@@ -63,7 +63,7 @@ parser.add_argument("--debug", help="sets everything small for fast model debugg
 
 
 args = parser.parse_args()
- 
+
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 args.silent = not args.verbose
 if args.debug:
@@ -72,9 +72,12 @@ if args.debug:
     args.verbose = True
 args.root_exp_dir = REPORTS_DIR
 args.pileup = True if 'pileup' in args.filename else False
+
+
+
 def main():
 
-    eh = ExperimentHandler(args)
+    eh = EvaluationExperimentHandler(args)
 
     ''' GET RELATIVE PATHS TO DATA AND MODELS '''
     '''----------------------------------------------------------------------- '''
@@ -89,6 +92,74 @@ def main():
     logging.info("DATA PATHS\n{}".format("\n".join(data_paths)))
     logging.info("MODEL PATHS\n{}".format("\n".join(model_paths)))
 
+
+    def evaluate_models(X, yy, w, model_filenames, batch_size=64):
+        rocs = []
+        fprs = []
+        tprs = []
+
+        for filename in model_filenames:
+            if 'DS_Store' not in filename:
+                logging.info("\t\tLoading %s" % filename),
+                model = load_model(filename)
+                if torch.cuda.is_available():
+                    model.cuda()
+                work = True
+                if work:
+                    model.eval()
+
+                    offset = 0
+                    yy_pred = []
+                    n_batches, remainder = np.divmod(len(X), batch_size)
+                    for i in range(n_batches):
+                        X_batch = X[offset:offset+batch_size]
+                        X_var = wrap_X(X_batch)
+                        yy_pred.append(unwrap(model(X_var)))
+                        unwrap_X(X_var)
+                        offset+=batch_size
+                    if remainder > 0:
+                        X_batch = X[-remainder:]
+                        X_var = wrap_X(X_batch)
+                        yy_pred.append(unwrap(model(X_var)))
+                        unwrap_X(X_var)
+                    yy_pred = np.squeeze(np.concatenate(yy_pred, 0), 1)
+
+                    # Roc
+                    #import ipdb; ipdb.set_trace()
+                    logdict = dict(
+                        model=filename.split('/')[-1],
+                        #iteration=iteration,
+                        yy=yy,
+                        yy_pred=yy_pred,
+                        w_valid=w_valid[:len(yy_pred)],
+                        #w_valid=w_valid,
+                        #train_loss=train_loss,
+                        #valid_loss=valid_loss,
+                        #settings=settings,
+                        #model=model
+                    )
+                    eh.log(**logdict)
+
+                    rocs.append(roc_auc_score(y, yy_pred, sample_weight=w))
+                    fpr, tpr, _ = roc_curve(y, yy_pred, sample_weight=w)
+
+                    fprs.append(fpr)
+                    tprs.append(tpr)
+                    inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
+
+                    logging.info("\t\t\tROC AUC = {:.4f}, 1/FPR = {:.4f}".format(rocs[-1], inv_fpr))
+
+        logging.info("\t\tMean ROC AUC = %.4f" % np.mean(rocs))
+
+        return rocs, fprs, tprs
+
+
+    def build_rocs(data, model_path, batch_size):
+        X, y, w = data
+        model_filenames = [os.path.join(model_path, fn) for fn in os.listdir(model_path)]
+        rocs, fprs, tprs = evaluate_models(X, y, w, model_filenames, batch_size)
+
+        return rocs, fprs, tprs
 
     ''' BUILD ROCS '''
     '''----------------------------------------------------------------------- '''

@@ -17,7 +17,6 @@ epochs=50
 iters=1
 for VARIABLE in 0 1 2 3
 do
-        let 'seed = VARIABLE + base_seed'
         python train.py -p -s -m 3 -i 1 -g 0 & disown %1
         sleep 20
 
