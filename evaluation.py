@@ -20,7 +20,7 @@ from loading import load_model
 
 from analysis.reports import report_score
 from analysis.reports import remove_outliers
-
+from architectures.preprocessing import wrap, unwrap, wrap_X, unwrap_X
 #from analysis.rocs import build_rocs
 
 from analysis.plotting import plot_rocs
