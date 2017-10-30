@@ -14,14 +14,14 @@ MODELS_DIR = 'models'
 FINISHED_MODELS_DIR = 'finished_models'
 DATA_DIR = 'data/w-vs-qcd/pickles'
 TRANSFORMS = [
-    (0, RelNNTransformConnected, 'RelationNet'),
-    (1, GRNNTransformSimple,'RecNN/simple'),
-    (2, GRNNTransformGated,'RecNN/gated'),
-    (3, MPNNTransformAdaptive,'MPNN/adaptive'),
-    (4, MPNNTransformFullyConnected,'MPNN/fc'),
-    (5, MPNNTransformIdentity,'MPNN/id'),
-    (6, MPNNTransformClusterTree,'MPNN/tree'),
-    (7, MPNNTransformSet2Set, 'MPNN/set')
+    (0, RelNNTransformConnected, 'relation'),
+    (1, GRNNTransformSimple,'recnn/simple'),
+    (2, GRNNTransformGated,'recnn/gated'),
+    (3, MPNNTransformAdaptive,'mpnn/adaptive'),
+    (4, MPNNTransformFullyConnected,'mpnn/fc'),
+    (5, MPNNTransformIdentity,'mpnn/id'),
+    (6, MPNNTransformClusterTree,'mpnn/tree'),
+    (7, MPNNTransformSet2Set, 'mpnn/set')
 ]
 RECIPIENT = "henrion@nyu.edu"
 REPORTS_DIR = "reports"
