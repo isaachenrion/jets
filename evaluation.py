@@ -49,7 +49,7 @@ parser.add_argument("-b", "--batch_size", type=int, default=64)
 
 # computing args
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=1)
-parser.add_argument("-g", "--gpu", type=int, default=-1)
+parser.add_argument("-g", "--gpu", type=str, default='')
 
 parser.add_argument('--extra_tag', default=0)
 
@@ -64,7 +64,7 @@ parser.add_argument("--debug", help="sets everything small for fast model debugg
 
 args = parser.parse_args()
 
-os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
+os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 args.silent = not args.verbose
 if args.debug:
     args.n_text = 1000
