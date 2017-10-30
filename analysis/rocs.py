@@ -64,7 +64,7 @@ def evaluate_models(X, y, w, model_filenames, batch_size=64):
                 tprs.append(tpr)
                 inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
 
-                logging.info("\t\t\tROC AUC = {:.4f}, 1/FPR = {:.4f}".format(rocs[-1]), inv_fpr)
+                logging.info("\t\t\tROC AUC = {:.4f}, 1/FPR = {:.4f}".format(rocs[-1], inv_fpr))
 
     logging.info("\t\tMean ROC AUC = %.4f" % np.mean(rocs))
 
