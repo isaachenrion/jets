@@ -99,6 +99,7 @@ def main():
         rocs = []
         fprs = []
         tprs = []
+        inv_fprs = []
 
         for filename in model_filenames:
             if 'DS_Store' not in filename:
@@ -151,21 +152,22 @@ def main():
                     rocs.append(roc)
                     fprs.append(fpr)
                     tprs.append(tpr)
+                    inv_fprs.append(inv_fpr)
                     #inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
 
-                    logging.info("\t\t\tROC AUC = {:.4f}, 1/FPR = {:.4f}".format(rocs[-1], inv_fpr))
+                    logging.info("\t\t\tROC AUC = {:.4f}, 1/FPR = {:.4f}".format(roc, inv_fpr))
 
-        logging.info("\t\tMean ROC AUC = %.4f" % np.mean(rocs))
+        logging.info("\t\tMean ROC AUC = {:.4f} Mean 1/FPR = {:.4f}".format(np.mean(rocs), np.mean(inv_fprs))
 
-        return rocs, fprs, tprs
+        return rocs, fprs, tprs, inv_fprs
 
 
     def build_rocs(data, model_path, batch_size):
         X, y, w = data
         model_filenames = [os.path.join(model_path, fn) for fn in os.listdir(model_path)]
-        rocs, fprs, tprs = evaluate_models(X, y, w, model_filenames, batch_size)
+        rocs, fprs, tprs, inv_fprs = evaluate_models(X, y, w, model_filenames, batch_size)
 
-        return rocs, fprs, tprs
+        return rocs, fprs, tprs, inv_fprs
 
     ''' BUILD ROCS '''
     '''----------------------------------------------------------------------- '''
@@ -188,22 +190,22 @@ def main():
             data = (X_test, y_test, w_test)
             for model_path in model_paths:
                 logging.info('\tBuilding ROCs for instances of {}'.format(model_path))
-                r, f, t = build_rocs(data, os.path.join(FINISHED_MODELS_DIR, model_path), args.batch_size)
+                r, f, t, inv_fprs = build_rocs(data, os.path.join(FINISHED_MODELS_DIR, model_path), args.batch_size)
 
                 absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
                 with open(absolute_roc_path, "wb") as fd:
-                    pickle.dump((r, f, t), fd)
+                    pickle.dump((r, f, t, inv_fprs), fd)
     else:
         for data_path in data_paths:
             for model_path in model_paths:
 
                 previous_absolute_roc_path = os.path.join(REPORTS_DIR, args.load_rocs, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
                 with open(previous_absolute_roc_path, "rb") as fd:
-                    r, f, t = pickle.load(fd)
+                    r, f, t, inv_fprs = pickle.load(fd)
 
                 absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
                 with open(absolute_roc_path, "wb") as fd:
-                    pickle.dump((r, f, t), fd)
+                    pickle.dump((r, f, t, inv_fprs), fd)
 
     ''' PLOT ROCS '''
     '''----------------------------------------------------------------------- '''
@@ -215,12 +217,12 @@ def main():
         for model_path, label, color in zip(model_paths, labels, colors):
             absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
             with open(absolute_roc_path, "rb") as fd:
-                r, f, t = pickle.load(fd)
+                r, f, t, inv_fprs = pickle.load(fd)
 
             if args.remove_outliers:
-                r, f, t = remove_outliers(r, f, t)
+                r, f, t, inv_fprs = remove_outliers(r, f, t, inv_fprs)
 
-            report_score(r, f, t, label=label)
+            report_score(r, inv_fprs, label=label)
             plot_rocs(r, f, t, label=label, color=color)
 
     figure_filename = os.path.join(eh.exp_dir, 'rocs.png')
