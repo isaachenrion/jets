@@ -55,7 +55,8 @@ def convert_state_dict_pt_file(path_to_state_dict):
 
 
 def main():
-    base = 'finished_models'
+    base='pileup_finished_models'
+    #base = 'finished_models'
     #base = 'reports'
 
     #models = ['mpnn', 'recnn', 'relation']
