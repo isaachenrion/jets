@@ -17,6 +17,7 @@ import numpy as np
 import torch
 import resource
 import time
+import socket
 
 from monitors import *
 from loggers import StatsLogger
@@ -169,6 +170,7 @@ class ExperimentHandler:
         ''' SET UP LOGGING '''
         '''----------------------------------------------------------------------- '''
         self.logfile = get_logfile(self.exp_dir, args.silent, args.verbose)
+        logging.info(socket.gethostname())
         logging.info(self.logfile)
         logging.info(self.exp_dir)
 
