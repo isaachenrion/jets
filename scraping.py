@@ -26,12 +26,16 @@ def remove_outliers_csv(csv_filename):
     inv_fprs = [float(l['inv_fpr']) for l in lines[1:]]
     scores = np.array(inv_fprs)
     scores = sorted(scores)
+    print("Original scores")
+    for s in scores: print('{:.2f}'.format(s))
     clipped_scores = scores[5:-5]
     robust_mean = np.mean(clipped_scores)
     robust_std = np.std(clipped_scores)
     indices = [i for i in range(len(scores)) if robust_mean - 3*robust_std <= scores[i] <= robust_mean + 3*robust_std]
     new_inv_fprs = [scores[i] for i in indices]
     #print(new_inv_fprs)
+    print("Filtered scores")
+    for s in new_inv_fprs: print('{:.2f}'.format(s))
     new_inv_fprs = np.array(new_inv_fprs)
     print("ROBUST MEAN = {}".format(np.mean(new_inv_fprs)))
     print("ROBUST STDDEV = {}".format(np.std(new_inv_fprs)))
