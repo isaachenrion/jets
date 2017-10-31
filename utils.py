@@ -170,7 +170,8 @@ class ExperimentHandler:
         ''' SET UP LOGGING '''
         '''----------------------------------------------------------------------- '''
         self.logfile = get_logfile(self.exp_dir, args.silent, args.verbose)
-        logging.info(socket.gethostname())
+        self.host = socket.gethostname()
+        logging.info("running on {}".format(self.host))
         logging.info(self.logfile)
         logging.info(self.exp_dir)
 
@@ -183,7 +184,7 @@ class ExperimentHandler:
                                 logfile=self.logfile,
                                 exp_dir=self.exp_dir,
                                 need_input=True,
-                                subject_string='{}(Logfile = {}, PID = {}, GPU = {})'.format("[DEBUGGING] " if args.debug else "", self.logfile, self.pid, args.gpu),
+                                subject_string='{}(Machine = {}, Logfile = {}, PID = {}, GPU = {})'.format(self.host, "[DEBUGGING] " if args.debug else "", self.logfile, self.pid, args.gpu),
                                 model=None
                             )
     def setup_stats_logger(self, args):
