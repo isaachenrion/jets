@@ -21,7 +21,7 @@ def load_model(filename):
                 'bn': False
                 }
 
-        with open(os.path.join(filename, 'model_state_dict.pt'), 'rb') as f:
+        with open(os.path.join(filename, 'cpu_model_state_dict.pt'), 'rb') as f:
             state_dict = torch.load(f)
             model = Predict(Transform, **model_kwargs)
             try:
