@@ -28,6 +28,24 @@ class MPAdaptive(nn.Module):
         else:
             return h
 
+class MPAdaptiveSymmetric(nn.Module):
+    def __init__(self, features=None, hidden=None):
+        super().__init__()
+        self.activation = F.tanh
+        self.vertex_update = GRUUpdate(hidden, hidden, features + 1)
+        self.message = DTNNMessage(hidden, hidden, 0)
+        self.adjacency_matrix = AdaptiveAdjacencyMatrix(hidden)
+
+    def forward(self, h, jets, mask, return_extras=False,):
+        A = self.adjacency_matrix(h, mask)
+        A = 0.5 * (A + torch.transpose(A, 1, 2))
+        message = self.activation(torch.matmul(A, self.message(h)))
+        h = self.vertex_update(h, message, jets)
+        if return_extras:
+            return h, A
+        else:
+            return h
+
 class MPIdentity(nn.Module):
     def __init__(self, features=None, hidden=None):
         super().__init__()
@@ -79,6 +97,25 @@ class MPSet2Set(nn.Module):
         else:
             return h
 
+class MPSet2SetSymmetric(nn.Module):
+    def __init__(self, features=None, hidden=None):
+        super().__init__()
+        self.activation = F.tanh
+        self.vertex_update = GRUUpdate(2 * hidden, hidden, features + 1)
+        self.message = DTNNMessage(hidden, hidden, 0)
+        self.adjacency_matrix = AdaptiveAdjacencyMatrix(hidden)
+
+    def forward(self, h, jets, mask, return_extras=False,):
+        A = self.adjacency_matrix(h, mask)
+        A = 0.5 * (A + torch.transpose(A, 1, 2))
+        message = self.activation(torch.matmul(A, self.message(h)))
+        h_mean = h.mean(1, keepdim=True).expand_as(h)
+        h = self.vertex_update(h, torch.cat((message, h_mean), 2), jets)
+        if return_extras:
+            return h, A
+        else:
+            return h
+
 class MPNNTransform(nn.Module):
     def __init__(self, features=None, hidden=None, iters=None, leaves=False, message_passing_layer=None):
         super().__init__()
@@ -112,6 +149,10 @@ class MPNNTransformAdaptive(MPNNTransform):
     def __init__(self, **kwargs):
         super().__init__(message_passing_layer=MPAdaptive, **kwargs)
 
+class MPNNTransformAdaptiveSymmetric(MPNNTransform):
+    def __init__(self, **kwargs):
+        super().__init__(message_passing_layer=MPAdaptiveSymmetric, **kwargs)
+
 class MPNNTransformIdentity(MPNNTransform):
     def __init__(self, **kwargs):
         super().__init__(message_passing_layer=MPIdentity, **kwargs)
@@ -123,6 +164,10 @@ class MPNNTransformFullyConnected(MPNNTransform):
 class MPNNTransformSet2Set(MPNNTransform):
     def __init__(self, **kwargs):
         super().__init__(message_passing_layer=MPSet2Set, **kwargs)
+
+class MPNNTransformSet2SetSymmetric(MPNNTransform):
+    def __init__(self, **kwargs):
+        super().__init__(message_passing_layer=MPSet2SetSymmetric, **kwargs)
 
 class MPNNTransformClusterTree(MPNNTransform):
     def __init__(self, **kwargs):
