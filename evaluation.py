@@ -204,7 +204,7 @@ def main():
             absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
             with open(absolute_roc_path, "rb") as fd:
                 r, f, t, inv_fprs = pickle.load(fd)
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             if args.remove_outliers:
                 r, f, t, inv_fprs = remove_outliers(r, f, t, inv_fprs)
