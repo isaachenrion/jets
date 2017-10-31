@@ -10,7 +10,7 @@ from scipy import interp
 
 def inv_fpr_at_tpr_equals_half(tpr, fpr):
     base_tpr = np.linspace(0.05, 1, 476)
-    fpr = fpr + 1e-20q
+    fpr = fpr + 1e-20
     inv_fpr = interp(base_tpr, tpr, 1. / fpr)
     return np.mean(inv_fpr[225])
 
