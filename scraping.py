@@ -58,9 +58,8 @@ def main():
     base='pileup_finished_models'
     #base = 'finished_models'
     #base = 'reports'
-
     #models = ['mpnn', 'recnn', 'relation']
-    flavours = ['vanilla', 'set', 'id']
+    flavours = ['vanilla', 'set', 'id', 'sym-set', 'sym-vanilla']
     iters = [1, 2, 3]
     model_dirs = [os.path.join(base, 'mpnn', flavour, str(i)) for flavour in flavours for i in iters]
     model_dirs.extend([os.path.join(base, 'recnn/simple'), os.path.join(base, 'relation')])
