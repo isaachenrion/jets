@@ -1,0 +1,29 @@
+2017-10-12 18:39:58,035 	batch_size = 64
+2017-10-12 18:39:58,035 	data_list_filename = evaldatasets.txt
+2017-10-12 18:39:58,035 	gpu = 0
+2017-10-12 18:39:58,035 	load_rocs = None
+2017-10-12 18:39:58,035 	model_list_filename = evalmodels.txt
+2017-10-12 18:39:58,035 	n_test = 200
+2017-10-12 18:39:58,035 	password = deeplearning
+2017-10-12 18:39:58,036 	plot = False
+2017-10-12 18:39:58,036 	remove_outliers = False
+2017-10-12 18:39:58,036 	silent = False
+2017-10-12 18:39:58,036 	username = results74207281
+2017-10-12 18:39:58,036 	verbose = True
+2017-10-12 18:39:58,036 	PID = 11835
+2017-10-12 18:39:58,245 DATA PATHS
+antikt-kt
+2017-10-12 18:39:58,245 MODEL PATHS
+RecNN-simple/Oct-11
+2017-10-12 18:39:58,246 Building ROCs for models trained on antikt-kt
+2017-10-12 18:39:58,246 TF already computed. Loading it.
+2017-10-12 18:39:58,406 Data loaded and already preprocessed
+2017-10-12 18:39:58,778 Loaded data: antikt-kt-valid.pickle
+2017-10-12 18:39:58,779 	X size = 5000
+2017-10-12 18:39:58,779 	y size = 5000
+2017-10-12 18:39:58,779 Cropping...
+2017-10-12 18:39:58,792 	After cropping: X size = 200
+2017-10-12 18:39:58,792 	After cropping: y size = 200
+2017-10-12 18:39:58,795 	Building ROCs for instances of ['RecNN-simple/Oct-11']
+2017-10-12 18:39:58,796 ['models/RecNN-simple/Oct-11/12-54-06', 'models/RecNN-simple/Oct-11/12-54-15', 'models/RecNN-simple/Oct-11/12-54-25', 'models/RecNN-simple/Oct-11/12-54-35', 'models/RecNN-simple/Oct-11/12-54-45', 'models/RecNN-simple/Oct-11/12-54-55', 'models/RecNN-simple/Oct-11/12-55-06', 'models/RecNN-simple/Oct-11/12-55-16', 'models/RecNN-simple/Oct-11/12-55-27', 'models/RecNN-simple/Oct-11/12-55-36']
+2017-10-12 18:39:58,796 		Loading models/RecNN-simple/Oct-11/12-54-06

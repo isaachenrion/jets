@@ -1,0 +1,60 @@
+2017-10-12 18:33:52,273 	batch_size = 64
+2017-10-12 18:33:52,273 	data_list_filename = evaldatasets.txt
+2017-10-12 18:33:52,273 	gpu = 0
+2017-10-12 18:33:52,273 	load_rocs = None
+2017-10-12 18:33:52,273 	model_list_filename = evalmodels.txt
+2017-10-12 18:33:52,273 	n_test = 200
+2017-10-12 18:33:52,274 	password = deeplearning
+2017-10-12 18:33:52,274 	plot = False
+2017-10-12 18:33:52,274 	remove_outliers = False
+2017-10-12 18:33:52,274 	silent = False
+2017-10-12 18:33:52,274 	username = results74207281
+2017-10-12 18:33:52,274 	verbose = True
+2017-10-12 18:33:52,274 	PID = 11386
+2017-10-12 18:33:52,507 DATA PATHS
+antikt-kt
+2017-10-12 18:33:52,507 MODEL PATHS
+RecNN-simple/Oct-11
+2017-10-12 18:33:52,508 Building ROCs for models trained on antikt-kt
+2017-10-12 18:33:52,508 TF already computed. Loading it.
+2017-10-12 18:33:52,665 Data loaded and already preprocessed
+2017-10-12 18:33:52,979 Loaded data: antikt-kt-valid.pickle
+2017-10-12 18:33:52,979 	X size = 5000
+2017-10-12 18:33:52,979 	y size = 5000
+2017-10-12 18:33:52,979 Cropping...
+2017-10-12 18:33:52,994 	After cropping: X size = 200
+2017-10-12 18:33:52,994 	After cropping: y size = 200
+2017-10-12 18:33:52,997 	Building ROCs for instances of ['RecNN-simple/Oct-11']
+2017-10-12 18:33:52,998 ['models/RecNN-simple/Oct-11/12-54-06', 'models/RecNN-simple/Oct-11/12-54-15', 'models/RecNN-simple/Oct-11/12-54-25', 'models/RecNN-simple/Oct-11/12-54-35', 'models/RecNN-simple/Oct-11/12-54-45', 'models/RecNN-simple/Oct-11/12-54-55', 'models/RecNN-simple/Oct-11/12-55-06', 'models/RecNN-simple/Oct-11/12-55-16', 'models/RecNN-simple/Oct-11/12-55-27', 'models/RecNN-simple/Oct-11/12-55-36']
+2017-10-12 18:33:52,998 		Loading models/RecNN-simple/Oct-11/12-54-06
+2017-10-12 18:33:57,352 OLD FORMAT MODEL: REWRITING TO NEW FORMAT
+2017-10-12 18:33:59,048 			ROC AUC = 0.3981
+2017-10-12 18:33:59,048 		Loading models/RecNN-simple/Oct-11/12-54-15
+2017-10-12 18:33:59,142 OLD FORMAT MODEL: REWRITING TO NEW FORMAT
+2017-10-12 18:33:59,942 			ROC AUC = 0.5634
+2017-10-12 18:33:59,942 		Loading models/RecNN-simple/Oct-11/12-54-25
+2017-10-12 18:34:00,017 OLD FORMAT MODEL: REWRITING TO NEW FORMAT
+2017-10-12 18:34:00,733 			ROC AUC = 0.4254
+2017-10-12 18:34:00,734 		Loading models/RecNN-simple/Oct-11/12-54-35
+2017-10-12 18:34:00,869 OLD FORMAT MODEL: REWRITING TO NEW FORMAT
+2017-10-12 18:34:01,567 			ROC AUC = 0.5761
+2017-10-12 18:34:01,567 		Loading models/RecNN-simple/Oct-11/12-54-45
+2017-10-12 18:34:01,663 OLD FORMAT MODEL: REWRITING TO NEW FORMAT
+2017-10-12 18:34:02,292 			ROC AUC = 0.5129
+2017-10-12 18:34:02,292 		Loading models/RecNN-simple/Oct-11/12-54-55
+2017-10-12 18:34:02,451 OLD FORMAT MODEL: REWRITING TO NEW FORMAT
+2017-10-12 18:34:03,115 			ROC AUC = 0.6255
+2017-10-12 18:34:03,115 		Loading models/RecNN-simple/Oct-11/12-55-06
+2017-10-12 18:34:03,211 OLD FORMAT MODEL: REWRITING TO NEW FORMAT
+2017-10-12 18:34:03,985 			ROC AUC = 0.5000
+2017-10-12 18:34:03,986 		Loading models/RecNN-simple/Oct-11/12-55-16
+2017-10-12 18:34:04,059 OLD FORMAT MODEL: REWRITING TO NEW FORMAT
+2017-10-12 18:34:04,793 			ROC AUC = 0.5000
+2017-10-12 18:34:04,793 		Loading models/RecNN-simple/Oct-11/12-55-27
+2017-10-12 18:34:04,890 OLD FORMAT MODEL: REWRITING TO NEW FORMAT
+2017-10-12 18:34:05,528 			ROC AUC = 0.4900
+2017-10-12 18:34:05,528 		Loading models/RecNN-simple/Oct-11/12-55-36
+2017-10-12 18:34:05,659 OLD FORMAT MODEL: REWRITING TO NEW FORMAT
+2017-10-12 18:34:06,387 			ROC AUC = 0.6349
+2017-10-12 18:34:06,388 		Mean ROC AUC = 0.5226
+2017-10-12 18:34:06,391              RecNN-simple/Oct-11	ROC AUC = 0.5226+-0.07406	(1/FPR @ TPR=0.5) = nan+-nan

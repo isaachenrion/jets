@@ -1,0 +1,36 @@
+2017-10-11 12:27:20,183 	batch_size = 64
+2017-10-11 12:27:20,183 	data_list_filename = evaldatasets.txt
+2017-10-11 12:27:20,183 	gpu = 1
+2017-10-11 12:27:20,183 	model_list_filename = evalmodels.txt
+2017-10-11 12:27:20,183 	n_test = -1
+2017-10-11 12:27:20,184 	silent = False
+2017-10-11 12:27:20,184 	verbose = True
+2017-10-11 12:27:20,184 	PID = 662
+2017-10-11 12:27:20,185 DATA PATHS
+antikt-kt
+2017-10-11 12:27:20,185 LEAF MODEL PATHS
+RecNN-gated/Oct-10
+RecNN-simple/Oct-10
+2017-10-11 12:27:20,185 Building ROCs for models/RecNN-gated/Oct-10 trained on antikt-kt
+2017-10-11 12:27:20,186 TF already computed. Loading it.
+2017-10-11 12:27:20,187 Loading test data: antikt-kt-test.pickle
+2017-10-11 12:27:22,435 Data loaded and already preprocessed
+2017-10-11 12:27:28,342 Cropping...
+2017-10-11 12:27:28,579 	X size = 37972
+2017-10-11 12:27:28,588 	y size = 37972
+2017-10-11 12:27:28,726 ['models/RecNN-gated/Oct-10/12-53-22', 'models/RecNN-gated/Oct-10/12-53-32', 'models/RecNN-gated/Oct-10/12-53-42', 'models/RecNN-gated/Oct-10/12-53-52', 'models/RecNN-gated/Oct-10/12-54-02', 'models/RecNN-gated/Oct-10/12-54-13', 'models/RecNN-gated/Oct-10/12-54-22', 'models/RecNN-gated/Oct-10/12-54-33', 'models/RecNN-gated/Oct-10/12-54-43']
+2017-10-11 12:27:28,726 Loading models/RecNN-gated/Oct-10/12-53-22
+2017-10-11 12:27:28,727 Loading from pickle models/RecNN-gated/Oct-10/12-53-22/model.pickle
+2017-10-11 12:27:28,727 FILESIZE = 441009
+2017-10-11 12:27:38,317 Saved to .pt file: models/RecNN-gated/Oct-10/12-53-22/model.pt
+2017-10-11 12:30:11,115 ROC AUC = 0.8530
+2017-10-11 12:30:11,115 Loading models/RecNN-gated/Oct-10/12-53-32
+2017-10-11 12:30:11,116 Loading from pickle models/RecNN-gated/Oct-10/12-53-32/model.pickle
+2017-10-11 12:30:11,117 FILESIZE = 441009
+2017-10-11 12:30:17,039 Saved to .pt file: models/RecNN-gated/Oct-10/12-53-32/model.pt
+2017-10-11 12:32:46,747 ROC AUC = 0.8520
+2017-10-11 12:32:46,748 Loading models/RecNN-gated/Oct-10/12-53-42
+2017-10-11 12:35:17,779 ROC AUC = 0.8674
+2017-10-11 12:35:17,780 Loading models/RecNN-gated/Oct-10/12-53-52
+2017-10-11 12:35:17,782 Loading from pickle models/RecNN-gated/Oct-10/12-53-52/model.pickle
+2017-10-11 12:35:17,783 FILESIZE = 434176

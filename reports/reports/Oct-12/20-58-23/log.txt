@@ -1,0 +1,62 @@
+2017-10-12 20:58:23,331 	batch_size = 64
+2017-10-12 20:58:23,331 	data_list_filename = evaldatasets.txt
+2017-10-12 20:58:23,331 	gpu = 0
+2017-10-12 20:58:23,331 	load_rocs = None
+2017-10-12 20:58:23,331 	model_list_filename = evalmodels.txt
+2017-10-12 20:58:23,331 	n_test = 200
+2017-10-12 20:58:23,331 	password = deeplearning
+2017-10-12 20:58:23,332 	plot = False
+2017-10-12 20:58:23,332 	remove_outliers = False
+2017-10-12 20:58:23,332 	set = train
+2017-10-12 20:58:23,332 	silent = False
+2017-10-12 20:58:23,332 	username = results74207281
+2017-10-12 20:58:23,332 	verbose = True
+2017-10-12 20:58:23,332 	PID = 18195
+2017-10-12 20:58:23,541 DATA PATHS
+antikt-kt
+2017-10-12 20:58:23,541 MODEL PATHS
+RecNN-simple/Oct-11
+RelationNet/Oct-12
+2017-10-12 20:58:23,542 Building ROCs for models trained on antikt-kt
+2017-10-12 20:58:23,542 TF already computed. Loading it.
+2017-10-12 20:58:26,186 Data loaded and already preprocessed
+2017-10-12 20:58:33,891 Loaded data: antikt-kt-train.pickle
+2017-10-12 20:58:33,893 	X size = 100000
+2017-10-12 20:58:33,893 	y size = 100000
+2017-10-12 20:58:33,893 Cropping...
+2017-10-12 20:58:34,513 	After cropping: X size = 200
+2017-10-12 20:58:34,514 	After cropping: y size = 200
+2017-10-12 20:58:34,645 	Building ROCs for instances of RecNN-simple/Oct-11
+2017-10-12 20:58:34,647 		Loading models/RecNN-simple/Oct-11/12-54-06
+2017-10-12 20:58:40,253 			ROC AUC = 0.9276
+2017-10-12 20:58:40,254 		Loading models/RecNN-simple/Oct-11/12-54-15
+2017-10-12 20:58:41,012 			ROC AUC = 0.9226
+2017-10-12 20:58:41,012 		Loading models/RecNN-simple/Oct-11/12-54-25
+2017-10-12 20:58:41,740 			ROC AUC = 0.9327
+2017-10-12 20:58:41,740 		Loading models/RecNN-simple/Oct-11/12-54-35
+2017-10-12 20:58:42,547 			ROC AUC = 0.9302
+2017-10-12 20:58:42,547 		Loading models/RecNN-simple/Oct-11/12-54-45
+2017-10-12 20:58:43,361 			ROC AUC = 0.9178
+2017-10-12 20:58:43,361 		Loading models/RecNN-simple/Oct-11/12-54-55
+2017-10-12 20:58:44,157 			ROC AUC = 0.9224
+2017-10-12 20:58:44,157 		Loading models/RecNN-simple/Oct-11/12-55-06
+2017-10-12 20:58:44,863 			ROC AUC = 0.9192
+2017-10-12 20:58:44,863 		Loading models/RecNN-simple/Oct-11/12-55-16
+2017-10-12 20:58:45,625 			ROC AUC = 0.9268
+2017-10-12 20:58:45,626 		Loading models/RecNN-simple/Oct-11/12-55-27
+2017-10-12 20:58:46,387 			ROC AUC = 0.9173
+2017-10-12 20:58:46,387 		Loading models/RecNN-simple/Oct-11/12-55-36
+2017-10-12 20:58:47,200 			ROC AUC = 0.9247
+2017-10-12 20:58:47,200 		Mean ROC AUC = 0.9241
+2017-10-12 20:58:47,203 	Building ROCs for instances of RelationNet/Oct-12
+2017-10-12 20:58:47,203 		Loading models/RelationNet/Oct-12/14-13-52
+2017-10-12 20:58:47,797 			ROC AUC = 0.3418
+2017-10-12 20:58:47,797 		Loading models/RelationNet/Oct-12/14-14-34
+2017-10-12 20:58:49,106 			ROC AUC = 0.6473
+2017-10-12 20:58:49,106 		Loading models/RelationNet/Oct-12/14-25-32
+2017-10-12 20:58:49,714 			ROC AUC = 0.4235
+2017-10-12 20:58:49,714 		Loading models/RelationNet/Oct-12/14-30-40
+2017-10-12 20:58:50,251 			ROC AUC = 0.7410
+2017-10-12 20:58:50,252 		Mean ROC AUC = 0.5384
+2017-10-12 20:58:50,255              RecNN-simple/Oct-11	ROC AUC = 0.9241+-0.00498	(1/FPR @ TPR=0.5) = nan+-nan
+2017-10-12 20:58:50,303               RelationNet/Oct-12	ROC AUC = 0.5384+-0.16183	(1/FPR @ TPR=0.5) = 3.20+-2.01

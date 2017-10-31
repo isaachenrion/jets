@@ -1,0 +1,35 @@
+2017-10-12 20:50:19,685 	batch_size = 64
+2017-10-12 20:50:19,686 	data_list_filename = evaldatasets.txt
+2017-10-12 20:50:19,686 	gpu = 0
+2017-10-12 20:50:19,686 	load_rocs = None
+2017-10-12 20:50:19,686 	model_list_filename = evalmodels.txt
+2017-10-12 20:50:19,686 	n_test = -1
+2017-10-12 20:50:19,686 	password = deeplearning
+2017-10-12 20:50:19,686 	plot = False
+2017-10-12 20:50:19,686 	remove_outliers = False
+2017-10-12 20:50:19,686 	silent = False
+2017-10-12 20:50:19,686 	username = results74207281
+2017-10-12 20:50:19,687 	verbose = True
+2017-10-12 20:50:19,687 	PID = 17622
+2017-10-12 20:50:19,906 DATA PATHS
+antikt-kt
+2017-10-12 20:50:19,906 MODEL PATHS
+RelationNet/Oct-12
+2017-10-12 20:50:19,906 Building ROCs for models trained on antikt-kt
+2017-10-12 20:50:19,907 TF already computed. Loading it.
+2017-10-12 20:50:20,062 Data loaded and already preprocessed
+2017-10-12 20:50:20,362 Loaded data: antikt-kt-valid.pickle
+2017-10-12 20:50:20,362 	X size = 5000
+2017-10-12 20:50:20,362 	y size = 5000
+2017-10-12 20:50:20,362 Cropping...
+2017-10-12 20:50:20,375 	After cropping: X size = 1820
+2017-10-12 20:50:20,375 	After cropping: y size = 1820
+2017-10-12 20:50:20,375 	Building ROCs for instances of ['RelationNet/Oct-12']
+2017-10-12 20:50:20,376 ['models/RelationNet/Oct-12/14-13-52', 'models/RelationNet/Oct-12/14-14-34', 'models/RelationNet/Oct-12/14-25-32', 'models/RelationNet/Oct-12/14-30-40']
+2017-10-12 20:50:20,376 		Loading models/RelationNet/Oct-12/14-13-52
+2017-10-12 20:50:32,263 			ROC AUC = 0.4930
+2017-10-12 20:50:32,264 		Loading models/RelationNet/Oct-12/14-14-34
+2017-10-12 20:50:40,651 			ROC AUC = 0.4660
+2017-10-12 20:50:40,652 		Loading models/RelationNet/Oct-12/14-25-32
+2017-10-12 20:50:45,920 			ROC AUC = 0.5789
+2017-10-12 20:50:45,921 		Loading models/RelationNet/Oct-12/14-30-40

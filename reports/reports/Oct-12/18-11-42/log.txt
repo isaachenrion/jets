@@ -1,0 +1,27 @@
+2017-10-12 18:11:42,619 	batch_size = 64
+2017-10-12 18:11:42,619 	data_list_filename = evaldatasets.txt
+2017-10-12 18:11:42,619 	gpu = 0
+2017-10-12 18:11:42,619 	load_rocs = None
+2017-10-12 18:11:42,619 	model_list_filename = evalmodels.txt
+2017-10-12 18:11:42,619 	n_test = -1
+2017-10-12 18:11:42,620 	password = deeplearning
+2017-10-12 18:11:42,620 	plot = False
+2017-10-12 18:11:42,620 	remove_outliers = False
+2017-10-12 18:11:42,620 	silent = False
+2017-10-12 18:11:42,620 	username = results74207281
+2017-10-12 18:11:42,620 	verbose = False
+2017-10-12 18:11:42,620 	PID = 10200
+2017-10-12 18:11:42,831 DATA PATHS
+antikt-kt
+2017-10-12 18:11:42,832 MODEL PATHS
+RecNN-simple/Oct-11
+2017-10-12 18:11:42,832 Building ROCs for models trained on antikt-kt
+2017-10-12 18:11:42,833 TF already computed. Loading it.
+2017-10-12 18:11:42,993 Data loaded and already preprocessed
+2017-10-12 18:11:43,356 Loaded data: antikt-kt-valid.pickle
+2017-10-12 18:11:43,356 	X size = 5000
+2017-10-12 18:11:43,356 	y size = 5000
+2017-10-12 18:11:43,356 Cropping...
+2017-10-12 18:11:43,369 	After cropping: X size = 1820
+2017-10-12 18:11:43,369 	After cropping: y size = 1820
+2017-10-12 18:11:43,369 	Building ROCs for instances of ['RecNN-simple/Oct-11']

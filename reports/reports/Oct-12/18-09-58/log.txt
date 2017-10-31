@@ -1,0 +1,30 @@
+2017-10-12 18:09:58,814 	batch_size = 64
+2017-10-12 18:09:58,815 	data_list_filename = evaldatasets.txt
+2017-10-12 18:09:58,815 	gpu = 0
+2017-10-12 18:09:58,815 	load_rocs = None
+2017-10-12 18:09:58,815 	model_list_filename = evalmodels.txt
+2017-10-12 18:09:58,815 	n_test = -1
+2017-10-12 18:09:58,815 	password = deeplearning
+2017-10-12 18:09:58,815 	plot = False
+2017-10-12 18:09:58,815 	remove_outliers = False
+2017-10-12 18:09:58,815 	silent = False
+2017-10-12 18:09:58,816 	username = results74207281
+2017-10-12 18:09:58,816 	verbose = False
+2017-10-12 18:09:58,816 	PID = 10106
+2017-10-12 18:09:59,032 DATA PATHS
+antikt-kt
+2017-10-12 18:09:59,032 MODEL PATHS
+MPNN/1_iter
+MPNN/3_iter
+2017-10-12 18:09:59,033 Building ROCs for models trained on antikt-kt
+2017-10-12 18:09:59,033 TF already computed. Loading it.
+2017-10-12 18:09:59,197 Data loaded and already preprocessed
+2017-10-12 18:09:59,499 Loaded data: antikt-kt-valid.pickle
+2017-10-12 18:09:59,499 	X size = 5000
+2017-10-12 18:09:59,500 	y size = 5000
+2017-10-12 18:09:59,500 Cropping...
+2017-10-12 18:09:59,514 	After cropping: X size = 1820
+2017-10-12 18:09:59,514 	After cropping: y size = 1820
+2017-10-12 18:09:59,514 	Building ROCs for instances of ['MPNN/1_iter', 'MPNN/3_iter']
+2017-10-12 18:09:59,515 ['models/MPNN/1_iter/13-59-38a', 'models/MPNN/1_iter/13-59-38b']
+2017-10-12 18:09:59,515 		Loading models/MPNN/1_iter/13-59-38a

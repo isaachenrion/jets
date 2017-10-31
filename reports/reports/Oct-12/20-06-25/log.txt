@@ -1,0 +1,23 @@
+2017-10-12 20:06:25,635 	batch_size = 10
+2017-10-12 20:06:25,635 	data_list_filename = evaldatasets.txt
+2017-10-12 20:06:25,635 	gpu = 0
+2017-10-12 20:06:25,635 	load_rocs = None
+2017-10-12 20:06:25,636 	model_list_filename = evalmodels.txt
+2017-10-12 20:06:25,636 	n_test = 200
+2017-10-12 20:06:25,636 	password = deeplearning
+2017-10-12 20:06:25,636 	plot = False
+2017-10-12 20:06:25,636 	remove_outliers = False
+2017-10-12 20:06:25,636 	silent = False
+2017-10-12 20:06:25,636 	username = results74207281
+2017-10-12 20:06:25,636 	verbose = True
+2017-10-12 20:06:25,636 	PID = 15883
+2017-10-12 20:06:25,841 DATA PATHS
+antikt-kt
+2017-10-12 20:06:25,841 MODEL PATHS
+RelationNet/Oct-12
+2017-10-12 20:06:25,841 Building ROCs for models trained on antikt-kt
+2017-10-12 20:06:25,842 Computing TF from antikt-kt-train.pickle
+2017-10-12 20:06:25,842 Preprocessing...
+2017-10-12 20:18:52,456 Preprocessed the data and saved it to data/w-vs-qcd/pickles/preprocessed/antikt-kt-train.pickle
+2017-10-12 20:19:05,207 Saved TF to data/w-vs-qcd/pickles/tf/TF-antikt-kt-train.pickle
+2017-10-12 20:19:05,943 Preprocessing...

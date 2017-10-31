@@ -1,0 +1,48 @@
+2017-10-12 11:58:22,029 	batch_size = 64
+2017-10-12 11:58:22,029 	data_list_filename = evaldatasets.txt
+2017-10-12 11:58:22,029 	gpu = 0
+2017-10-12 11:58:22,029 	load_rocs = None
+2017-10-12 11:58:22,029 	model_list_filename = evalmodels.txt
+2017-10-12 11:58:22,029 	n_test = -1
+2017-10-12 11:58:22,029 	plot = False
+2017-10-12 11:58:22,030 	remove_outliers = False
+2017-10-12 11:58:22,030 	silent = False
+2017-10-12 11:58:22,030 	verbose = True
+2017-10-12 11:58:22,030 	PID = 26524
+2017-10-12 11:58:22,032 DATA PATHS
+antikt-kt
+2017-10-12 11:58:22,032 LEAF MODEL PATHS
+MPNN/1_iter
+MPNN/3_iter
+2017-10-12 11:58:22,032 Building ROCs for models/MPNN/1_iter trained on antikt-kt
+2017-10-12 11:58:22,032 TF already computed. Loading it.
+2017-10-12 11:58:22,033 Loading test data: antikt-kt-test.pickle
+2017-10-12 11:58:24,543 Data loaded and already preprocessed
+2017-10-12 11:58:31,364 Cropping...
+2017-10-12 11:58:31,774 	X size = 37972
+2017-10-12 11:58:31,786 	y size = 37972
+2017-10-12 11:58:32,168 ['models/MPNN/1_iter/13-59-38a', 'models/MPNN/1_iter/13-59-38b']
+2017-10-12 11:58:32,168 Loading models/MPNN/1_iter/13-59-38a
+2017-10-12 11:58:35,606 FILE LOADED! models/MPNN/1_iter/13-59-38a
+2017-10-12 11:59:14,910 ROC AUC = 0.9171
+2017-10-12 11:59:14,910 Loading models/MPNN/1_iter/13-59-38b
+2017-10-12 11:59:14,933 FILE LOADED! models/MPNN/1_iter/13-59-38b
+2017-10-12 11:59:53,502 ROC AUC = 0.9171
+2017-10-12 11:59:53,504 Mean ROC AUC = 0.9171
+2017-10-12 11:59:54,185 Building ROCs for models/MPNN/3_iter trained on antikt-kt
+2017-10-12 11:59:54,186 TF already computed. Loading it.
+2017-10-12 11:59:54,186 Loading test data: antikt-kt-test.pickle
+2017-10-12 11:59:56,372 Data loaded and already preprocessed
+2017-10-12 12:00:02,084 Cropping...
+2017-10-12 12:00:02,361 	X size = 37972
+2017-10-12 12:00:02,375 	y size = 37972
+2017-10-12 12:00:02,573 ['models/MPNN/3_iter/13-59-55a', 'models/MPNN/3_iter/13-59-55b']
+2017-10-12 12:00:02,573 Loading models/MPNN/3_iter/13-59-55a
+2017-10-12 12:00:02,602 FILE LOADED! models/MPNN/3_iter/13-59-55a
+2017-10-12 12:01:35,201 ROC AUC = 0.9168
+2017-10-12 12:01:35,241 Loading models/MPNN/3_iter/13-59-55b
+2017-10-12 12:01:36,281 FILE LOADED! models/MPNN/3_iter/13-59-55b
+2017-10-12 12:03:08,830 ROC AUC = 0.9168
+2017-10-12 12:03:08,832 Mean ROC AUC = 0.9168
+2017-10-12 12:03:09,076                      MPNN/1_iter	ROC AUC = 0.9171+-0.00000	(1/FPR @ TPR=0.5) = 85.60+-0.00
+2017-10-12 12:03:09,156                      MPNN/3_iter	ROC AUC = 0.9168+-0.00000	(1/FPR @ TPR=0.5) = 76.79+-0.00

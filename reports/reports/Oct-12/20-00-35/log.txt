@@ -1,0 +1,38 @@
+2017-10-12 20:00:35,570 	batch_size = 10
+2017-10-12 20:00:35,571 	data_list_filename = evaldatasets.txt
+2017-10-12 20:00:35,571 	gpu = 0
+2017-10-12 20:00:35,571 	load_rocs = None
+2017-10-12 20:00:35,571 	model_list_filename = evalmodels.txt
+2017-10-12 20:00:35,571 	n_test = 200
+2017-10-12 20:00:35,571 	password = deeplearning
+2017-10-12 20:00:35,571 	plot = False
+2017-10-12 20:00:35,572 	remove_outliers = False
+2017-10-12 20:00:35,572 	silent = False
+2017-10-12 20:00:35,572 	username = results74207281
+2017-10-12 20:00:35,572 	verbose = True
+2017-10-12 20:00:35,572 	PID = 15451
+2017-10-12 20:00:35,793 DATA PATHS
+antikt-kt
+2017-10-12 20:00:35,793 MODEL PATHS
+RelationNet/Oct-12
+2017-10-12 20:00:35,793 Building ROCs for models trained on antikt-kt
+2017-10-12 20:00:35,794 TF already computed. Loading it.
+2017-10-12 20:00:35,910 Data loaded and already preprocessed
+2017-10-12 20:00:36,239 Loaded data: antikt-kt-valid.pickle
+2017-10-12 20:00:36,239 	X size = 5000
+2017-10-12 20:00:36,239 	y size = 5000
+2017-10-12 20:00:36,239 Cropping...
+2017-10-12 20:00:36,256 	After cropping: X size = 200
+2017-10-12 20:00:36,256 	After cropping: y size = 200
+2017-10-12 20:00:36,260 	Building ROCs for instances of ['RelationNet/Oct-12']
+2017-10-12 20:00:36,261 ['models/RelationNet/Oct-12/14-13-52', 'models/RelationNet/Oct-12/14-14-34', 'models/RelationNet/Oct-12/14-25-32', 'models/RelationNet/Oct-12/14-30-40']
+2017-10-12 20:00:36,261 		Loading models/RelationNet/Oct-12/14-13-52
+2017-10-12 20:00:42,886 			ROC AUC = 0.5586
+2017-10-12 20:00:42,887 		Loading models/RelationNet/Oct-12/14-14-34
+2017-10-12 20:00:43,882 			ROC AUC = 0.4448
+2017-10-12 20:00:43,882 		Loading models/RelationNet/Oct-12/14-25-32
+2017-10-12 20:00:44,655 			ROC AUC = 0.6037
+2017-10-12 20:00:44,656 		Loading models/RelationNet/Oct-12/14-30-40
+2017-10-12 20:00:45,394 			ROC AUC = 0.6773
+2017-10-12 20:00:45,394 		Mean ROC AUC = 0.5711
+2017-10-12 20:00:45,416               RelationNet/Oct-12	ROC AUC = 0.5711+-0.08432	(1/FPR @ TPR=0.5) = 2.73+-0.63

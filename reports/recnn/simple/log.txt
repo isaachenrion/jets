@@ -1,0 +1,97 @@
+2017-10-30 23:55:58,790 reports/recnn/simple/log.txt
+2017-10-30 23:55:58,790 reports/recnn/simple
+2017-10-30 23:55:58,793 Logfile at reports/recnn/simple/log.txt
+2017-10-30 23:55:58,793 	batch_size = 64
+2017-10-30 23:55:58,794 	data_dir = data/w-vs-qcd/pickles
+2017-10-30 23:55:58,794 	debug = False
+2017-10-30 23:55:58,795 	extra_tag = 0
+2017-10-30 23:55:58,795 	filename = antikt-kt
+2017-10-30 23:55:58,795 	gpu = 2
+2017-10-30 23:55:58,795 	latex = None
+2017-10-30 23:55:58,795 	load_rocs = None
+2017-10-30 23:55:58,795 	n_test = -1
+2017-10-30 23:55:58,795 	password = deeplearning
+2017-10-30 23:55:58,795 	pileup = False
+2017-10-30 23:55:58,795 	plot = False
+2017-10-30 23:55:58,795 	recipient = henrion@nyu.edu
+2017-10-30 23:55:58,795 	remove_outliers = False
+2017-10-30 23:55:58,795 	root_exp_dir = reports
+2017-10-30 23:55:58,795 	root_model_dir = recnn/simple
+2017-10-30 23:55:58,795 	seed = 1
+2017-10-30 23:55:58,796 	sender = results74207281@gmail.com
+2017-10-30 23:55:58,796 	set = test
+2017-10-30 23:55:58,796 	silent = True
+2017-10-30 23:55:58,796 	verbose = False
+2017-10-30 23:55:58,796 	PID = 137458
+2017-10-30 23:55:58,796 	Running on GPU
+2017-10-30 23:55:58,796 DATA PATHS
+antikt-kt
+2017-10-30 23:55:58,796 MODEL PATHS
+recnn/simple
+2017-10-30 23:55:58,796 Building ROCs for models trained on antikt-kt
+2017-10-30 23:55:58,797 TF already computed. Loading it.
+2017-10-30 23:56:01,520 Data loaded and already preprocessed
+2017-10-30 23:56:08,442 Cropping...
+2017-10-30 23:57:39,250 37972 (selected) + 62028 (cropped) = 100000
+2017-10-30 23:57:39,746 	Building ROCs for instances of recnn/simple
+2017-10-30 23:57:39,753 	[0] Loading finished_models/recnn/simple/15-59-27
+2017-10-30 23:58:26,925 	Model = 15-59-27	1/FPR @ TPR = 0.5=68.0707	roc_auc=0.9165
+2017-10-30 23:58:26,925 	[1] Loading finished_models/recnn/simple/16-02-25
+2017-10-30 23:59:14,535 	Model = 16-02-25	1/FPR @ TPR = 0.5=69.1040	roc_auc=0.9173
+2017-10-30 23:59:14,535 	[2] Loading finished_models/recnn/simple/14-20-25_1
+2017-10-31 00:00:01,017 	Model = 14-20-25_1	1/FPR @ TPR = 0.5=78.5587	roc_auc=0.9172
+2017-10-31 00:00:01,018 	[3] Loading finished_models/recnn/simple/14-20-48_3
+2017-10-31 00:00:46,336 	Model = 14-20-48_3	1/FPR @ TPR = 0.5=67.8724	roc_auc=0.9156
+2017-10-31 00:00:46,337 	[4] Loading finished_models/recnn/simple/14-20-48_8
+2017-10-31 00:01:34,746 	Model = 14-20-48_8	1/FPR @ TPR = 0.5=68.4976	roc_auc=0.9197
+2017-10-31 00:01:34,747 	[5] Loading finished_models/recnn/simple/14-20-49_2
+2017-10-31 00:02:22,429 	Model = 14-20-49_2	1/FPR @ TPR = 0.5=67.4108	roc_auc=0.9180
+2017-10-31 00:02:22,430 	[6] Loading finished_models/recnn/simple/14-20-49_4
+2017-10-31 00:03:10,099 	Model = 14-20-49_4	1/FPR @ TPR = 0.5=69.2732	roc_auc=0.9167
+2017-10-31 00:03:10,100 	[7] Loading finished_models/recnn/simple/14-20-49_5
+2017-10-31 00:04:00,140 	Model = 14-20-49_5	1/FPR @ TPR = 0.5=76.8683	roc_auc=0.9202
+2017-10-31 00:04:00,141 	[8] Loading finished_models/recnn/simple/14-20-49_6
+2017-10-31 00:04:45,812 	Model = 14-20-49_6	1/FPR @ TPR = 0.5=73.8489	roc_auc=0.9197
+2017-10-31 00:04:45,812 	[9] Loading finished_models/recnn/simple/14-20-49_7
+2017-10-31 00:05:34,018 	Model = 14-20-49_7	1/FPR @ TPR = 0.5=72.6028	roc_auc=0.9203
+2017-10-31 00:05:34,019 	[10] Loading finished_models/recnn/simple/14-20-49_9
+2017-10-31 00:06:18,687 	Model = 14-20-49_9	1/FPR @ TPR = 0.5=72.8666	roc_auc=0.9176
+2017-10-31 00:06:18,687 	[11] Loading finished_models/recnn/simple/14-21-21_10
+2017-10-31 00:07:04,570 	Model = 14-21-21_10	1/FPR @ TPR = 0.5=65.0134	roc_auc=0.9173
+2017-10-31 00:07:04,571 	[12] Loading finished_models/recnn/simple/14-22-25_1
+2017-10-31 00:07:50,436 	Model = 14-22-25_1	1/FPR @ TPR = 0.5=76.5408	roc_auc=0.9189
+2017-10-31 00:07:50,437 	[13] Loading finished_models/recnn/simple/14-22-58_2
+2017-10-31 00:08:34,813 	Model = 14-22-58_2	1/FPR @ TPR = 0.5=73.7301	roc_auc=0.9188
+2017-10-31 00:08:34,814 	[14] Loading finished_models/recnn/simple/14-23-31_3
+2017-10-31 00:09:20,310 	Model = 14-23-31_3	1/FPR @ TPR = 0.5=72.0677	roc_auc=0.9180
+2017-10-31 00:09:20,310 	[15] Loading finished_models/recnn/simple/14-23-31_4
+2017-10-31 00:10:02,108 	Model = 14-23-31_4	1/FPR @ TPR = 0.5=75.5353	roc_auc=0.9188
+2017-10-31 00:10:02,108 	[16] Loading finished_models/recnn/simple/14-24-02_5
+2017-10-31 00:10:45,959 	Model = 14-24-02_5	1/FPR @ TPR = 0.5=68.4636	roc_auc=0.9183
+2017-10-31 00:10:45,959 	[17] Loading finished_models/recnn/simple/14-24-25_6
+2017-10-31 00:11:33,423 	Model = 14-24-25_6	1/FPR @ TPR = 0.5=71.1611	roc_auc=0.9172
+2017-10-31 00:11:33,424 	[18] Loading finished_models/recnn/simple/14-24-25_7
+2017-10-31 00:12:20,106 	Model = 14-24-25_7	1/FPR @ TPR = 0.5=72.9494	roc_auc=0.9187
+2017-10-31 00:12:20,107 	[19] Loading finished_models/recnn/simple/14-24-26_8
+2017-10-31 00:13:05,514 	Model = 14-24-26_8	1/FPR @ TPR = 0.5=64.9969	roc_auc=0.9177
+2017-10-31 00:13:05,514 	[20] Loading finished_models/recnn/simple/14-24-35_10
+2017-10-31 00:13:53,674 	Model = 14-24-35_10	1/FPR @ TPR = 0.5=73.1268	roc_auc=0.9178
+2017-10-31 00:13:53,675 	[21] Loading finished_models/recnn/simple/14-24-35_9
+2017-10-31 00:14:37,479 	Model = 14-24-35_9	1/FPR @ TPR = 0.5=70.3793	roc_auc=0.9172
+2017-10-31 00:14:37,480 	[22] Loading finished_models/recnn/simple/19-21-38_0
+2017-10-31 00:15:24,769 	Model = 19-21-38_0	1/FPR @ TPR = 0.5=72.2442	roc_auc=0.9197
+2017-10-31 00:15:24,770 	[23] Loading finished_models/recnn/simple/19-22-04_0
+2017-10-31 00:16:13,957 	Model = 19-22-04_0	1/FPR @ TPR = 0.5=73.9281	roc_auc=0.9191
+2017-10-31 00:16:13,958 	[24] Loading finished_models/recnn/simple/19-22-34_0
+2017-10-31 00:17:02,519 	Model = 19-22-34_0	1/FPR @ TPR = 0.5=70.2853	roc_auc=0.9171
+2017-10-31 00:17:02,520 	[25] Loading finished_models/recnn/simple/19-23-03_0
+2017-10-31 00:17:51,498 	Model = 19-23-03_0	1/FPR @ TPR = 0.5=70.5619	roc_auc=0.9185
+2017-10-31 00:17:51,498 	[26] Loading finished_models/recnn/simple/19-23-09_0
+2017-10-31 00:18:39,869 	Model = 19-23-09_0	1/FPR @ TPR = 0.5=75.8013	roc_auc=0.9192
+2017-10-31 00:18:39,870 	[27] Loading finished_models/recnn/simple/15-46-47_0
+2017-10-31 00:19:27,428 	Model = 15-46-47_0	1/FPR @ TPR = 0.5=76.1719	roc_auc=0.9190
+2017-10-31 00:19:27,429 	[28] Loading finished_models/recnn/simple/15-47-09_0
+2017-10-31 00:20:14,141 	Model = 15-47-09_0	1/FPR @ TPR = 0.5=78.6981	roc_auc=0.9185
+2017-10-31 00:20:14,141 	[29] Loading finished_models/recnn/simple/15-47-23_0
+2017-10-31 00:20:59,843 	Model = 15-47-23_0	1/FPR @ TPR = 0.5=64.0116	roc_auc=0.9163
+2017-10-31 00:20:59,844 	Mean ROC AUC = 0.9182 Mean 1/FPR = 71.6880

@@ -1,0 +1,62 @@
+2017-10-12 10:54:13,811 	batch_size = 10
+2017-10-12 10:54:13,811 	data_list_filename = evaldatasets.txt
+2017-10-12 10:54:13,812 	gpu = 0
+2017-10-12 10:54:13,812 	model_list_filename = evalmodels.txt
+2017-10-12 10:54:13,812 	n_test = 300
+2017-10-12 10:54:13,812 	silent = False
+2017-10-12 10:54:13,812 	verbose = True
+2017-10-12 10:54:13,812 	PID = 22073
+2017-10-12 10:54:13,814 DATA PATHS
+antikt-kt
+2017-10-12 10:54:13,814 LEAF MODEL PATHS
+RecNN-gated/Oct-11
+RecNN-simple/Oct-11
+2017-10-12 10:54:13,814 Building ROCs for models/RecNN-gated/Oct-11 trained on antikt-kt
+2017-10-12 10:54:13,815 TF already computed. Loading it.
+2017-10-12 10:54:13,816 Loading test data: antikt-kt-test.pickle
+2017-10-12 10:54:16,161 Data loaded and already preprocessed
+2017-10-12 10:54:22,038 Cropping...
+2017-10-12 10:54:22,436 	X size = 37972
+2017-10-12 10:54:22,445 	y size = 37972
+2017-10-12 10:54:22,706 ['models/RecNN-gated/Oct-11/12-54-10', 'models/RecNN-gated/Oct-11/12-54-20', 'models/RecNN-gated/Oct-11/12-54-30', 'models/RecNN-gated/Oct-11/12-54-40', 'models/RecNN-gated/Oct-11/12-54-50', 'models/RecNN-gated/Oct-11/12-55-01', 'models/RecNN-gated/Oct-11/12-55-11', 'models/RecNN-gated/Oct-11/12-55-21', 'models/RecNN-gated/Oct-11/12-55-31', 'models/RecNN-gated/Oct-11/12-55-41']
+2017-10-12 10:54:22,706 Loading models/RecNN-gated/Oct-11/12-54-10
+2017-10-12 10:54:25,294 FILE LOADED! models/RecNN-gated/Oct-11/12-54-10
+2017-10-12 10:54:26,899 ROC AUC = 0.7050
+2017-10-12 10:54:26,899 Loading models/RecNN-gated/Oct-11/12-54-20
+2017-10-12 10:54:26,920 FILE LOADED! models/RecNN-gated/Oct-11/12-54-20
+2017-10-12 10:54:28,155 ROC AUC = 0.7083
+2017-10-12 10:54:28,155 Loading models/RecNN-gated/Oct-11/12-54-30
+2017-10-12 10:54:28,175 FILE LOADED! models/RecNN-gated/Oct-11/12-54-30
+2017-10-12 10:54:29,467 ROC AUC = 0.8051
+2017-10-12 10:54:29,467 Loading models/RecNN-gated/Oct-11/12-54-40
+2017-10-12 10:54:29,486 FILE LOADED! models/RecNN-gated/Oct-11/12-54-40
+2017-10-12 10:54:30,723 ROC AUC = 0.7812
+2017-10-12 10:54:30,723 Loading models/RecNN-gated/Oct-11/12-54-50
+2017-10-12 10:54:30,961 FILE LOADED! models/RecNN-gated/Oct-11/12-54-50
+2017-10-12 10:54:32,205 ROC AUC = 0.7813
+2017-10-12 10:54:32,205 Loading models/RecNN-gated/Oct-11/12-55-01
+2017-10-12 10:54:32,440 FILE LOADED! models/RecNN-gated/Oct-11/12-55-01
+2017-10-12 10:54:33,684 ROC AUC = 0.8172
+2017-10-12 10:54:33,684 Loading models/RecNN-gated/Oct-11/12-55-11
+2017-10-12 10:54:33,919 FILE LOADED! models/RecNN-gated/Oct-11/12-55-11
+2017-10-12 10:54:35,164 ROC AUC = 0.7132
+2017-10-12 10:54:35,164 Loading models/RecNN-gated/Oct-11/12-55-21
+2017-10-12 10:54:35,484 FILE LOADED! models/RecNN-gated/Oct-11/12-55-21
+2017-10-12 10:54:36,762 ROC AUC = 0.7599
+2017-10-12 10:54:36,763 Loading models/RecNN-gated/Oct-11/12-55-31
+2017-10-12 10:54:37,003 FILE LOADED! models/RecNN-gated/Oct-11/12-55-31
+2017-10-12 10:54:38,244 ROC AUC = 0.6534
+2017-10-12 10:54:38,244 Loading models/RecNN-gated/Oct-11/12-55-41
+2017-10-12 10:54:38,264 FILE LOADED! models/RecNN-gated/Oct-11/12-55-41
+2017-10-12 10:54:39,499 ROC AUC = 0.8328
+2017-10-12 10:54:39,500 Mean ROC AUC = 0.7558
+2017-10-12 10:54:39,538 Building ROCs for models/RecNN-simple/Oct-11 trained on antikt-kt
+2017-10-12 10:54:39,539 TF already computed. Loading it.
+2017-10-12 10:54:39,541 Loading test data: antikt-kt-test.pickle
+2017-10-12 10:54:41,574 Data loaded and already preprocessed
+2017-10-12 10:54:47,239 Cropping...
+2017-10-12 10:54:47,495 	X size = 37972
+2017-10-12 10:54:47,509 	y size = 37972
+2017-10-12 10:54:47,766 ['models/RecNN-simple/Oct-11/12-51-58', 'models/RecNN-simple/Oct-11/12-52-23', 'models/RecNN-simple/Oct-11/12-54-06', 'models/RecNN-simple/Oct-11/12-54-15', 'models/RecNN-simple/Oct-11/12-54-25', 'models/RecNN-simple/Oct-11/12-54-35', 'models/RecNN-simple/Oct-11/12-54-45', 'models/RecNN-simple/Oct-11/12-54-55', 'models/RecNN-simple/Oct-11/12-55-06', 'models/RecNN-simple/Oct-11/12-55-16', 'models/RecNN-simple/Oct-11/12-55-27', 'models/RecNN-simple/Oct-11/12-55-36']
+2017-10-12 10:54:47,767 Loading models/RecNN-simple/Oct-11/12-51-58
+2017-10-12 10:54:47,767 Loading from pickle models/RecNN-simple/Oct-11/12-51-58/model.pickle
