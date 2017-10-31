@@ -108,6 +108,8 @@ class Saver(Monitor):
 
     def save(self, model, settings):
         with open(self.model_file, 'wb') as f:
-            torch.save(model.state_dict(), f)
+            torch.save(model.cpu().state_dict(), f)
+            if torch.cuda.is_available():
+                model.cuda()
         with open(self.settings_file, "wb") as f:
             pickle.dump(settings, f)

@@ -1,5 +1,7 @@
 from loggers import StatsLogger
 import os
+import torch
+
 import csv
 from constants import REPORTS_DIR
 import numpy as np
@@ -41,24 +43,34 @@ def remove_outliers_csv(csv_filename):
     print("ROBUST STDDEV = {}".format(np.std(new_inv_fprs)))
     print("ROBUST STDERR = {}".format(np.std(new_inv_fprs) / (len(new_inv_fprs) ** 0.5)))
 
+def convert_state_dict_pt_file(path_to_state_dict):
+    with open(os.path.join(path_to_state_dict, 'model_state_dict.pt'), 'rb') as f:
+        state_dict = torch.load(f)
+    for k, v in state_dict.items():
+        state_dict[k] = v.cpu()
+    with open(os.path.join(path_to_state_dict, 'cpu_model_state_dict.pt'), 'wb') as f:
+        torch.save(state_dict, f)
+
+
+
 
 def main():
-    #base = 'finished_models'
-    base = 'reports'
+    base = 'finished_models'
+    #base = 'reports'
+
     #models = ['mpnn', 'recnn', 'relation']
     flavours = ['vanilla', 'set', 'id']
     iters = [1, 2, 3]
-
     model_dirs = [os.path.join(base, 'mpnn', flavour, str(i)) for flavour in flavours for i in iters]
-
     model_dirs.extend([os.path.join(base, 'recnn/simple'), os.path.join(base, 'relation')])
-
     for md in model_dirs: print(md)
     for model_dir in model_dirs:
         print(model_dir)
         #scrape_results(model_dir)
         try:
-            remove_outliers_csv(os.path.join(model_dir, 'stats.csv'))
+            model_filenames = [os.path.join(model_dir, fn) for fn in os.listdir(model_dir)]
+            for model_fn in model_filenames:
+                convert_state_dict_pt_file(model_fn)
         except FileNotFoundError as e:
             print(e)
 
