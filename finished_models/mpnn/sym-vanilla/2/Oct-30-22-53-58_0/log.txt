@@ -1,0 +1,349 @@
+2017-10-30 22:53:58,263 models/mpnn/sym-vanilla/2/Oct-30-22-53-58_0/log.txt
+2017-10-30 22:53:58,263 models/mpnn/sym-vanilla/2/Oct-30-22-53-58_0
+2017-10-30 22:53:58,265 Logfile at models/mpnn/sym-vanilla/2/Oct-30-22-53-58_0/log.txt
+2017-10-30 22:53:58,266 	batch_size = 100
+2017-10-30 22:53:58,266 	data_dir = data/w-vs-qcd/pickles
+2017-10-30 22:53:58,266 	debug = False
+2017-10-30 22:53:58,266 	decay = 0.94
+2017-10-30 22:53:58,266 	dont_add_cropped = False
+2017-10-30 22:53:58,266 	epochs = 50
+2017-10-30 22:53:58,266 	extra_tag = 0
+2017-10-30 22:53:58,267 	features = 7
+2017-10-30 22:53:58,267 	filename = antikt-kt
+2017-10-30 22:53:58,267 	gpu = 1
+2017-10-30 22:53:58,267 	hidden = 40
+2017-10-30 22:53:58,267 	iters = 2
+2017-10-30 22:53:58,267 	leaves = True
+2017-10-30 22:53:58,267 	load = None
+2017-10-30 22:53:58,267 	model_type = 6
+2017-10-30 22:53:58,268 	n_train = -1
+2017-10-30 22:53:58,268 	n_valid = 27000
+2017-10-30 22:53:58,268 	not_leaves = False
+2017-10-30 22:53:58,268 	password = deeplearning
+2017-10-30 22:53:58,268 	pileup = False
+2017-10-30 22:53:58,268 	recipient = henrion@nyu.edu
+2017-10-30 22:53:58,268 	restart = False
+2017-10-30 22:53:58,268 	root_exp_dir = models/mpnn/sym-vanilla/2
+2017-10-30 22:53:58,269 	seed = 53362
+2017-10-30 22:53:58,269 	sender = results74207281@gmail.com
+2017-10-30 22:53:58,269 	silent = True
+2017-10-30 22:53:58,269 	step_size = 0.001
+2017-10-30 22:53:58,269 	verbose = False
+2017-10-30 22:53:58,269 	PID = 5208
+2017-10-30 22:53:58,269 	Running on GPU
+2017-10-30 22:53:58,270 Loading data...
+2017-10-30 22:53:58,271 TF already computed. Loading it.
+2017-10-30 22:54:02,454 Data loaded and already preprocessed
+2017-10-30 22:54:16,589 Splitting into train and validation...
+2017-10-30 22:54:16,651 	raw train size = 73000
+2017-10-30 22:54:16,651 	raw valid size = 27000
+2017-10-30 22:54:16,651 Cropping...
+2017-10-30 22:54:23,104 10187 (selected) + 16813 (cropped) = 27000
+2017-10-30 22:54:41,836 	final train size = 89813
+2017-10-30 22:54:41,840 	final valid size = 10187
+2017-10-30 22:54:41,840 Initializing model...
+2017-10-30 22:54:41,846 PredictFromParticleEmbedding (
+  (transform): MPNNTransformAdaptiveSymmetric (
+    (embedding): Linear (8 -> 40)
+    (readout): DTNNReadout (
+      (fc1): Linear (40 -> 40)
+      (fc2): Linear (40 -> 40)
+    )
+    (mp_layers): ModuleList (
+      (0): MPAdaptiveSymmetric (
+        (vertex_update): GRUUpdate (
+          (gru): AnyBatchGRUCell (
+            (linear_ih): Linear (48 -> 120)
+            (linear_hh): Linear (40 -> 120)
+          )
+        )
+        (message): DTNNMessage (
+          (vertex_wx_plus_b): Linear (40 -> 40)
+        )
+        (adjacency_matrix): AdaptiveAdjacencyMatrix (
+          (edge_embedding): Linear (40 -> 1)
+          (softmax): PaddedMatrixSoftmax (
+          )
+        )
+      )
+      (1): MPAdaptiveSymmetric (
+        (vertex_update): GRUUpdate (
+          (gru): AnyBatchGRUCell (
+            (linear_ih): Linear (48 -> 120)
+            (linear_hh): Linear (40 -> 120)
+          )
+        )
+        (message): DTNNMessage (
+          (vertex_wx_plus_b): Linear (40 -> 40)
+        )
+        (adjacency_matrix): AdaptiveAdjacencyMatrix (
+          (edge_embedding): Linear (40 -> 1)
+          (softmax): PaddedMatrixSoftmax (
+          )
+        )
+      )
+    )
+  )
+  (fc1): Linear (40 -> 40)
+  (fc2): Linear (40 -> 40)
+  (fc3): Linear (40 -> 1)
+)
+2017-10-30 22:54:41,848 Number of parameters: 31923
+2017-10-30 22:54:41,848 Moving model to GPU
+2017-10-30 22:54:46,529 Moved model to GPU
+2017-10-30 22:54:46,543 Building optimizer...
+2017-10-30 22:54:46,566 Training...
+2017-10-30 22:54:46,566 epoch = 0
+2017-10-30 22:54:46,566 step_size = 0.00100000
+2017-10-30 23:12:42,709 Modeling validation data took 165.27733612060547s
+2017-10-30 23:12:42,743   898	~loss(train)=0.4529	loss(valid)=0.4146	roc_auc(valid)=0.9032	1/FPR @ TPR = 0.5: 32.89	Best 1/FPR @ TPR = 0.5: 32.89
+2017-10-30 23:12:43,705 Epoch took 1077.1387062072754 seconds
+2017-10-30 23:12:43,706 epoch = 1
+2017-10-30 23:12:43,706 step_size = 0.00094000
+2017-10-30 23:29:16,532 Modeling validation data took 167.70844984054565s
+2017-10-30 23:29:16,587  1796	~loss(train)=0.4564	loss(valid)=0.3938	roc_auc(valid)=0.9095	1/FPR @ TPR = 0.5: 41.63	Best 1/FPR @ TPR = 0.5: 41.63
+2017-10-30 23:29:17,593 Epoch took 993.8866586685181 seconds
+2017-10-30 23:29:17,593 epoch = 2
+2017-10-30 23:29:17,593 step_size = 0.00088360
+2017-10-30 23:45:43,249 Modeling validation data took 163.79250741004944s
+2017-10-30 23:45:43,279  2694	~loss(train)=0.4237	loss(valid)=0.3817	roc_auc(valid)=0.9111	1/FPR @ TPR = 0.5: 43.31	Best 1/FPR @ TPR = 0.5: 43.31
+2017-10-30 23:45:44,126 Epoch took 986.5329432487488 seconds
+2017-10-30 23:45:44,126 epoch = 3
+2017-10-30 23:45:44,127 step_size = 0.00083058
+2017-10-31 00:01:39,269 Modeling validation data took 159.23933124542236s
+2017-10-31 00:01:39,304  3592	~loss(train)=0.4216	loss(valid)=0.3786	roc_auc(valid)=0.9149	1/FPR @ TPR = 0.5: 58.45	Best 1/FPR @ TPR = 0.5: 58.45
+2017-10-31 00:01:40,166 Epoch took 956.0392036437988 seconds
+2017-10-31 00:01:40,166 epoch = 4
+2017-10-31 00:01:40,167 step_size = 0.00078075
+2017-10-31 00:17:35,045 Modeling validation data took 160.646497964859s
+2017-10-31 00:17:35,093  4490	~loss(train)=0.4081	loss(valid)=0.3598	roc_auc(valid)=0.9163	1/FPR @ TPR = 0.5: 69.26	Best 1/FPR @ TPR = 0.5: 69.26
+2017-10-31 00:17:36,025 Epoch took 955.858033657074 seconds
+2017-10-31 00:17:36,025 epoch = 5
+2017-10-31 00:17:36,025 step_size = 0.00073390
+2017-10-31 00:33:29,931 Modeling validation data took 159.66106033325195s
+2017-10-31 00:33:29,983  5388	~loss(train)=0.4122	loss(valid)=0.3623	roc_auc(valid)=0.9159	1/FPR @ TPR = 0.5: 70.08	Best 1/FPR @ TPR = 0.5: 70.08
+2017-10-31 00:33:30,847 Epoch took 954.8218746185303 seconds
+2017-10-31 00:33:30,848 epoch = 6
+2017-10-31 00:33:30,848 step_size = 0.00068987
+2017-10-31 00:49:22,099 Modeling validation data took 157.62500977516174s
+2017-10-31 00:49:22,118  6286	~loss(train)=0.4122	loss(valid)=0.3706	roc_auc(valid)=0.9169	1/FPR @ TPR = 0.5: 60.08	Best 1/FPR @ TPR = 0.5: 70.08
+2017-10-31 00:49:22,895 Epoch took 952.0474145412445 seconds
+2017-10-31 00:49:22,904 epoch = 7
+2017-10-31 00:49:22,904 step_size = 0.00064848
+2017-10-31 01:05:22,104 Modeling validation data took 161.46320748329163s
+2017-10-31 01:05:22,126  7184	~loss(train)=0.4194	loss(valid)=0.3707	roc_auc(valid)=0.9146	1/FPR @ TPR = 0.5: 49.94	Best 1/FPR @ TPR = 0.5: 70.08
+2017-10-31 01:05:23,102 Epoch took 960.1975646018982 seconds
+2017-10-31 01:05:23,102 epoch = 8
+2017-10-31 01:05:23,102 step_size = 0.00060957
+2017-10-31 01:21:13,783 Modeling validation data took 158.82016038894653s
+2017-10-31 01:21:13,822  8082	~loss(train)=0.4025	loss(valid)=0.3568	roc_auc(valid)=0.9180	1/FPR @ TPR = 0.5: 75.96	Best 1/FPR @ TPR = 0.5: 75.96
+2017-10-31 01:21:14,831 Epoch took 951.7288739681244 seconds
+2017-10-31 01:21:14,832 epoch = 9
+2017-10-31 01:21:14,832 step_size = 0.00057299
+2017-10-31 01:37:12,189 Modeling validation data took 161.67761087417603s
+2017-10-31 01:37:12,209  8980	~loss(train)=0.4100	loss(valid)=0.3640	roc_auc(valid)=0.9168	1/FPR @ TPR = 0.5: 75.24	Best 1/FPR @ TPR = 0.5: 75.96
+2017-10-31 01:37:13,120 Epoch took 958.2878634929657 seconds
+2017-10-31 01:37:13,120 epoch = 10
+2017-10-31 01:37:13,120 step_size = 0.00053862
+2017-10-31 01:53:01,544 Modeling validation data took 157.537531375885s
+2017-10-31 01:53:01,574  9878	~loss(train)=0.4059	loss(valid)=0.3582	roc_auc(valid)=0.9183	1/FPR @ TPR = 0.5: 75.95	Best 1/FPR @ TPR = 0.5: 75.96
+2017-10-31 01:53:02,442 Epoch took 949.321471452713 seconds
+2017-10-31 01:53:02,442 epoch = 11
+2017-10-31 01:53:02,442 step_size = 0.00050630
+2017-10-31 02:08:53,893 Modeling validation data took 158.82315278053284s
+2017-10-31 02:08:53,914 10776	~loss(train)=0.4035	loss(valid)=0.3595	roc_auc(valid)=0.9182	1/FPR @ TPR = 0.5: 78.01	Best 1/FPR @ TPR = 0.5: 78.01
+2017-10-31 02:08:54,957 Epoch took 952.5143735408783 seconds
+2017-10-31 02:08:54,957 epoch = 12
+2017-10-31 02:08:54,957 step_size = 0.00047592
+2017-10-31 02:24:46,240 Modeling validation data took 157.44916892051697s
+2017-10-31 02:24:46,269 11674	~loss(train)=0.4003	loss(valid)=0.3552	roc_auc(valid)=0.9187	1/FPR @ TPR = 0.5: 78.23	Best 1/FPR @ TPR = 0.5: 78.23
+2017-10-31 02:24:47,087 Epoch took 952.1297943592072 seconds
+2017-10-31 02:24:47,088 epoch = 13
+2017-10-31 02:24:47,088 step_size = 0.00044737
+2017-10-31 02:40:40,404 Modeling validation data took 160.12695002555847s
+2017-10-31 02:40:40,464 12572	~loss(train)=0.4038	loss(valid)=0.3560	roc_auc(valid)=0.9182	1/FPR @ TPR = 0.5: 80.08	Best 1/FPR @ TPR = 0.5: 80.08
+2017-10-31 02:40:41,485 Epoch took 954.3966994285583 seconds
+2017-10-31 02:40:41,485 epoch = 14
+2017-10-31 02:40:41,485 step_size = 0.00042052
+2017-10-31 02:56:37,145 Modeling validation data took 158.92640137672424s
+2017-10-31 02:56:37,162 13470	~loss(train)=0.4007	loss(valid)=0.3539	roc_auc(valid)=0.9193	1/FPR @ TPR = 0.5: 74.59	Best 1/FPR @ TPR = 0.5: 80.08
+2017-10-31 02:56:38,165 Epoch took 956.6798160076141 seconds
+2017-10-31 02:56:38,166 epoch = 15
+2017-10-31 02:56:38,166 step_size = 0.00039529
+2017-10-31 03:12:24,817 Modeling validation data took 157.1870756149292s
+2017-10-31 03:12:24,844 14368	~loss(train)=0.4029	loss(valid)=0.3594	roc_auc(valid)=0.9187	1/FPR @ TPR = 0.5: 69.98	Best 1/FPR @ TPR = 0.5: 80.08
+2017-10-31 03:12:25,503 Epoch took 947.3366458415985 seconds
+2017-10-31 03:12:25,503 epoch = 16
+2017-10-31 03:12:25,503 step_size = 0.00037157
+2017-10-31 03:28:13,034 Modeling validation data took 158.56815147399902s
+2017-10-31 03:28:13,096 15266	~loss(train)=0.3983	loss(valid)=0.3535	roc_auc(valid)=0.9199	1/FPR @ TPR = 0.5: 83.29	Best 1/FPR @ TPR = 0.5: 83.29
+2017-10-31 03:28:13,807 Epoch took 948.3035390377045 seconds
+2017-10-31 03:28:13,807 epoch = 17
+2017-10-31 03:28:13,807 step_size = 0.00034928
+2017-10-31 03:44:02,179 Modeling validation data took 158.67988848686218s
+2017-10-31 03:44:02,211 16164	~loss(train)=0.4033	loss(valid)=0.3561	roc_auc(valid)=0.9208	1/FPR @ TPR = 0.5: 80.81	Best 1/FPR @ TPR = 0.5: 83.29
+2017-10-31 03:44:03,025 Epoch took 949.2174959182739 seconds
+2017-10-31 03:44:03,025 epoch = 18
+2017-10-31 03:44:03,025 step_size = 0.00032832
+2017-10-31 03:59:51,796 Modeling validation data took 155.66746306419373s
+2017-10-31 03:59:51,824 17062	~loss(train)=0.3993	loss(valid)=0.3571	roc_auc(valid)=0.9192	1/FPR @ TPR = 0.5: 74.79	Best 1/FPR @ TPR = 0.5: 83.29
+2017-10-31 03:59:52,703 Epoch took 949.6774911880493 seconds
+2017-10-31 03:59:52,703 epoch = 19
+2017-10-31 03:59:52,703 step_size = 0.00030862
+2017-10-31 04:15:41,522 Modeling validation data took 158.90712141990662s
+2017-10-31 04:15:41,559 17960	~loss(train)=0.3956	loss(valid)=0.3519	roc_auc(valid)=0.9217	1/FPR @ TPR = 0.5: 75.37	Best 1/FPR @ TPR = 0.5: 83.29
+2017-10-31 04:15:42,513 Epoch took 949.808890581131 seconds
+2017-10-31 04:15:42,513 epoch = 20
+2017-10-31 04:15:42,513 step_size = 0.00029011
+2017-10-31 04:31:25,718 Modeling validation data took 155.62943720817566s
+2017-10-31 04:31:25,741 18858	~loss(train)=0.3949	loss(valid)=0.3557	roc_auc(valid)=0.9196	1/FPR @ TPR = 0.5: 72.93	Best 1/FPR @ TPR = 0.5: 83.29
+2017-10-31 04:31:26,412 Epoch took 943.8984611034393 seconds
+2017-10-31 04:31:26,412 epoch = 21
+2017-10-31 04:31:26,412 step_size = 0.00027270
+2017-10-31 04:47:12,558 Modeling validation data took 156.6366274356842s
+2017-10-31 04:47:12,607 19756	~loss(train)=0.3956	loss(valid)=0.3527	roc_auc(valid)=0.9210	1/FPR @ TPR = 0.5: 84.67	Best 1/FPR @ TPR = 0.5: 84.67
+2017-10-31 04:47:13,484 Epoch took 947.0719001293182 seconds
+2017-10-31 04:47:13,484 epoch = 22
+2017-10-31 04:47:13,484 step_size = 0.00025634
+2017-10-31 05:03:01,077 Modeling validation data took 156.14258456230164s
+2017-10-31 05:03:01,094 20654	~loss(train)=0.3960	loss(valid)=0.3520	roc_auc(valid)=0.9211	1/FPR @ TPR = 0.5: 75.84	Best 1/FPR @ TPR = 0.5: 84.67
+2017-10-31 05:03:01,946 Epoch took 948.4617674350739 seconds
+2017-10-31 05:03:01,947 epoch = 23
+2017-10-31 05:03:01,947 step_size = 0.00024096
+2017-10-31 05:18:48,198 Modeling validation data took 157.1764259338379s
+2017-10-31 05:18:48,226 21552	~loss(train)=0.3958	loss(valid)=0.3504	roc_auc(valid)=0.9209	1/FPR @ TPR = 0.5: 84.35	Best 1/FPR @ TPR = 0.5: 84.67
+2017-10-31 05:18:49,013 Epoch took 947.0659084320068 seconds
+2017-10-31 05:18:49,013 epoch = 24
+2017-10-31 05:18:49,013 step_size = 0.00022650
+2017-10-31 05:34:30,067 Modeling validation data took 156.91839575767517s
+2017-10-31 05:34:30,089 22450	~loss(train)=0.3920	loss(valid)=0.3505	roc_auc(valid)=0.9215	1/FPR @ TPR = 0.5: 76.16	Best 1/FPR @ TPR = 0.5: 84.67
+2017-10-31 05:34:31,068 Epoch took 942.0543055534363 seconds
+2017-10-31 05:34:31,068 epoch = 25
+2017-10-31 05:34:31,068 step_size = 0.00021291
+2017-10-31 05:50:18,805 Modeling validation data took 157.66148495674133s
+2017-10-31 05:50:18,843 23348	~loss(train)=0.4014	loss(valid)=0.3636	roc_auc(valid)=0.9189	1/FPR @ TPR = 0.5: 61.48	Best 1/FPR @ TPR = 0.5: 84.67
+2017-10-31 05:50:19,825 Epoch took 948.7570147514343 seconds
+2017-10-31 05:50:19,826 epoch = 26
+2017-10-31 05:50:19,826 step_size = 0.00020014
+2017-10-31 06:06:14,509 Modeling validation data took 159.31945729255676s
+2017-10-31 06:06:14,529 24246	~loss(train)=0.3899	loss(valid)=0.3485	roc_auc(valid)=0.9219	1/FPR @ TPR = 0.5: 81.05	Best 1/FPR @ TPR = 0.5: 84.67
+2017-10-31 06:06:15,519 Epoch took 955.6928219795227 seconds
+2017-10-31 06:06:15,519 epoch = 27
+2017-10-31 06:06:15,519 step_size = 0.00018813
+2017-10-31 06:22:00,056 Modeling validation data took 156.86015105247498s
+2017-10-31 06:22:00,072 25144	~loss(train)=0.3936	loss(valid)=0.3505	roc_auc(valid)=0.9216	1/FPR @ TPR = 0.5: 69.77	Best 1/FPR @ TPR = 0.5: 84.67
+2017-10-31 06:22:00,903 Epoch took 945.3836822509766 seconds
+2017-10-31 06:22:00,904 epoch = 28
+2017-10-31 06:22:00,904 step_size = 0.00017684
+2017-10-31 06:37:56,803 Modeling validation data took 158.61430406570435s
+2017-10-31 06:37:56,847 26042	~loss(train)=0.3952	loss(valid)=0.3594	roc_auc(valid)=0.9204	1/FPR @ TPR = 0.5: 77.39	Best 1/FPR @ TPR = 0.5: 84.67
+2017-10-31 06:37:57,667 Epoch took 956.7625799179077 seconds
+2017-10-31 06:37:57,667 epoch = 29
+2017-10-31 06:37:57,667 step_size = 0.00016623
+2017-10-31 06:53:51,648 Modeling validation data took 157.19539403915405s
+2017-10-31 06:53:51,661 26940	~loss(train)=0.3899	loss(valid)=0.3502	roc_auc(valid)=0.9213	1/FPR @ TPR = 0.5: 81.14	Best 1/FPR @ TPR = 0.5: 84.67
+2017-10-31 06:53:52,704 Epoch took 955.0368459224701 seconds
+2017-10-31 06:53:52,705 epoch = 30
+2017-10-31 06:53:52,718 step_size = 0.00015626
+2017-10-31 07:09:29,802 Modeling validation data took 157.01831531524658s
+2017-10-31 07:09:29,833 27838	~loss(train)=0.3908	loss(valid)=0.3519	roc_auc(valid)=0.9209	1/FPR @ TPR = 0.5: 80.26	Best 1/FPR @ TPR = 0.5: 84.67
+2017-10-31 07:09:30,579 Epoch took 937.8607749938965 seconds
+2017-10-31 07:09:30,579 epoch = 31
+2017-10-31 07:09:30,580 step_size = 0.00014688
+2017-10-31 07:25:15,502 Modeling validation data took 156.75870537757874s
+2017-10-31 07:25:15,541 28736	~loss(train)=0.3933	loss(valid)=0.3505	roc_auc(valid)=0.9210	1/FPR @ TPR = 0.5: 65.18	Best 1/FPR @ TPR = 0.5: 84.67
+2017-10-31 07:25:16,616 Epoch took 946.0361976623535 seconds
+2017-10-31 07:25:16,616 epoch = 32
+2017-10-31 07:25:16,616 step_size = 0.00013807
+2017-10-31 07:41:09,605 Modeling validation data took 159.4302361011505s
+2017-10-31 07:41:09,638 29634	~loss(train)=0.3951	loss(valid)=0.3527	roc_auc(valid)=0.9209	1/FPR @ TPR = 0.5: 97.48	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 07:41:10,486 Epoch took 953.869392156601 seconds
+2017-10-31 07:41:10,486 epoch = 33
+2017-10-31 07:41:10,486 step_size = 0.00012978
+2017-10-31 07:56:56,976 Modeling validation data took 156.68818640708923s
+2017-10-31 07:56:57,004 30532	~loss(train)=0.3869	loss(valid)=0.3518	roc_auc(valid)=0.9214	1/FPR @ TPR = 0.5: 89.73	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 07:56:58,010 Epoch took 947.5230886936188 seconds
+2017-10-31 07:56:58,010 epoch = 34
+2017-10-31 07:56:58,010 step_size = 0.00012200
+2017-10-31 08:12:44,036 Modeling validation data took 157.81395959854126s
+2017-10-31 08:12:44,063 31430	~loss(train)=0.3896	loss(valid)=0.3505	roc_auc(valid)=0.9220	1/FPR @ TPR = 0.5: 85.25	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 08:12:44,938 Epoch took 946.9275486469269 seconds
+2017-10-31 08:12:44,938 epoch = 35
+2017-10-31 08:12:44,948 step_size = 0.00011468
+2017-10-31 08:28:25,767 Modeling validation data took 158.59955739974976s
+2017-10-31 08:28:25,803 32328	~loss(train)=0.3872	loss(valid)=0.3515	roc_auc(valid)=0.9216	1/FPR @ TPR = 0.5: 75.74	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 08:28:26,904 Epoch took 941.956399679184 seconds
+2017-10-31 08:28:26,905 epoch = 36
+2017-10-31 08:28:26,905 step_size = 0.00010780
+2017-10-31 08:44:18,409 Modeling validation data took 159.60485434532166s
+2017-10-31 08:44:18,423 33226	~loss(train)=0.3870	loss(valid)=0.3511	roc_auc(valid)=0.9224	1/FPR @ TPR = 0.5: 78.35	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 08:44:19,156 Epoch took 952.2512395381927 seconds
+2017-10-31 08:44:19,157 epoch = 37
+2017-10-31 08:44:19,157 step_size = 0.00010133
+2017-10-31 09:00:27,669 Modeling validation data took 161.8651533126831s
+2017-10-31 09:00:27,703 34124	~loss(train)=0.3872	loss(valid)=0.3510	roc_auc(valid)=0.9211	1/FPR @ TPR = 0.5: 89.81	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 09:00:28,413 Epoch took 969.2559869289398 seconds
+2017-10-31 09:00:28,413 epoch = 38
+2017-10-31 09:00:28,413 step_size = 0.00009525
+2017-10-31 09:16:16,658 Modeling validation data took 157.8343243598938s
+2017-10-31 09:16:16,689 35022	~loss(train)=0.3874	loss(valid)=0.3484	roc_auc(valid)=0.9222	1/FPR @ TPR = 0.5: 88.08	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 09:16:17,487 Epoch took 949.0732324123383 seconds
+2017-10-31 09:16:17,487 epoch = 39
+2017-10-31 09:16:17,487 step_size = 0.00008953
+2017-10-31 09:32:00,098 Modeling validation data took 156.25219678878784s
+2017-10-31 09:32:00,141 35920	~loss(train)=0.3855	loss(valid)=0.3514	roc_auc(valid)=0.9214	1/FPR @ TPR = 0.5: 84.37	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 09:32:01,121 Epoch took 943.633939743042 seconds
+2017-10-31 09:32:01,122 epoch = 40
+2017-10-31 09:32:01,122 step_size = 0.00008416
+2017-10-31 09:47:41,966 Modeling validation data took 154.37713074684143s
+2017-10-31 09:47:41,987 36818	~loss(train)=0.3921	loss(valid)=0.3634	roc_auc(valid)=0.9194	1/FPR @ TPR = 0.5: 67.59	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 09:47:42,754 Epoch took 941.6319873332977 seconds
+2017-10-31 09:47:42,754 epoch = 41
+2017-10-31 09:47:42,754 step_size = 0.00007911
+2017-10-31 10:03:26,672 Modeling validation data took 158.05562138557434s
+2017-10-31 10:03:26,706 37716	~loss(train)=0.3863	loss(valid)=0.3500	roc_auc(valid)=0.9212	1/FPR @ TPR = 0.5: 86.89	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 10:03:27,444 Epoch took 944.6897394657135 seconds
+2017-10-31 10:03:27,445 epoch = 42
+2017-10-31 10:03:27,445 step_size = 0.00007437
+2017-10-31 10:19:15,181 Modeling validation data took 154.9503936767578s
+2017-10-31 10:19:15,200 38614	~loss(train)=0.3856	loss(valid)=0.3506	roc_auc(valid)=0.9213	1/FPR @ TPR = 0.5: 73.44	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 10:19:16,026 Epoch took 948.581262588501 seconds
+2017-10-31 10:19:16,027 epoch = 43
+2017-10-31 10:19:16,027 step_size = 0.00006990
+2017-10-31 10:34:50,938 Modeling validation data took 151.31161785125732s
+2017-10-31 10:34:50,955 39512	~loss(train)=0.3835	loss(valid)=0.3535	roc_auc(valid)=0.9219	1/FPR @ TPR = 0.5: 73.54	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 10:34:51,514 Epoch took 935.4874212741852 seconds
+2017-10-31 10:34:51,515 epoch = 44
+2017-10-31 10:34:51,515 step_size = 0.00006571
+2017-10-31 10:43:23,490 Modeling validation data took 81.19001412391663s
+2017-10-31 10:43:23,502 40410	~loss(train)=0.3872	loss(valid)=0.3557	roc_auc(valid)=0.9214	1/FPR @ TPR = 0.5: 89.19	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 10:43:24,028 Epoch took 512.5136301517487 seconds
+2017-10-31 10:43:24,029 epoch = 45
+2017-10-31 10:43:24,029 step_size = 0.00006177
+2017-10-31 10:51:57,263 Modeling validation data took 81.00319242477417s
+2017-10-31 10:51:57,279 41308	~loss(train)=0.3866	loss(valid)=0.3595	roc_auc(valid)=0.9178	1/FPR @ TPR = 0.5: 52.12	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 10:51:57,724 Epoch took 513.6952607631683 seconds
+2017-10-31 10:51:57,725 epoch = 46
+2017-10-31 10:51:57,725 step_size = 0.00005806
+2017-10-31 11:00:31,751 Modeling validation data took 82.83142304420471s
+2017-10-31 11:00:31,761 42206	~loss(train)=0.3920	loss(valid)=0.3616	roc_auc(valid)=0.9179	1/FPR @ TPR = 0.5: 60.23	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 11:00:32,163 Epoch took 514.4378528594971 seconds
+2017-10-31 11:00:32,163 epoch = 47
+2017-10-31 11:00:32,163 step_size = 0.00005458
+2017-10-31 11:09:02,397 Modeling validation data took 81.00807332992554s
+2017-10-31 11:09:02,409 43104	~loss(train)=0.3776	loss(valid)=0.3533	roc_auc(valid)=0.9219	1/FPR @ TPR = 0.5: 74.37	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 11:09:02,902 Epoch took 510.7384190559387 seconds
+2017-10-31 11:09:02,902 epoch = 48
+2017-10-31 11:09:02,902 step_size = 0.00005130
+2017-10-31 11:16:34,834 Modeling validation data took 59.86639070510864s
+2017-10-31 11:16:34,843 44002	~loss(train)=0.3783	loss(valid)=0.3499	roc_auc(valid)=0.9214	1/FPR @ TPR = 0.5: 80.33	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 11:16:35,214 Epoch took 452.312237739563 seconds
+2017-10-31 11:16:35,214 epoch = 49
+2017-10-31 11:16:35,214 step_size = 0.00004822
+2017-10-31 11:23:02,895 Modeling validation data took 59.86245369911194s
+2017-10-31 11:23:02,910 44900	~loss(train)=0.3787	loss(valid)=0.3499	roc_auc(valid)=0.9212	1/FPR @ TPR = 0.5: 79.26	Best 1/FPR @ TPR = 0.5: 97.48
+2017-10-31 11:23:03,328 Epoch took 388.11334133148193 seconds
+2017-10-31 11:23:03,328 FINISHED TRAINING
+2017-10-31 11:23:03,328 Results in models/mpnn/sym-vanilla/2/Oct-30-22-53-58_0
+2017-10-31 11:23:03,329 COMPLETED on Oct-31 at 11:23:03
+2017-10-31 11:23:04,293 SENT EMAIL
