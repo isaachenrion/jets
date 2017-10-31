@@ -101,9 +101,9 @@ def main():
         tprs = []
         inv_fprs = []
 
-        for filename in model_filenames:
+        for i, filename in enumerate(model_filenames):
             if 'DS_Store' not in filename:
-                logging.info("\t\tLoading %s" % filename),
+                logging.info("\t[{}] Loading {}".format(i, filename)),
                 model = load_model(filename)
                 if torch.cuda.is_available():
                     model.cuda()
@@ -127,24 +127,13 @@ def main():
                         unwrap_X(X_var)
                     yy_pred = np.squeeze(np.concatenate(yy_pred, 0), 1)
 
-                    # Roc
-                    #import ipdb; ipdb.set_trace()
                     logdict = dict(
                         model=filename.split('/')[-1],
-                        #iteration=iteration,
                         yy=yy,
                         yy_pred=yy_pred,
                         w_valid=w[:len(yy_pred)],
-                        #w_valid=w_valid,
-                        #train_loss=train_loss,
-                        #valid_loss=valid_loss,
-                        #settings=settings,
-                        #model=model
                     )
                     eh.log(**logdict)
-
-                    #rocs.append(roc_auc_score(y, yy_pred, sample_weight=w))
-                    #fpr, tpr, _ = roc_curve(y, yy_pred, sample_weight=w)
                     roc = eh.monitors['roc_auc'].value
                     fpr = eh.monitors['roc_curve'].value[0]
                     tpr = eh.monitors['roc_curve'].value[1]
@@ -153,11 +142,8 @@ def main():
                     fprs.append(fpr)
                     tprs.append(tpr)
                     inv_fprs.append(inv_fpr)
-                    #inv_fpr = inv_fpr_at_tpr_equals_half(tpr, fpr)
 
-                    logging.info("\t\t\tROC AUC = {:.4f}, 1/FPR = {:.4f}".format(roc, inv_fpr))
-
-        logging.info("\t\tMean ROC AUC = {:.4f} Mean 1/FPR = {:.4f}".format(np.mean(rocs), np.mean(inv_fprs)))
+        logging.info("\tMean ROC AUC = {:.4f} Mean 1/FPR = {:.4f}".format(np.mean(rocs), np.mean(inv_fprs)))
 
         return rocs, fprs, tprs, inv_fprs
 
