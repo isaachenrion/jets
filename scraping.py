@@ -51,6 +51,7 @@ def main():
 
     for md in model_dirs: print(md)
     for model_dir in model_dirs:
+        print(model_dir)
         #scrape_results(model_dir)
         try:
             remove_outliers_csv(os.path.join(model_dir, 'stats.csv'))
