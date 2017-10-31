@@ -35,9 +35,6 @@ from losses import log_loss
 
 from architectures import PredictFromParticleEmbedding
 
-from analysis.rocs import inv_fpr_at_tpr_equals_half
-from analysis.reports import report_score
-
 from loggers import StatsLogger
 
 from loading import load_data
