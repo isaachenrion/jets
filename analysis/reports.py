@@ -35,6 +35,7 @@ def remove_outliers(rocs, fprs, tprs, inv_fprs):
     return new_r, new_f, new_t, new_inv_fprs
 
 
+
 def report_score(rocs, inv_fprs, label, latex=False, input="particles", short=False):
     #inv_fprs = []
     #base_tpr = np.linspace(0.05, 1, 476)
