@@ -2,7 +2,7 @@ from loggers import StatsLogger
 import os
 import csv
 from constants import REPORTS_DIR
-
+import numpy as np
 def scrape_results(model_dir):
     model_filenames = [os.path.join(model_dir, fn) for fn in os.listdir(model_dir)]
     for f in model_filenames: print('\t{}'.format(f))
