@@ -1,8 +1,0 @@
-2017-10-11 10:42:11,145 	batch_size = 64
-2017-10-11 10:42:11,145 	data_list_filename = evaldatasets.txt
-2017-10-11 10:42:11,145 	gpu = 0
-2017-10-11 10:42:11,145 	model_list_filename = evalmodels.txt
-2017-10-11 10:42:11,145 	n_test = 500
-2017-10-11 10:42:11,145 	silent = False
-2017-10-11 10:42:11,146 	verbose = True
-2017-10-11 10:42:11,146 	PID = 64502
