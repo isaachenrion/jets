@@ -109,7 +109,7 @@ if args.pileup:
     args.filename = 'antikt-kt-pileup25-new'
 def train(args):
     _, Transform, model_type = TRANSFORMS[args.model_type]
-    args.root_exp_dir = os.path.join(MODELS_DIR,model_type, args.iters)
+    args.root_exp_dir = os.path.join(MODELS_DIR,model_type, str(args.iters))
 
     eh = ExperimentHandler(args)
 
