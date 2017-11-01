@@ -1,4 +1,0 @@
-/home/ih692/anaconda3/envs/jets/bin/deactivate: line 84: /home/ih692/anaconda3/envs/jets/bin/conda: No such file or directory
-/home/ih692/anaconda3/envs/jets/bin/activate: line 65: /home/ih692/anaconda3/envs/jets/bin/conda: No such file or directory
-/opt/slurm/data/slurmd/job2802719/slurm_script: line 35: sleep: No such file or directory
-/opt/slurm/data/slurmd/job2802719/slurm_script: line 36: python: No such file or directory
