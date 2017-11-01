@@ -27,6 +27,7 @@ def scrape_results(model_dir):
     print('{}: ({} models) {:.2f} +- {:.2f}'.format(model_dir, len(inv_fprs), np.mean(np.array(inv_fprs)), np.std(np.array(inv_fprs))))
 
 def remove_outliers_csv(model_dir):
+    print(model_dir)
     csv_filename = os.path.join(model_dir, 'stats.csv')
     with open(csv_filename, newline='') as f:
         reader = csv.DictReader(f)
@@ -52,7 +53,7 @@ def remove_outliers_csv(model_dir):
     #for s in new_inv_fprs: print('{:.2f}'.format(s))
     new_inv_fprs = np.array(new_inv_fprs)
     new_rocs = np.array(new_rocs)
-    print(model_dir)
+
     print("OLD")
     print("{:.4f}".format(np.mean(inv_fprs)))
     print("{:.4f}".format(np.std(inv_fprs)))
