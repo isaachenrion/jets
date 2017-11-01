@@ -263,7 +263,7 @@ class ExperimentHandler:
         self.stats_logger.close()
 
     def initial_email(self):
-        text = ['JOB STARTED', self.exp_dir, self.host]
+        text = ['JOB STARTED', self.exp_dir, self.host.split('.')[0], self.pid]
         self.emailer.send_msg('\n'.join(text), ' | '.join(text))
 
 

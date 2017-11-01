@@ -149,6 +149,8 @@ def main():
                 else:
                     with open(model_test_file, "rb") as fd:
                         roc, fpr, tpr, inv_fpr = pickle.load(fd)
+                    stats_dict = {'roc_auc': roc, 'inv_fpr':inv_fpr}
+                    eh.stats_logger.log(stats_dict)
                 rocs.append(roc)
                 fprs.append(fpr)
                 tprs.append(tpr)
