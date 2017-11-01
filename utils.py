@@ -282,10 +282,10 @@ class EvaluationExperimentHandler(ExperimentHandler):
             filename_exp += '-DEBUG'
         self.exp_dir = os.path.join(args.root_exp_dir, filename_exp)
         i = 0
-        temp = os.path.join(self.exp_dir,str(i))
+        temp = self.exp_dir + '-run' + str(i)
         while os.path.exists(temp):
             i += 1
-            temp = os.path.join(self.exp_dir,str(i))
+            temp = self.exp_dir + '-run' + str(i)
         self.exp_dir = temp
         os.makedirs(self.exp_dir)
 

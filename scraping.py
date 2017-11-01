@@ -64,11 +64,14 @@ def remove_outliers_csv(model_dir):
 
 
 
-def main():
+def main(pileup):
 
     #base='pileup_finished_models'
     #base = 'finished_models'
+
     base = 'reports'
+    dataset = 'pileup' if pileup else 'original'
+    base = os.path.join(base, dataset)
     #models = ['mpnn', 'recnn', 'relation']
     flavours = ['vanilla', 'set', 'id', 'sym-set', 'sym-vanilla']
     iters = [1, 2, 3]
@@ -89,4 +92,6 @@ def main():
             print(e)
 
 if __name__ == '__main__':
-    main()
+    pileup = False
+
+    main(pileup)
