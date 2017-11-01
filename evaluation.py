@@ -77,7 +77,9 @@ args.finished_models_dir = FINISHED_MODELS_DIR
 if args.pileup:
     args.filename = 'antikt-kt-pileup25-new'
     args.finished_models_dir = 'pileup_' + args.finished_models_dir
-
+    args.root_exp_dir += '/pileup'
+else:
+    args.root_exp_dir += '/original'
 
 def main():
 
