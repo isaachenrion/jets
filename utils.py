@@ -101,10 +101,15 @@ class SignalHandler:
         #    os.system("rm {}/*".format(self.exp_dir))
         #    os.system("rm -r {}".format(self.exp_dir))
 
+    def prepend_to_logfile(self, text):
+        with open(self.logfile, 'r') as original: data = original.read()
+        with open(self.logfile, 'w') as modified: modified.write("{}\n".format(text) + data)
+
     def signal_handler(self, signal, cleanup=True):
         d = timestring()
         alert = '{} on {}'.format(signal, timestring())
         logging.warning(alert)
+        self.prepend_to_logfile(alert)
         subject = "Job {} {}".format(signal, self.subject_string)
         text = "{}\n{}\n{}".format(alert, self.results_strings[-1], self.model)
         attachments = [self.logfile]
@@ -138,6 +143,7 @@ class ExperimentHandler:
         self.setup_signal_handler(args)
         self.setup_stats_logger(args)
         self.record_settings(args)
+        self.initial_email()
 
     def cuda_and_random_seed(self, args):
         ''' CUDA AND RANDOM SEED '''
@@ -250,10 +256,16 @@ class ExperimentHandler:
         self.saver.save(model, settings)
 
     def finished(self):
-        logging.info("FINISHED TRAINING")
+        finished_training = "FINISHED TRAINING"
+        logging.info(finished_training)
         logging.info("Results in {}".format(self.exp_dir))
         self.signal_handler.completed()
         self.stats_logger.close()
+
+    def initial_email(self):
+        text = ['JOB STARTED', self.exp_dir, self.host]
+        self.emailer.send_msg('\n'.join(text), ' | '.join(text))
+
 
 class EvaluationExperimentHandler(ExperimentHandler):
     def __init__(self, args):

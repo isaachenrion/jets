@@ -35,8 +35,9 @@ def remove_outliers_csv(model_dir):
     rocs = [float(l['roc_auc']) for l in lines[:]]
     #print(len(inv_fprs))
     scores = np.array(inv_fprs)[:30]
+    print(len(scores))
     #import ipdb; ipdb.set_trace()
-    assert len(scores) == 30
+    #assert len(scores) == 30
     scores = sorted(scores)
     #print("Original scores")
     #for s in scores: print('{:.2f}'.format(s))
@@ -59,13 +60,6 @@ def remove_outliers_csv(model_dir):
     print("{:.4f}".format(np.std(new_rocs)))
 
 
-def convert_state_dict_pt_file(path_to_state_dict):
-    with open(os.path.join(path_to_state_dict, 'model_state_dict.pt'), 'rb') as f:
-        state_dict = torch.load(f)
-    for k, v in state_dict.items():
-        state_dict[k] = v.cpu()
-    with open(os.path.join(path_to_state_dict, 'cpu_model_state_dict.pt'), 'wb') as f:
-        torch.save(state_dict, f)
 
 
 
@@ -83,16 +77,16 @@ def main():
     for md in model_dirs: print(md)
     for model_dir in model_dirs:
         #print(model_dir)
-        scrape_results(model_dir)
-        #try:
-        #    remove_outliers_csv(model_dir)
+        #scrape_results(model_dir)
+        try:
+            remove_outliers_csv(model_dir)
         #try:
         #    remove_outliers_csv()
         #    model_filenames = [os.path.join(model_dir, fn) for fn in os.listdir(model_dir)]
         #    for model_fn in model_filenames:
         #        #convert_state_dict_pt_file(model_fn)
-        #except FileNotFoundError as e:
-        #    print(e)
+        except FileNotFoundError as e:
+            print(e)
 
 if __name__ == '__main__':
     main()
