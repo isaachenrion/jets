@@ -1,0 +1,32 @@
+2017-10-28 22:36:09,414 reports/Oct-28/22-36-09_0/log.txt
+2017-10-28 22:36:09,415 reports/Oct-28/22-36-09_0
+2017-10-28 22:36:09,415 Logfile at reports/Oct-28/22-36-09_0/log.txt
+2017-10-28 22:36:09,415 	batch_size = 10
+2017-10-28 22:36:09,415 	data_list_filename = evaldatasets.txt
+2017-10-28 22:36:09,415 	debug = False
+2017-10-28 22:36:09,415 	extra_tag = 0
+2017-10-28 22:36:09,415 	gpu = -1
+2017-10-28 22:36:09,415 	load_rocs = None
+2017-10-28 22:36:09,415 	model_list_filename = evalmodels.txt
+2017-10-28 22:36:09,415 	n_test = 1000
+2017-10-28 22:36:09,415 	password = deeplearning
+2017-10-28 22:36:09,415 	plot = False
+2017-10-28 22:36:09,415 	recipient = henrion@nyu.edu
+2017-10-28 22:36:09,415 	remove_outliers = False
+2017-10-28 22:36:09,415 	seed = 1
+2017-10-28 22:36:09,415 	sender = results74207281@gmail.com
+2017-10-28 22:36:09,416 	set = test
+2017-10-28 22:36:09,416 	silent = True
+2017-10-28 22:36:09,416 	verbose = False
+2017-10-28 22:36:09,416 	PID = 28735
+2017-10-28 22:36:09,416 	Not running on GPU
+2017-10-28 22:36:09,416 DATA PATHS
+antikt-kt
+2017-10-28 22:36:09,416 MODEL PATHS
+mpnn/vanilla/1
+mpnn/vanilla/2
+2017-10-28 22:36:09,416 Building ROCs for models trained on antikt-kt
+2017-10-28 22:36:09,416 TF already computed. Loading it.
+2017-10-28 22:36:12,154 Data loaded and already preprocessed
+2017-10-28 22:36:15,055 INTERRUPTED on Oct-28 at 22:36:15
+2017-10-28 22:36:17,040 SENT EMAIL

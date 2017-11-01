@@ -21,27 +21,38 @@ def scrape_results(model_dir):
             sd['model'] = fn.split('/')[-1]
             sl.log(sd)
 
-def remove_outliers_csv(csv_filename):
+def remove_outliers_csv(model_dir):
+    csv_filename = os.path.join(model_dir, 'stats.csv')
     with open(csv_filename, newline='') as f:
         reader = csv.DictReader(f)
         lines = [l for l in reader]
-    inv_fprs = [float(l['inv_fpr']) for l in lines[1:]]
-    scores = np.array(inv_fprs)
+    inv_fprs = [float(l['inv_fpr']) for l in lines[:]]
+    rocs = [float(l['roc_auc']) for l in lines[:]]
+    #print(len(inv_fprs))
+    scores = np.array(inv_fprs)[:30]
+    #import ipdb; ipdb.set_trace()
+    assert len(scores) == 30
     scores = sorted(scores)
-    print("Original scores")
-    for s in scores: print('{:.2f}'.format(s))
+    #print("Original scores")
+    #for s in scores: print('{:.2f}'.format(s))
     clipped_scores = scores[5:-5]
     robust_mean = np.mean(clipped_scores)
     robust_std = np.std(clipped_scores)
     indices = [i for i in range(len(scores)) if robust_mean - 3*robust_std <= scores[i] <= robust_mean + 3*robust_std]
     new_inv_fprs = [scores[i] for i in indices]
+    new_rocs = [rocs[i] for i in indices]
     #print(new_inv_fprs)
-    print("Filtered scores")
-    for s in new_inv_fprs: print('{:.2f}'.format(s))
+    #print("Filtered scores")
+    #for s in new_inv_fprs: print('{:.2f}'.format(s))
     new_inv_fprs = np.array(new_inv_fprs)
-    print("ROBUST MEAN = {}".format(np.mean(new_inv_fprs)))
-    print("ROBUST STDDEV = {}".format(np.std(new_inv_fprs)))
-    print("ROBUST STDERR = {}".format(np.std(new_inv_fprs) / (len(new_inv_fprs) ** 0.5)))
+    new_rocs = np.array(new_rocs)
+    #print("{:.4f}".format(np.mean(new_inv_fprs)))
+    #print("{:.4f}".format(np.std(new_inv_fprs)))
+    #print("{:.4f}".format(np.std(new_inv_fprs) / (len(new_inv_fprs) ** 0.5)))
+
+    print("{:.4f}".format(np.mean(new_rocs)))
+    print("{:.4f}".format(np.std(new_rocs)))
+
 
 def convert_state_dict_pt_file(path_to_state_dict):
     with open(os.path.join(path_to_state_dict, 'model_state_dict.pt'), 'rb') as f:
@@ -57,8 +68,8 @@ def convert_state_dict_pt_file(path_to_state_dict):
 def main():
 
     #base='pileup_finished_models'
-    base = 'finished_models'
-    #base = 'reports'
+    #base = 'finished_models'
+    base = 'reports'
     #models = ['mpnn', 'recnn', 'relation']
     flavours = ['vanilla', 'set', 'id', 'sym-set', 'sym-vanilla']
     iters = [1, 2, 3]
@@ -67,13 +78,16 @@ def main():
     for md in model_dirs: print(md)
     for model_dir in model_dirs:
         print(model_dir)
-        #scrape_results(model_dir)
-        try:
-            model_filenames = [os.path.join(model_dir, fn) for fn in os.listdir(model_dir)]
-            for model_fn in model_filenames:
-                convert_state_dict_pt_file(model_fn)
-        except FileNotFoundError as e:
-            print(e)
+        scrape_results(model_dir)
+        #try:
+        #    remove_outliers_csv(model_dir)
+        #try:
+        #    remove_outliers_csv()
+        #    model_filenames = [os.path.join(model_dir, fn) for fn in os.listdir(model_dir)]
+        #    for model_fn in model_filenames:
+        #        #convert_state_dict_pt_file(model_fn)
+        #except FileNotFoundError as e:
+        #    print(e)
 
 if __name__ == '__main__':
     main()

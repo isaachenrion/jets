@@ -107,7 +107,8 @@ def main():
                 model = load_model(filename)
                 if torch.cuda.is_available():
                     model.cuda()
-                work = True
+                model_test_file = os.path.join(filename, 'test-rocs.pickle')
+                work = not os.path.exists(model_test_file)
                 if work:
                     model.eval()
 
@@ -138,10 +139,16 @@ def main():
                     fpr = eh.monitors['roc_curve'].value[0]
                     tpr = eh.monitors['roc_curve'].value[1]
                     inv_fpr = eh.monitors['inv_fpr'].value
-                    rocs.append(roc)
-                    fprs.append(fpr)
-                    tprs.append(tpr)
-                    inv_fprs.append(inv_fpr)
+
+                    with open(model_test_file, "wb") as fd:
+                        pickle.dump((roc, fpr, tpr, inv_fpr), fd)
+                else:
+                    with open(model_test_file, "rb") as fd:
+                        roc, fpr, tpr, inv_fpr = pickle.load(fd)
+                rocs.append(roc)
+                fprs.append(fpr)
+                tprs.append(tpr)
+                inv_fprs.append(inv_fpr)
 
         logging.info("\tMean ROC AUC = {:.4f} Mean 1/FPR = {:.4f}".format(np.mean(rocs), np.mean(inv_fprs)))
 

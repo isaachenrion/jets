@@ -1,0 +1,27 @@
+2017-10-28 22:34:51,957 reports/Oct-28/22-34-51_0/log.txt
+2017-10-28 22:34:51,958 reports/Oct-28/22-34-51_0
+2017-10-28 22:34:51,958 Logfile at reports/Oct-28/22-34-51_0/log.txt
+2017-10-28 22:34:51,958 	batch_size = 10
+2017-10-28 22:34:51,958 	data_list_filename = evaldatasets.txt
+2017-10-28 22:34:51,958 	debug = False
+2017-10-28 22:34:51,958 	extra_tag = 0
+2017-10-28 22:34:51,958 	gpu = -1
+2017-10-28 22:34:51,958 	load_rocs = isaachenrion@gmail.com
+2017-10-28 22:34:51,958 	model_list_filename = evalmodels.txt
+2017-10-28 22:34:51,958 	n_test = 1000
+2017-10-28 22:34:51,958 	password = deeplearning
+2017-10-28 22:34:51,958 	plot = False
+2017-10-28 22:34:51,958 	recipient = henrion@nyu.edu
+2017-10-28 22:34:51,958 	remove_outliers = False
+2017-10-28 22:34:51,958 	seed = 1
+2017-10-28 22:34:51,958 	sender = results74207281@gmail.com
+2017-10-28 22:34:51,959 	set = test
+2017-10-28 22:34:51,959 	silent = True
+2017-10-28 22:34:51,959 	verbose = False
+2017-10-28 22:34:51,959 	PID = 28730
+2017-10-28 22:34:51,959 	Not running on GPU
+2017-10-28 22:34:51,960 DATA PATHS
+antikt-kt
+2017-10-28 22:34:51,960 MODEL PATHS
+mpnn/vanilla/1
+mpnn/vanilla/2

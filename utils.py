@@ -184,7 +184,7 @@ class ExperimentHandler:
                                 logfile=self.logfile,
                                 exp_dir=self.exp_dir,
                                 need_input=True,
-                                subject_string='{}(Machine = {}, Logfile = {}, PID = {}, GPU = {})'.format(self.host, "[DEBUGGING] " if args.debug else "", self.logfile, self.pid, args.gpu),
+                                subject_string='{} (Machine = {}, Logfile = {}, PID = {}, GPU = {})'.format("[DEBUGGING] " if args.debug else "", self.host, self.logfile, self.pid, args.gpu),
                                 model=None
                             )
     def setup_stats_logger(self, args):
