@@ -8,7 +8,7 @@ import numpy as np
 
 def scrape_results(model_dir):
     model_filenames = [os.path.join(model_dir, fn) for fn in os.listdir(model_dir)]
-    for f in model_filenames: print('\t{}'.format(f))
+    #for f in model_filenames: print('\t{}'.format(f))
     inv_fprs = []
     for i, fn in enumerate(model_filenames):
         with open(os.path.join(fn, 'stats.csv'), newline='') as f:
@@ -24,7 +24,7 @@ def scrape_results(model_dir):
             sl.log(sd)
             inv_fprs.append(float(sd['best_inv_fpr']))
     #print(2)
-    print('{}: {} +- {}'.format(model_dir, np.mean(np.array(inv_fprs)), np.std(np.array(inv_fprs))))
+    print('{}: ({} models) {:.2f} +- {:.2f}'.format(model_dir, np.mean(np.array(inv_fprs)), np.std(np.array(inv_fprs))))
 
 def remove_outliers_csv(model_dir):
     csv_filename = os.path.join(model_dir, 'stats.csv')
@@ -82,7 +82,7 @@ def main():
     model_dirs.extend([os.path.join(base, 'recnn/simple'), os.path.join(base, 'relation')])
     for md in model_dirs: print(md)
     for model_dir in model_dirs:
-        print(model_dir)
+        #print(model_dir)
         scrape_results(model_dir)
         #try:
         #    remove_outliers_csv(model_dir)
