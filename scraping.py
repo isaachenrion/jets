@@ -68,8 +68,8 @@ def convert_state_dict_pt_file(path_to_state_dict):
 def main():
 
     #base='pileup_finished_models'
-    #base = 'finished_models'
-    base = 'reports'
+    base = 'finished_models'
+    #base = 'reports'
     #models = ['mpnn', 'recnn', 'relation']
     flavours = ['vanilla', 'set', 'id', 'sym-set', 'sym-vanilla']
     iters = [1, 2, 3]
