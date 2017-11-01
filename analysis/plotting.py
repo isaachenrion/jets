@@ -12,6 +12,7 @@ def plot_rocs(rocs, fprs, tprs, label="", color="r", show_all=False):
     base_tpr = np.linspace(0.05, 1, 476)
 
     for fpr, tpr in zip(fprs, tprs):
+        fpr += 1e-20
         inv_fpr = interp(base_tpr, tpr, 1. / fpr)
         inv_fprs.append(inv_fpr)
         if show_all:
