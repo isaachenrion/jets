@@ -38,7 +38,7 @@ parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_test", type=int, default=-1)
 parser.add_argument("-s", "--set", type=str, default='test')
 parser.add_argument("-m", "--root_model_dir", type=str, default=None)
-parser.add_argument("-p", "--plot", action="store_true")
+parser.add_argument("--plot", action="store_true")
 parser.add_argument("-o", "--remove_outliers", action="store_true")
 parser.add_argument("-l", "--load_rocs", type=str, default=None)
 parser.add_argument("--latex", type=str, default=None)
@@ -48,7 +48,7 @@ parser.add_argument("-v", "--verbose", action='store_true', default=False)
 
 # training args
 parser.add_argument("-b", "--batch_size", type=int, default=64)
-
+parser.add_argument("-p", "--pileup", action='store_true', default=False)
 # computing args
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=1)
 parser.add_argument("-g", "--gpu", type=str, default='')
@@ -73,8 +73,10 @@ if args.debug:
     args.batch_size = 9
     args.verbose = True
 args.root_exp_dir = REPORTS_DIR
-args.pileup = True if 'pileup' in args.filename else False
-
+args.finished_models_dir = FINISHED_MODELS_DIR
+if args.pileup:
+    args.filename = 'antikt-kt-pileup25-new'
+    args.finished_models_dir = 'pileup_' + args.finished_models_dir
 
 
 def main():
@@ -183,7 +185,7 @@ def main():
             data = (X_test, y_test, w_test)
             for model_path in model_paths:
                 logging.info('\tBuilding ROCs for instances of {}'.format(model_path))
-                r, f, t, inv_fprs = build_rocs(data, os.path.join(FINISHED_MODELS_DIR, model_path), args.batch_size)
+                r, f, t, inv_fprs = build_rocs(data, os.path.join(args.finished_models_dir, model_path), args.batch_size)
 
                 absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
                 with open(absolute_roc_path, "wb") as fd:
