@@ -5,6 +5,7 @@ import torch
 import csv
 from constants import REPORTS_DIR
 import numpy as np
+
 def scrape_results(model_dir):
     model_filenames = [os.path.join(model_dir, fn) for fn in os.listdir(model_dir)]
     for f in model_filenames: print('\t{}'.format(f))
@@ -21,8 +22,8 @@ def scrape_results(model_dir):
             sd = lines[-1]
             sd['model'] = fn.split('/')[-1]
             sl.log(sd)
-            inv_fprs.append(float(sd['best_inv_fpr'])
-            
+            inv_fprs.append(float(sd['best_inv_fpr']))
+    #print(2)
     print('{}: {} +- {}'.format(model_dir, np.mean(np.array(inv_fprs)), np.std(np.array(inv_fprs))))
 
 def remove_outliers_csv(model_dir):
