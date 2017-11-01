@@ -67,8 +67,8 @@ def remove_outliers_csv(model_dir):
 def main():
 
     #base='pileup_finished_models'
-    base = 'finished_models'
-    #base = 'reports'
+    #base = 'finished_models'
+    base = 'reports'
     #models = ['mpnn', 'recnn', 'relation']
     flavours = ['vanilla', 'set', 'id', 'sym-set', 'sym-vanilla']
     iters = [1, 2, 3]
