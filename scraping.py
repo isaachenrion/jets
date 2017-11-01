@@ -22,7 +22,7 @@ def scrape_results(model_dir):
             sd['model'] = fn.split('/')[-1]
             sl.log(sd)
             inv_fprs.append(sd['inv_fpr'])
-    print('{}: {} +- {}'.format(model_dir, np.mean(np.array(inv_fprs)), np.std(np.array(inv_fprs)))
+    print('{}: {} +- {}'.format(model_dir, np.mean(np.array(inv_fprs)), np.std(np.array(inv_fprs))))
 
 def remove_outliers_csv(model_dir):
     csv_filename = os.path.join(model_dir, 'stats.csv')
