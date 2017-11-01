@@ -170,10 +170,16 @@ def train(args):
             Predict = settings["predict"]
             model_kwargs = settings["model_kwargs"]
 
-        with open(os.path.join(args.load, 'cpu_model_state_dict.pt'), 'rb') as f:
-            state_dict = torch.load(f)
-            model = PredictFromParticleEmbedding(Transform, **model_kwargs)
-            model.load_state_dict(state_dict)
+        model = PredictFromParticleEmbedding(Transform, **model_kwargs)
+        
+        try:
+            with open(os.path.join(args.load, 'cpu_model_state_dict.pt'), 'rb') as f:
+                state_dict = torch.load(f)
+        except FileNotFoundError as e:
+            with open(os.path.join(args.load, 'model_state_dict.pt'), 'rb') as f:
+                state_dict = torch.load(f)
+
+        model.load_state_dict(state_dict)
 
         if args.restart:
             args.step_size = settings["step_size"]
