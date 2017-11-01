@@ -52,9 +52,9 @@ def remove_outliers_csv(model_dir):
     #for s in new_inv_fprs: print('{:.2f}'.format(s))
     new_inv_fprs = np.array(new_inv_fprs)
     new_rocs = np.array(new_rocs)
-    #print("{:.4f}".format(np.mean(new_inv_fprs)))
-    #print("{:.4f}".format(np.std(new_inv_fprs)))
-    #print("{:.4f}".format(np.std(new_inv_fprs) / (len(new_inv_fprs) ** 0.5)))
+    print("{:.4f}".format(np.mean(new_inv_fprs)))
+    print("{:.4f}".format(np.std(new_inv_fprs)))
+    print("{:.4f}".format(np.std(new_inv_fprs) / (len(new_inv_fprs) ** 0.5)))
 
     print("{:.4f}".format(np.mean(new_rocs)))
     print("{:.4f}".format(np.std(new_rocs)))
