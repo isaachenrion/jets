@@ -269,6 +269,12 @@ class EvaluationExperimentHandler(ExperimentHandler):
         if args.debug:
             filename_exp += '-DEBUG'
         self.exp_dir = os.path.join(args.root_exp_dir, filename_exp)
+        i = 0
+        temp = self.exp_dir + str(i)
+        while os.path.exists(temp):
+            i += 1
+            temp = self.exp_dir + str(i)
+        self.exp_dir = temp
         os.makedirs(self.exp_dir)
 
     def setup_stats_logger(self, args):
