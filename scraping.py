@@ -90,7 +90,8 @@ def main(pileup):
     for md in model_dirs: print(md)
     for model_dir in model_dirs:
         #print(model_dir)
-        scrape_results(model_dir)
+        try:
+            scrape_results(model_dir)
         #try:
         #    remove_outliers_csv(model_dir)
         #try:
@@ -98,8 +99,8 @@ def main(pileup):
         #    model_filenames = [os.path.join(model_dir, fn) for fn in os.listdir(model_dir)]
         #    for model_fn in model_filenames:
         #        #convert_state_dict_pt_file(model_fn)
-        #except FileNotFoundError as e:
-        #    print(e)
+        except FileNotFoundError as e:
+            print(e)
 
 if __name__ == '__main__':
     pileup = False
