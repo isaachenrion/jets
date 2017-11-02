@@ -1,6 +1,7 @@
 from loggers import StatsLogger
 import os
 import torch
+import logging
 
 import csv
 from constants import REPORTS_DIR
@@ -26,51 +27,42 @@ def scrape_results(model_dir):
     #print(2)
     print('{}: ({} models) {:.2f} +- {:.2f}'.format(model_dir, len(inv_fprs), np.mean(np.array(inv_fprs)), np.std(np.array(inv_fprs))))
 
+
+
 def remove_outliers_csv(model_dir):
-    print(model_dir)
+    logging.info(model_dir)
     csv_filename = os.path.join(model_dir, 'stats.csv')
     with open(csv_filename, newline='') as f:
         reader = csv.DictReader(f)
         lines = [l for l in reader]
     inv_fprs = [float(l['inv_fpr']) for l in lines[:]]
     rocs = [float(l['roc_auc']) for l in lines[:]]
-    #print(len(inv_fprs))
     scores = np.array(inv_fprs)[:30]
-    print(len(scores))
-    #import ipdb; ipdb.set_trace()
-    #assert len(scores) == 30
+    logging.info(len(scores))
     scores = sorted(scores)
-    #print("Original scores")
-    #for s in scores: print('{:.2f}'.format(s))
     clipped_scores = scores[5:-5]
     robust_mean = np.mean(clipped_scores)
     robust_std = np.std(clipped_scores)
     indices = [i for i in range(len(scores)) if robust_mean - 3*robust_std <= scores[i] <= robust_mean + 3*robust_std]
     new_inv_fprs = [scores[i] for i in indices]
     new_rocs = [rocs[i] for i in indices]
-    #print(new_inv_fprs)
-    #print("Filtered scores")
-    #for s in new_inv_fprs: print('{:.2f}'.format(s))
     new_inv_fprs = np.array(new_inv_fprs)
     new_rocs = np.array(new_rocs)
 
-    print("OLD")
-    print("{:.4f}".format(np.mean(inv_fprs)))
-    print("{:.4f}".format(np.std(inv_fprs)))
-    print("{:.4f}".format(np.std(inv_fprs) / (len(inv_fprs) ** 0.5)))
-    print("{:.4f}".format(np.mean(rocs)))
-    print("{:.4f}".format(np.std(rocs)))
-    print("")
-    print("NEW")
-    print("{:.4f}".format(np.mean(new_inv_fprs)))
-    print("{:.4f}".format(np.std(new_inv_fprs)))
-    print("{:.4f}".format(np.std(new_inv_fprs) / (len(new_inv_fprs) ** 0.5)))
-    print("{:.4f}".format(np.mean(new_rocs)))
-    print("{:.4f}".format(np.std(new_rocs)))
-    print("")
-
-
-
+    logging.info("OLD")
+    logging.info("{:.4f}".format(np.mean(inv_fprs)))
+    logging.info("{:.4f}".format(np.std(inv_fprs)))
+    logging.info("{:.4f}".format(np.std(inv_fprs) / (len(inv_fprs) ** 0.5)))
+    logging.info("{:.4f}".format(np.mean(rocs)))
+    logging.info("{:.4f}".format(np.std(rocs)))
+    logging.info("")
+    logging.info("NEW")
+    logging.info("{:.4f}".format(np.mean(new_inv_fprs)))
+    logging.info("{:.4f}".format(np.std(new_inv_fprs)))
+    logging.info("{:.4f}".format(np.std(new_inv_fprs) / (len(new_inv_fprs) ** 0.5)))
+    logging.info("{:.4f}".format(np.mean(new_rocs)))
+    logging.info("{:.4f}".format(np.std(new_rocs)))
+    logging.info("")
 
 
 
