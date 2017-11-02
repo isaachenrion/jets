@@ -76,12 +76,12 @@ def remove_outliers_csv(model_dir):
 
 def main(pileup):
 
-    #base='pileup_finished_models'
+    base='pileup_finished_models'
     #base = 'finished_models'
 
-    base = 'reports'
-    dataset = 'pileup' if pileup else 'original'
-    base = os.path.join(base, dataset)
+    #base = 'reports'
+    #dataset = 'pileup' if pileup else 'original'
+    #base = os.path.join(base, dataset)
     #models = ['mpnn', 'recnn', 'relation']
     flavours = ['vanilla', 'set', 'id', 'sym-set', 'sym-vanilla']
     iters = [1, 2, 3]
@@ -90,16 +90,16 @@ def main(pileup):
     for md in model_dirs: print(md)
     for model_dir in model_dirs:
         #print(model_dir)
-        #scrape_results(model_dir)
-        try:
-            remove_outliers_csv(model_dir)
+        scrape_results(model_dir)
+        #try:
+        #    remove_outliers_csv(model_dir)
         #try:
         #    remove_outliers_csv()
         #    model_filenames = [os.path.join(model_dir, fn) for fn in os.listdir(model_dir)]
         #    for model_fn in model_filenames:
         #        #convert_state_dict_pt_file(model_fn)
-        except FileNotFoundError as e:
-            print(e)
+        #except FileNotFoundError as e:
+        #    print(e)
 
 if __name__ == '__main__':
     pileup = False
