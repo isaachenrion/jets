@@ -68,24 +68,24 @@ def remove_outliers_csv(model_dir):
 
 def main(pileup):
 
-    base='pileup_finished_models'
+    #base='pileup_finished_models'
     #base = 'finished_models'
 
-    #base = 'reports'
-    #dataset = 'pileup' if pileup else 'original'
-    #base = os.path.join(base, dataset)
+    base = 'reports'
+    dataset = 'pileup' if pileup else 'original'
+    base = os.path.join(base, dataset)
     #models = ['mpnn', 'recnn', 'relation']
     flavours = ['vanilla', 'set', 'id', 'sym-set', 'sym-vanilla']
     iters = [1, 2, 3]
     model_dirs = [os.path.join(base, 'mpnn', flavour, str(i)) for flavour in flavours for i in iters]
     model_dirs.extend([os.path.join(base, 'recnn/simple'), os.path.join(base, 'relation')])
-    for md in model_dirs: print(md)
+    #for md in model_dirs: print(md)
     for model_dir in model_dirs:
         #print(model_dir)
-        try:
-            scrape_results(model_dir)
         #try:
-        #    remove_outliers_csv(model_dir)
+        #    scrape_results(model_dir)
+        try:
+            remove_outliers_csv(model_dir)
         #try:
         #    remove_outliers_csv()
         #    model_filenames = [os.path.join(model_dir, fn) for fn in os.listdir(model_dir)]

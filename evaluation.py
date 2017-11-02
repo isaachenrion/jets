@@ -191,7 +191,7 @@ def main():
             for model_path in model_paths:
                 logging.info('\tBuilding ROCs for instances of {}'.format(model_path))
                 r, f, t, inv_fprs = build_rocs(data, os.path.join(args.finished_models_dir, model_path), args.batch_size)
-                remove_outliers_csv(os.path.join(args.finished_models_dir, model_path))
+                #remove_outliers_csv(os.path.join(args.finished_models_dir, model_path))
                 absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_path.split('/')), data_path))
                 with open(absolute_roc_path, "wb") as fd:
                     pickle.dump((r, f, t, inv_fprs), fd)
