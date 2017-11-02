@@ -67,7 +67,7 @@ def remove_outliers_csv(model_dir):
 
 
 def main(pileup):
-
+    logging.basicConfig(level=logging.DEBUG)
     #base='pileup_finished_models'
     #base = 'finished_models'
 
