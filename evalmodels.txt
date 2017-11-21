@@ -1,4 +1,0 @@
-#MPNN/Oct-10
-#RecNN-gated/Oct-10
-RecNN-simple/evaltest
-#RelationNet/Oct-10

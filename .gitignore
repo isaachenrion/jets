@@ -1,6 +1,10 @@
-reports
+bash_snippets.txt
 data
 models
+documents
+reports
+finished_models
+pileup_finished_models
 .git
 *.pyc
 *.pyo

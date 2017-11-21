@@ -5,11 +5,11 @@ import numpy as np
 
 from sklearn.preprocessing import RobustScaler
 
-from architectures.preprocessing import permute_by_pt
-from architectures.preprocessing import extract
-from architectures.preprocessing import sequentialize_by_pt
-from architectures.preprocessing import randomize
-from architectures.preprocessing import rewrite_content
+from data_ops.preprocessing import permute_by_pt
+from data_ops.preprocessing import extract
+from data_ops.preprocessing import sequentialize_by_pt
+from data_ops.preprocessing import randomize
+from data_ops.preprocessing import rewrite_content
 
 def load_data(data_dir, filename):
 
@@ -50,29 +50,18 @@ def load_tf(data_dir, filename):
 
     return tf
 
-def _load_data(tf, data_dir, filename, n):
-    X, y = load_raw_data(data_dir, filename)
-    X = np.array(X)
-    y = np.array(y)
-    for jet in X:
-        jet["content"] = tf.transform(jet["content"])
-    if n > 0:
-        indices = np.random.permutation(len(X))[:n]
-        X = X[indices]
-        y = y[indices]
-    logging.warning("Loaded data: {}".format(filename))
-    logging.warning("\tX size = %d" % len(X))
-    logging.warning("\ty size = %d" % len(y))
-    return X, y
-
-def crop(X, y, return_cropped_indices=False):
+def crop(X, y, return_cropped_indices=False, pileup=False):
     # Cropping
     logging.warning("Cropping...")
-    indices = [i for i, j in enumerate(X) if 250 < j["pt"] < 300 and 50 < j["mass"] < 110]
+    if pileup:
+        pt_min, pt_max, m_min, m_max = 300, 365, 150, 220
+    else:
+        pt_min, pt_max, m_min, m_max = 250, 300, 50, 110
+    indices = [i for i, j in enumerate(X) if pt_min < j["pt"] < pt_max and m_min < j["mass"] < m_max]
     cropped_indices = [i for i, j in enumerate(X) if i not in indices]
     logging.warning("{} (selected) + {} (cropped) = {}".format(len(indices), len(cropped_indices), (len(indices) + len(cropped_indices))))
-    X_ = [j for j in X if 250 < j["pt"] < 300 and 50 < j["mass"] < 110]
-    y_ = [y[i] for i, j in enumerate(X) if 250 < j["pt"] < 300 and 50 < j["mass"] < 110]
+    X_ = [j for j in X if pt_min < j["pt"] < pt_max and m_min < j["mass"] < m_max]
+    y_ = [y[i] for i, j in enumerate(X) if pt_min < j["pt"] < pt_max and m_min < j["mass"] < m_max]
 
     y_ = np.array(y_)
 
@@ -80,7 +69,7 @@ def crop(X, y, return_cropped_indices=False):
     w = np.zeros(len(y_))
 
     X0 = [X_[i] for i in range(len(y_)) if y_[i] == 0]
-    pdf, edges = np.histogram([j["pt"] for j in X0], density=True, range=[250, 300], bins=50)
+    pdf, edges = np.histogram([j["pt"] for j in X0], density=True, range=[pt_min, pt_max], bins=50)
     pts = [j["pt"] for j in X0]
     indices = np.searchsorted(edges, pts) - 1
     inv_w = 1. / pdf[indices]
@@ -88,7 +77,7 @@ def crop(X, y, return_cropped_indices=False):
     w[y_==0] = inv_w
 
     X1 = [X_[i] for i in range(len(y_)) if y_[i] == 1]
-    pdf, edges = np.histogram([j["pt"] for j in X1], density=True, range=[250, 300], bins=50)
+    pdf, edges = np.histogram([j["pt"] for j in X1], density=True, range=[pt_min, pt_max], bins=50)
     pts = [j["pt"] for j in X1]
     indices = np.searchsorted(edges, pts) - 1
     inv_w = 1. / pdf[indices]
@@ -99,6 +88,7 @@ def crop(X, y, return_cropped_indices=False):
         return X_, y_, cropped_indices, w
     return X_, y_, w
 
+### DEPRECATED
 def load_test(tf, data_dir, filename, n_test=-1, cropping=True):
     X, y = load_data(data_dir, filename)
     #tf = load_tf(data_dir, "{}-train.pickle".format(filename))
