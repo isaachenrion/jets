@@ -36,7 +36,8 @@ class PaddedMatrixSoftmax(nn.Module):
         #exp_matrix = torch.exp(matrix - matrix_max)
         #S = exp_matrix / torch.sum(exp_matrix, 2, keepdim=True)
         S = F.softmax(matrix)
-        S = S * mask
+        if mask is not None:
+            S = S * mask
         Z = S.sum(2, keepdim=True) + 1e-10
         S = S / Z
         #import ipdb; ipdb.set_trace()

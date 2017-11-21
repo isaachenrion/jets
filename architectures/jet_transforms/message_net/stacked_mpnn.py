@@ -8,39 +8,36 @@ from data_ops.batching import trees_as_adjacency_matrices
 
 from .readout import SetReadout
 
-from .message_net import *
+from .message_passing_layers import *
 
+class AttentionPooling(nn.Module):
+    def __init__(self, nodes_in, nodes_out, hidden):
+        super().__init__()
+
+    def forward(self, h):
+        pass
+    
 class StackedMPNNTransform(nn.Module):
     def __init__(
         self,
-        mpnn_scales=None,
-        features=None,
+        scales=None,
         hidden=None,
         iters=None,
-        leaves=False,
-        message_passing_layer=None
+        mp_layer=None,
+        pooling_layer=None,
         ):
         super().__init__()
-        readouts = [SetReadout(hidden, mpnn_scales[0])] + [SetReadout(mpnn_scales[i-1], mpnn_scales[i]) for i in range(mpnn_scales) if i > 0]
-        self.mpnns = nn.ModuleList([
-                        mpnn(
-                            features=features,
-                            hidden=hidden,
-                            iters=iters,
-                            readout=readouts[i],
-                            message_passing_layer=message_passing_layer
-                            ) for i in range(mpnn_scales)])
+        self.mpnns = nn.ModuleList([MultipleIterationMessagePassingLayer(iters, hidden, mpnn_layer) for _ in scales])
+        self.pools = nn.ModuleList([AttentionPooling(scale[i], scale[i+1]) for i in range(len(scales) - 1)])
 
     def forward(self, jets, return_extras=False, **kwargs):
         jets, mask = batch_leaves(jets)
         h = self.activation(self.embedding(jets))
-        for mp in self.mp_layers:
-            if return_extras:
-                h, A = mp(h=h, jets=jets, mask=mask, return_extras=True)
+        for i, (mpnn, pool) in enumerate(zip(self.mpnns, self.pools)):
+            if i == 0:
+                h = mpnn(h=h, mask=mask, return_extras=return_extras)
             else:
-                h= mp(h=h, jets=jets, mask=mask, return_extras=False)
+                h = mpnn(h=h, mask=None, return_extras=return_extras)
+            h = pool(h)
         out = self.readout(h)
-        if return_extras:
-            return out, A
-        else:
-            return out
+        return out

@@ -10,6 +10,7 @@ from .readout import DTNNReadout, SetReadout
 
 from .message_passing import *
 
+
 class MPNNTransform(nn.Module):
     def __init__(self,
         features=None,
@@ -28,19 +29,19 @@ class MPNNTransform(nn.Module):
         self.features = features + 1
         self.embedding = nn.Linear(self.features, hidden)
         if readout is None:
-            self.readout = DTNNReadout(hidden, targets)
+            self.readout = DTNNReadout(hidden, hidden)
         else:
             self.readout = readout
-        self.mp_layers = nn.ModuleList([message_passing_layer(self.features, hidden) for i in range(iters)])
+        self.multiple_iterations_of_message_passing = MultipleIterationMessagePassingLayer(iters, hidden, message_passing_layer)
 
     def forward(self, jets, return_extras=False, **kwargs):
         jets, mask = batch_leaves(jets)
         h = self.activation(self.embedding(jets))
-        for mp in self.mp_layers:
-            if return_extras:
-                h, A = mp(h=h, mask=mask, return_extras=True)
-            else:
-                h= mp(h=h, mask=mask, return_extras=False)
+        stuff = self.multiple_iterations_of_message_passing(h, mask, return_extras)
+        if return_extras:
+            h, A = stuff
+        else:
+            h = stuff
         out = self.readout(h)
         if return_extras:
             return out, A

@@ -41,7 +41,7 @@ parser.add_argument("--dont_add_cropped", action='store_true', default=False)
 parser.add_argument("-p", "--pileup", action='store_true', default=False)
 
 # general model args
-parser.add_argument("-m", "--model_type", help="index of the model you want to train - look in the code for the model list", type=int, default=0)
+parser.add_argument("-m", "--model_type", help="index of the model you want to train - look in constants.py for the model list", type=int, default=0)
 parser.add_argument("--features", type=int, default=7)
 parser.add_argument("--hidden", type=int, default=40)
 
