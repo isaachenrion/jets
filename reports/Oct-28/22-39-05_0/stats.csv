@@ -1,1 +1,0 @@
-epoch,iteration,roc_auc,inv_fpr,best_inv_fpr,valid_loss,train_loss,save

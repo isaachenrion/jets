@@ -1,41 +1,28 @@
 import torch
-from torch.autograd import Variable
 from torch.optim import Adam, lr_scheduler
 import copy
 import numpy as np
 import logging
 import pickle
-import datetime
 import time
-import sys
 import os
-import signal
 import argparse
-import shutil
-import gc
-
-from utils import ExperimentHandler
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_curve
-from sklearn.metrics import roc_auc_score
-from sklearn.preprocessing import RobustScaler
 
-from architectures.preprocessing import rewrite_content
-from architectures.preprocessing import permute_by_pt
-from architectures.preprocessing import extract
-from architectures.preprocessing import wrap
-from architectures.preprocessing import unwrap
-from architectures.preprocessing import wrap_X
-from architectures.preprocessing import unwrap_X
+from data_ops.wrapping import wrap
+from data_ops.wrapping import unwrap
+from data_ops.wrapping import wrap_X
+from data_ops.wrapping import unwrap_X
 
-from constants import *
+from misc.constants import *
+from misc.handlers import ExperimentHandler
+from misc.loggers import StatsLogger
 
-from losses import log_loss
+from monitors.losses import *
+from monitors.monitors import *
 
 from architectures import PredictFromParticleEmbedding
-
-from loggers import StatsLogger
 
 from loading import load_data
 from loading import load_tf
@@ -97,6 +84,7 @@ if args.debug:
     args.epochs = 3
     args.n_train = 1000
     args.seed = 1
+    args.iters = 1
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
@@ -171,7 +159,7 @@ def train(args):
             model_kwargs = settings["model_kwargs"]
 
         model = PredictFromParticleEmbedding(Transform, **model_kwargs)
-        
+
         try:
             with open(os.path.join(args.load, 'cpu_model_state_dict.pt'), 'rb') as f:
                 state_dict = torch.load(f)

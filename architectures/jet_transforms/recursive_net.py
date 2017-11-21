@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .batching import pad_batch, batch
-from .batching import batch_parents
+from data_ops.batching import pad_batch, batch
+from data_ops.batching import batch_parents
 
 from .nn_utils import AnyBatchGRUCell
 from .nn_utils import BiDirectionalTreeGRU

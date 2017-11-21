@@ -5,11 +5,11 @@ import numpy as np
 
 from sklearn.preprocessing import RobustScaler
 
-from architectures.preprocessing import permute_by_pt
-from architectures.preprocessing import extract
-from architectures.preprocessing import sequentialize_by_pt
-from architectures.preprocessing import randomize
-from architectures.preprocessing import rewrite_content
+from data_ops.preprocessing import permute_by_pt
+from data_ops.preprocessing import extract
+from data_ops.preprocessing import sequentialize_by_pt
+from data_ops.preprocessing import randomize
+from data_ops.preprocessing import rewrite_content
 
 def load_data(data_dir, filename):
 

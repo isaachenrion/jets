@@ -26,7 +26,7 @@ class VertexUpdate(nn.Module):
 
 
 class GRUUpdate(VertexUpdate):
-    def __init__(self, message_dim, hidden_dim, vertex_state_dim):
+    def __init__(self, message_dim, hidden_dim, vertex_state_dim=0):
         super().__init__(message_dim, hidden_dim, vertex_state_dim)
         self.activation = F.tanh
         self.gru = AnyBatchGRUCell(self.message_dim + self.vertex_state_dim, self.hidden_dim)

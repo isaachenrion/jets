@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .batching import pad_batch, batch_leaves
+from data_ops.batching import pad_batch, batch_leaves
 
 class RelNNTransformConnected(nn.Module):
     def __init__(self, features=None, hidden=None, **kwargs):
