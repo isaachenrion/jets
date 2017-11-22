@@ -46,10 +46,14 @@ class StackedMPNNTransform(nn.Module):
         **kwargs
         ):
         super().__init__()
-
         self.embedding = nn.Linear(features+1, hidden)
         self.activation = F.tanh
-        self.mpnns = nn.ModuleList([MultipleIterationMessagePassingLayer(iters, hidden, mp_layer) for _ in scales])
+        self.mpnns = nn.ModuleList(
+            [MultipleIterationMessagePassingLayer(
+                iters=iters, hidden=hidden, message_passing_layer=mp_layer
+                )
+            for _ in scales]
+            )
         self.attn_pools = nn.ModuleList([pooling_layer(scales[i], hidden) for i in range(len(scales))])
         self.readout = SimpleReadout(hidden, hidden)
 

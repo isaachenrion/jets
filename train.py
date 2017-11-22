@@ -84,7 +84,6 @@ if args.debug:
     args.epochs = 3
     args.n_train = 1000
     args.seed = 1
-    args.iters = 1
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 

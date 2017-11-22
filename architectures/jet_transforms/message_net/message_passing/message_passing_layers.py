@@ -9,9 +9,9 @@ from .adjacency import AdaptiveAdjacencyMatrix
 
 
 class MultipleIterationMessagePassingLayer(nn.Module):
-    def __init__(self, n_layers, hidden, message_passing_layer):
+    def __init__(self, iters=None, hidden=None, message_passing_layer=None):
         super().__init__()
-        self.mp_layers = nn.ModuleList([message_passing_layer(hidden) for _ in range(n_layers)])
+        self.mp_layers = nn.ModuleList([message_passing_layer(hidden) for _ in range(iters)])
 
     def forward(self, h=None, mask=None, return_extras=False):
         for mp in self.mp_layers:
