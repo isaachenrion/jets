@@ -67,7 +67,7 @@ parser.add_argument("-g", "--gpu", type=str, default="")
 # MPNN
 parser.add_argument("--not_leaves", action='store_true')
 parser.add_argument("-i", "--iters", type=int, default=0)
-
+parser.add_argument("--scales", nargs='+', type=int, default=-1)
 # email
 parser.add_argument("--sender", type=str, default="results74207281@gmail.com")
 parser.add_argument("--password", type=str, default="deeplearning")
@@ -142,7 +142,7 @@ def train(args):
             'hidden': args.hidden,
             'iters': args.iters,
             'leaves': args.leaves,
-            'scales': [29, 13, 7]
+            'scales': args.scales
         }
         model = Predict(Transform, **model_kwargs)
         settings = {
