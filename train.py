@@ -78,8 +78,8 @@ parser.add_argument("--debug", help="sets everything small for fast model debugg
 args = parser.parse_args()
 
 if args.debug:
-    args.hidden = 1
-    args.batch_size = 9
+    args.hidden = 7
+    args.batch_size = 5
     args.verbose = True
     args.epochs = 3
     args.n_train = 1000
@@ -142,6 +142,7 @@ def train(args):
             'hidden': args.hidden,
             'iters': args.iters,
             'leaves': args.leaves,
+            'scales': [29, 13, 7]
         }
         model = Predict(Transform, **model_kwargs)
         settings = {

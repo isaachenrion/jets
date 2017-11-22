@@ -8,6 +8,7 @@ from architectures import MPNNTransformIdentity
 from architectures import MPNNTransformSet2Set
 from architectures import MPNNTransformSet2SetSymmetric
 from architectures import MPNNTransformAdaptiveSymmetric
+from architectures import StackedMPNNTransform
 
 ''' LOOKUP TABLES AND CONSTANTS '''
 '''----------------------------------------------------------------------- '''
@@ -23,6 +24,7 @@ TRANSFORMS = [
     (5, MPNNTransformSet2Set, 'mpnn/set'),
     (6, MPNNTransformAdaptiveSymmetric,'mpnn/sym-vanilla'),
     (7, MPNNTransformSet2SetSymmetric,'mpnn/sym-set'),
+    (8, StackedMPNNTransform, 'stacked-mpnn')
 ]
 RECIPIENT = "henrion@nyu.edu"
 REPORTS_DIR = "reports"

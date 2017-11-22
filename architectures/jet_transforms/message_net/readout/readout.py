@@ -30,6 +30,18 @@ class DTNNReadout(Readout):
         x = x.mean(1)
         return x
 
+class SimpleReadout(Readout):
+    def __init__(self, hidden_dim, target_dim):
+        super().__init__(hidden_dim, target_dim)
+        self.fc = nn.Linear(hidden_dim, target_dim)
+
+    def forward(self, x):
+        x = self.fc(x)
+        x = F.tanh(x)
+        x = x.mean(1)
+        return x
+
+
 
 class SetReadout(Readout):
     def __init__(self, hidden_dim, target_dim):

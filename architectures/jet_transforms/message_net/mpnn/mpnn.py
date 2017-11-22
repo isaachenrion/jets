@@ -6,9 +6,9 @@ from torch.autograd import Variable
 from data_ops.batching import batch_leaves
 from data_ops.batching import trees_as_adjacency_matrices
 
-from .readout import DTNNReadout, SetReadout
+from ..readout import DTNNReadout, SetReadout
 
-from .message_passing import *
+from ..message_passing import *
 
 
 class MPNNTransform(nn.Module):
@@ -17,13 +17,12 @@ class MPNNTransform(nn.Module):
         hidden=None,
         targets=None,
         iters=None,
-        leaves=False,
         message_passing_layer=None,
-        readout=None
+        readout=None,
+        **kwargs
         ):
         super().__init__()
         self.iters = iters
-        self.leaves = leaves
         self.activation = F.tanh
         self.hidden = hidden
         self.features = features + 1
@@ -47,27 +46,3 @@ class MPNNTransform(nn.Module):
             return out, A
         else:
             return out
-
-class MPNNTransformAdaptive(MPNNTransform):
-    def __init__(self, **kwargs):
-        super().__init__(message_passing_layer=MPAdaptive, **kwargs)
-
-class MPNNTransformAdaptiveSymmetric(MPNNTransform):
-    def __init__(self, **kwargs):
-        super().__init__(message_passing_layer=MPAdaptiveSymmetric, **kwargs)
-
-class MPNNTransformIdentity(MPNNTransform):
-    def __init__(self, **kwargs):
-        super().__init__(message_passing_layer=MPIdentity, **kwargs)
-
-class MPNNTransformFullyConnected(MPNNTransform):
-    def __init__(self, **kwargs):
-        super().__init__(message_passing_layer=MPFullyConnected, **kwargs)
-
-class MPNNTransformSet2Set(MPNNTransform):
-    def __init__(self, **kwargs):
-        super().__init__(message_passing_layer=MPSet2Set, **kwargs)
-
-class MPNNTransformSet2SetSymmetric(MPNNTransform):
-    def __init__(self, **kwargs):
-        super().__init__(message_passing_layer=MPSet2SetSymmetric, **kwargs)
