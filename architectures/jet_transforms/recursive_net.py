@@ -5,8 +5,8 @@ import torch.nn.functional as F
 from data_ops.batching import pad_batch, batch
 from data_ops.batching import batch_parents
 
-from .nn_utils import AnyBatchGRUCell
-from .nn_utils import BiDirectionalTreeGRU
+from ..utils import AnyBatchGRUCell
+from ..utils import BiDirectionalTreeGRU
 
 class GRNNTransformSimple(nn.Module):
     def __init__(self, features=None, hidden=None,**kwargs):
