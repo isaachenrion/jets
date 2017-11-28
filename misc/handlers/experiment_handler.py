@@ -94,8 +94,8 @@ class ExperimentHandler:
             self.saver,
         ]
         self.statsfile = os.path.join(self.exp_dir, 'stats')
-        self.stats_logger = StatsLogger(self.statsfile, headers=[m.name for m in self.monitors])
         self.monitors = {m.name: m for m in self.monitors}
+        self.stats_logger = StatsLogger(self.statsfile, self.monitors)
 
     def record_settings(self, args):
         ''' RECORD SETTINGS '''
@@ -107,10 +107,10 @@ class ExperimentHandler:
         logging.warning("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
 
     def log(self, **kwargs):
-        stats_dict = {}
-        for name, monitor in self.monitors.items():
-            stats_dict[name] = monitor(**kwargs)
-        self.stats_logger.log(stats_dict)
+        #stats_dict = {}
+        #for name, monitor in self.monitors.items():
+        #    stats_dict[name] = monitor(**kwargs)
+        self.stats_logger.log(**kwargs)
 
         if np.isnan(self.monitors['inv_fpr'].value):
             logging.warning("NaN in 1/FPR\n")
@@ -169,23 +169,27 @@ class EvaluationExperimentHandler(ExperimentHandler):
         inv_fpr = InvFPR()
         roc_curve = ROCCurve()
         model_counter = Regurgitate('model')
+        signal_collector = Collect(1,'yy','yy_pred')
+        background_collector = Collect(0,'yy','yy_pred')
         self.monitors = [
             model_counter,
             roc_auc,
             inv_fpr,
             roc_curve,
+            signal_collector,
+            background_collector
         ]
         self.statsfile = os.path.join(self.exp_dir, 'stats')
-        self.stats_logger = StatsLogger(self.statsfile, headers=[m.name for m in self.monitors if m.scalar])
         self.monitors = {m.name: m for m in self.monitors}
+        self.stats_logger = StatsLogger(self.statsfile, self.monitors)
 
     def log(self, **kwargs):
-        stats_dict = {}
-        for name, monitor in self.monitors.items():
-            monitor_value = monitor(**kwargs)
-            if monitor.scalar:
-                stats_dict[name] = monitor_value
-        self.stats_logger.log(stats_dict)
+        #stats_dict = {}
+        #for name, monitor in self.monitors.items():
+        #    monitor_value = monitor(**kwargs)
+        #    if monitor.scalar:
+        #        stats_dict[name] = monitor_value
+        self.stats_logger.log(**kwargs)
 
         if not self.latex:
             out_str = "\tModel = {}\t1/FPR @ TPR = 0.5={:.4f}\troc_auc={:.4f}".format(

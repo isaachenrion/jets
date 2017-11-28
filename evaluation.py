@@ -47,9 +47,10 @@ parser.add_argument("--latex", type=str, default=None)
 # logging args
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
 
-# training args
+# computing args
 parser.add_argument("-b", "--batch_size", type=int, default=64)
 parser.add_argument("-p", "--pileup", action='store_true', default=False)
+parser.add_argument("--recompute", action='store_true', default=False)
 # computing args
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=1)
 parser.add_argument("-g", "--gpu", type=str, default='')
@@ -70,7 +71,7 @@ args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 args.silent = not args.verbose
 if args.debug:
-    args.n_text = 1000
+    args.n_test = 1000
     args.batch_size = 9
     args.verbose = True
 args.root_exp_dir = REPORTS_DIR
@@ -98,7 +99,7 @@ def main():
             lines = [l for l in reader]
             model_paths = [(l['model'], l['filename']) for l in lines[0:]]
 
-    logging.info("DATASET\n{}".format("\n".join(args.filename)))
+    logging.info("DATASET\n{}".format(args.filename))
     data_path = args.filename
     logging.info("MODEL PATHS\n{}".format("\n".join(mp for (_,mp) in model_paths)))
 
@@ -116,7 +117,7 @@ def main():
                 if torch.cuda.is_available():
                     model.cuda()
                 model_test_file = os.path.join(filename, 'test-rocs.pickle')
-                work = not os.path.exists(model_test_file)
+                work = args.recompute or not os.path.exists(model_test_file)
                 if work:
                     model.eval()
 
@@ -174,7 +175,7 @@ def main():
 
     ''' BUILD ROCS '''
     '''----------------------------------------------------------------------- '''
-    if args.load_rocs is None and args.model_list_file is None:
+    if args.recompute or args.model_list_file is None:
 
         logging.info('Building ROCs for models trained on {}'.format(data_path))
         tf = load_tf(args.data_dir, "{}-train.pickle".format(data_path))
@@ -190,7 +191,7 @@ def main():
         X_test, y_test, cropped_indices, w_test = crop(X, y, return_cropped_indices=True, pileup=args.pileup)
 
         data = (X_test, y_test, w_test)
-        for model_path in model_paths:
+        for _, model_path in model_paths:
             logging.info('\tBuilding ROCs for instances of {}'.format(model_path))
             r, f, t, inv_fprs = build_rocs(data, os.path.join(args.finished_models_dir, model_path), args.batch_size)
             #remove_outliers_csv(os.path.join(args.finished_models_dir, model_path))

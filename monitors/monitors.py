@@ -90,6 +90,21 @@ class Regurgitate(Monitor):
         self.value = kwargs[self.value_name]
         return self.value
 
+class Collect(Monitor):
+    def __init__(self, target_value, target_name, output_name):
+        super().__init__('collect-{}'.format(target_value))
+        self.scalar = False
+        self.target_name = target_name
+        self.output_name = output_name
+        self.target_value = target_value
+        self.value = []
+
+    def call(self, **kwargs):
+        targets = kwargs['target_name']
+        outputs = kwargs['output_name']
+        goodstuff = [o for (t,o) in zip(targets, outputs) if t == self.target_value]
+        self.value += goodstuff
+
 class Saver(Monitor):
     def __init__(self, save_monitor, model_file, settings_file):
         self.saved = False
