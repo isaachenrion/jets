@@ -41,7 +41,7 @@ parser.add_argument("--dont_add_cropped", action='store_true', default=False)
 parser.add_argument("-p", "--pileup", action='store_true', default=False)
 
 # general model args
-parser.add_argument("-m", "--model_type", help="index of the model you want to train - look in constants.py for the model list", type=int, default=0)
+parser.add_argument("-m", "--model_type", help="index of the model you want to train - look in constants.py for the model list", type=str, default="")
 parser.add_argument("--features", type=int, default=7)
 parser.add_argument("--hidden", type=int, default=40)
 
@@ -86,7 +86,8 @@ if args.debug:
     args.seed = 1
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-
+if isinstance(args.model_type, int):
+    args.model_type = [k for k, (n, _) in TRANSFORMS.items() if n == int(args.model_type)].pop()
 
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
@@ -95,8 +96,8 @@ args.leaves = not args.not_leaves
 if args.pileup:
     args.filename = 'antikt-kt-pileup25-new'
 def train(args):
-    _, Transform, model_type = TRANSFORMS[args.model_type]
-    args.root_exp_dir = os.path.join(MODELS_DIR,model_type, str(args.iters))
+    _, Transform = TRANSFORMS[args.model_type]
+    args.root_exp_dir = os.path.join(MODELS_DIR,args.model_type, str(args.iters))
 
     eh = ExperimentHandler(args)
 
@@ -145,7 +146,7 @@ def train(args):
         }
         model = Predict(Transform, **model_kwargs)
         settings = {
-            "transform": Transform,
+            "transform": args.model_type,
             "predict": Predict,
             "model_kwargs": model_kwargs,
             "step_size": args.step_size,
