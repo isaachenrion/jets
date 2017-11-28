@@ -32,7 +32,7 @@
 #SBATCH --mail-type=END,FAIL # notifications for job done & fail
 #SBATCH --mail-user=henrion@nyu.edu
 
-SLURMARGS="$1"
+SLURMARGS="$@"
 SRCDIR=$HOME/jets
 cd $SRCDIR
 
