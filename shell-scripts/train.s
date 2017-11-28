@@ -35,7 +35,7 @@
 SLURMARGS="$@"
 SRCDIR=$HOME/jets
 cd $SRCDIR
-
+printf $SLURMARGS
 source activate jets
 
 #DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
