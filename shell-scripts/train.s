@@ -1,4 +1,3 @@
-
 #!/bin/bash
 #
 #all commands that start with SBATCH contain commands that are just used by SLURM for scheduling
