@@ -4,7 +4,9 @@ models
 documents
 reports
 finished_models
-pileup_finished_models
+debug_models
+killed_models
+interrupted_models
 .git
 *.pyc
 *.pyo

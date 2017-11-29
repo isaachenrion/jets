@@ -33,12 +33,12 @@ from loading import crop
 parser = argparse.ArgumentParser(description='Jets')
 
 # data args
-parser.add_argument("-f", "--filename", type=str, default='antikt-kt')
 parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_train", type=int, default=-1)
 parser.add_argument("--n_valid", type=int, default=27000)
 parser.add_argument("--dont_add_cropped", action='store_true', default=False)
 parser.add_argument("-p", "--pileup", action='store_true', default=False)
+parser.add_argument("--root_dir", default=MODELS_DIR)
 
 # general model args
 parser.add_argument("-m", "--model_type", help="index of the model you want to train - look in constants.py for the model list", type=str, default="")
@@ -65,7 +65,6 @@ parser.add_argument("--seed", help="Random seed used in torch and numpy", type=i
 parser.add_argument("-g", "--gpu", type=str, default="")
 
 # MPNN
-parser.add_argument("--not_leaves", action='store_true')
 parser.add_argument("-i", "--iters", type=int, default=0)
 parser.add_argument("--scales", nargs='+', type=int, default=-1)
 # email
@@ -76,7 +75,7 @@ parser.add_argument("--password", type=str, default="deeplearning")
 parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
 
 args = parser.parse_args()
-
+args.train = True
 if args.debug:
     args.hidden = 7
     args.batch_size = 5
@@ -92,12 +91,14 @@ if isinstance(args.model_type, int):
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
 args.recipient = RECIPIENT
-args.leaves = not args.not_leaves
+
 if args.pileup:
-    args.filename = 'antikt-kt-pileup25-new'
+    args.dataset = 'pileup'
+else:
+    args.dataset = 'original'
+
 def train(args):
     _, Transform = TRANSFORMS[args.model_type]
-    args.root_exp_dir = os.path.join(MODELS_DIR,args.model_type, str(args.iters))
 
     eh = ExperimentHandler(args)
 
@@ -105,8 +106,8 @@ def train(args):
     '''----------------------------------------------------------------------- '''
     logging.warning("Loading data...")
 
-    tf = load_tf(args.data_dir, "{}-train.pickle".format(args.filename))
-    X, y = load_data(args.data_dir, "{}-train.pickle".format(args.filename))
+    tf = load_tf(args.data_dir, "{}-train.pickle".format(DATASETS[args.dataset]))
+    X, y = load_data(args.data_dir, "{}-train.pickle".format(DATASETS[args.dataset]))
     for ij, jet in enumerate(X):
         jet["content"] = tf.transform(jet["content"])
 
@@ -141,7 +142,6 @@ def train(args):
             'features': args.features,
             'hidden': args.hidden,
             'iters': args.iters,
-            'leaves': args.leaves,
             'scales': args.scales
         }
         model = Predict(Transform, **model_kwargs)

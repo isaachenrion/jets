@@ -100,8 +100,8 @@ class Collect(Monitor):
         self.value = []
 
     def call(self, **kwargs):
-        targets = kwargs['target_name']
-        outputs = kwargs['output_name']
+        targets = kwargs[self.target_name]
+        outputs = kwargs[self.output_name]
         goodstuff = [o for (t,o) in zip(targets, outputs) if t == self.target_value]
         self.value += goodstuff
 

@@ -15,6 +15,16 @@ from architectures import PredictFromParticleEmbedding
 '''----------------------------------------------------------------------- '''
 MODELS_DIR = 'models'
 FINISHED_MODELS_DIR = 'finished_models'
+DEBUG_MODELS_DIR = 'debug_models'
+INTERRUPTED_MODELS_DIR = 'interrupted_models'
+KILLED_MODELS_DIR = 'killed_models'
+ALL_MODEL_DIRS = [
+    MODELS_DIR,
+    FINISHED_MODELS_DIR,
+    DEBUG_MODELS_DIR,
+    INTERRUPTED_MODELS_DIR,
+    KILLED_MODELS_DIR,
+]
 DATA_DIR = 'data/w-vs-qcd/pickles'
 TRANSFORMS = {
     'relation':(0, RelNNTransformConnected),
@@ -32,5 +42,8 @@ PREDICTORS = {
 }
 RECIPIENT = "henrion@nyu.edu"
 REPORTS_DIR = "reports"
-
+DATASETS = {
+    'original':'antikt-kt',
+    'pileup':'antikt-kt-pileup25'
+}
 #RECIPIENT = None

@@ -4,17 +4,21 @@ import os
 import datetime
 import numpy as np
 import socket
+import shutil
 from ..utils import *
 from .emailer import Emailer
 from .signal_handler import SignalHandler
 from monitors.monitors import *
 from ..loggers import StatsLogger
+from misc.constants import ALL_MODEL_DIRS
 
 
 class ExperimentHandler:
     def __init__(self, args):
+        self.debug = args.debug
         self.pid = os.getpid()
         self.cuda_and_random_seed(args)
+        self.create_all_model_dirs()
         self.model_directory(args)
         self.setup_logging(args)
         self.setup_signal_handler(args)
@@ -39,15 +43,20 @@ class ExperimentHandler:
             torch.manual_seed(args.seed)
 
     def model_directory(self, args):
-        ''' CREATE MODEL DIRECTORY '''
-        '''----------------------------------------------------------------------- '''
-        #
+        self.root_dir = args.root_dir
+        self.model_type_dir = os.path.join(args.dataset, args.model_type, str(args.iters))
         dt = datetime.datetime.now()
-        filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.extra_tag)
+        self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.extra_tag)
         if args.debug:
-            filename_exp += '-DEBUG'
-        self.exp_dir = os.path.join(args.root_exp_dir, filename_exp)
+            self.filename_exp += '-DEBUG'
+        self.leaf_dir = os.path.join(self.model_type_dir, self.filename_exp)
+        self.exp_dir = os.path.join(self.root_dir,self.leaf_dir)
         os.makedirs(self.exp_dir)
+
+    def create_all_model_dirs(self):
+        for model_dir in ALL_MODEL_DIRS:
+            if not os.path.isdir(model_dir):
+                os.makedirs(model_dir)
 
     def setup_logging(self, args):
         ''' SET UP LOGGING '''
@@ -55,7 +64,6 @@ class ExperimentHandler:
         self.logfile = get_logfile(self.exp_dir, args.silent, args.verbose)
         self.host = socket.gethostname()
         logging.info("running on {}".format(self.host))
-        logging.info(self.logfile)
         logging.info(self.exp_dir)
 
     def setup_signal_handler(self, args):
@@ -65,11 +73,15 @@ class ExperimentHandler:
         self.signal_handler = SignalHandler(
                                 emailer=self.emailer,
                                 logfile=self.logfile,
-                                exp_dir=self.exp_dir,
+                                root_dir=self.root_dir,
+                                leaf_dir=self.leaf_dir,
                                 need_input=True,
                                 subject_string='{} (Machine = {}, Logfile = {}, PID = {}, GPU = {})'.format("[DEBUGGING] " if args.debug else "", self.host, self.logfile, self.pid, args.gpu),
-                                model=None
+                                model=None,
+                                debug=args.debug,
+                                train=args.train
                             )
+
     def setup_stats_logger(self, args):
         ''' STATS LOGGER '''
         '''----------------------------------------------------------------------- '''
@@ -100,7 +112,6 @@ class ExperimentHandler:
     def record_settings(self, args):
         ''' RECORD SETTINGS '''
         '''----------------------------------------------------------------------- '''
-        logging.info("Logfile at {}".format(self.logfile))
         for k, v in sorted(vars(args).items()): logging.warning('\t{} = {}'.format(k, v))
 
         logging.warning("\tPID = {}".format(self.pid))
@@ -129,11 +140,7 @@ class ExperimentHandler:
         self.saver.save(model, settings)
 
     def finished(self):
-        finished_training = "FINISHED TRAINING"
-        logging.info(finished_training)
-        logging.info("Results in {}".format(self.exp_dir))
         self.signal_handler.completed()
-        self.stats_logger.close()
 
     def initial_email(self):
         text = ['JOB STARTED', self.exp_dir, self.host.split('.')[0], str(self.pid)]
@@ -146,20 +153,24 @@ class EvaluationExperimentHandler(ExperimentHandler):
         self.latex = args.latex
 
     def model_directory(self, args):
-        ''' CREATE MODEL DIRECTORY '''
-        '''----------------------------------------------------------------------- '''
-        #
+        self.root_dir = args.root_dir
+        self.model_type_dir = args.model_dir
+
         #dt = datetime.datetime.now()
-        filename_exp = '{}'.format(args.root_model_dir)
-        if args.debug:
-            filename_exp += '-DEBUG'
-        self.exp_dir = os.path.join(args.root_exp_dir, filename_exp)
+        #self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.extra_tag)
+        #if args.debug:
+        #    self.filename_exp += '-DEBUG'
+
+        self.leaf_dir = self.model_type_dir
         i = 0
-        temp = self.exp_dir + '/run' + str(i)
-        while os.path.exists(temp):
+        temp = self.leaf_dir + '/run' + str(i)
+        while os.path.exists(os.path.join(self.root_dir,temp)):
             i += 1
-            temp = self.exp_dir + '/run' + str(i)
-        self.exp_dir = temp
+            temp = self.leaf_dir + '/run' + str(i)
+        self.leaf_dir = temp
+
+        self.exp_dir = os.path.join(self.root_dir,self.leaf_dir)
+        print(self.exp_dir)
         os.makedirs(self.exp_dir)
 
     def setup_stats_logger(self, args):
@@ -194,8 +205,8 @@ class EvaluationExperimentHandler(ExperimentHandler):
         if not self.latex:
             out_str = "\tModel = {}\t1/FPR @ TPR = 0.5={:.4f}\troc_auc={:.4f}".format(
                     kwargs['model'],
-                    self.monitors['inv_fpr'].value,
-                    self.monitors['roc_auc'].value
+                    self.monitors['inv_fpr'].value if kwargs.get('compute_monitors', True) else kwargs['inv_fpr'],
+                    self.monitors['roc_auc'].value if kwargs.get('compute_monitors', True) else kwargs['roc_auc']
                     )
         else:
             if not short:

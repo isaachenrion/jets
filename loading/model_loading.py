@@ -16,13 +16,15 @@ def convert_state_dict_pt_file(path_to_state_dict):
 def load_model(filename):
     with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
         settings = pickle.load(f)
-        if isinstance(settings["transform"], basestring):
-            Transform = TRANSFORMS[settings['transform']]
+        if isinstance(settings["transform"], str):
+            Transform = TRANSFORMS[settings['transform']][1]
         else: # backwards compatibility
+            logging.warning('settings should save transform in string format.')
             Transform = settings["transform"]
-        if isinstance(settings["predict"], basestring):
-            Predict = PREDICTORS[settings['predict']]
+        if isinstance(settings["predict"], str):
+            Predict = PREDICTORS[settings['predict']][1]
         else: # backwards compatibility
+            logging.warning('settings should save predictor in string format.')
             Predict = settings["predict"]
         #try:
         #    Predict = settings["predict"]

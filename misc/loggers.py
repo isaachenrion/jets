@@ -13,15 +13,22 @@ class StatsLogger:
             writer = csv.DictWriter(f, self.headers)
             writer.writeheader()
 
-    def log_scalars(self, **kwargs):
+    def compute_monitors(self, **kwargs):
         stats_dict = {}
         for name, monitor in self.monitors.items():
             monitor_value = monitor(**kwargs)
             if monitor.scalar:
                 stats_dict[name] = monitor_value
+        return stats_dict
+
+    def log_scalars(self, stats_dict):
         with open(self.scalar_filename, 'a', newline='') as f:
             writer = csv.DictWriter(f, self.headers)
             writer.writerow(stats_dict)
 
-    def log(self, **kwargs):
-        self.log_scalars(**kwargs)
+    def log(self, compute_monitors=True,**kwargs):
+        if compute_monitors:
+            stats_dict = self.compute_monitors(**kwargs)
+            self.log_scalars(stats_dict)
+        else:
+            self.log_scalars(kwargs)
