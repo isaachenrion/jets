@@ -35,15 +35,15 @@ parser = argparse.ArgumentParser(description='Jets')
 # data args
 parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_train", type=int, default=-1)
-parser.add_argument("--n_valid", type=int, default=27000)
+parser.add_argument("--valid", type=int, default=VALID)
 parser.add_argument("--dont_add_cropped", action='store_true', default=False)
 parser.add_argument("-p", "--pileup", action='store_true', default=False)
 parser.add_argument("--root_dir", default=MODELS_DIR)
 
 # general model args
 parser.add_argument("-m", "--model_type", help="index of the model you want to train - look in constants.py for the model list", type=str, default="")
-parser.add_argument("--features", type=int, default=7)
-parser.add_argument("--hidden", type=int, default=40)
+parser.add_argument("--features", type=int, default=FEATURES)
+parser.add_argument("--hidden", type=int, default=HIDDEN)
 
 # logging args
 parser.add_argument("-s", "--silent", action='store_true', default=False)
@@ -55,21 +55,21 @@ parser.add_argument("-l", "--load", help="model directory from which we load a s
 parser.add_argument("-r", "--restart", help="restart a loaded model from where it left off", action='store_true', default=False)
 
 # training args
-parser.add_argument("-e", "--epochs", type=int, default=50)
-parser.add_argument("-b", "--batch_size", type=int, default=100)
-parser.add_argument("-a", "--step_size", type=float, default=0.001)
-parser.add_argument("-d", "--decay", type=float, default=.94)
+parser.add_argument("-e", "--epochs", type=int, default=EPOCHS)
+parser.add_argument("-b", "--batch_size", type=int, default=BATCH_SIZE)
+parser.add_argument("-a", "--step_size", type=float, default=STEP_SIZE)
+parser.add_argument("-d", "--decay", type=float, default=DECAY)
 
 # computing args
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)
 parser.add_argument("-g", "--gpu", type=str, default="")
 
 # MPNN
-parser.add_argument("-i", "--iters", type=int, default=0)
-parser.add_argument("--scales", nargs='+', type=int, default=-1)
+parser.add_argument("-i", "--iters", type=int, default=ITERS)
+parser.add_argument("--scales", nargs='+', type=int, default=SCALES)
 # email
-parser.add_argument("--sender", type=str, default="results74207281@gmail.com")
-parser.add_argument("--password", type=str, default="deeplearning")
+parser.add_argument("--sender", type=str, default=SENDER)
+parser.add_argument("--password", type=str, default=PASSWORD)
 
 # debugging
 parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)

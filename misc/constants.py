@@ -25,7 +25,6 @@ ALL_MODEL_DIRS = [
     INTERRUPTED_MODELS_DIR,
     KILLED_MODELS_DIR,
 ]
-DATA_DIR = 'data/w-vs-qcd/pickles'
 TRANSFORMS = {
     'relation':(0, RelNNTransformConnected),
     'recnn/simple':(1, GRNNTransformSimple),
@@ -47,3 +46,15 @@ DATASETS = {
     'pileup':'antikt-kt-pileup25'
 }
 #RECIPIENT = None
+''' argparse args '''
+STEP_SIZE=0.0001
+HIDDEN=40
+FEATURES=7
+DECAY=0.94
+EPOCHS=50
+ITERS=2
+SCALES=-1
+SENDER="results74207281@gmail.com"
+PASSWORD="deeplearning"
+VALID=27000
+DATA_DIR = 'data/w-vs-qcd/pickles'
