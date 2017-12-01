@@ -33,12 +33,12 @@
 #SBATCH --mail-user=henrion@nyu.edu
 
 HOME='/misc/kcgscratch1/ChoGroup/isaac'
-SLURMARGS="$@"
 SRCDIR=$HOME/jets
-RUNDIR=$SRCDIR/shell-scripts
 DATADIR=$SRCDIR/data/w-vs-qcd/pickles
+
+SLURMARGS="$@"
 SLURMARGS="--data_dir "$DATADIR" "$SLURMARGS
-cd $RUNDIR
+cd $SRCDIR
 echo "$SLURMARGS"
 source activate jets
 
