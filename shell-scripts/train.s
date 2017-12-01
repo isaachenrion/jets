@@ -38,7 +38,7 @@ SRCDIR=$HOME/jets
 DATADIR=$SRCDIR/data/w-vs-qcd/pickles
 SLURMARGS="--data_dir "$DATADIR" "$SLURMARGS
 cd $SRCDIR
-cat $SLURMARGS
+echo "$SLURMARGS"
 source activate jets
 
 #DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
