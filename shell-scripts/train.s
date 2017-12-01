@@ -39,8 +39,12 @@ DATADIR=$SRCDIR/data/w-vs-qcd/pickles
 SLURMARGS="$@"
 SLURMARGS="--data_dir "$DATADIR" "$SLURMARGS
 cd $SRCDIR
+
+echo "$HOME"
+echo "$SRCDIR"
+echo "$DATADIR"
 echo "$SLURMARGS"
+
 source activate jets
 
-#DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
 python $SRCDIR/train.py $SLURMARGS & disown %1
