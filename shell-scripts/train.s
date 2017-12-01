@@ -32,10 +32,13 @@
 #SBATCH --mail-type=END,FAIL # notifications for job done & fail
 #SBATCH --mail-user=henrion@nyu.edu
 
+HOME='/misc/kcgscratch1/ChoGroup/isaac'
 SLURMARGS="$@"
 SRCDIR=$HOME/jets
+DATADIR=$SRCDIR/data/w-vs-qcd/pickles
+SLURMARGS="--data_dir "$DATADIR" "$SLURMARGS
 cd $SRCDIR
-printf "$SLURMARGS"
+printf $SLURMARGS
 source activate jets
 
 #DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
