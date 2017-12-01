@@ -47,4 +47,4 @@ echo "$SLURMARGS"
 
 source activate jets
 
-python $SRCDIR/train.py $SLURMARGS & disown %1
+python $SRCDIR/train.py $SLURMARGS
