@@ -35,7 +35,7 @@ parser = argparse.ArgumentParser(description='Jets')
 # data args
 parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_train", type=int, default=-1)
-parser.add_argument("--valid", type=int, default=VALID)
+parser.add_argument("--n_valid", type=int, default=VALID)
 parser.add_argument("--dont_add_cropped", action='store_true', default=False)
 parser.add_argument("-p", "--pileup", action='store_true', default=False)
 parser.add_argument("--root_dir", default=MODELS_DIR)
