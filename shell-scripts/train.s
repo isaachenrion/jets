@@ -1,15 +1,17 @@
 #!/bin/bash
+HOME='/misc/kcgscratch1/ChoGroup/isaac'
+SLURMOUT=$HOME/shell-scripts/slurm-out
 #
 #all commands that start with SBATCH contain commands that are just used by SLURM for scheduling
 #################
 #set a job name
-#SBATCH --job-name=JetsTrain
+#SBATCH --job-name=$SLURMOUT/JetsTrain%j
 #################
 #a file for job output, you can check job progress
-#SBATCH --output=JetsTrain.out
+#SBATCH --output=$SLURMOUT/JetsTrain%j.out
 #################
 # a file for errors from the job
-#SBATCH --error=JetsTrain.err
+#SBATCH --error=$SLURMOUT/JetsTrain%j.err
 #################
 #time you think you need; default is one hour
 #in minutes
@@ -32,7 +34,6 @@
 #SBATCH --mail-type=END,FAIL # notifications for job done & fail
 #SBATCH --mail-user=henrion@nyu.edu
 
-HOME='/misc/kcgscratch1/ChoGroup/isaac'
 SLURMARGS="$@"
 SRCDIR=$HOME/jets
 DATADIR=$SRCDIR/data/w-vs-qcd/pickles
@@ -42,4 +43,4 @@ echo "$SLURMARGS"
 source activate jets
 
 #DATA_DIR=$SCRATCH/data/w-vs-qcd/pickles
-python train.py $SLURMARGS
+python train.py $SLURMARGS & disown %1
