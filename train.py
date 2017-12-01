@@ -85,8 +85,11 @@ if args.debug:
     args.seed = 1
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-if isinstance(args.model_type, int):
-    args.model_type = [k for k, (n, _) in TRANSFORMS.items() if n == int(args.model_type)].pop()
+try:
+    args.model_type = int(args.model_type)
+    args.model_type = [k for k, (n, _) in TRANSFORMS.items() if n == args.model_type].pop()
+except ValueError:
+    pass
 
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
