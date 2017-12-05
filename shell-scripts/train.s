@@ -37,7 +37,7 @@ SRCDIR=$HOME/jets
 DATADIR=$SRCDIR/data/w-vs-qcd/pickles
 
 SLURMARGS="$@"
-SLURMARGS="--data_dir "$DATADIR" "$SLURMARGS
+SLURMARGS="--data_dir "$DATADIR "--slurm_job_id "$SBATCH_JOBID "$SLURMARGS"
 cd $SRCDIR
 
 echo "$HOME"

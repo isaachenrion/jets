@@ -1,17 +1,30 @@
 import csv
 import os
+import visdom
+import logging
 class StatsLogger:
-    def __init__(self, directory, monitors):
-        self.directory = directory
-        os.makedirs(directory)
-        self.scalar_filename = os.path.join(directory, 'scalars.csv')
+    def __init__(self, directory, monitors, visualizing):
+        self.visualizing = visualizing:
+        if self.visualizing:
+            self.viz = visdom.Visdom()
+        else:
+            self.viz = None
 
+        self.statsdir = os.path.join(directory, 'stats')
+        self.plotsdir = os.path.join(directory, 'plots')
+        os.makedirs(self.statsdir)
+        os.makedirs(self.plotsdir)
+        self.scalar_filename = os.path.join(self.statsdir, 'scalars.csv')
         self.monitors = monitors
+
+        for monitor in self.monitors.values():
+            monitor.initialize(self.statsdir, self.plotsdir, self.viz)
         self.headers = [name for name, m in self.monitors.items() if m.scalar]
 
         with open(self.scalar_filename, 'a', newline='') as f:
             writer = csv.DictWriter(f, self.headers)
             writer.writeheader()
+
 
     def compute_monitors(self, **kwargs):
         stats_dict = {}
@@ -32,3 +45,7 @@ class StatsLogger:
             self.log_scalars(stats_dict)
         else:
             self.log_scalars(kwargs)
+
+    def complete_logging(self):
+        for monitor in self.monitors.values():
+            monitor.finish()

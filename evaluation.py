@@ -8,6 +8,7 @@ import datetime
 import sys
 import csv
 import torch
+import time
 
 from misc.handlers import EvaluationExperimentHandler
 from misc.constants import *
@@ -38,6 +39,7 @@ parser.add_argument("-n", "--n_test", type=int, default=-1)
 parser.add_argument("--dataset_type", type=str, default='test')
 parser.add_argument("-r", "--root_dir", type=str, default=REPORTS_DIR)
 parser.add_argument("-m", "--model_dir", type=str, default=None)
+parser.add_argument("-s", "--single_model", action='store_true')
 parser.add_argument("-i", "--inventory", type=str, default=None)
 parser.add_argument("--plot", action="store_true")
 parser.add_argument("-o", "--remove_outliers", action="store_true")
@@ -82,6 +84,7 @@ else:
 if args.inventory is not None:
     assert arg.model_dir is None
     args.model_dir = args.inventory.split('.')[0]
+assert (args.inventory is None) + (args.model_dir is None) == 1
 def main():
 
     eh = EvaluationExperimentHandler(args)
@@ -89,7 +92,6 @@ def main():
     ''' GET RELATIVE PATHS TO DATA AND MODELS '''
     '''----------------------------------------------------------------------- '''
     if args.inventory is None:
-        assert args.model_dir is not None
         model_type_paths = [(args.model_dir,args.model_dir)]
     else:
         with open(args.inventory, newline='') as f:
@@ -116,6 +118,7 @@ def main():
                 model_test_file = os.path.join(filename, 'test-rocs.pickle')
                 work = args.recompute or not os.path.exists(model_test_file)
                 if work:
+                    t0 = time.time()
                     model.eval()
 
                     offset = 0
@@ -133,18 +136,20 @@ def main():
                         yy_pred.append(unwrap(model(X_var)))
                         unwrap_X(X_var)
                     yy_pred = np.squeeze(np.concatenate(yy_pred, 0), 1)
+                    t1 = time.time()
 
                     logdict = dict(
                         model=filename.split('/')[-1],
                         yy=yy,
                         yy_pred=yy_pred,
                         w_valid=w[:len(yy_pred)],
+                        logtime=np.log((t1-t0-0.0) / len(X))
                     )
                     eh.log(**logdict)
-                    roc = eh.monitors['roc_auc'].value
-                    fpr = eh.monitors['roc_curve'].value[0]
-                    tpr = eh.monitors['roc_curve'].value[1]
-                    inv_fpr = eh.monitors['inv_fpr'].value
+                    roc = eh.stats_logger.monitors['roc_auc'].value
+                    fpr = eh.stats_logger.monitors['roc_curve'].value[0]
+                    tpr = eh.stats_logger.monitors['roc_curve'].value[1]
+                    inv_fpr = eh.stats_logger.monitors['inv_fpr'].value
 
                     with open(model_test_file, "wb") as fd:
                         pickle.dump((roc, fpr, tpr, inv_fpr), fd)
@@ -165,7 +170,10 @@ def main():
 
     def build_rocs(data, model_type_path, batch_size):
         X, y, w = data
-        model_filenames = [os.path.join(model_type_path, fn) for fn in os.listdir(model_type_path)]
+        if not args.single_model:
+            model_filenames = [os.path.join(model_type_path, fn) for fn in os.listdir(model_type_path)]
+        else:
+            model_filenames = [model_type_path]
         rocs, fprs, tprs, inv_fprs = evaluate_models(X, y, w, model_filenames, batch_size)
 
         return rocs, fprs, tprs, inv_fprs

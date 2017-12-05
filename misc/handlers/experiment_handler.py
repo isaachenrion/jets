@@ -88,14 +88,20 @@ class ExperimentHandler:
         roc_auc = ROCAUC()
         inv_fpr = InvFPR()
         best_inv_fpr = Best(inv_fpr)
-        epoch_counter = Regurgitate('epoch')
-        batch_counter = Regurgitate('iteration')
+        epoch_counter = Regurgitate('epoch', visualizing=False)
+        batch_counter = Regurgitate('iteration', visualizing=False)
         valid_loss = Regurgitate('valid_loss')
         train_loss = Regurgitate('train_loss')
+        #prediction_histogram = EachClassHistogram([0,1], 'yy', 'yy_pred', append=False)
+        #logtimer = Regurgitate('logtime')
+        logtimer=Collect('logtime', fn='last', visualizing=True)
+        cumulative_timer=Collect('time', fn='sum', visualizing=True)
+
         model_file = os.path.join(self.exp_dir, 'model_state_dict.pt')
         settings_file = os.path.join(self.exp_dir, 'settings.pickle')
-        self.saver = Saver(best_inv_fpr, model_file, settings_file)
-        self.monitors = [
+        self.saver = Saver(best_inv_fpr, model_file, settings_file, visualizing=False)
+
+        monitors = [
             epoch_counter,
             batch_counter,
             roc_auc,
@@ -104,10 +110,14 @@ class ExperimentHandler:
             valid_loss,
             train_loss,
             self.saver,
+            #prediction_histogram,
+            logtimer,
+            cumulative_timer
         ]
-        self.statsfile = os.path.join(self.exp_dir, 'stats')
-        self.monitors = {m.name: m for m in self.monitors}
-        self.stats_logger = StatsLogger(self.statsfile, self.monitors)
+
+        statsfile = os.path.join(self.exp_dir, 'stats')
+        monitors = {m.name: m for m in monitors}
+        self.stats_logger = StatsLogger(statsfile, monitors)
 
     def record_settings(self, args):
         ''' RECORD SETTINGS '''
@@ -118,21 +128,18 @@ class ExperimentHandler:
         logging.warning("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
 
     def log(self, **kwargs):
-        #stats_dict = {}
-        #for name, monitor in self.monitors.items():
-        #    stats_dict[name] = monitor(**kwargs)
         self.stats_logger.log(**kwargs)
 
-        if np.isnan(self.monitors['inv_fpr'].value):
+        if np.isnan(self.stats_logger.monitors['inv_fpr'].value):
             logging.warning("NaN in 1/FPR\n")
 
         out_str = "{:5d}\t~loss(train)={:.4f}\tloss(valid)={:.4f}\troc_auc(valid)={:.4f}".format(
                 kwargs['iteration'],
                 kwargs['train_loss'],
                 kwargs['valid_loss'],
-                self.monitors['roc_auc'].value)
+                self.stats_logger.monitors['roc_auc'].value)
 
-        out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.2f}".format(self.monitors['inv_fpr'].value, self.monitors['best_inv_fpr'].value)
+        out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.2f}".format(self.stats_logger.monitors['inv_fpr'].value, self.stats_logger.monitors['best_inv_fpr'].value)
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)
 
@@ -140,6 +147,7 @@ class ExperimentHandler:
         self.saver.save(model, settings)
 
     def finished(self):
+        self.stats_logger.complete_logging()
         self.signal_handler.completed()
 
     def initial_email(self):
@@ -155,12 +163,6 @@ class EvaluationExperimentHandler(ExperimentHandler):
     def model_directory(self, args):
         self.root_dir = args.root_dir
         self.model_type_dir = args.model_dir
-
-        #dt = datetime.datetime.now()
-        #self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.extra_tag)
-        #if args.debug:
-        #    self.filename_exp += '-DEBUG'
-
         self.leaf_dir = self.model_type_dir
         i = 0
         temp = self.leaf_dir + '/run' + str(i)
@@ -179,34 +181,28 @@ class EvaluationExperimentHandler(ExperimentHandler):
         roc_auc = ROCAUC()
         inv_fpr = InvFPR()
         roc_curve = ROCCurve()
-        model_counter = Regurgitate('model')
-        signal_collector = Collect(1,'yy','yy_pred')
-        background_collector = Collect(0,'yy','yy_pred')
-        self.monitors = [
+        model_counter = Regurgitate('model', visualizing=False)
+        logtimer=Collect('logtime', fn='mean')
+        prediction_histogram = EachClassHistogram([0,1], 'yy', 'yy_pred', append=True)
+        monitors = [
             model_counter,
             roc_auc,
             inv_fpr,
             roc_curve,
-            signal_collector,
-            background_collector
+            prediction_histogram,
+            logtimer
         ]
-        self.statsfile = os.path.join(self.exp_dir, 'stats')
-        self.monitors = {m.name: m for m in self.monitors}
-        self.stats_logger = StatsLogger(self.statsfile, self.monitors)
+        monitors = {m.name: m for m in monitors}
+        self.stats_logger = StatsLogger(self.exp_dir, monitors)
 
     def log(self, **kwargs):
-        #stats_dict = {}
-        #for name, monitor in self.monitors.items():
-        #    monitor_value = monitor(**kwargs)
-        #    if monitor.scalar:
-        #        stats_dict[name] = monitor_value
         self.stats_logger.log(**kwargs)
 
         if not self.latex:
             out_str = "\tModel = {}\t1/FPR @ TPR = 0.5={:.4f}\troc_auc={:.4f}".format(
                     kwargs['model'],
-                    self.monitors['inv_fpr'].value if kwargs.get('compute_monitors', True) else kwargs['inv_fpr'],
-                    self.monitors['roc_auc'].value if kwargs.get('compute_monitors', True) else kwargs['roc_auc']
+                    self.stats_logger.monitors['inv_fpr'].value if kwargs.get('compute_monitors', True) else kwargs['inv_fpr'],
+                    self.stats_logger.monitors['roc_auc'].value if kwargs.get('compute_monitors', True) else kwargs['roc_auc']
                     )
         else:
             if not short:
@@ -225,6 +221,5 @@ class EvaluationExperimentHandler(ExperimentHandler):
                        np.mean(inv_fprs[:, 225]),
                        np.std(inv_fprs[:, 225])))
 
-        #out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.2f}".format(self.monitors['inv_fpr'].value, self.monitors['best_inv_fpr'].value)
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)

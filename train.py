@@ -49,6 +49,7 @@ parser.add_argument("--hidden", type=int, default=HIDDEN)
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("--extra_tag", type=int, default=0)
+parser.add_argument("--slurm_job_id", default=None)
 
 # loading previous models args
 parser.add_argument("-l", "--load", help="model directory from which we load a state_dict", type=str, default=None)
@@ -101,6 +102,7 @@ else:
     args.dataset = 'original'
 
 def train(args):
+    t_start = time.time()
     _, Transform = TRANSFORMS[args.model_type]
 
     eh = ExperimentHandler(args)
@@ -246,7 +248,9 @@ def train(args):
                 train_loss=train_loss,
                 valid_loss=valid_loss,
                 settings=settings,
-                model=model
+                model=model,
+                logtime=np.log((t1-t0) / len(X_valid)),
+                time=((t1-t_start) / 3600)
             )
             eh.log(**logdict)
 
