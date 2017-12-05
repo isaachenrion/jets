@@ -7,8 +7,7 @@ from data_ops.batching import batch_leaves
 from data_ops.batching import trees_as_adjacency_matrices
 
 from ..readout import DTNNReadout, SetReadout
-
-from ..message_passing import *
+from ..message_passing import MultipleIterationMessagePassingLayer
 
 
 class MPNNTransform(nn.Module):
@@ -17,7 +16,7 @@ class MPNNTransform(nn.Module):
         hidden=None,
         targets=None,
         iters=None,
-        message_passing_layer=None,
+        mp_layer=None,
         readout=None,
         **kwargs
         ):
@@ -31,7 +30,7 @@ class MPNNTransform(nn.Module):
             self.readout = DTNNReadout(hidden, hidden)
         else:
             self.readout = readout
-        self.multiple_iterations_of_message_passing = MultipleIterationMessagePassingLayer(iters, hidden, message_passing_layer)
+        self.multiple_iterations_of_message_passing = MultipleIterationMessagePassingLayer(iters, hidden, mp_layer)
 
     def forward(self, jets, return_extras=False, **kwargs):
         jets, mask = batch_leaves(jets)

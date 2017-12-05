@@ -7,32 +7,11 @@ from torch.autograd import Variable
 from data_ops.batching import batch_leaves
 from data_ops.batching import trees_as_adjacency_matrices
 
+from ..message_passing import MultipleIterationMessagePassingLayer
 from ..readout import SimpleReadout
+from .attention_pooling import AttentionPooling
+from .attention_pooling import RecurrentAttentionPooling
 
-from ..message_passing import *
-
-from architectures.utils import Attention
-
-class AttentionPooling(nn.Module):
-    def __init__(self, nodes_out, hidden):
-        super().__init__()
-        self.nodes_out = nodes_out
-        self.readout = SimpleReadout(hidden, hidden)
-        self.attn = Attention()
-        self.recurrent_cell = nn.GRUCell(hidden, hidden)
-
-    def forward(self, h):
-        z = self.readout(h)
-        hiddens_out = []
-        for t in range(self.nodes_out):
-            z = z.unsqueeze(1)
-            attn_out, _ = self.attn(h, z, h)
-            z = z.squeeze(1)
-            attn_out = attn_out.squeeze(1)
-            z = self.recurrent_cell(attn_out, z)
-            hiddens_out.append(z)
-        new_hiddens = torch.stack(hiddens_out, 1)
-        return new_hiddens
 
 class StackedMPNNTransform(nn.Module):
     def __init__(
@@ -41,8 +20,8 @@ class StackedMPNNTransform(nn.Module):
         features=None,
         hidden=None,
         iters=None,
-        mp_layer=MPAdaptiveSymmetric,
-        pooling_layer=AttentionPooling,
+        mp_layer=None,
+        pooling_layer=None,
         **kwargs
         ):
         super().__init__()

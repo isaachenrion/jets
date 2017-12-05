@@ -22,7 +22,10 @@ from misc.loggers import StatsLogger
 from monitors.losses import *
 from monitors.monitors import *
 
-from architectures import PredictFromParticleEmbedding
+from architectures import POOLINGS
+from architectures import TRANSFORMS
+from architectures import MESSAGE_PASSING_LAYERS
+from architectures import PREDICTORS
 
 from loading import load_data
 from loading import load_tf
@@ -69,7 +72,9 @@ parser.add_argument("-g", "--gpu", type=str, default="")
 # MPNN
 parser.add_argument("-i", "--iters", type=int, default=ITERS)
 parser.add_argument("--scales", nargs='+', type=int, default=SCALES)
-
+parser.add_argument("--mp", type=str, default=None, help='type of message passing layer')
+parser.add_argument("--pool", type=str, default=None, help='type of pooling layer')
+parser.add_argument("--predict", type=str, default=0, help='type of prediction layer')
 # email
 parser.add_argument("--sender", type=str, default=SENDER)
 parser.add_argument("--password", type=str, default=PASSWORD)
@@ -88,11 +93,7 @@ if args.debug:
     args.seed = 1
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-try:
-    args.model_type = int(args.model_type)
-    args.model_type = [k for k, (n, _) in TRANSFORMS.items() if n == args.model_type].pop()
-except ValueError:
-    pass
+
 
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
@@ -105,7 +106,20 @@ else:
 
 def train(args):
     t_start = time.time()
-    _, Transform = TRANSFORMS[args.model_type]
+    def lookup(component_key, component_table):
+        try:
+            component_key = int(component_key)
+            component_key = [k for k, (n, _) in component_table.items() if n == component_key].pop()
+        except ValueError:
+            pass
+        _, Component = component_table[component_key]
+        return component_key, Component
+
+    args.model_type, Transform = lookup(args.model_type, TRANSFORMS)
+    args.mp, MessagePassingLayer = lookup(args.mp, MESSAGE_PASSING_LAYERS)
+    args.pool, PoolingLayer = lookup(args.pool, POOLINGS)
+    args.predict, Predict = lookup(args.predict, PREDICTORS)
+
 
     eh = ExperimentHandler(args)
 
@@ -143,13 +157,15 @@ def train(args):
     '''----------------------------------------------------------------------- '''
     # Initialization
     logging.info("Initializing model...")
-    Predict = PredictFromParticleEmbedding
+    #Predict = PredictFromParticleEmbedding
     if args.load is None:
         model_kwargs = {
             'features': args.features,
             'hidden': args.hidden,
             'iters': args.iters,
-            'scales': args.scales
+            'scales': args.scales,
+            'pooling_layer':PoolingLayer,
+            'mp_layer':MessagePassingLayer
         }
         model = Predict(Transform, **model_kwargs)
         settings = {

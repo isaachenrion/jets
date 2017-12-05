@@ -4,7 +4,7 @@ import visdom
 import logging
 class StatsLogger:
     def __init__(self, directory, monitors, visualizing):
-        self.visualizing = visualizing:
+        self.visualizing = visualizing
         if self.visualizing:
             self.viz = visdom.Visdom()
         else:

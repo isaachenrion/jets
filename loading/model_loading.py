@@ -2,7 +2,8 @@ import os
 import pickle
 import torch
 import logging
-from misc.constants import TRANSFORMS, PREDICTORS
+from architectures import TRANSFORMS
+from architectures import PREDICTORS
 
 def convert_state_dict_pt_file(path_to_state_dict):
     with open(os.path.join(path_to_state_dict, 'model_state_dict.pt'), 'rb') as f:
