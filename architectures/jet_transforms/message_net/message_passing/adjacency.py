@@ -4,17 +4,42 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 class AdaptiveAdjacencyMatrix(nn.Module):
-    def __init__(self, hidden):
+    def __init__(self, symmetric=None, **kwargs):
         super().__init__()
-        self.edge_embedding = nn.Linear(hidden, 1)
-        self.softmax = PaddedMatrixSoftmax()
+        self.symmetric = symmetric
+
+    def compute_adjacency_matrix(self, h, mask):
+        pass
 
     def forward(self, h, mask):
+        A = self.compute_adjacency_matrix(h, mask)
+        if self.symmetric:
+            A = 0.5 * (A + torch.transpose(A, 1, 2))
+        return A
+
+class SumMatrix(AdaptiveAdjacencyMatrix):
+    def __init__(self, hidden=None, **kwargs):
+        super().__init__(**kwargs)
+        self.softmax = PaddedMatrixSoftmax()
+        self.edge_embedding = nn.Linear(hidden, 1)
+
+    def compute_adjacency_matrix(self, h, mask):
         shp = h.size()
         h_l = h.view(shp[0], shp[1], 1, shp[2])
         h_r = h.view(shp[0], 1, shp[1], shp[2])
         A = self.edge_embedding(h_l + h_r).squeeze(-1)
         #A = F.softmax(A).squeeze(-1)
+        A = self.softmax(A, mask)
+        return A
+
+class DistMult(AdaptiveAdjacencyMatrix):
+    def __init__(self, hidden=None, **kwargs):
+        super().__init__(**kwargs)
+        self.softmax = PaddedMatrixSoftmax()
+        self.matrix = nn.Parameter(torch.zeros(hidden,hidden))
+
+    def compute_adjacency_matrix(self, h, mask):
+        A = torch.matmul(h, torch.matmul(self.matrix, h.transpose(1,2)))
         A = self.softmax(A, mask)
         return A
 

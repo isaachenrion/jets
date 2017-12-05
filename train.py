@@ -26,6 +26,7 @@ from architectures import POOLINGS
 from architectures import TRANSFORMS
 from architectures import MESSAGE_PASSING_LAYERS
 from architectures import PREDICTORS
+from architectures import ADAPTIVE_MATRICES
 
 from loading import load_data
 from loading import load_tf
@@ -75,6 +76,8 @@ parser.add_argument("--scales", nargs='+', type=int, default=SCALES)
 parser.add_argument("--mp", type=str, default=None, help='type of message passing layer')
 parser.add_argument("--pool", type=str, default=None, help='type of pooling layer')
 parser.add_argument("--predict", type=str, default=0, help='type of prediction layer')
+parser.add_argument("--matrix", type=str, default=0, help='type of adaptive matrix layer')
+parser.add_argument("--sym", action='store_true', default=False)
 # email
 parser.add_argument("--sender", type=str, default=SENDER)
 parser.add_argument("--password", type=str, default=PASSWORD)
@@ -107,6 +110,7 @@ else:
 def train(args):
     t_start = time.time()
     def lookup(component_key, component_table):
+        if component_key is None: return None, None
         try:
             component_key = int(component_key)
             component_key = [k for k, (n, _) in component_table.items() if n == component_key].pop()
@@ -119,7 +123,7 @@ def train(args):
     args.mp, MessagePassingLayer = lookup(args.mp, MESSAGE_PASSING_LAYERS)
     args.pool, PoolingLayer = lookup(args.pool, POOLINGS)
     args.predict, Predict = lookup(args.predict, PREDICTORS)
-
+    args.matrix, Matrix = lookup(args.matrix, ADAPTIVE_MATRICES)
 
     eh = ExperimentHandler(args)
 
@@ -165,7 +169,9 @@ def train(args):
             'iters': args.iters,
             'scales': args.scales,
             'pooling_layer':PoolingLayer,
-            'mp_layer':MessagePassingLayer
+            'mp_layer':MessagePassingLayer,
+            'symmetric':args.sym,
+            'adaptive_matrix':Matrix
         }
         model = Predict(Transform, **model_kwargs)
         settings = {

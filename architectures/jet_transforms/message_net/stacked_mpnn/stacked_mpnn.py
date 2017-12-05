@@ -29,7 +29,7 @@ class StackedMPNNTransform(nn.Module):
         self.activation = F.tanh
         self.mpnns = nn.ModuleList(
             [MultipleIterationMessagePassingLayer(
-                iters=iters, hidden=hidden, message_passing_layer=mp_layer
+                iters=iters, hidden=hidden, message_passing_layer=mp_layer, **kwargs
                 )
             for _ in scales]
             )

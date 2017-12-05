@@ -30,7 +30,7 @@ class MPNNTransform(nn.Module):
             self.readout = DTNNReadout(hidden, hidden)
         else:
             self.readout = readout
-        self.multiple_iterations_of_message_passing = MultipleIterationMessagePassingLayer(iters, hidden, mp_layer)
+        self.multiple_iterations_of_message_passing = MultipleIterationMessagePassingLayer(iters=iters, hidden=hidden, mp_layer=mp_layer, **kwargs)
 
     def forward(self, jets, return_extras=False, **kwargs):
         jets, mask = batch_leaves(jets)
