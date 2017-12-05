@@ -117,7 +117,7 @@ class ExperimentHandler:
 
         statsfile = os.path.join(self.exp_dir, 'stats')
         monitors = {m.name: m for m in monitors}
-        self.stats_logger = StatsLogger(statsfile, monitors)
+        self.stats_logger = StatsLogger(statsfile, monitors, args.visualizing)
 
     def record_settings(self, args):
         ''' RECORD SETTINGS '''

@@ -48,6 +48,7 @@ parser.add_argument("--hidden", type=int, default=HIDDEN)
 # logging args
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
+parser.add_argument("--visualizing", action='store_true', default=False)
 parser.add_argument("--extra_tag", type=int, default=0)
 parser.add_argument("--slurm_job_id", default=None)
 
@@ -68,6 +69,7 @@ parser.add_argument("-g", "--gpu", type=str, default="")
 # MPNN
 parser.add_argument("-i", "--iters", type=int, default=ITERS)
 parser.add_argument("--scales", nargs='+', type=int, default=SCALES)
+
 # email
 parser.add_argument("--sender", type=str, default=SENDER)
 parser.add_argument("--password", type=str, default=PASSWORD)

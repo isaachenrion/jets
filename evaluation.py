@@ -48,6 +48,7 @@ parser.add_argument("--latex", type=str, default=None)
 
 # logging args
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
+parser.add_argument("--visualizing", action='store_true', default=False)
 
 # computing args
 parser.add_argument("-b", "--batch_size", type=int, default=64)
