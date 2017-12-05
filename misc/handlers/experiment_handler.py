@@ -193,7 +193,7 @@ class EvaluationExperimentHandler(ExperimentHandler):
             logtimer
         ]
         monitors = {m.name: m for m in monitors}
-        self.stats_logger = StatsLogger(self.exp_dir, monitors)
+        self.stats_logger = StatsLogger(self.exp_dir, monitors, args.visualizing)
 
     def log(self, **kwargs):
         self.stats_logger.log(**kwargs)
