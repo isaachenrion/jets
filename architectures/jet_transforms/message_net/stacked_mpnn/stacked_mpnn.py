@@ -22,6 +22,7 @@ class StackedMPNNTransform(nn.Module):
         iters=None,
         mp_layer=None,
         pooling_layer=None,
+        pool_first=False,
         **kwargs
         ):
         super().__init__()
@@ -35,16 +36,22 @@ class StackedMPNNTransform(nn.Module):
             )
         self.attn_pools = nn.ModuleList([pooling_layer(scales[i], hidden) for i in range(len(scales))])
         self.readout = SimpleReadout(hidden, hidden)
+        self.pool_first = pool_first
 
     def forward(self, jets, **kwargs):
         jets, mask = batch_leaves(jets)
         h = self.activation(self.embedding(jets))
         for i, (mpnn, pool) in enumerate(zip(self.mpnns, self.attn_pools)):
+            if self.pool_first:
+                h = pool(h)
+
             if i == 0:
                 h = mpnn(h=h, mask=mask)
             else:
                 h = mpnn(h=h, mask=None)
-            h = pool(h)
+
+            if not self.pool_first:
+                h = pool(h)
 
         out = self.readout(h)
         return out

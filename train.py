@@ -53,7 +53,6 @@ parser.add_argument("--hidden", type=int, default=HIDDEN)
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("--visualizing", action='store_true', default=False)
-parser.add_argument("--extra_tag", type=int, default=0)
 parser.add_argument("--slurm_job_id", default=None)
 
 # loading previous models args
@@ -78,6 +77,7 @@ parser.add_argument("--pool", type=str, default=None, help='type of pooling laye
 parser.add_argument("--predict", type=str, default=0, help='type of prediction layer')
 parser.add_argument("--matrix", type=str, default=0, help='type of adaptive matrix layer')
 parser.add_argument("--sym", action='store_true', default=False)
+parser.add_argument("--pool_first", action='store_true', default=False)
 # email
 parser.add_argument("--sender", type=str, default=SENDER)
 parser.add_argument("--password", type=str, default=PASSWORD)
@@ -171,6 +171,7 @@ def train(args):
             'pooling_layer':PoolingLayer,
             'mp_layer':MessagePassingLayer,
             'symmetric':args.sym,
+            'pool_first':args.pool_first,
             'adaptive_matrix':Matrix
         }
         model = Predict(Transform, **model_kwargs)

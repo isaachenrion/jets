@@ -43,6 +43,19 @@ class DistMult(AdaptiveAdjacencyMatrix):
         A = self.softmax(A, mask)
         return A
 
+class Siamese(AdaptiveAdjacencyMatrix):
+    def __init__(self, hidden=None, **kwargs):
+        super().__init__(**kwargs)
+        self.softmax = PaddedMatrixSoftmax()
+
+    def compute_adjacency_matrix(self, h, mask):
+        shp = h.size()
+        h_l = h.view(shp[0], shp[1], 1, shp[2])
+        h_r = h.view(shp[0], 1, shp[1], shp[2])
+        A = torch.norm(h_l - h_r, 2, 3)
+        A = self.softmax(A, mask)
+        return A
+
 class PaddedMatrixSoftmax(nn.Module):
     def __init__(self):
         super().__init__()

@@ -20,14 +20,13 @@ DATASETS = {
     'original':'antikt-kt',
     'pileup':'antikt-kt-pileup25'
 }
-#RECIPIENT =
 ''' argparse args '''
 STEP_SIZE=0.001
 HIDDEN=40
 BATCH_SIZE=100
 FEATURES=7
 DECAY=0.96
-EPOCHS=100
+EPOCHS=50
 ITERS=2
 SCALES=-1
 SENDER="results74207281@gmail.com"
