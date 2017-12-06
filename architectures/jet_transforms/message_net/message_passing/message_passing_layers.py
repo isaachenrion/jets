@@ -5,9 +5,6 @@ from torch.autograd import Variable
 
 from ..vertex_update import GRUUpdate
 from .message import DTNNMessage
-from .adjacency import SumMatrix
-#sfrom .adjacency import AdaptiveAdjacencyMatrix
-from .adjacency import DistMult
 
 class MultipleIterationMessagePassingLayer(nn.Module):
     def __init__(self, iters=None,  mp_layer=None, **kwargs):

@@ -53,7 +53,7 @@ parser.add_argument("--hidden", type=int, default=HIDDEN)
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("--visualizing", action='store_true', default=False)
-parser.add_argument("--slurm_job_id", default=None)
+parser.add_argument("--slurm_job_id", default=0)
 
 # loading previous models args
 parser.add_argument("-l", "--load", help="model directory from which we load a state_dict", type=str, default=None)
