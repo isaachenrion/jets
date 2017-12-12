@@ -4,6 +4,9 @@ models
 archive
 documents
 reports
+inventory.txt
+notebooks
+pileup_finished_models
 finished_models
 debug_models
 killed_models
