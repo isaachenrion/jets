@@ -30,6 +30,25 @@ class DTNNReadout(Readout):
         x = x.mean(1)
         return x
 
+class SimpleReadout(Readout):
+    def __init__(self, hidden_dim, target_dim):
+        super().__init__(hidden_dim, target_dim)
+        self.fc = nn.Linear(hidden_dim, target_dim)
+
+    def forward(self, x):
+        x = self.fc(x)
+        x = F.tanh(x)
+        x = x.mean(1)
+        return x
+
+class MultipleReadout(Readout):
+    def __init__(self, hidden_dim, target_dim, n_readouts):
+        super().__init__(hidden_dim, target_dim)
+        self.readouts = nn.ModuleList([SimpleReadout(hidden_dim, target_dim) for i in range(n_readouts)])
+
+    def forward(self, x):
+        x = torch.stack([r(x) for r in self.readouts], 1)
+        return x
 
 class SetReadout(Readout):
     def __init__(self, hidden_dim, target_dim):

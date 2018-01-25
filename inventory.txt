@@ -1,3 +1,0 @@
-model,filename
-MPNN (learned adjacency matrix),mpnn/vanilla/2
-RecNN (nongated),recnn/simple

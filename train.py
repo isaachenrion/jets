@@ -20,84 +20,93 @@ from misc.handlers import ExperimentHandler
 from misc.loggers import StatsLogger
 
 from monitors.losses import *
-from monitors.monitors import *
 
-from architectures import PredictFromParticleEmbedding
+from experiment import convert_args
 
 from loading import load_data
 from loading import load_tf
 from loading import crop
+from loading import load_model
 
 ''' ARGUMENTS '''
 '''----------------------------------------------------------------------- '''
 parser = argparse.ArgumentParser(description='Jets')
 
 # data args
-parser.add_argument("-f", "--filename", type=str, default='antikt-kt')
 parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_train", type=int, default=-1)
-parser.add_argument("--n_valid", type=int, default=27000)
+parser.add_argument("--n_valid", type=int, default=VALID)
 parser.add_argument("--dont_add_cropped", action='store_true', default=False)
 parser.add_argument("-p", "--pileup", action='store_true', default=False)
+parser.add_argument("--root_dir", default=MODELS_DIR)
 
 # general model args
-parser.add_argument("-m", "--model_type", help="index of the model you want to train - look in constants.py for the model list", type=int, default=0)
-parser.add_argument("--features", type=int, default=7)
-parser.add_argument("--hidden", type=int, default=40)
+parser.add_argument("-m", "--model_type", help="name of the model you want to train - look in constants.py for the model list", type=str, default="mpnn")
+parser.add_argument("--features", type=int, default=FEATURES)
+parser.add_argument("--hidden", type=int, default=HIDDEN)
 
 # logging args
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
-parser.add_argument("--extra_tag", type=int, default=0)
+parser.add_argument("--visualizing", action='store_true', default=False)
+parser.add_argument("--slurm_job_id", default=0)
 
 # loading previous models args
 parser.add_argument("-l", "--load", help="model directory from which we load a state_dict", type=str, default=None)
 parser.add_argument("-r", "--restart", help="restart a loaded model from where it left off", action='store_true', default=False)
 
 # training args
-parser.add_argument("-e", "--epochs", type=int, default=50)
-parser.add_argument("-b", "--batch_size", type=int, default=100)
-parser.add_argument("-a", "--step_size", type=float, default=0.001)
-parser.add_argument("-d", "--decay", type=float, default=.94)
+parser.add_argument("-e", "--epochs", type=int, default=EPOCHS)
+parser.add_argument("-b", "--batch_size", type=int, default=BATCH_SIZE)
+parser.add_argument("-a", "--step_size", type=float, default=STEP_SIZE)
+parser.add_argument("-d", "--decay", type=float, default=DECAY)
+parser.add_argument("--clip", type=float, default=None)
 
 # computing args
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)
 parser.add_argument("-g", "--gpu", type=str, default="")
 
 # MPNN
-parser.add_argument("--not_leaves", action='store_true')
-parser.add_argument("-i", "--iters", type=int, default=0)
-
+parser.add_argument("-i", "--iters", type=int, default=ITERS)
+parser.add_argument("--scales", nargs='+', type=int, default=SCALES)
+parser.add_argument("--mp", type=str, default='van', help='type of message passing layer')
+parser.add_argument("--pool", type=str, default='attn', help='type of pooling layer')
+parser.add_argument("--predict", type=str, default=0, help='type of prediction layer')
+parser.add_argument("--matrix", type=str, default=0, help='type of adaptive matrix layer')
+parser.add_argument("--sym", action='store_true', default=False)
+parser.add_argument("--pool_first", action='store_true', default=False)
 # email
-parser.add_argument("--sender", type=str, default="results74207281@gmail.com")
-parser.add_argument("--password", type=str, default="deeplearning")
+#parser.add_argument("--sender", type=str, default=SENDER)
+#parser.add_argument("--password", type=str, default=PASSWORD)
 
 # debugging
 parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
 
 args = parser.parse_args()
-
+args.train = True
 if args.debug:
-    args.hidden = 1
-    args.batch_size = 9
+    args.hidden = 7
+    args.batch_size = 5
     args.verbose = True
     args.epochs = 3
     args.n_train = 1000
     args.seed = 1
-    args.iters = 1
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
-
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
-args.recipient = RECIPIENT
-args.leaves = not args.not_leaves
+#args.recipient = RECIPIENT
+
 if args.pileup:
-    args.filename = 'antikt-kt-pileup25-new'
+    args.dataset = 'pileup'
+else:
+    args.dataset = 'original'
+
 def train(args):
-    _, Transform, model_type = TRANSFORMS[args.model_type]
-    args.root_exp_dir = os.path.join(MODELS_DIR,model_type, str(args.iters))
+    t_start = time.time()
+
+    args, architecture = convert_args(args)
 
     eh = ExperimentHandler(args)
 
@@ -105,8 +114,8 @@ def train(args):
     '''----------------------------------------------------------------------- '''
     logging.warning("Loading data...")
 
-    tf = load_tf(args.data_dir, "{}-train.pickle".format(args.filename))
-    X, y = load_data(args.data_dir, "{}-train.pickle".format(args.filename))
+    tf = load_tf(args.data_dir, "{}-train.pickle".format(DATASETS[args.dataset]))
+    X, y = load_data(args.data_dir, "{}-train.pickle".format(DATASETS[args.dataset]))
     for ij, jet in enumerate(X):
         jet["content"] = tf.transform(jet["content"])
 
@@ -135,40 +144,28 @@ def train(args):
     '''----------------------------------------------------------------------- '''
     # Initialization
     logging.info("Initializing model...")
-    Predict = PredictFromParticleEmbedding
     if args.load is None:
         model_kwargs = {
             'features': args.features,
             'hidden': args.hidden,
             'iters': args.iters,
-            'leaves': args.leaves,
+            'scales': args.scales,
+            'pooling_layer':architecture.pooling_layer,
+            'mp_layer':architecture.message_passing_layer,
+            'symmetric':args.sym,
+            'pool_first':args.pool_first,
+            'adaptive_matrix':architecture.matrix
         }
-        model = Predict(Transform, **model_kwargs)
+        model = architecture.predict(architecture.transform, **model_kwargs)
         settings = {
-            "transform": Transform,
-            "predict": Predict,
+            "transform": args.model_type,
+            "predict": architecture.predict,
             "model_kwargs": model_kwargs,
             "step_size": args.step_size,
             "args": args,
             }
     else:
-        with open(os.path.join(args.load, 'settings.pickle'), "rb") as f:
-            settings = pickle.load(f, encoding='latin-1')
-            Transform = settings["transform"]
-            Predict = settings["predict"]
-            model_kwargs = settings["model_kwargs"]
-
-        model = PredictFromParticleEmbedding(Transform, **model_kwargs)
-
-        try:
-            with open(os.path.join(args.load, 'cpu_model_state_dict.pt'), 'rb') as f:
-                state_dict = torch.load(f)
-        except FileNotFoundError as e:
-            with open(os.path.join(args.load, 'model_state_dict.pt'), 'rb') as f:
-                state_dict = torch.load(f)
-
-        model.load_state_dict(state_dict)
-
+        load_model(args.load)
         if args.restart:
             args.step_size = settings["step_size"]
 
@@ -191,13 +188,10 @@ def train(args):
     #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
 
     n_batches = int(len(X_train) // args.batch_size)
-    best_score = [-np.inf]  # yuck, but works
-    best_model_state_dict = copy.deepcopy(model.state_dict())
 
     def loss(y_pred, y):
         l = log_loss(y, y_pred.squeeze(1)).mean()
         return l
-
 
         ''' VALIDATION '''
     '''----------------------------------------------------------------------- '''
@@ -214,7 +208,12 @@ def train(args):
                 Xt, yt = X_train[idx], y_train[idx]
                 X_var = wrap_X(Xt); y_var = wrap(yt)
                 tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
-                X = unwrap_X(X_var); y = unwrap(y_var)
+                X = unwrap_X(X_var); y = unwrap(y_var);
+
+                #Xt, yt = X_train[idx], y_train[idx]
+                #X_var = wrap_X(Xt); y_var = wrap(yt)
+                #tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
+                #X = unwrap_X(X_var); y = unwrap(y_var)
 
                 Xv, yv = X_valid[idx], y_valid[idx]
                 X_var = wrap_X(Xv); y_var = wrap(yv)
@@ -231,7 +230,6 @@ def train(args):
             yy_pred = np.concatenate(yy_pred, 0)
 
             t1=time.time()
-            logging.info("Modeling validation data took {}s".format(t1-t0))
             logdict = dict(
                 epoch=epoch,
                 iteration=iteration,
@@ -242,7 +240,9 @@ def train(args):
                 train_loss=train_loss,
                 valid_loss=valid_loss,
                 settings=settings,
-                model=model
+                model=model,
+                logtime=np.log((t1-t0) / len(X_valid)),
+                time=((t1-t_start))
             )
             eh.log(**logdict)
 
@@ -268,6 +268,8 @@ def train(args):
             X_var = wrap_X(X); y_var = wrap(y)
             l = loss(model(X_var), y_var)
             l.backward()
+            if args.clip is not None:
+                torch.nn.utils.clip_grad_norm(model.parameters(), args.clip)
             optimizer.step()
             X = unwrap_X(X_var); y = unwrap(y_var)
             callback(i, iteration, model)
@@ -278,7 +280,6 @@ def train(args):
         settings['step_size'] = args.step_size * (args.decay) ** (i + 1)
 
     eh.finished()
-
 
 
 if __name__ == "__main__":

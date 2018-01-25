@@ -2,7 +2,6 @@ import os
 import pickle
 import torch
 import logging
-from architectures import PredictFromParticleEmbedding
 
 def convert_state_dict_pt_file(path_to_state_dict):
     with open(os.path.join(path_to_state_dict, 'model_state_dict.pt'), 'rb') as f:
@@ -14,25 +13,46 @@ def convert_state_dict_pt_file(path_to_state_dict):
 
 def load_model(filename):
     with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
-        settings = pickle.load(f)
+        settings = pickle.load(f, encoding='latin-1')
         Transform = settings["transform"]
-        try:
+        Predict = settings["predict"]
+        model_kwargs = settings["model_kwargs"]
+
+    model = Predict(Transform, **model_kwargs)
+
+    #try:
+    with open(os.path.join(filename, 'cpu_model_state_dict.pt'), 'rb') as f:
+        state_dict = torch.load(f)
+    #except FileNotFoundError as e:
+    #    with open(os.path.join(filename, 'model_state_dict.pt'), 'rb') as f:
+    #        state_dict = torch.load(f)
+
+    model.load_state_dict(state_dict)
+
+def OLDload_model(filename):
+    with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
+        settings = pickle.load(f)
+        if isinstance(settings["transform"], str):
+            Transform = TRANSFORMS[settings['transform']][1]
+        else: # backwards compatibility
+            logging.warning('settings should save transform in string format.')
+            Transform = settings["transform"]
+        if isinstance(settings["predict"], str):
+            Predict = PREDICTORS[settings['predict']][1]
+        else: # backwards compatibility
+            logging.warning('settings should save predictor in string format.')
             Predict = settings["predict"]
-        except KeyError:
-            Predict = PredictFromParticleEmbedding # hack
-        try:
-            model_kwargs = settings["model_kwargs"]
-        except KeyError:
-            model_kwargs = { # hack
-            'n_features': 7,
-            'n_hidden': 40,
-            'bn': False
-            }
+        #try:
+        #    Predict = settings["predict"]
+        #except KeyError:
+        #    Predict = PredictFromParticleEmbedding # hack
+        model_kwargs = settings["model_kwargs"]
+
 
     try:
         with open(os.path.join(filename, 'cpu_model_state_dict.pt'), 'rb') as f:
             state_dict = torch.load(f)
-    except FileNotFoundError:
+    except FileNotFoundError: # backwards compatibility
         convert_state_dict_pt_file(filename)
         with open(os.path.join(filename, 'cpu_model_state_dict.pt'), 'rb') as f:
             state_dict = torch.load(f)

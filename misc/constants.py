@@ -1,30 +1,42 @@
-
-from architectures import GRNNTransformGated
-from architectures import GRNNTransformSimple
-from architectures import RelNNTransformConnected
-from architectures import MPNNTransformAdaptive
-from architectures import MPNNTransformFullyConnected
-from architectures import MPNNTransformIdentity
-from architectures import MPNNTransformSet2Set
-from architectures import MPNNTransformSet2SetSymmetric
-from architectures import MPNNTransformAdaptiveSymmetric
-
-''' LOOKUP TABLES AND CONSTANTS '''
+import os
+''' CONSTANTS '''
 '''----------------------------------------------------------------------- '''
 MODELS_DIR = 'models'
-FINISHED_MODELS_DIR = 'finished_models'
-DATA_DIR = 'data/w-vs-qcd/pickles'
-TRANSFORMS = [
-    (0, RelNNTransformConnected, 'relation'),
-    (1, GRNNTransformSimple,'recnn/simple'),
-    (2, GRNNTransformGated,'recnn/gated'),
-    (3, MPNNTransformIdentity,'mpnn/id'),
-    (4, MPNNTransformAdaptive,'mpnn/vanilla'),
-    (5, MPNNTransformSet2Set, 'mpnn/set'),
-    (6, MPNNTransformAdaptiveSymmetric,'mpnn/sym-vanilla'),
-    (7, MPNNTransformSet2SetSymmetric,'mpnn/sym-set'),
+RUNNING_MODELS_DIR = os.path.join(MODELS_DIR,'running')
+FINISHED_MODELS_DIR = os.path.join(MODELS_DIR,'finished')
+DEBUG_MODELS_DIR = os.path.join(MODELS_DIR,'debugging')
+INTERRUPTED_MODELS_DIR = os.path.join(MODELS_DIR,'interrupted')
+KILLED_MODELS_DIR = os.path.join(MODELS_DIR,'killed')
+ARCHIVED_MODELS_DIR = os.path.join(MODELS_DIR,'archive')
+ALL_MODEL_DIRS = [
+    RUNNING_MODELS_DIR,
+    FINISHED_MODELS_DIR,
+    DEBUG_MODELS_DIR,
+    INTERRUPTED_MODELS_DIR,
+    KILLED_MODELS_DIR,
+    ARCHIVED_MODELS_DIR,
 ]
-RECIPIENT = "henrion@nyu.edu"
-REPORTS_DIR = "reports"
 
-#RECIPIENT = None
+with open('misc/email_addresses.txt', 'r') as f:
+    lines = f.readlines()
+    RECIPIENT, SENDER, PASSWORD = (l.strip() for l in lines)
+
+REPORTS_DIR = "reports"
+DATASETS = {
+    'original':'antikt-kt',
+    'pileup':'antikt-kt-pileup25'
+}
+
+''' argparse args '''
+STEP_SIZE=0.001
+HIDDEN=40
+BATCH_SIZE=100
+FEATURES=7
+DECAY=0.96
+EPOCHS=50
+ITERS=2
+SCALES=-1
+#SENDER="results74207281@gmail.com"
+#PASSWORD="deeplearning"
+VALID=27000
+DATA_DIR = 'data/w-vs-qcd/pickles'
