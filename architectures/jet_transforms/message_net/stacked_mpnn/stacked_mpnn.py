@@ -46,12 +46,12 @@ class StackedMPNNTransform(nn.Module):
                 h = pool(h)
 
             if i == 0 and not self.pool_first:
-                h = mpnn(h=h, mask=mask)
+                h, A = mpnn(h=h, mask=mask)
             else:
-                h = mpnn(h=h, mask=None)
+                h, A = mpnn(h=h, mask=None)
 
             if not self.pool_first:
                 h = pool(h)
 
         out = self.readout(h)
-        return out
+        return out, A

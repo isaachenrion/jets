@@ -32,16 +32,9 @@ class MPNNTransform(nn.Module):
             self.readout = readout
         self.multiple_iterations_of_message_passing = MultipleIterationMessagePassingLayer(iters=iters, hidden=hidden, mp_layer=mp_layer, **kwargs)
 
-    def forward(self, jets, return_extras=False, **kwargs):
+    def forward(self, jets, **kwargs):
         jets, mask = batch_leaves(jets)
         h = self.activation(self.embedding(jets))
-        stuff = self.multiple_iterations_of_message_passing(h, mask, return_extras)
-        if return_extras:
-            h, A = stuff
-        else:
-            h = stuff
+        h, A = self.multiple_iterations_of_message_passing(h=h, mask=mask, **kwargs)
         out = self.readout(h)
-        if return_extras:
-            return out, A
-        else:
-            return out
+        return out, A

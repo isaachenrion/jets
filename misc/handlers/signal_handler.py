@@ -48,12 +48,12 @@ class SignalHandler:
 
     def killed(self, signal, frame):
         self.signal_handler(signal='KILLED')
-        if self.train: self.mover.move_to_hell()
+        if self.train: self.mover.move_to_killed()
         sys.exit(0)
 
     def interrupted(self, signal, frame):
         self.signal_handler(signal='INTERRUPTED')
-        if self.train: self.mover.move_to_limbo()
+        if self.train: self.mover.move_to_interrupted()
         sys.exit(0)
 
     def completed(self):
@@ -61,9 +61,9 @@ class SignalHandler:
         self.signal_handler(signal='COMPLETED')
         if self.train:
             if self.debug:
-                self.mover.move_to_morgue()
+                self.mover.move_to_debug()
             else:
-                self.mover.move_to_heaven()
+                self.mover.move_to_finished()
 
 
     def crashed(self):

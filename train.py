@@ -20,17 +20,13 @@ from misc.handlers import ExperimentHandler
 from misc.loggers import StatsLogger
 
 from monitors.losses import *
-from monitors.monitors import *
 
-from architectures import POOLINGS
-from architectures import TRANSFORMS
-from architectures import MESSAGE_PASSING_LAYERS
-from architectures import PREDICTORS
-from architectures import ADAPTIVE_MATRICES
+from experiment import convert_args
 
 from loading import load_data
 from loading import load_tf
 from loading import crop
+from loading import load_model
 
 ''' ARGUMENTS '''
 '''----------------------------------------------------------------------- '''
@@ -45,7 +41,7 @@ parser.add_argument("-p", "--pileup", action='store_true', default=False)
 parser.add_argument("--root_dir", default=MODELS_DIR)
 
 # general model args
-parser.add_argument("-m", "--model_type", help="index of the model you want to train - look in constants.py for the model list", type=str, default="")
+parser.add_argument("-m", "--model_type", help="name of the model you want to train - look in constants.py for the model list", type=str, default="mpnn")
 parser.add_argument("--features", type=int, default=FEATURES)
 parser.add_argument("--hidden", type=int, default=HIDDEN)
 
@@ -64,6 +60,7 @@ parser.add_argument("-e", "--epochs", type=int, default=EPOCHS)
 parser.add_argument("-b", "--batch_size", type=int, default=BATCH_SIZE)
 parser.add_argument("-a", "--step_size", type=float, default=STEP_SIZE)
 parser.add_argument("-d", "--decay", type=float, default=DECAY)
+parser.add_argument("--clip", type=float, default=None)
 
 # computing args
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)
@@ -72,15 +69,15 @@ parser.add_argument("-g", "--gpu", type=str, default="")
 # MPNN
 parser.add_argument("-i", "--iters", type=int, default=ITERS)
 parser.add_argument("--scales", nargs='+', type=int, default=SCALES)
-parser.add_argument("--mp", type=str, default=None, help='type of message passing layer')
-parser.add_argument("--pool", type=str, default=None, help='type of pooling layer')
+parser.add_argument("--mp", type=str, default='van', help='type of message passing layer')
+parser.add_argument("--pool", type=str, default='attn', help='type of pooling layer')
 parser.add_argument("--predict", type=str, default=0, help='type of prediction layer')
 parser.add_argument("--matrix", type=str, default=0, help='type of adaptive matrix layer')
 parser.add_argument("--sym", action='store_true', default=False)
 parser.add_argument("--pool_first", action='store_true', default=False)
 # email
-parser.add_argument("--sender", type=str, default=SENDER)
-parser.add_argument("--password", type=str, default=PASSWORD)
+#parser.add_argument("--sender", type=str, default=SENDER)
+#parser.add_argument("--password", type=str, default=PASSWORD)
 
 # debugging
 parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
@@ -97,10 +94,9 @@ if args.debug:
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
-
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
-args.recipient = RECIPIENT
+#args.recipient = RECIPIENT
 
 if args.pileup:
     args.dataset = 'pileup'
@@ -109,21 +105,8 @@ else:
 
 def train(args):
     t_start = time.time()
-    def lookup(component_key, component_table):
-        if component_key is None: return None, None
-        try:
-            component_key = int(component_key)
-            component_key = [k for k, (n, _) in component_table.items() if n == component_key].pop()
-        except ValueError:
-            pass
-        _, Component = component_table[component_key]
-        return component_key, Component
 
-    args.model_type, Transform = lookup(args.model_type, TRANSFORMS)
-    args.mp, MessagePassingLayer = lookup(args.mp, MESSAGE_PASSING_LAYERS)
-    args.pool, PoolingLayer = lookup(args.pool, POOLINGS)
-    args.predict, Predict = lookup(args.predict, PREDICTORS)
-    args.matrix, Matrix = lookup(args.matrix, ADAPTIVE_MATRICES)
+    args, architecture = convert_args(args)
 
     eh = ExperimentHandler(args)
 
@@ -161,45 +144,28 @@ def train(args):
     '''----------------------------------------------------------------------- '''
     # Initialization
     logging.info("Initializing model...")
-    #Predict = PredictFromParticleEmbedding
     if args.load is None:
         model_kwargs = {
             'features': args.features,
             'hidden': args.hidden,
             'iters': args.iters,
             'scales': args.scales,
-            'pooling_layer':PoolingLayer,
-            'mp_layer':MessagePassingLayer,
+            'pooling_layer':architecture.pooling_layer,
+            'mp_layer':architecture.message_passing_layer,
             'symmetric':args.sym,
             'pool_first':args.pool_first,
-            'adaptive_matrix':Matrix
+            'adaptive_matrix':architecture.matrix
         }
-        model = Predict(Transform, **model_kwargs)
+        model = architecture.predict(architecture.transform, **model_kwargs)
         settings = {
             "transform": args.model_type,
-            "predict": Predict,
+            "predict": architecture.predict,
             "model_kwargs": model_kwargs,
             "step_size": args.step_size,
             "args": args,
             }
     else:
-        with open(os.path.join(args.load, 'settings.pickle'), "rb") as f:
-            settings = pickle.load(f, encoding='latin-1')
-            Transform = settings["transform"]
-            Predict = settings["predict"]
-            model_kwargs = settings["model_kwargs"]
-
-        model = PredictFromParticleEmbedding(Transform, **model_kwargs)
-
-        try:
-            with open(os.path.join(args.load, 'cpu_model_state_dict.pt'), 'rb') as f:
-                state_dict = torch.load(f)
-        except FileNotFoundError as e:
-            with open(os.path.join(args.load, 'model_state_dict.pt'), 'rb') as f:
-                state_dict = torch.load(f)
-
-        model.load_state_dict(state_dict)
-
+        load_model(args.load)
         if args.restart:
             args.step_size = settings["step_size"]
 
@@ -222,13 +188,10 @@ def train(args):
     #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
 
     n_batches = int(len(X_train) // args.batch_size)
-    best_score = [-np.inf]  # yuck, but works
-    best_model_state_dict = copy.deepcopy(model.state_dict())
 
     def loss(y_pred, y):
         l = log_loss(y, y_pred.squeeze(1)).mean()
         return l
-
 
         ''' VALIDATION '''
     '''----------------------------------------------------------------------- '''
@@ -245,7 +208,12 @@ def train(args):
                 Xt, yt = X_train[idx], y_train[idx]
                 X_var = wrap_X(Xt); y_var = wrap(yt)
                 tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
-                X = unwrap_X(X_var); y = unwrap(y_var)
+                X = unwrap_X(X_var); y = unwrap(y_var);
+
+                #Xt, yt = X_train[idx], y_train[idx]
+                #X_var = wrap_X(Xt); y_var = wrap(yt)
+                #tl = unwrap(loss(model(X_var), y_var)); train_loss.append(tl)
+                #X = unwrap_X(X_var); y = unwrap(y_var)
 
                 Xv, yv = X_valid[idx], y_valid[idx]
                 X_var = wrap_X(Xv); y_var = wrap(yv)
@@ -262,7 +230,6 @@ def train(args):
             yy_pred = np.concatenate(yy_pred, 0)
 
             t1=time.time()
-            logging.info("Modeling validation data took {}s".format(t1-t0))
             logdict = dict(
                 epoch=epoch,
                 iteration=iteration,
@@ -275,7 +242,7 @@ def train(args):
                 settings=settings,
                 model=model,
                 logtime=np.log((t1-t0) / len(X_valid)),
-                time=((t1-t_start) / 3600)
+                time=((t1-t_start))
             )
             eh.log(**logdict)
 
@@ -301,6 +268,8 @@ def train(args):
             X_var = wrap_X(X); y_var = wrap(y)
             l = loss(model(X_var), y_var)
             l.backward()
+            if args.clip is not None:
+                torch.nn.utils.clip_grad_norm(model.parameters(), args.clip)
             optimizer.step()
             X = unwrap_X(X_var); y = unwrap(y_var)
             callback(i, iteration, model)
@@ -311,7 +280,6 @@ def train(args):
         settings['step_size'] = args.step_size * (args.decay) ** (i + 1)
 
     eh.finished()
-
 
 
 if __name__ == "__main__":

@@ -11,6 +11,7 @@ finished_models
 debug_models
 killed_models
 interrupted_models
+misc/email_addresses.txt
 .git
 *.pyc
 *.pyo

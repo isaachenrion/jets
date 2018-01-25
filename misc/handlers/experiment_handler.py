@@ -8,9 +8,9 @@ import shutil
 from ..utils import *
 from .emailer import Emailer
 from .signal_handler import SignalHandler
-from monitors.monitors import *
+from monitors import *
 from ..loggers import StatsLogger
-from misc.constants import ALL_MODEL_DIRS
+from misc.constants import RUNNING_MODELS_DIR, ALL_MODEL_DIRS
 
 
 class ExperimentHandler:
@@ -43,7 +43,7 @@ class ExperimentHandler:
             torch.manual_seed(args.seed)
 
     def model_directory(self, args):
-        self.root_dir = args.root_dir
+        self.root_dir = RUNNING_MODELS_DIR
         self.model_type_dir = os.path.join(args.dataset, args.model_type, str(args.iters))
         dt = datetime.datetime.now()
         self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.slurm_job_id)
@@ -58,6 +58,7 @@ class ExperimentHandler:
         #self.leaf_dir = temp
         self.exp_dir = os.path.join(self.root_dir,self.leaf_dir)
         os.makedirs(self.exp_dir)
+        self.start_dt = dt
 
     def create_all_model_dirs(self):
         for model_dir in ALL_MODEL_DIRS:
@@ -75,7 +76,12 @@ class ExperimentHandler:
     def setup_signal_handler(self, args):
         ''' SIGNAL HANDLER '''
         '''----------------------------------------------------------------------- '''
-        self.emailer=Emailer(args.sender, args.password, args.recipient)
+
+        with open('misc/email_addresses.txt', 'r') as f:
+            lines = f.readlines()
+            recipient, sender, password = (l.strip() for l in lines)
+
+        self.emailer=Emailer(sender, password, recipient)
         self.signal_handler = SignalHandler(
                                 emailer=self.emailer,
                                 logfile=self.logfile,
@@ -100,8 +106,10 @@ class ExperimentHandler:
         train_loss = Regurgitate('train_loss')
         #prediction_histogram = EachClassHistogram([0,1], 'yy', 'yy_pred', append=False)
         #logtimer = Regurgitate('logtime')
-        logtimer=Collect('logtime', fn='last', visualizing=True)
-        cumulative_timer=Collect('time', fn='sum', visualizing=True)
+        logtimer=Collect('logtime', fn='last', visualizing=False)
+        epoch_timer=Hours()
+        cumulative_timer=Collect('time', fn='sum', visualizing=False)
+        eta=ETA(self.start_dt, args.epochs)
 
         model_file = os.path.join(self.exp_dir, 'model_state_dict.pt')
         settings_file = os.path.join(self.exp_dir, 'settings.pickle')
@@ -118,7 +126,9 @@ class ExperimentHandler:
             self.saver,
             #prediction_histogram,
             logtimer,
-            cumulative_timer
+            cumulative_timer,
+            epoch_timer,
+            eta
         ]
 
         statsfile = os.path.join(self.exp_dir, 'stats')

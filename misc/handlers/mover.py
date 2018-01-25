@@ -14,14 +14,14 @@ class Mover:
         shutil.move(src, dst)
         logging.info('Moved model directory to {}'.format(dst))
 
-    def move_to_heaven(self):
+    def move_to_finished(self):
         self.move_to_folder(FINISHED_MODELS_DIR)
 
-    def move_to_morgue(self):
+    def move_to_debug(self):
         self.move_to_folder(DEBUG_MODELS_DIR)
 
-    def move_to_hell(self):
+    def move_to_killed(self):
         self.move_to_folder(KILLED_MODELS_DIR)
 
-    def move_to_limbo(self):
+    def move_to_interrupted(self):
         self.move_to_folder(INTERRUPTED_MODELS_DIR)

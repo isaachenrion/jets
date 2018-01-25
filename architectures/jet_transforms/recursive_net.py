@@ -61,7 +61,7 @@ class GRNNTransformSimple(nn.Module):
             else:
                 embeddings.append(u_k)
 
-        return embeddings[-1].view((len(jets), -1))
+        return embeddings[-1].view((len(jets), -1)), None
 
 
 class GRNNTransformGated(nn.Module):
@@ -100,14 +100,14 @@ class GRNNTransformGated(nn.Module):
         self.recursive_embedding(up_embeddings, levels, children, n_inners, contents)
 
         if True:# or self.iters == 0:
-            return up_embeddings[0].view((len(jets), -1))
+            return up_embeddings[0].view((len(jets), -1)), None
         else:
             return torch.cat(
                         (
                         up_embeddings[0].view((len(jets), -1)),
                         down_embeddings[0].view((len(jets), -1))
                         ),
-                    1)
+                    1), None
 
     def recursive_embedding(self, up_embeddings, levels, children, n_inners, contents):
         n_levels = len(levels)

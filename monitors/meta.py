@@ -1,114 +1,5 @@
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-#import visdom
-
+from .baseclasses import ScalarMonitor, Monitor
 import numpy as np
-from sklearn.metrics import roc_curve
-from sklearn.metrics import roc_auc_score
-
-import logging
-import torch
-import pickle
-import os
-from scipy import interp
-
-def inv_fpr_at_tpr_equals_half(tpr, fpr):
-    base_tpr = np.linspace(0.05, 1, 476)
-    fpr = fpr + 1e-20
-    inv_fpr = interp(base_tpr, tpr, 1. / fpr)
-    return np.mean(inv_fpr[225])
-
-class Monitor:
-    def __init__(self, name, visualizing=True):
-        self.value = None
-        self.name = name
-        self.scalar = None
-        self.visualizing = visualizing
-
-    def initialize(self, statsdir, plotsdir, viz):
-        #print("INIT, {}, {}".format(savedir, self.name))
-        self.plotsdir = plotsdir
-        self.statsdir = statsdir
-        if self.visualizing:
-            self.viz = viz
-        else:
-            self.viz = None
-
-    def __call__(self, **kwargs):
-        self.value = self.call(**kwargs)
-        if self.visualizing and self.viz is not None:
-            self.visualize()
-        return self.value
-
-    def visualize(self):
-        pass
-
-    def call(self, **kwargs):
-        pass
-
-    def finish(self):
-        pass
-
-class ScalarMonitor(Monitor):
-    def __init__(self, name, **kwargs):
-        super().__init__(name, **kwargs)
-        self.scalar = True
-        self.counter = 0
-
-    def visualize(self):
-        self.counter += 1
-        if self.counter == 1:
-            self.viz.line(
-                X=np.array((self.counter,)),
-                Y=np.array((self.value,)),
-                win=self.name,
-                opts=dict(
-                    fillarea=False,
-                    showlegend=True,
-                    width=400,
-                    height=400,
-                    xlabel='Epochs',
-                    ylabel=self.name,
-                    title=self.name,
-                    marginleft=30,
-                    marginright=30,
-                    marginbottom=80,
-                    margintop=30,
-                )
-            )
-        else:
-            self.viz.line(
-                X=np.array((self.counter,)),
-                Y=np.array((self.value,)),
-                win=self.name,
-                update='append'
-            )
-
-class ROCAUC(ScalarMonitor):
-    def __init__(self, **kwargs):
-        super().__init__('roc_auc', **kwargs)
-
-    def call(self, yy=None, yy_pred=None, w_valid=None, **kwargs):
-        return roc_auc_score(yy, yy_pred, sample_weight=w_valid)
-
-class ROCCurve(Monitor):
-    def __init__(self, **kwargs):
-        super().__init__('roc_curve', **kwargs)
-        self.scalar = False
-        self.fpr, self.tpr = None, None
-
-    def call(self, yy=None, yy_pred=None, w_valid=None, **kwargs):
-        self.fpr, self.tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
-        return (self.fpr, self.tpr)
-
-class InvFPR(ScalarMonitor):
-    def __init__(self, **kwargs):
-        super().__init__('inv_fpr', **kwargs)
-
-    def call(self, yy=None, yy_pred=None, w_valid=None, **kwargs):
-        fpr, tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
-        return inv_fpr_at_tpr_equals_half(tpr, fpr)
 
 class Best(ScalarMonitor):
     def __init__(self, monitor, track='max', **kwargs):
@@ -166,6 +57,8 @@ class Collect(ScalarMonitor):
         self.collection.append(kwargs[self.value_name])
         self.value = self.fn(self.collection)
         return self.value
+
+
 
 class Histogram(Monitor):
     def __init__(self, name, n_bins=30, rootname=None, append=False, **kwargs):
@@ -236,28 +129,3 @@ class EachClassHistogram(Monitor):
     #        center = (bins[:-1] + bins[1:]) / 2
     #        bars = plt.bar(center, hist, align='center', width=width)
     #    plt.savefig(os.path.join(self.plotsdir, self.name + '-fig'))
-
-
-class Saver(ScalarMonitor):
-    def __init__(self, save_monitor, model_file, settings_file, **kwargs):
-        self.saved = False
-        self.save_monitor = save_monitor
-        self.model_file = model_file
-        self.settings_file = settings_file
-        super().__init__('save', **kwargs)
-
-    def call(self, model=None, settings=None, **kwargs):
-        if self.save_monitor.changed:
-            self.save(model, settings)
-            self.value = True
-        else:
-            self.value = False
-        return self.value
-
-    def save(self, model, settings):
-        with open(self.model_file, 'wb') as f:
-            torch.save(model.cpu().state_dict(), f)
-            if torch.cuda.is_available():
-                model.cuda()
-        with open(self.settings_file, "wb") as f:
-            pickle.dump(settings, f)

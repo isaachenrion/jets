@@ -11,6 +11,29 @@ from data_ops.preprocessing import sequentialize_by_pt
 from data_ops.preprocessing import randomize
 from data_ops.preprocessing import rewrite_content
 
+def _load_data(data_dir, filename):
+
+    path_to_preprocessed_dir = os.path.join(data_dir, 'preprocessed')
+    path_to_preprocessed = os.path.join(path_to_preprocessed_dir, filename)
+
+    if not os.path.exists(path_to_preprocessed):
+        logging.warning("Preprocessing...")
+        with open(os.path.join(data_dir, 'raw', filename), mode="rb") as fd:
+            X, y, dij = pickle.load(fd, encoding='latin-1')
+        y = np.array(y)
+        X = [extract(permute_by_pt(rewrite_content(jet))) for jet in X]
+        if not os.path.exists(path_to_preprocessed_dir):
+            os.makedirs(path_to_preprocessed_dir)
+        with open(path_to_preprocessed, mode="wb") as fd:
+            pickle.dump((X, y, dij), fd)
+
+        logging.warning("Preprocessed the data and saved it to {}".format(path_to_preprocessed))
+    else:
+        with open(path_to_preprocessed, mode="rb") as fd:
+            X, y, dij = pickle.load(fd, encoding='latin-1')
+        logging.warning("Data loaded and already preprocessed")
+    return X, y, dij
+
 def load_data(data_dir, filename):
 
     path_to_preprocessed_dir = os.path.join(data_dir, 'preprocessed')
@@ -87,30 +110,3 @@ def crop(X, y, return_cropped_indices=False, pileup=False):
     if return_cropped_indices:
         return X_, y_, cropped_indices, w
     return X_, y_, w
-
-### DEPRECATED
-def load_test(tf, data_dir, filename, n_test=-1, cropping=True):
-    X, y = load_data(data_dir, filename)
-    #tf = load_tf(data_dir, "{}-train.pickle".format(filename))
-
-    for jet in X:
-        jet["content"] = tf.transform(jet["content"])
-
-
-    if not cropping:
-        if n_test > 0:
-            indices = np.random.permutation(len(X))[:n_test]
-            X = X[indices]
-            y = y[indices]
-        return X, y
-
-    X, y, w = crop(X, y)
-
-    X = X[:n_test]
-    y = y[:n_test]
-    w = w[:n_test]
-
-    logging.warning("\tAfter cropping: X size = %d" % len(X))
-    logging.warning("\tAfter cropping: y size = %d" % len(y))
-
-    return X, y, w
