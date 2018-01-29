@@ -75,9 +75,6 @@ parser.add_argument("--predict", type=str, default=0, help='type of prediction l
 parser.add_argument("--matrix", type=str, default=0, help='type of adaptive matrix layer')
 parser.add_argument("--sym", action='store_true', default=False)
 parser.add_argument("--pool_first", action='store_true', default=False)
-# email
-#parser.add_argument("--sender", type=str, default=SENDER)
-#parser.add_argument("--password", type=str, default=PASSWORD)
 
 # debugging
 parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
@@ -96,7 +93,6 @@ os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
 if args.n_train <= 5 * args.n_valid and args.n_train > 0:
     args.n_valid = args.n_train // 5
-#args.recipient = RECIPIENT
 
 if args.pileup:
     args.dataset = 'pileup'

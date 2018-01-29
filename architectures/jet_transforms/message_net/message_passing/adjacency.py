@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-class AdaptiveAdjacencyMatrix(nn.Module):
+class AdjacencyMatrix(nn.Module):
     def __init__(self, symmetric=None, **kwargs):
         super().__init__()
         self.symmetric = symmetric
@@ -17,7 +17,7 @@ class AdaptiveAdjacencyMatrix(nn.Module):
             A = 0.5 * (A + torch.transpose(A, 1, 2))
         return A
 
-class SumMatrix(AdaptiveAdjacencyMatrix):
+class SumMatrix(AdjacencyMatrix):
     def __init__(self, hidden=None, **kwargs):
         super().__init__(**kwargs)
         self.softmax = PaddedMatrixSoftmax()
@@ -32,7 +32,7 @@ class SumMatrix(AdaptiveAdjacencyMatrix):
         A = self.softmax(A, mask)
         return A
 
-class DistMult(AdaptiveAdjacencyMatrix):
+class DistMult(AdjacencyMatrix):
     def __init__(self, hidden=None, **kwargs):
         super().__init__(**kwargs)
         self.softmax = PaddedMatrixSoftmax()
@@ -43,7 +43,7 @@ class DistMult(AdaptiveAdjacencyMatrix):
         A = self.softmax(A, mask)
         return A
 
-class Siamese(AdaptiveAdjacencyMatrix):
+class Siamese(AdjacencyMatrix):
     def __init__(self, hidden=None, **kwargs):
         super().__init__(**kwargs)
         self.softmax = PaddedMatrixSoftmax()
