@@ -23,6 +23,7 @@ class MessagePassingLayer(nn.Module):
         self.activation = F.tanh
         self.vertex_update = GRUUpdate(hidden, hidden)
         self.message = DTNNMessage(hidden, hidden, 0)
+        self.physics_based = False
 
     def get_adjacency_matrix(self, **kwargs):
         pass
@@ -57,12 +58,13 @@ class MPAdaptive(MessagePassingLayer):
     def get_adjacency_matrix(self, h=None, mask=None, **kwargs):
         return self.adjacency_matrix(h, mask)
 
-class MPFixed(MessagePassingLayer):
-    def __init__(self, hidden=None, adaptive_matrix=None, symmetric=False, **kwargs):
+class MPPhysics(MessagePassingLayer):
+    def __init__(self, hidden=None, **kwargs):
         super().__init__(hidden=hidden, **kwargs)
+        self.physics_based = True
 
-    def get_adjacency_matrix(self, matrix=None):
-        return matrix
+    def get_adjacency_matrix(self, **kwargs):
+        return kwargs.pop('dij', None)
 
 class MPSet2Set(MPAdaptive):
     def __init__(self, hidden=None, **kwargs):

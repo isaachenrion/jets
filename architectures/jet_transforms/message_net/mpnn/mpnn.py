@@ -9,6 +9,7 @@ from data_ops.batching import trees_as_adjacency_matrices
 from ..readout import DTNNReadout, SetReadout
 from ..message_passing import MultipleIterationMessagePassingLayer
 
+from physics.adjacency import torch_calculate_dij
 
 class MPNNTransform(nn.Module):
     def __init__(self,
@@ -30,11 +31,21 @@ class MPNNTransform(nn.Module):
             self.readout = DTNNReadout(hidden, hidden)
         else:
             self.readout = readout
-        self.multiple_iterations_of_message_passing = MultipleIterationMessagePassingLayer(iters=iters, hidden=hidden, mp_layer=mp_layer, **kwargs)
+        #self.multiple_iterations_of_message_passing = MultipleIterationMessagePassingLayer(iters=iters, hidden=hidden, mp_layer=mp_layer, **kwargs)
+        self.mp_layers = nn.ModuleList([mp_layer(hidden=hidden,**kwargs) for _ in range(iters)])
 
     def forward(self, jets, **kwargs):
         jets, mask = batch_leaves(jets)
+        if self.mp_layers[0].physics_based:
+            dij = torch_calculate_dij(jets)
+        else:
+            dij = None
+
         h = self.activation(self.embedding(jets))
-        h, A = self.multiple_iterations_of_message_passing(h=h, mask=mask, **kwargs)
+
+        for mp in self.mp_layers:
+            h, A = mp(h=h, **kwargs)
+        #return h
+        #h, A = self.multiple_iterations_of_message_passing(h=h, mask=mask, dij=dij,**kwargs)
         out = self.readout(h)
         return out, A
