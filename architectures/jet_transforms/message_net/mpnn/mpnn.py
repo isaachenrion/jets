@@ -36,6 +36,7 @@ class MPNNTransform(nn.Module):
 
     def forward(self, jets, **kwargs):
         jets, mask = batch_leaves(jets)
+
         if self.mp_layers[0].physics_based:
             dij = torch_calculate_dij(jets)
         else:
@@ -44,7 +45,7 @@ class MPNNTransform(nn.Module):
         h = self.activation(self.embedding(jets))
 
         for mp in self.mp_layers:
-            h, A = mp(h=h, **kwargs)
+            h, A = mp(h=h, mask=mask, dij=dij, **kwargs)
         #return h
         #h, A = self.multiple_iterations_of_message_passing(h=h, mask=mask, dij=dij,**kwargs)
         out = self.readout(h)
