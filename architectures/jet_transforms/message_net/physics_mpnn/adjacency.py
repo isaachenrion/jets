@@ -14,7 +14,10 @@ class PhysicsBasedAdjacencyMatrix(nn.Module):
         else:
             self.alpha_raw = Variable(torch.FloatTensor([alpha_raw]))
             self.logR = Variable(torch.FloatTensor([logR]))
-
+        if torch.cuda.is_available():
+            self.alpha_raw = self.alpha_raw.cuda()
+            self.logR = self.logR.cuda()
+            
     def alpha(self):
         return F.tanh(self.alpha_raw)
 
