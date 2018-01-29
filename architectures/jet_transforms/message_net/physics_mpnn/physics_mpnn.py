@@ -5,15 +5,24 @@ import torch.nn.functional as F
 from data_ops.batching import batch_leaves
 
 from ..readout import DTNNReadout, SetReadout
-#from ..message_passing import MultipleIterationMessagePassingLayer
+from .adjacency import PhysicsBasedAdjacencyMatrix
+from ..message_passing.message_passing_layers import MessagePassingLayer
 
-class MPNNTransform(nn.Module):
+class MPPhysics(MessagePassingLayer):
+    def __init__(self, hidden=None, **kwargs):
+        super().__init__(hidden=hidden, **kwargs)
+        self.physics_based = True
+
+    def get_adjacency_matrix(self, **kwargs):
+        return kwargs.pop('dij', None)
+
+class PhysicsBasedMPNNTransform(nn.Module):
     def __init__(self,
         features=None,
         hidden=None,
         iters=None,
-        mp_layer=None,
         readout=None,
+        trainable=False,
         **kwargs
         ):
         super().__init__()
@@ -26,22 +35,17 @@ class MPNNTransform(nn.Module):
             self.readout = DTNNReadout(hidden, hidden)
         else:
             self.readout = readout
-        #self.multiple_iterations_of_message_passing = MultipleIterationMessagePassingLayer(iters=iters, hidden=hidden, mp_layer=mp_layer, **kwargs)
-        self.mp_layers = nn.ModuleList([mp_layer(hidden=hidden,**kwargs) for _ in range(iters)])
+        self.mp_layers = nn.ModuleList([MPPhysics(hidden=hidden,**kwargs) for _ in range(iters)])
+        self.physics_based_adjacency_matrix = PhysicsBasedAdjacencyMatrix(trainable=trainable)
 
     def forward(self, jets, **kwargs):
         jets, mask = batch_leaves(jets)
 
-        #if self.mp_layers[0].physics_based:
-        #    dij = self.physics_based_adjacency_matrix(jets)
-        #else:
-        #    dij = None
+        dij = self.physics_based_adjacency_matrix(jets)
 
         h = self.activation(self.embedding(jets))
 
         for mp in self.mp_layers:
-            h, A = mp(h=h, mask=mask, **kwargs)
-        #return h
-        #h, A = self.multiple_iterations_of_message_passing(h=h, mask=mask, dij=dij,**kwargs)
+            h, A = mp(h=h, mask=mask, dij=dij, **kwargs)
         out = self.readout(h)
         return out, A

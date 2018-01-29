@@ -1,7 +1,42 @@
-from .fourvector import FourMomentum
+#from .fourvector import FourMomentum
 import torch
 import math
+import torch.nn as nn
+from torch.autograd import Variable
+import torch.nn.functional as F
 
+class PhysicsBasedAdjacencyMatrix(nn.Module):
+    def __init__(self, alpha_raw=0, logR=0, trainable=False):
+        super().__init__()
+        if trainable:
+            self.alpha_raw = nn.Parameter(torch.FloatTensor([alpha_raw]))
+            self.logR = nn.Parameter(torch.FloatTensor([logR]))
+        else:
+            self.alpha_raw = Variable(torch.FloatTensor([alpha_raw]))
+            self.logR = Variable(torch.FloatTensor([logR]))
+
+    def alpha(self):
+        return F.tanh(self.alpha_raw)
+
+    def R(self):
+        return torch.exp(self.logR)
+
+    def forward(self, p):
+        p1 = p.unsqueeze(1)
+        p2 = p.unsqueeze(2)
+
+        delta_eta = p1[:,:,:,1] - p2[:,:,:,1]
+
+        delta_phi = p1[:,:,:,2] - p2[:,:,:,2]
+        delta_phi = torch.remainder(delta_phi + math.pi, 2*math.pi) - math.pi
+
+        delta_r = (delta_phi**2 + delta_eta**2)**0.5
+
+        dij = torch.min(p1[:,:,:,0]**(2.*self.alpha()), p2[:,:,:,0]**(2.*self.alpha())) * delta_r / self.R()
+
+        return dij
+
+'''
 def calculate_dij(p1, p2, alpha=1., R=1.):
     delta_eta = p1[1] - p2[1]
 
@@ -80,3 +115,4 @@ def calculate_dij_matrices(X, alpha=1., R=1.):
         dij_list.append(dij)
 
     return dij_list
+'''

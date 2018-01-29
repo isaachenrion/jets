@@ -6,16 +6,6 @@ from torch.autograd import Variable
 from ..vertex_update import GRUUpdate
 from .message import DTNNMessage
 
-class MultipleIterationMessagePassingLayer(nn.Module):
-    def __init__(self, iters=None, mp_layer=None, **kwargs):
-        super().__init__()
-        self.mp_layers = nn.ModuleList([mp_layer(**kwargs) for _ in range(iters)])
-
-    def forward(self, **kwargs):
-        for mp in self.mp_layers:
-            h = mp(**kwargs)
-        return h
-
 
 class MessagePassingLayer(nn.Module):
     def __init__(self, hidden=None, **kwargs):
@@ -32,10 +22,6 @@ class MessagePassingLayer(nn.Module):
         A = self.get_adjacency_matrix(h=h, **kwargs)
         message = self.activation(torch.matmul(A, self.message(h)))
         h = self.vertex_update(h, message)
-        #if return_extras:
-        #    return h, A
-        #else:
-        #    return h
         return h, A
 
 class MPIdentity(MessagePassingLayer):
@@ -58,13 +44,6 @@ class MPAdaptive(MessagePassingLayer):
     def get_adjacency_matrix(self, h=None, mask=None, **kwargs):
         return self.adjacency_matrix(h, mask)
 
-class MPPhysics(MessagePassingLayer):
-    def __init__(self, hidden=None, **kwargs):
-        super().__init__(hidden=hidden, **kwargs)
-        self.physics_based = True
-
-    def get_adjacency_matrix(self, **kwargs):
-        return kwargs.pop('dij', None)
 
 class MPSet2Set(MPAdaptive):
     def __init__(self, hidden=None, **kwargs):

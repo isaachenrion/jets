@@ -76,6 +76,9 @@ parser.add_argument("--matrix", type=str, default=0, help='type of adaptive matr
 parser.add_argument("--sym", action='store_true', default=False)
 parser.add_argument("--pool_first", action='store_true', default=False)
 
+# Physics MPNN
+parser.add_argument("--trainable", action='store_true', default=False)
+
 # debugging
 parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
 
@@ -150,7 +153,8 @@ def train(args):
             'mp_layer':architecture.message_passing_layer,
             'symmetric':args.sym,
             'pool_first':args.pool_first,
-            'adaptive_matrix':architecture.matrix
+            'adaptive_matrix':architecture.matrix,
+            'trainable':args.trainable
         }
         model = architecture.predict(architecture.transform, **model_kwargs)
         settings = {

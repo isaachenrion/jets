@@ -1,5 +1,6 @@
 from .message_net import MPNNTransform
 from .message_net import StackedMPNNTransform
+from .message_net import PhysicsBasedMPNNTransform
 from .message_net import MESSAGE_PASSING_LAYERS
 from .message_net import POOLINGS
 from .message_net import ADAPTIVE_MATRICES
@@ -12,4 +13,5 @@ TRANSFORMS = {
     'recnn/gated':(2, GRNNTransformGated),
     'mpnn':(3, MPNNTransform),
     'stacked-mpnn':(4, StackedMPNNTransform),
+    'physics-mpnn':(5, PhysicsBasedMPNNTransform),
 }
