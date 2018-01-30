@@ -5,6 +5,7 @@ from torch.autograd import Variable
 
 from ..vertex_update import GRUUpdate
 from .message import DTNNMessage
+from .adjacency import construct_adjacency_matrix_layer
 
 from misc.abstract_constructor import construct_object
 
@@ -53,7 +54,7 @@ class MPIdentity(MessagePassingLayer):
 class MPAdaptive(MessagePassingLayer):
     def __init__(self, hidden=None, adaptive_matrix=None, symmetric=False, **kwargs):
         super().__init__(hidden=hidden, **kwargs)
-        self.adjacency_matrix = adaptive_matrix(hidden=hidden, symmetric=symmetric)
+        self.adjacency_matrix = construct_adjacency_matrix_layer(adaptive_matrix, hidden=hidden, symmetric=symmetric)
 
     def get_adjacency_matrix(self, h=None, mask=None, **kwargs):
         return self.adjacency_matrix(h, mask)

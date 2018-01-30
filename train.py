@@ -19,8 +19,6 @@ from admin import ExperimentHandler
 
 from monitors.losses import *
 
-#from experiment import convert_args
-
 from loading.data import prepare_train_data
 from loading.model import build_model
 
@@ -32,12 +30,10 @@ parser = argparse.ArgumentParser(description='Jets')
 parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_train", type=int, default=-1)
 parser.add_argument("--n_valid", type=int, default=VALID)
-#parser.add_argument("--dont_add_cropped", action='store_true', default=False)
 parser.add_argument("-p", "--pileup", action='store_true', default=False)
 parser.add_argument("--root_dir", default=MODELS_DIR)
 
-# general model args
-parser.add_argument("-j", "--jet_transform", type=str, default="mp", help="name of the model you want to train - look in constants.py for the model list")
+# dimension args
 parser.add_argument("--features", type=int, default=FEATURES)
 parser.add_argument("--hidden", type=int, default=HIDDEN)
 
@@ -62,18 +58,25 @@ parser.add_argument("--clip", type=float, default=None)
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)
 parser.add_argument("-g", "--gpu", type=str, default="")
 
-# MPNN
-parser.add_argument("-i", "--iters", type=int, default=ITERS)
-parser.add_argument("--scales", nargs='+', type=int, default=SCALES)
-parser.add_argument("--mp", type=str, default='van', help='type of message passing layer')
-parser.add_argument("--pool", type=str, default='attn', help='type of pooling layer')
+# Classifier
 parser.add_argument("--predict", type=str, default='simple', help='type of prediction layer')
+
+# Transform
+parser.add_argument("-j", "--jet_transform", type=str, default="nmp", help="name of the model you want to train - look in constants.py for the model list")
+
+# NMP
+parser.add_argument("-i", "--iters", type=int, default=ITERS)
+parser.add_argument("--mp", type=str, default='van', help='type of message passing layer')
 parser.add_argument("--matrix", type=str, default='dm', help='type of adaptive matrix layer')
 parser.add_argument("--sym", action='store_true', default=False)
-parser.add_argument("--pool_first", action='store_true', default=False)
 parser.add_argument("--readout", type=str, default='dtnn', help='type of readout layer')
 
-# Physics MPNN
+# Stack NMP
+parser.add_argument("--pool_first", action='store_true', default=False)
+parser.add_argument("--scales", nargs='+', type=int, default=SCALES)
+parser.add_argument("--pool", type=str, default='attn', help='type of pooling layer')
+
+# Physics NMP
 parser.add_argument("-t", "--trainable_physics", action='store_true', default=False)
 
 # debugging
@@ -101,8 +104,6 @@ else:
 
 def train(args):
     t_start = time.time()
-
-    #args, architecture = convert_args(args)
 
     eh = ExperimentHandler(args)
 
@@ -162,7 +163,6 @@ def train(args):
                 yy=yy,
                 yy_pred=yy_pred,
                 w_valid=w_valid[:len(yy_pred)],
-                #w_valid=w_valid,
                 train_loss=train_loss,
                 valid_loss=valid_loss,
                 settings=settings,

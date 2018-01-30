@@ -4,6 +4,7 @@ import torch
 from .load_model import load_model
 
 from architectures import construct_classifier
+
 def build_model(load, restart, args):
     # Initialization
     logging.info("Initializing model...")
