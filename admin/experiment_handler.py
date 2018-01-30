@@ -68,8 +68,8 @@ class ExperimentHandler:
         '''----------------------------------------------------------------------- '''
         self.logfile = get_logfile(self.exp_dir, args.silent, args.verbose)
         self.host = socket.gethostname()
-        logging.info("running on {}".format(self.host))
-        logging.info(self.exp_dir)
+        logging.warning("running on {}".format(self.host))
+        logging.warning(self.exp_dir)
 
     def setup_signal_handler(self, args):
         ''' SIGNAL HANDLER '''
