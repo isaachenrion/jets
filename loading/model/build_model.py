@@ -1,47 +1,42 @@
 import logging
 import numpy as np
 import torch
-from .load_model import load_model
+import os
+import pickle
 
-from architectures import construct_classifier
+from .model_kwargs import construct_model_kwargs
+from .model_kwargs import load_model_kwargs
+from .model_kwargs import build_model_from_kwargs
+from .load_model_state_dict import load_model_state_dict
 
-def build_model(load, restart, args):
-    # Initialization
-    logging.info("Initializing model...")
-    if load is None:
-        model_kwargs = {
-            'features': args.features,
-            'hidden': args.hidden,
-            'iters': args.iters,
-            'scales': args.scales,
-            'pooling_layer':args.pool,
-            'mp_layer':args.mp,
-            'symmetric':args.sym,
-            'readout':args.readout,
-            'pool_first':args.pool_first,
-            'adaptive_matrix':args.matrix,
-            'trainable_physics':args.trainable_physics,
-            'jet_transform':args.jet_transform
-        }
-        model = construct_classifier(args.predict, **model_kwargs)
+def build_model(filename, restart, args):
+    if filename is None:
+        logging.info("Initializing model...")
+        model_kwargs = construct_model_kwargs(args)
+    else:
+        logging.info("Loading model...")
+        model_kwargs = load_model_kwargs(filename)
+
+    model = build_model_from_kwargs(model_kwargs)
+
+    if filename is None:
+        logging.warning(model)
+        out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))
+        logging.warning(out_str)
         settings = {
-            "jet_transform": args.jet_transform,
-            "predict": args.predict,
             "model_kwargs": model_kwargs,
             "step_size": args.step_size,
             "args": args,
             }
     else:
-        load_model(load)
+        load_model_state_dict(model, filename)
         if restart:
-            args.step_size = settings["step_size"]
-
-    logging.warning(model)
-    out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))
-    logging.warning(out_str)
+            with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
+                settings = pickle.load(f)
 
     if torch.cuda.is_available():
         logging.warning("Moving model to GPU")
         model.cuda()
         logging.warning("Moved model to GPU")
+
     return model, settings

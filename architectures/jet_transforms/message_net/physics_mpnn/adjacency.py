@@ -1,4 +1,3 @@
-#from .fourvector import FourMomentum
 import torch
 import math
 import torch.nn as nn

@@ -122,7 +122,7 @@ def train(args):
     ''' OPTIMIZER AND LOSS '''
     '''----------------------------------------------------------------------- '''
     logging.info("Building optimizer...")
-    optimizer = Adam(model.parameters(), lr=args.step_size)
+    optimizer = Adam(model.parameters(), lr=settings['step_size'])
     scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
     #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
 
@@ -211,7 +211,7 @@ def train(args):
         logging.info("Epoch took {} seconds".format(t1-t0))
 
         scheduler.step()
-        settings['step_size'] = args.step_size * (args.decay) ** (i + 1)
+        settings['step_size'] = settings['step_size'] * (args.decay) ** (i + 1)
 
     eh.finished()
 
