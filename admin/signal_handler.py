@@ -46,7 +46,8 @@ class SignalHandler:
         subject = "Job {} {}".format(signal, self.subject_string)
         text = "{}\n{}\n{}".format(alert, self.results_strings[-1], self.model)
         attachments = [self.logfile]
-        self.emailer.send_msg(text, subject, attachments)
+        if self.emailer is not None:
+            self.emailer.send_msg(text, subject, attachments)
 
     def killed(self, signal, frame):
         self.signal_handler(signal='KILLED')

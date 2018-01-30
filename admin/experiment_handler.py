@@ -79,7 +79,10 @@ class ExperimentHandler:
             lines = f.readlines()
             recipient, sender, password = (l.strip() for l in lines)
 
-        self.emailer=Emailer(sender, password, recipient)
+        if not args.no_email:
+            self.emailer = Emailer(sender, password, recipient)
+        else:
+            self.emailer = None
         self.signal_handler = SignalHandler(
                                 emailer=self.emailer,
                                 logfile=self.logfile,
@@ -89,7 +92,7 @@ class ExperimentHandler:
                                 subject_string='{} (Machine = {}, Logfile = {}, PID = {}, GPU = {})'.format("[DEBUGGING] " if args.debug else "", self.host, self.logfile, self.pid, args.gpu),
                                 model=None,
                                 debug=args.debug,
-                                train=args.train
+                                train=args.train,
                             )
 
     def setup_stats_logger(self, args):
@@ -166,7 +169,8 @@ class ExperimentHandler:
 
     def initial_email(self):
         text = ['JOB STARTED', self.exp_dir, self.host.split('.')[0], str(self.pid)]
-        self.emailer.send_msg('\n'.join(text), ' | '.join(text))
+        if self.emailer is not None:
+            self.emailer.send_msg('\n'.join(text), ' | '.join(text))
 
 
 class EvaluationExperimentHandler(ExperimentHandler):

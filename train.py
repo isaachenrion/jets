@@ -42,6 +42,7 @@ parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("--visualizing", action='store_true', default=False)
 parser.add_argument("--slurm_job_id", default=0)
+parser.add_argument("--no_email", action='store_true', default=False)
 
 # loading previous models args
 parser.add_argument("-l", "--load", help="model directory from which we load a state_dict", type=str, default=None)
@@ -85,6 +86,7 @@ parser.add_argument("--debug", help="sets everything small for fast model debugg
 args = parser.parse_args()
 args.train = True
 if args.debug:
+    args.no_email = True
     args.hidden = 7
     args.batch_size = 5
     args.verbose = True
