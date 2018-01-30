@@ -17,7 +17,7 @@ class PhysicsBasedAdjacencyMatrix(nn.Module):
         if torch.cuda.is_available():
             self.alpha_raw = self.alpha_raw.cuda()
             self.logR = self.logR.cuda()
-            
+
     def alpha(self):
         return F.tanh(self.alpha_raw)
 
@@ -37,7 +37,7 @@ class PhysicsBasedAdjacencyMatrix(nn.Module):
 
         dij = torch.min(p1[:,:,:,0]**(2.*self.alpha()), p2[:,:,:,0]**(2.*self.alpha())) * delta_r / self.R()
 
-        return dij
+        return torch.exp(-dij)
 
 '''
 def calculate_dij(p1, p2, alpha=1., R=1.):

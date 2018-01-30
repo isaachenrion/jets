@@ -9,9 +9,9 @@ from architectures.preprocessing import unwrap
 from architectures.preprocessing import wrap_X
 from architectures.preprocessing import unwrap_X
 
-from loading import load_data
-from loading import load_tf
-from loading import crop
+from loading.data import load_data
+from loading.data import load_tf
+from loading.data import crop
 
 import matplotlib
 matplotlib.use('Agg')

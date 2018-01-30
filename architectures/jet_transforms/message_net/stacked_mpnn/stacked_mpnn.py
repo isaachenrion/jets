@@ -5,23 +5,20 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from data_ops.batching import batch_leaves
-from data_ops.batching import trees_as_adjacency_matrices
 
-#from ..message_passing import MultipleIterationMessagePassingLayer
-from ..readout import SimpleReadout
-from .attention_pooling import AttentionPooling
-from .attention_pooling import RecurrentAttentionPooling
-
+from ..readout import construct_readout
+from .attention_pooling import construct_pooling_layer
+from ..message_passing import construct_mp_layer
 
 class MultipleIterationMessagePassingLayer(nn.Module):
     def __init__(self, iters=None, mp_layer=None, **kwargs):
         super().__init__()
-        self.mp_layers = nn.ModuleList([mp_layer(**kwargs) for _ in range(iters)])
+        self.mp_layers = nn.ModuleList([construct_mp_layer(mp_layer, **kwargs) for _ in range(iters)])
 
-    def forward(self, **kwargs):
+    def forward(self, h=None, **kwargs):
         for mp in self.mp_layers:
-            h = mp(h=h,**kwargs)
-        return h
+            h, A = mp(h=h,**kwargs)
+        return h, A
 
 class StackedMPNNTransform(nn.Module):
     def __init__(
@@ -31,6 +28,7 @@ class StackedMPNNTransform(nn.Module):
         hidden=None,
         iters=None,
         mp_layer=None,
+        readout=None,
         pooling_layer=None,
         pool_first=False,
         **kwargs
@@ -44,8 +42,8 @@ class StackedMPNNTransform(nn.Module):
                 )
             for _ in scales]
             )
-        self.attn_pools = nn.ModuleList([pooling_layer(scales[i], hidden) for i in range(len(scales))])
-        self.readout = SimpleReadout(hidden, hidden)
+        self.attn_pools = nn.ModuleList([construct_pooling_layer(pooling_layer, scales[i], hidden) for i in range(len(scales))])
+        self.readout = construct_readout(readout, hidden, hidden)
         self.pool_first = pool_first
 
     def forward(self, jets, **kwargs):

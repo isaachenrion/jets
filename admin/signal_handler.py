@@ -1,7 +1,8 @@
 import signal
 import logging
 import sys
-from ..utils import timestring
+
+from .utils import timestring
 from .mover import Mover
 
 class SignalHandler:
@@ -27,6 +28,7 @@ class SignalHandler:
         self.train = train
         self.debug = debug
         signal.signal(signal.SIGTERM, self.killed)
+        #signal.signal(signal.SIGKILL, self.killed)
         signal.signal(signal.SIGINT, self.interrupted)
 
     def set_model(self, model):

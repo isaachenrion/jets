@@ -6,6 +6,19 @@ from torch.autograd import Variable
 from ..vertex_update import GRUUpdate
 from .message import DTNNMessage
 
+from misc.abstract_constructor import construct_object
+
+def construct_mp_layer(key, *args, **kwargs):
+    dictionary = dict(
+        van=MPAdaptive,
+        set=MPSet2Set,
+        id=MPIdentity,
+        physics=MPPhysics,
+    )
+    try:
+        return construct_object(key, dictionary, *args, **kwargs)
+    except ValueError as e:
+        raise ValueError('Message passing layer {}'.format(e))
 
 class MessagePassingLayer(nn.Module):
     def __init__(self, hidden=None, **kwargs):
@@ -23,6 +36,7 @@ class MessagePassingLayer(nn.Module):
         message = self.activation(torch.matmul(A, self.message(h)))
         h = self.vertex_update(h, message)
         return h, A
+
 
 class MPIdentity(MessagePassingLayer):
     def __init__(self, **kwargs):
@@ -43,6 +57,14 @@ class MPAdaptive(MessagePassingLayer):
 
     def get_adjacency_matrix(self, h=None, mask=None, **kwargs):
         return self.adjacency_matrix(h, mask)
+
+class MPPhysics(MessagePassingLayer):
+    def __init__(self, hidden=None, **kwargs):
+        super().__init__(hidden=hidden, **kwargs)
+        self.physics_based = True
+
+    def get_adjacency_matrix(self, **kwargs):
+        return kwargs.pop('dij', None)
 
 
 class MPSet2Set(MPAdaptive):

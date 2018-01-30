@@ -176,7 +176,7 @@ def batch_leaves(jets):
 
     batch_outers = []
 
-    
+
     for j, jet in enumerate(jets):
         tree = np.copy(jet["tree"])
         inners = []   # Inner nodes at level i

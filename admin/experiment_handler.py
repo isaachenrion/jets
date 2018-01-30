@@ -5,11 +5,11 @@ import datetime
 import numpy as np
 import socket
 import shutil
-from ..utils import *
+from .utils import get_logfile
 from .emailer import Emailer
 from .signal_handler import SignalHandler
 from monitors import *
-from ..loggers import StatsLogger
+from .logger import StatsLogger
 from misc.constants import RUNNING_MODELS_DIR, ALL_MODEL_DIRS
 
 
@@ -44,7 +44,7 @@ class ExperimentHandler:
 
     def model_directory(self, args):
         self.root_dir = RUNNING_MODELS_DIR
-        self.model_type_dir = os.path.join(args.dataset, args.model_type, str(args.iters))
+        self.model_type_dir = os.path.join(args.dataset, args.jet_transform, str(args.iters))
         dt = datetime.datetime.now()
         self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.slurm_job_id)
         self.leaf_dir = os.path.join(self.model_type_dir, self.filename_exp)

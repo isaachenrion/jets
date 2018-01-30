@@ -3,6 +3,19 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
+from misc.abstract_constructor import construct_object
+
+def construct_adjacency_matrix_layer(key, *args, **kwargs):
+    dictionary = dict(
+        sum=SumMatrix,
+        dm=DistMult,
+        siam=Siamese,
+    )
+    try:
+        return construct_object(key, dictionary, *args, **kwargs)
+    except ValueError as e:
+        raise ValueError('Adjacency matrix layer {}'.format(e))
+
 class AdjacencyMatrix(nn.Module):
     def __init__(self, symmetric=None, **kwargs):
         super().__init__()

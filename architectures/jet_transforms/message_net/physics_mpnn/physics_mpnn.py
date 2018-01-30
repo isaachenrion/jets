@@ -4,17 +4,10 @@ import torch.nn.functional as F
 
 from data_ops.batching import batch_leaves
 
-from ..readout import DTNNReadout, SetReadout
+from ..readout import construct_readout
 from .adjacency import PhysicsBasedAdjacencyMatrix
-from ..message_passing.message_passing_layers import MessagePassingLayer
+from ..message_passing import construct_mp_layer
 
-class MPPhysics(MessagePassingLayer):
-    def __init__(self, hidden=None, **kwargs):
-        super().__init__(hidden=hidden, **kwargs)
-        self.physics_based = True
-
-    def get_adjacency_matrix(self, **kwargs):
-        return kwargs.pop('dij', None)
 
 class PhysicsBasedMPNNTransform(nn.Module):
     def __init__(self,
@@ -22,7 +15,7 @@ class PhysicsBasedMPNNTransform(nn.Module):
         hidden=None,
         iters=None,
         readout=None,
-        trainable=False,
+        trainable_physics=False,
         **kwargs
         ):
         super().__init__()
@@ -31,12 +24,9 @@ class PhysicsBasedMPNNTransform(nn.Module):
         self.hidden = hidden
         self.features = features + 1
         self.embedding = nn.Linear(self.features, hidden)
-        if readout is None:
-            self.readout = DTNNReadout(hidden, hidden)
-        else:
-            self.readout = readout
-        self.mp_layers = nn.ModuleList([MPPhysics(hidden=hidden,**kwargs) for _ in range(iters)])
-        self.physics_based_adjacency_matrix = PhysicsBasedAdjacencyMatrix(trainable=trainable)
+        self.readout = construct_readout(readout, hidden, hidden)
+        self.mp_layers = nn.ModuleList([construct_mp_layer('physics', hidden=hidden,**kwargs) for _ in range(iters)])
+        self.physics_based_adjacency_matrix = PhysicsBasedAdjacencyMatrix(trainable=trainable_physics)
 
     def forward(self, jets, **kwargs):
         jets, mask = batch_leaves(jets)

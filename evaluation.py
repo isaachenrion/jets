@@ -10,19 +10,17 @@ import csv
 import torch
 import time
 
-from misc.handlers import EvaluationExperimentHandler
+from admin import EvaluationExperimentHandler
 from misc.constants import *
 
-from loading import load_tf
-from loading import load_data
-from loading import crop
-from loading import load_model
+from loading.data import prepare_test_data
+from loading.model import load_model
 
 from analysis.reports import report_score
 from analysis.reports import remove_outliers
 from analysis.scraping import remove_outliers_csv
 
-from data_ops.wrapping import wrap, unwrap, wrap_X, unwrap_X
+from data_ops.wrapping import wrap, unwrap, wrap_jet, unwrap_jet
 
 from analysis.plotting import plot_rocs
 from analysis.plotting import plot_show
@@ -86,6 +84,7 @@ if args.inventory is not None:
     assert arg.model_dir is None
     args.model_dir = args.inventory.split('.')[0]
 assert (args.inventory is None) + (args.model_dir is None) == 1
+
 def main():
 
     eh = EvaluationExperimentHandler(args)
@@ -114,8 +113,8 @@ def main():
             if 'DS_Store' not in filename:
                 logging.info("\t[{}] Loading {}".format(i, filename)),
                 model = load_model(filename)
-                if torch.cuda.is_available():
-                    model.cuda()
+                #if torch.cuda.is_available():
+                #    model.cuda()
                 model_test_file = os.path.join(filename, 'test-rocs.pickle')
                 work = args.recompute or not os.path.exists(model_test_file)
                 if work:
@@ -127,15 +126,15 @@ def main():
                     n_batches, remainder = np.divmod(len(X), batch_size)
                     for i in range(n_batches):
                         X_batch = X[offset:offset+batch_size]
-                        X_var = wrap_X(X_batch)
+                        X_var = wrap_jet(X_batch)
                         yy_pred.append(unwrap(model(X_var)))
-                        unwrap_X(X_var)
+                        unwrap_jet(X_var)
                         offset+=batch_size
                     if remainder > 0:
                         X_batch = X[-remainder:]
-                        X_var = wrap_X(X_batch)
+                        X_var = wrap_jet(X_batch)
                         yy_pred.append(unwrap(model(X_var)))
-                        unwrap_X(X_var)
+                        unwrap_jet(X_var)
                     yy_pred = np.squeeze(np.concatenate(yy_pred, 0), 1)
                     t1 = time.time()
 
@@ -185,17 +184,16 @@ def main():
     if args.recompute or args.inventory is None:
 
         logging.info('Building ROCs for models trained on {}'.format(dataset))
-        tf = load_tf(args.data_dir, "{}-train.pickle".format(dataset))
-        X, y = load_data(args.data_dir, "{}-{}.pickle".format(dataset, args.dataset_type))
-        for ij, jet in enumerate(X):
-            jet["content"] = tf.transform(jet["content"])
-
-        if args.n_test > 0:
-            indices = torch.randperm(len(X)).numpy()[:args.n_test]
-            X = [X[i] for i in indices]
-            y = y[indices]
-
-        X_test, y_test, cropped_indices, w_test = crop(X, y, return_cropped_indices=True, pileup=args.pileup)
+        X_test, y_test, w_test = prepare_test_data(args.data_dir, "{}-train.pickle".format(dataset), args.n_test, args.pileup)
+        #tf = load_tf(args.data_dir, "{}-train.pickle".format(dataset))
+        #X, y = load_data(args.data_dir, "{}-{}.pickle".format(dataset, args.dataset_type))
+        #for ij, jet in enumerate(X):
+        #    jet["content"] = tf.transform(jet["content"])
+        #if args.n_test > 0:
+        #    indices = torch.randperm(len(X)).numpy()[:args.n_test]
+        #    X = [X[i] for i in indices]
+        #    y = y[indices]
+        #X_test, y_test, w_test = crop(X, y, pileup=args.pileup)
 
         data = (X_test, y_test, w_test)
         for _, model_type_path in model_type_paths:

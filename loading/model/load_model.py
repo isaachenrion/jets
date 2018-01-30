@@ -17,6 +17,7 @@ def load_model(filename):
         Transform = settings["transform"]
         Predict = settings["predict"]
         model_kwargs = settings["model_kwargs"]
+    import ipdb; ipdb.set_trace()
 
     model = Predict(Transform, **model_kwargs)
 
@@ -28,6 +29,9 @@ def load_model(filename):
     #        state_dict = torch.load(f)
 
     model.load_state_dict(state_dict)
+    if torch.cuda.is_available():
+        model.cuda()
+    return model
 
 def OLDload_model(filename):
     with open(os.path.join(filename, 'settings.pickle'), "rb") as f:

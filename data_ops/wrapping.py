@@ -19,13 +19,13 @@ def unwrap(y_wrap):
         y = y_wrap.data.numpy()
     return y
 
-def wrap_X(X):
+def wrap_jet(X):
     X_wrap = copy.deepcopy(X)
     for jet in X_wrap:
         jet["content"] = wrap(jet["content"])
     return X_wrap
 
-def unwrap_X(X_wrap):
+def unwrap_jet(X_wrap):
     X_new = []
     for jet in X_wrap:
         jet["content"] = unwrap(jet["content"])

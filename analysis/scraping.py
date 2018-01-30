@@ -4,7 +4,7 @@ import logging
 import csv
 import numpy as np
 
-from misc.loggers import StatsLogger
+from admin.logger import StatsLogger
 from misc.constants import REPORTS_DIR
 
 def scrape_results(model_dir):

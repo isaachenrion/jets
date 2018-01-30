@@ -4,8 +4,8 @@ import torch.nn.functional as F
 
 from data_ops.batching import batch_leaves
 
-from ..readout import DTNNReadout, SetReadout
-#from ..message_passing import MultipleIterationMessagePassingLayer
+from ..readout import construct_readout
+from ..message_passing import construct_mp_layer
 
 class MPNNTransform(nn.Module):
     def __init__(self,
@@ -22,12 +22,8 @@ class MPNNTransform(nn.Module):
         self.hidden = hidden
         self.features = features + 1
         self.embedding = nn.Linear(self.features, hidden)
-        if readout is None:
-            self.readout = DTNNReadout(hidden, hidden)
-        else:
-            self.readout = readout
-        #self.multiple_iterations_of_message_passing = MultipleIterationMessagePassingLayer(iters=iters, hidden=hidden, mp_layer=mp_layer, **kwargs)
-        self.mp_layers = nn.ModuleList([mp_layer(hidden=hidden,**kwargs) for _ in range(iters)])
+        self.readout = construct_readout(readout, hidden, hidden)
+        self.mp_layers = nn.ModuleList([construct_mp_layer(mp_layer,hidden=hidden,**kwargs) for _ in range(iters)])
 
     def forward(self, jets, **kwargs):
         jets, mask = batch_leaves(jets)
