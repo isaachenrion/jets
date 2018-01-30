@@ -6,10 +6,10 @@
 #SBATCH --job-name=JetsTrain%j
 #################
 #a file for job output, you can check job progress
-#SBATCH --output=slurm-out/JetsTrain%j.out
+#SBATCH --output=slurm_out/JetsTrain%j.out
 #################
 # a file for errors from the job
-#SBATCH --error=slurm-out/JetsTrain%j.err
+#SBATCH --error=slurm_out/JetsTrain%j.err
 #################
 #time you think you need; default is one hour
 #in minutes
