@@ -2,6 +2,7 @@ import csv
 import os
 import visdom
 import logging
+
 class StatsLogger:
     def __init__(self, directory, monitors, visualizing):
         self.visualizing = visualizing

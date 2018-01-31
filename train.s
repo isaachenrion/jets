@@ -18,7 +18,7 @@
 #SBATCH --time=48:00:00
 #################
 # --gres will give you one GPU, you can ask for more, up to 8 (or how ever many are on the node/card)
-#SBATCH --gres gpu:1080ti:1 
+#SBATCH --gres gpu:1080ti:1
 # We are submitting to the gpu partition, if you can submit to the hns partition, change this to -p hns_gpu.
 #SBATCH --qos=batch
 #################
@@ -31,6 +31,7 @@
 # Have SLURM send you an email when the job ends or fails, careful, the email could end up in your clutter folder
 #SBATCH --mail-type=END,FAIL # notifications for job done & fail
 #SBATCH --mail-user=henrion@nyu.edu
+
 
 HOME='/misc/kcgscratch1/ChoGroup/isaac'
 SRCDIR=$HOME/jets
@@ -47,4 +48,5 @@ echo "$SLURMARGS"
 
 source activate jets
 
+python -m visdom.server &
 python $SRCDIR/train.py $SLURMARGS

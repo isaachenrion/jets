@@ -28,7 +28,6 @@ class SignalHandler:
         self.train = train
         self.debug = debug
         signal.signal(signal.SIGTERM, self.killed)
-        #signal.signal(signal.SIGKILL, self.killed)
         signal.signal(signal.SIGINT, self.interrupted)
 
     def set_model(self, model):
@@ -38,7 +37,7 @@ class SignalHandler:
         with open(self.logfile, 'r') as original: data = original.read()
         with open(self.logfile, 'w') as modified: modified.write("{}\n".format(text) + data)
 
-    def signal_handler(self, signal, cleanup=True):
+    def signal_admin(self, signal, cleanup=True):
         d = timestring()
         alert = '{} on {}'.format(signal, timestring())
         logging.warning(alert)
@@ -50,18 +49,18 @@ class SignalHandler:
             self.emailer.send_msg(text, subject, attachments)
 
     def killed(self, signal, frame):
-        self.signal_handler(signal='KILLED')
+        self.signal_admin(signal='KILLED')
         if self.train: self.mover.move_to_killed()
         sys.exit(0)
 
     def interrupted(self, signal, frame):
-        self.signal_handler(signal='INTERRUPTED')
+        self.signal_admin(signal='INTERRUPTED')
         if self.train: self.mover.move_to_interrupted()
         sys.exit(0)
 
     def completed(self):
         self.done = True
-        self.signal_handler(signal='COMPLETED')
+        self.signal_admin(signal='COMPLETED')
         if self.train:
             if self.debug:
                 self.mover.move_to_debug()
@@ -70,4 +69,4 @@ class SignalHandler:
 
 
     def crashed(self):
-        self.signal_handler(signal='CRASHED')
+        self.signal_admin(signal='CRASHED')

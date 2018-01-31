@@ -9,10 +9,10 @@ def reset_unused_args(args):
         args.matrix = None
         args.sym = None
         if args.trainable_physics:
-            args.alpha = None
+            #args.alpha = None
             args.R = None
     else:
-        args.alpha = None
+        #args.alpha = None
         args.R = None
         args.trainable_physics = None
 

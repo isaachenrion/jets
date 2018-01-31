@@ -146,7 +146,8 @@ class ExperimentHandler:
 
     def log(self, **kwargs):
         self.stats_logger.log(**kwargs)
-
+        if kwargs['epoch'] == 1 and self.emailer is not None:
+            self.emailer.send_msg(self.stats_logger.monitors['eta'].value, "PID {} on {} ETA: {}".format(self.pid, self.host.split('.')[0], self.stats_logger.monitors['eta'].value))
         if np.isnan(self.stats_logger.monitors['inv_fpr'].value):
             logging.warning("NaN in 1/FPR\n")
 

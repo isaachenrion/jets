@@ -12,7 +12,7 @@ class Hours(ScalarMonitor):
 
 
 class ETA(Monitor):
-    def __init__(self, start_time, epochs, **kwargs):
+    def __init__(self, start_time, epochs,**kwargs):
         super().__init__('eta', **kwargs)
         self.start_time = start_time
         self.epochs = epochs
