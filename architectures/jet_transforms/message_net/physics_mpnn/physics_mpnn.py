@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from data_ops.batching import batch_leaves
 
 from ..readout import construct_readout
-from .adjacency import PhysicsBasedAdjacencyMatrix
+from .adjacency import construct_physics_based_adjacency_matrix
 from ..message_passing import construct_mp_layer
 
 
@@ -15,7 +15,6 @@ class PhysicsBasedMPNNTransform(nn.Module):
         hidden=None,
         iters=None,
         readout=None,
-        trainable_physics=False,
         **kwargs
         ):
         super().__init__()
@@ -26,7 +25,11 @@ class PhysicsBasedMPNNTransform(nn.Module):
         self.embedding = nn.Linear(self.features, hidden)
         self.readout = construct_readout(readout, hidden, hidden)
         self.mp_layers = nn.ModuleList([construct_mp_layer('physics', hidden=hidden,**kwargs) for _ in range(iters)])
-        self.physics_based_adjacency_matrix = PhysicsBasedAdjacencyMatrix(trainable=trainable_physics)
+        self.physics_based_adjacency_matrix = construct_physics_based_adjacency_matrix(
+                                                    alpha=kwargs.pop('alpha', None),
+                                                    R=kwargs.pop('R', None),
+                                                    trainable_physics=kwargs.pop('trainable_physics', None)
+                                                    )
 
     def forward(self, jets, **kwargs):
         jets, mask = batch_leaves(jets)

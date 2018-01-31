@@ -1,11 +1,11 @@
 import argparse
 from experiment import train
+from experiment import reset_unused_args
 from misc.constants import *
 
 ''' ARGUMENTS '''
 '''----------------------------------------------------------------------- '''
 parser = argparse.ArgumentParser(description='Jets')
-
 # Debugging
 parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
 
@@ -64,27 +64,13 @@ parser.add_argument("--pool", type=str, default='attn', help='type of pooling la
 
 # Physics NMP
 parser.add_argument("-t", "--trainable_physics", action='store_true', default=False)
+parser.add_argument("--alpha", type=float, default=1)
+parser.add_argument("-R", type=int, default=1)
+
 
 args = parser.parse_args()
-args.train = True
-if args.debug:
-    args.no_email = True
-    args.hidden = 7
-    args.batch_size = 5
-    args.verbose = True
-    args.epochs = 3
-    args.n_train = 1000
-    args.seed = 1
-
+args = reset_unused_args(args)
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-
-if args.n_train <= 5 * args.n_valid and args.n_train > 0:
-    args.n_valid = args.n_train // 5
-
-if args.pileup:
-    args.dataset = 'pileup'
-else:
-    args.dataset = 'original'
 
 if __name__ == "__main__":
     train(args)

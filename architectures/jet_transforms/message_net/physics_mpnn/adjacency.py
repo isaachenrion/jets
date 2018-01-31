@@ -4,39 +4,69 @@ import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F
 
-class PhysicsBasedAdjacencyMatrix(nn.Module):
-    def __init__(self, alpha_raw=0, logR=0, trainable=False):
+def construct_physics_based_adjacency_matrix(alpha=None, R=None, trainable_physics=False):
+    if trainable_physics:
+        assert alpha is None
+        assert R is None
+        return TrainablePhysicsBasedAdjacencyMatrix()
+    else:
+        return FixedPhysicsBasedAdjacencyMatrix(alpha=alpha, R=R)
+
+def compute_dij(p, alpha, R):
+    p1 = p.unsqueeze(1)
+    p2 = p.unsqueeze(2)
+
+    delta_eta = p1[:,:,:,1] - p2[:,:,:,1]
+
+    delta_phi = p1[:,:,:,2] - p2[:,:,:,2]
+    delta_phi = torch.remainder(delta_phi + math.pi, 2*math.pi) - math.pi
+
+    delta_r = (delta_phi**2 + delta_eta**2)**0.5
+
+    dij = torch.min(p1[:,:,:,0]**(2.*alpha), p2[:,:,:,0]**(2.*alpha)) * delta_r / R
+
+    return dij
+
+class _PhysicsBasedAdjacencyMatrix(nn.Module):
+    def __init__(self):
         super().__init__()
-        if trainable:
-            self.alpha_raw = nn.Parameter(torch.FloatTensor([alpha_raw]))
-            self.logR = nn.Parameter(torch.FloatTensor([logR]))
-        else:
-            self.alpha_raw = Variable(torch.FloatTensor([alpha_raw]))
-            self.logR = Variable(torch.FloatTensor([logR]))
-            if torch.cuda.is_available():
-                self.alpha_raw = self.alpha_raw.cuda()
-                self.logR = self.logR.cuda()
+
+    def alpha(self):
+        pass
+
+    def R(self):
+        pass
+
+    def forward(self, p):
+        dij = compute_dij(p, self.alpha(), self.R())
+        return torch.exp(-dij)
+
+class FixedPhysicsBasedAdjacencyMatrix(_PhysicsBasedAdjacencyMatrix):
+    def __init__(self, alpha=1, R=1):
+        super().__init__()
+        self._alpha = Variable(torch.FloatTensor([alpha]))
+        self._R = Variable(torch.FloatTensor([R]))
+        if torch.cuda.is_available():
+            self._alpha = self._alpha.cuda()
+            self._R = self._R.cuda()
+
+    def alpha(self):
+        return self._alpha
+
+    def R(self):
+        return self._R
+
+class TrainablePhysicsBasedAdjacencyMatrix(_PhysicsBasedAdjacencyMatrix):
+    def __init__(self):
+        super().__init__()
+        self.alpha_raw = nn.Parameter(torch.Tensor([0]))
+        self.logR = nn.Parameter(torch.Tensor([0]))
 
     def alpha(self):
         return F.tanh(self.alpha_raw)
 
     def R(self):
         return torch.exp(self.logR)
-
-    def forward(self, p):
-        p1 = p.unsqueeze(1)
-        p2 = p.unsqueeze(2)
-
-        delta_eta = p1[:,:,:,1] - p2[:,:,:,1]
-
-        delta_phi = p1[:,:,:,2] - p2[:,:,:,2]
-        delta_phi = torch.remainder(delta_phi + math.pi, 2*math.pi) - math.pi
-
-        delta_r = (delta_phi**2 + delta_eta**2)**0.5
-
-        dij = torch.min(p1[:,:,:,0]**(2.*self.alpha()), p2[:,:,:,0]**(2.*self.alpha())) * delta_r / self.R()
-
-        return torch.exp(-dij)
 
 '''
 def calculate_dij(p1, p2, alpha=1., R=1.):

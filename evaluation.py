@@ -36,6 +36,7 @@ parser.add_argument("--recompute", action='store_true', default=False)
 # Computing
 parser.add_argument("-b", "--batch_size", type=int, default=64)
 parser.add_argument("-g", "--gpu", type=str, default='')
+parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)
 
 
 args = parser.parse_args()

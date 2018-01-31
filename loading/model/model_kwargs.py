@@ -16,7 +16,9 @@ def construct_model_kwargs(args):
         'adaptive_matrix':args.matrix,
         'trainable_physics':args.trainable_physics,
         'jet_transform':args.jet_transform,
-        'predict':args.predict
+        'predict':args.predict,
+        'alpha':args.alpha,
+        'R':args.R
     }
     return model_kwargs
 
