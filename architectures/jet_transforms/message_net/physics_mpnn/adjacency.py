@@ -68,6 +68,8 @@ class TrainablePhysicsBasedAdjacencyMatrix(_PhysicsBasedAdjacencyMatrix):
         super().__init__()
         #self.alpha_raw = nn.Parameter(torch.Tensor([0]))
         self._alpha = Variable(torch.FloatTensor([alpha]))
+        if torch.cuda.is_available():
+            self._alpha = self._alpha.cuda()
         self.logR = nn.Parameter(torch.Tensor([0]))
 
     def alpha(self):
