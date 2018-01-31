@@ -48,5 +48,5 @@ echo "$SLURMARGS"
 
 source activate jets
 
-python -m visdom.server &
+##python -m visdom.server &
 python $SRCDIR/train.py $SLURMARGS
