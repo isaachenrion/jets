@@ -1,5 +1,6 @@
 import datetime
 from .baseclasses import ScalarMonitor
+from .baseclasses import Monitor
 
 class Hours(ScalarMonitor):
     def __init__(self, **kwargs):
@@ -10,7 +11,7 @@ class Hours(ScalarMonitor):
         return self.value
 
 
-class ETA(ScalarMonitor):
+class ETA(Monitor):
     def __init__(self, start_time, epochs, **kwargs):
         super().__init__('eta', **kwargs)
         self.start_time = start_time

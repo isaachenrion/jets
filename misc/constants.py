@@ -36,7 +36,5 @@ DECAY=0.96
 EPOCHS=50
 ITERS=2
 SCALES=-1
-#SENDER="results74207281@gmail.com"
-#PASSWORD="deeplearning"
 VALID=27000
 DATA_DIR = 'data/w-vs-qcd/pickles'
