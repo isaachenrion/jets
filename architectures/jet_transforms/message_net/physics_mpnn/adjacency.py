@@ -4,13 +4,13 @@ import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F
 
-import visdom
-from monitors import Regurgitate
-viz = visdom.Visdom()
-alpha_monitor = Regurgitate('alpha', visualizing=True)
-alpha_monitor.initialize(None, None, viz)
-R_monitor = Regurgitate('R', visualizing=True)
-R_monitor.initialize(None, None, viz)
+#import visdom
+#from monitors import Regurgitate
+#viz = visdom.Visdom()
+#alpha_monitor = Regurgitate('alpha', visualizing=True)
+#alpha_monitor.initialize(None, None, viz)
+#R_monitor = Regurgitate('R', visualizing=True)
+#R_monitor.initialize(None, None, viz)
 
 def construct_physics_based_adjacency_matrix(alpha=None, R=None, trainable_physics=False):
     if trainable_physics:
@@ -81,7 +81,7 @@ class TrainablePhysicsBasedAdjacencyMatrix(_PhysicsBasedAdjacencyMatrix):
 
     def R(self):
         R = torch.exp(self.logR)
-        R_monitor(R=R.data[0])
+        #R_monitor(R=R.data[0])
         return R
 
 class AlphaTrainablePhysicsBasedAdjacencyMatrix(_PhysicsBasedAdjacencyMatrix):
