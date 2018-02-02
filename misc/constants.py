@@ -24,7 +24,7 @@ with open('misc/email_addresses.txt', 'r') as f:
 REPORTS_DIR = "reports"
 DATASETS = {
     'original':'antikt-kt',
-    'pileup':'antikt-kt-pileup25'
+    'pileup':'antikt-kt-pileup25-new'
 }
 
 ''' argparse args '''
