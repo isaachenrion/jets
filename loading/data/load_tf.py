@@ -3,7 +3,7 @@ import pickle
 import logging
 
 from sklearn.preprocessing import RobustScaler
-
+from .load_data import load_data
 def load_tf(data_dir, filename):
     path_to_tf = os.path.join(data_dir, 'tf', 'TF-' + filename)
     if not os.path.exists(path_to_tf):
