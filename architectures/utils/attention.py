@@ -68,7 +68,7 @@ class Attention(nn.Module):
         s = dot(query, key)
         if dimensions is None:
             dimensions  = Variable(torch.FloatTensor([key.size()[1]]).view(1, 1, 1).expand_as(s))
-        if torch.cuda.is_availables:
+        if torch.cuda.is_available:
             dimensions = dimensions.cuda()
         scaling_factor = torch.sqrt(1 / dimensions)
         alpha = F.softmax(s / scaling_factor)
