@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.autograd import Variable
 
 def dot(a, b):
     """Compute the dot product between pairs of vectors in 3D Variables.
@@ -21,50 +22,55 @@ class Attention(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, context, query, target):
+    def forward(self, query, key, value, dimensions=None):
         ''' Input:
-            context vectors c_1, .., c_n
             query vectors q_1, ..., q_m
-            target vectors t_1, ..., t_n
+            key vectors k_1, .., k_n
+            value vectors v_1, ..., v_n
 
             all of equal dimension and batch size.
 
             Compute the attention weights alpha_ij as follows:
 
-            score_ij = (q_j)^T c_i
+            score_ij = (q_j)^T k_i
             alpha_ij = exp(score_ij) / sum_k exp(score_ik)
 
-            Then apply the attention weights to t_1, ..., t_n as follows:
+            Then apply the attention weights to v_1, ..., v_n as follows:
 
-            output_ij = sum_k (alpha_ik * t_kj)
+            output_ij = sum_k (alpha_ik * v_kj)
         '''
-        bsc, n_contexts, dim_context = context.size()
+        bsk, n_keys, dim_key = key.size()
         bsq, n_queries, dim_query = query.size()
-        bst, n_queries, dim_target = target.size()
+        bsv, n_queries, dim_value = value.size()
 
         try:
-            assert bsq == bsc == bst
-            batch_size = bsc
+            assert bsq == bsk == bsv
+            batch_size = bsk
         except AssertionError as e:
             logging.debug(
                 'Mismatch: \
                 query batch size = {}, \
-                context batch size = {}, \
-                target batch size = {} \
-                but should be equal'.format(bsq, bsc, bst))
+                key batch size = {}, \
+                value batch size = {} \
+                but should be equal'.format(bsq, bsk, bsv))
             raise e
         try:
-            assert dim_context == dim_query == dim_target
+            assert dim_key == dim_query == dim_value
         except AssertionError as e:
             logging.debug(
                 'Mismatch: \
                 query data dimension = {}, \
-                context data dimension = {}, \
-                target data dimension = {} \
-                but should be equal'.format(dim_query, dim_context, dim_target))
+                key data dimension = {}, \
+                value data dimension = {} \
+                but should be equal'.format(dim_query, dim_key, dim_value))
             raise e
 
-        s = dot(query, context)
-        alpha = F.softmax(s)
-        output = torch.bmm(alpha, target)
+        s = dot(query, key)
+        if dimensions is None:
+            dimensions  = Variable(torch.FloatTensor([key.size()[1]]).view(1, 1, 1).expand_as(s))
+        if torch.cuda.is_available:
+            dimensions = dimensions.cuda()
+        scaling_factor = torch.sqrt(1 / dimensions)
+        alpha = F.softmax(s / scaling_factor)
+        output = torch.bmm(alpha, value)
         return output, alpha

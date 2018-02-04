@@ -5,17 +5,17 @@ import datetime
 import numpy as np
 import socket
 import shutil
-from ..utils import *
+from .utils import get_logfile
 from .emailer import Emailer
 from .signal_handler import SignalHandler
 from monitors import *
-from ..loggers import StatsLogger
+from .logger import StatsLogger
 from misc.constants import RUNNING_MODELS_DIR, ALL_MODEL_DIRS
 
 
 class ExperimentHandler:
     def __init__(self, args):
-        self.debug = args.debug
+        #self.debug = args.debug
         self.pid = os.getpid()
         self.cuda_and_random_seed(args)
         self.create_all_model_dirs()
@@ -44,11 +44,9 @@ class ExperimentHandler:
 
     def model_directory(self, args):
         self.root_dir = RUNNING_MODELS_DIR
-        self.model_type_dir = os.path.join(args.dataset, args.model_type, str(args.iters))
+        self.model_type_dir = os.path.join(args.dataset, args.jet_transform, str(args.iters))
         dt = datetime.datetime.now()
         self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.slurm_job_id)
-        if args.debug:
-            self.filename_exp += '-DEBUG'
         self.leaf_dir = os.path.join(self.model_type_dir, self.filename_exp)
         #i = 1
         #temp = self.leaf_dir + '-run-' + str(i)
@@ -70,8 +68,8 @@ class ExperimentHandler:
         '''----------------------------------------------------------------------- '''
         self.logfile = get_logfile(self.exp_dir, args.silent, args.verbose)
         self.host = socket.gethostname()
-        logging.info("running on {}".format(self.host))
-        logging.info(self.exp_dir)
+        logging.warning("running on {}".format(self.host))
+        logging.warning(self.exp_dir)
 
     def setup_signal_handler(self, args):
         ''' SIGNAL HANDLER '''
@@ -81,7 +79,10 @@ class ExperimentHandler:
             lines = f.readlines()
             recipient, sender, password = (l.strip() for l in lines)
 
-        self.emailer=Emailer(sender, password, recipient)
+        if not args.no_email:
+            self.emailer = Emailer(sender, password, recipient)
+        else:
+            self.emailer = None
         self.signal_handler = SignalHandler(
                                 emailer=self.emailer,
                                 logfile=self.logfile,
@@ -91,7 +92,7 @@ class ExperimentHandler:
                                 subject_string='{} (Machine = {}, Logfile = {}, PID = {}, GPU = {})'.format("[DEBUGGING] " if args.debug else "", self.host, self.logfile, self.pid, args.gpu),
                                 model=None,
                                 debug=args.debug,
-                                train=args.train
+                                train=args.train,
                             )
 
     def setup_stats_logger(self, args):
@@ -145,7 +146,8 @@ class ExperimentHandler:
 
     def log(self, **kwargs):
         self.stats_logger.log(**kwargs)
-
+        if kwargs['epoch'] == 1 and self.emailer is not None:
+            self.emailer.send_msg(self.stats_logger.monitors['eta'].value, "PID {} on {} ETA: {}".format(self.pid, self.host.split('.')[0], self.stats_logger.monitors['eta'].value))
         if np.isnan(self.stats_logger.monitors['inv_fpr'].value):
             logging.warning("NaN in 1/FPR\n")
 
@@ -168,7 +170,8 @@ class ExperimentHandler:
 
     def initial_email(self):
         text = ['JOB STARTED', self.exp_dir, self.host.split('.')[0], str(self.pid)]
-        self.emailer.send_msg('\n'.join(text), ' | '.join(text))
+        if self.emailer is not None:
+            self.emailer.send_msg('\n'.join(text), ' | '.join(text))
 
 
 class EvaluationExperimentHandler(ExperimentHandler):

@@ -6,10 +6,10 @@
 #SBATCH --job-name=JetsTrain%j
 #################
 #a file for job output, you can check job progress
-#SBATCH --output=shell-scripts/slurm-out/JetsTrain%j.out
+#SBATCH --output=slurm_out/JetsTrain%j.out
 #################
 # a file for errors from the job
-#SBATCH --error=shell-scripts/slurm-out/JetsTrain%j.err
+#SBATCH --error=slurm_out/JetsTrain%j.err
 #################
 #time you think you need; default is one hour
 #in minutes
@@ -18,7 +18,7 @@
 #SBATCH --time=48:00:00
 #################
 # --gres will give you one GPU, you can ask for more, up to 8 (or how ever many are on the node/card)
-#SBATCH --gres gpu:1
+#SBATCH --gres gpu:1080ti:1
 # We are submitting to the gpu partition, if you can submit to the hns partition, change this to -p hns_gpu.
 #SBATCH --qos=batch
 #################
@@ -32,12 +32,13 @@
 #SBATCH --mail-type=END,FAIL # notifications for job done & fail
 #SBATCH --mail-user=henrion@nyu.edu
 
+
 HOME='/misc/kcgscratch1/ChoGroup/isaac'
 SRCDIR=$HOME/jets
 DATADIR=$SRCDIR/data/w-vs-qcd/pickles
 
 SLURMARGS="$@"
-SLURMARGS="--data_dir $DATADIR --slurm_job_id $SLURM_JOB_ID $SLURMARGS"
+SLURMARGS="--data_dir $DATADIR --gpu 0 --slurm_job_id $SLURM_JOB_ID $SLURMARGS"
 cd $SRCDIR
 
 echo "$HOME"
@@ -47,4 +48,5 @@ echo "$SLURMARGS"
 
 source activate jets
 
+##python -m visdom.server &
 python $SRCDIR/train.py $SLURMARGS

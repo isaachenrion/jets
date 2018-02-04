@@ -2,10 +2,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from .jet_transforms import construct_transform
+
 class PredictFromParticleEmbedding(nn.Module):
-    def __init__(self, particle_transform=None, features=None, hidden=None, **kwargs):
+    def __init__(self, jet_transform=None, hidden=None, **kwargs):
         super().__init__()
-        self.transform = particle_transform(features=features, hidden=hidden, **kwargs)
+        self.transform = construct_transform(jet_transform, hidden=hidden, **kwargs)
 
         activation_string = 'relu'
         self.activation = getattr(F, activation_string)
@@ -23,11 +25,6 @@ class PredictFromParticleEmbedding(nn.Module):
 
     def forward(self, jets, **kwargs):
         h, extras = self.transform(jets, **kwargs)
-        return_extras = kwargs.pop('return_extras', False)
-        #if return_extras:
-        #    h, extras = out_stuff
-        #else:
-        #    h = out_stuff
 
         h = self.fc1(h)
         h = self.activation(h)
@@ -36,7 +33,7 @@ class PredictFromParticleEmbedding(nn.Module):
         h = self.activation(h)
 
         h = F.sigmoid(self.fc3(h))
-        if return_extras:
+        if kwargs.pop('return_extras', False):
             return h, extras
         else:
             return h

@@ -24,7 +24,7 @@ with open('misc/email_addresses.txt', 'r') as f:
 REPORTS_DIR = "reports"
 DATASETS = {
     'original':'antikt-kt',
-    'pileup':'antikt-kt-pileup25'
+    'pileup':'antikt-kt-pileup25-new'
 }
 
 ''' argparse args '''
@@ -36,7 +36,5 @@ DECAY=0.96
 EPOCHS=50
 ITERS=2
 SCALES=-1
-#SENDER="results74207281@gmail.com"
-#PASSWORD="deeplearning"
 VALID=27000
 DATA_DIR = 'data/w-vs-qcd/pickles'

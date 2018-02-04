@@ -5,14 +5,15 @@ from misc.constants import FINISHED_MODELS_DIR, DEBUG_MODELS_DIR, KILLED_MODELS_
 
 class Mover:
     def __init__(self, root_dir, leaf_dir):
-        self.root_dir = root_dir
+        self.current_root = root_dir
         self.leaf_dir = leaf_dir
 
     def move_to_folder(self, folder):
-        src = os.path.join(self.root_dir, self.leaf_dir)
+        src = os.path.join(self.current_root, self.leaf_dir)
         dst = os.path.join(folder, self.leaf_dir)
         shutil.move(src, dst)
         logging.info('Moved model directory to {}'.format(dst))
+        self.current_root = folder
 
     def move_to_finished(self):
         self.move_to_folder(FINISHED_MODELS_DIR)

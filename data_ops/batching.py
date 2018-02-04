@@ -176,13 +176,12 @@ def batch_leaves(jets):
 
     batch_outers = []
 
+
     for j, jet in enumerate(jets):
         tree = np.copy(jet["tree"])
         inners = []   # Inner nodes at level i
         outers = []   # Outer nodes at level i
-
         queue = [(jet["root_id"], -1)]
-
         while len(queue) > 0:
             node, parent = queue.pop(0)
             # Inner node
@@ -197,7 +196,6 @@ def batch_leaves(jets):
         batch_outers.append(outers)
     jet_contents = [jet['content'] for jet in jets]
     leaves = [torch.stack([jet[i] for i in outers], 0) for jet, outers in zip(jet_contents, batch_outers)]
-
     original_sizes = [len(jet) for jet in leaves]
     biggest_jet_size = max(original_sizes)
     mask = torch.ones(len(leaves), biggest_jet_size, biggest_jet_size)

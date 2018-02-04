@@ -92,7 +92,7 @@ class GRNNTransformGated(nn.Module):
     def forward(self, jets, return_states=False):
 
         levels, children, n_inners, contents = batch(jets)
-        parents= batch_parents(jets)
+        #parents= batch_parents(jets)
 
         up_embeddings = [None for _ in range(len(levels))]
         down_embeddings = [None for _ in range(len(levels))]

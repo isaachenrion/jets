@@ -1,7 +1,8 @@
 bash_snippets.txt
-data
+/data
 models
 archive
+magic_commands.txt
 documents
 reports
 inventory.txt
@@ -12,6 +13,7 @@ debug_models
 killed_models
 interrupted_models
 misc/email_addresses.txt
+recnn-gated-gilles.py
 .git
 *.pyc
 *.pyo

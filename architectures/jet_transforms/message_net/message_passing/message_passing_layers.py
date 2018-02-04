@@ -5,17 +5,21 @@ from torch.autograd import Variable
 
 from ..vertex_update import GRUUpdate
 from .message import DTNNMessage
+from .adjacency import construct_adjacency_matrix_layer
 
-class MultipleIterationMessagePassingLayer(nn.Module):
-    def __init__(self, iters=None, mp_layer=None, **kwargs):
-        super().__init__()
-        self.mp_layers = nn.ModuleList([mp_layer(**kwargs) for _ in range(iters)])
+from misc.abstract_constructor import construct_object
 
-    def forward(self, **kwargs):
-        for mp in self.mp_layers:
-            h = mp(**kwargs)
-        return h
-
+def construct_mp_layer(key, *args, **kwargs):
+    dictionary = dict(
+        van=MPAdaptive,
+        set=MPSet2Set,
+        id=MPIdentity,
+        physics=MPPhysics,
+    )
+    try:
+        return construct_object(key, dictionary, *args, **kwargs)
+    except ValueError as e:
+        raise ValueError('Message passing layer {}'.format(e))
 
 class MessagePassingLayer(nn.Module):
     def __init__(self, hidden=None, **kwargs):
@@ -23,6 +27,7 @@ class MessagePassingLayer(nn.Module):
         self.activation = F.tanh
         self.vertex_update = GRUUpdate(hidden, hidden)
         self.message = DTNNMessage(hidden, hidden, 0)
+        self.physics_based = False
 
     def get_adjacency_matrix(self, **kwargs):
         pass
@@ -31,11 +36,8 @@ class MessagePassingLayer(nn.Module):
         A = self.get_adjacency_matrix(h=h, **kwargs)
         message = self.activation(torch.matmul(A, self.message(h)))
         h = self.vertex_update(h, message)
-        #if return_extras:
-        #    return h, A
-        #else:
-        #    return h
         return h, A
+
 
 class MPIdentity(MessagePassingLayer):
     def __init__(self, **kwargs):
@@ -52,17 +54,19 @@ class MPIdentity(MessagePassingLayer):
 class MPAdaptive(MessagePassingLayer):
     def __init__(self, hidden=None, adaptive_matrix=None, symmetric=False, **kwargs):
         super().__init__(hidden=hidden, **kwargs)
-        self.adjacency_matrix = adaptive_matrix(hidden=hidden, symmetric=symmetric)
+        self.adjacency_matrix = construct_adjacency_matrix_layer(adaptive_matrix, hidden=hidden, symmetric=symmetric)
 
     def get_adjacency_matrix(self, h=None, mask=None, **kwargs):
         return self.adjacency_matrix(h, mask)
 
-class MPFixed(MessagePassingLayer):
-    def __init__(self, hidden=None, adaptive_matrix=None, symmetric=False, **kwargs):
+class MPPhysics(MessagePassingLayer):
+    def __init__(self, hidden=None, **kwargs):
         super().__init__(hidden=hidden, **kwargs)
+        self.physics_based = True
 
-    def get_adjacency_matrix(self, matrix=None):
-        return matrix
+    def get_adjacency_matrix(self, **kwargs):
+        return kwargs.pop('dij', None)
+
 
 class MPSet2Set(MPAdaptive):
     def __init__(self, hidden=None, **kwargs):
