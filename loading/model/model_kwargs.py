@@ -18,7 +18,9 @@ def construct_model_kwargs(args):
         'jet_transform':args.jet_transform,
         'predict':args.predict,
         'alpha':args.alpha,
-        'R':args.R
+        'R':args.R,
+        'n_heads':args.n_heads,
+        'n_layers':args.n_layers
     }
     return model_kwargs
 

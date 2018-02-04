@@ -31,7 +31,7 @@ class RecurrentAttentionPooling(nn.Module):
         hiddens_out = []
         for t in range(self.nodes_out):
             z = z.unsqueeze(1)
-            attn_out, _ = self.attn(h, z, h)
+            attn_out, _ = self.attn(z, h, h)
             z = z.squeeze(1)
             attn_out = attn_out.squeeze(1)
             z = self.recurrent_cell(attn_out, z)
@@ -49,5 +49,5 @@ class AttentionPooling(nn.Module):
 
     def forward(self, h):
         z = self.readout(h)
-        new_hiddens, _ = self.attn(h, z, h)
+        new_hiddens, _ = self.attn(z, h, h)
         return new_hiddens

@@ -67,6 +67,9 @@ parser.add_argument("-t", "--trainable_physics", action='store_true', default=Fa
 parser.add_argument("--alpha", type=float, default=1)
 parser.add_argument("-R", type=int, default=1)
 
+# Transformer
+parser.add_argument("--n_layers", type=int, default=3)
+parser.add_argument("--n_heads", type=int, default=8)
 
 args = parser.parse_args()
 args = reset_unused_args(args)

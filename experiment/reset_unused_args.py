@@ -4,6 +4,10 @@ def reset_unused_args(args):
         args.scales = None
         args.pool_first = None
 
+    if not args.jet_transform == 'tra':
+        args.n_layers = None
+        args.n_heads = None
+
     if args.jet_transform == 'phy':
         args.mp = None
         args.matrix = None
