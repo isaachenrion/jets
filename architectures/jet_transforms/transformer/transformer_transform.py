@@ -21,7 +21,7 @@ class TransformerTransform(nn.Module):
         self.activation = F.relu
         self.embedding = nn.Linear(features + 1, hidden)
         self.readout = construct_readout(readout, hidden, hidden)
-        self.transformer = Transformer(hidden, n_heads, n_layers)
+        self.transformer = Transformer(hidden, n_heads, n_layers, **kwargs)
 
     def forward(self, jets, **kwargs):
         jets, mask = batch_leaves(jets)

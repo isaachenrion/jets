@@ -70,6 +70,7 @@ parser.add_argument("-R", type=int, default=1)
 # Transformer
 parser.add_argument("--n_layers", type=int, default=3)
 parser.add_argument("--n_heads", type=int, default=8)
+parser.add_argument("--dropout", action='store_true', default=False)
 
 args = parser.parse_args()
 args = reset_unused_args(args)

@@ -4,23 +4,37 @@ from architectures import construct_classifier
 
 def construct_model_kwargs(args):
     model_kwargs = {
+        # model dimensions
         'features': args.features,
         'hidden': args.hidden,
+        
+        # classifier on top
+        'predict':args.predict,
+
+        # jet transform
+        'jet_transform':args.jet_transform,
+
+        # NMP
         'iters': args.iters,
-        'scales': args.scales,
-        'pooling_layer':args.pool,
         'mp_layer':args.mp,
         'symmetric':args.sym,
         'readout':args.readout,
-        'pool_first':args.pool_first,
         'adaptive_matrix':args.matrix,
-        'trainable_physics':args.trainable_physics,
-        'jet_transform':args.jet_transform,
-        'predict':args.predict,
+
+        # Stacked NMP
+        'scales': args.scales,
+        'pooling_layer':args.pool,
+        'pool_first':args.pool_first,
+
+        # Physics MPNN
         'alpha':args.alpha,
         'R':args.R,
+        'trainable_physics':args.trainable_physics,
+
+        # Transformer
         'n_heads':args.n_heads,
-        'n_layers':args.n_layers
+        'n_layers':args.n_layers,
+        'dropout':args.dropout
     }
     return model_kwargs
 

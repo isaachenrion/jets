@@ -8,10 +8,11 @@ class Transformer(nn.Module):
     def __init__(self,
         hidden=None,
         n_heads=None,
-        n_layers=None
+        n_layers=None,
+        **kwargs
         ):
         super().__init__()
-        self.transformer_layers = nn.ModuleList([SelfAttentionLayer(hidden, n_heads) for _ in range(n_layers)])
+        self.transformer_layers = nn.ModuleList([SelfAttentionLayer(hidden, n_heads, **kwargs) for _ in range(n_layers)])
 
     def forward(self, x, **kwargs):
         '''
@@ -25,9 +26,9 @@ class Transformer(nn.Module):
         return x
 
 class SelfAttentionLayer(nn.Module):
-    def __init__(self, hidden, n_heads):
+    def __init__(self, hidden, n_heads, **kwargs):
         super().__init__()
-        self.multihead_attention = MultiHeadAttention(n_heads, 64, 64, hidden)
+        self.multihead_attention = MultiHeadAttention(n_heads, 64, 64, hidden, **kwargs)
         self.ln1 = LayerNorm(hidden)
         self.ff = nn.Sequential(
                     nn.Linear(hidden, 4 * hidden),
