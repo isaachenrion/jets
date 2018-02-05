@@ -53,7 +53,7 @@ class MultiHeadAttention(nn.Module):
 
         # back to original mb_size batch, result size = mb_size x len_q x (n_head*d_v)
         outputs = torch.cat(torch.split(outputs, mb_size, dim=0), dim=-1)
-
+        #import ipdb; ipdb.set_trace()
         # project back to residual size
         outputs = self.proj(outputs)
         outputs = self.dropout(outputs)
