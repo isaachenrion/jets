@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from ....utils import AnyBatchGRUCell
+from architectures.utils import AnyBatchGRUCell
 
 class VertexUpdate(nn.Module):
     def __init__(self, message_dim, hidden_dim, vertex_state_dim):

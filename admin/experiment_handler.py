@@ -44,16 +44,10 @@ class ExperimentHandler:
 
     def model_directory(self, args):
         self.root_dir = RUNNING_MODELS_DIR
-        self.model_type_dir = os.path.join(args.dataset, args.jet_transform, str(args.iters))
+        self.model_type_dir = os.path.join(args.dataset, args.jet_transform)
         dt = datetime.datetime.now()
         self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.slurm_job_id)
         self.leaf_dir = os.path.join(self.model_type_dir, self.filename_exp)
-        #i = 1
-        #temp = self.leaf_dir + '-run-' + str(i)
-        #while os.path.exists(os.path.join(self.root_dir,temp)):
-        #    i += 1
-        #    temp = self.leaf_dir + '-run-' + str(i)
-        #self.leaf_dir = temp
         self.exp_dir = os.path.join(self.root_dir,self.leaf_dir)
         os.makedirs(self.exp_dir)
         self.start_dt = dt

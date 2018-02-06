@@ -12,7 +12,8 @@ def construct_readout(key, *args, **kwargs):
         dtnn=DTNNReadout,
         simple=SimpleReadout,
         set=SetReadout,
-        mult=MultipleReadout
+        mult=MultipleReadout,
+        clf=ClassificationReadout
     )
     try:
         return construct_object(key, dictionary, *args, **kwargs)
@@ -54,6 +55,14 @@ class SimpleReadout(Readout):
         x = F.tanh(x)
         x = x.mean(1)
         return x
+
+class ClassificationReadout(Readout):
+    def __init__(self, hidden_dim, *args):
+        super().__init__(hidden_dim, 1)
+        self.fc = nn.Linear(hidden_dim, 1)
+
+    def forward(self, x):
+        return F.sigmoid(self.fc(x))
 
 class MultipleReadout(Readout):
     def __init__(self, hidden_dim, target_dim, n_readouts):

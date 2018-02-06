@@ -2,6 +2,7 @@
 #from .jet_transforms import TRANSFORMS, MESSAGE_PASSING_LAYERS, POOLINGS, ADAPTIVE_MATRICES
 #from .jet_transforms import construct_transform
 from .predict import PredictFromParticleEmbedding
+from .predict import JetClassifier
 
 
 #PREDICTORS = {
@@ -14,6 +15,7 @@ def construct_classifier(key, *args, **kwargs):
         simple=PredictFromParticleEmbedding
     )
     try:
-        return construct_object(key, dictionary, *args, **kwargs)
+        #return construct_object(key, dictionary, *args, **kwargs)
+        return JetClassifier(**kwargs)
     except ValueError as e:
         raise ValueError('Classifier {}'.format(e))

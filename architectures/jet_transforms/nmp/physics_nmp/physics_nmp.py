@@ -4,12 +4,13 @@ import torch.nn.functional as F
 
 from data_ops.batching import batch_leaves
 
-from ..readout import construct_readout
+from architectures.readout import construct_readout
+from architectures.embedding import construct_embedding
 from .adjacency import construct_physics_based_adjacency_matrix
 from ..message_passing import construct_mp_layer
 
 
-class PhysicsBasedMPNNTransform(nn.Module):
+class PhysicsNMP(nn.Module):
     def __init__(self,
         features=None,
         hidden=None,
@@ -22,7 +23,7 @@ class PhysicsBasedMPNNTransform(nn.Module):
         self.activation = F.tanh
         self.hidden = hidden
         self.features = features + 1
-        self.embedding = nn.Linear(self.features, hidden)
+        self.embedding = construct_embedding('simple', features + 1, hidden, act='tanh')
         self.readout = construct_readout(readout, hidden, hidden)
         self.mp_layers = nn.ModuleList([construct_mp_layer('physics', hidden=hidden,**kwargs) for _ in range(iters)])
         self.physics_based_adjacency_matrix = construct_physics_based_adjacency_matrix(

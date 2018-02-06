@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-from ..vertex_update import GRUUpdate
+from .vertex_update import GRUUpdate
 from .message import DTNNMessage
 from .adjacency import construct_adjacency_matrix_layer
 

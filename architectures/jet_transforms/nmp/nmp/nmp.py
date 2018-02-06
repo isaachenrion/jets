@@ -4,10 +4,11 @@ import torch.nn.functional as F
 
 from data_ops.batching import batch_leaves
 
-from ..readout import construct_readout
+from architectures.readout import construct_readout
+from architectures.embedding import construct_embedding
 from ..message_passing import construct_mp_layer
 
-class MPNNTransform(nn.Module):
+class NMP(nn.Module):
     def __init__(self,
         features=None,
         hidden=None,
@@ -20,24 +21,14 @@ class MPNNTransform(nn.Module):
         self.iters = iters
         self.activation = F.tanh
         self.hidden = hidden
-        self.features = features + 1
-        self.embedding = nn.Linear(self.features, hidden)
+        self.embedding = construct_embedding('simple', features + 1, hidden, act='tanh')
         self.readout = construct_readout(readout, hidden, hidden)
         self.mp_layers = nn.ModuleList([construct_mp_layer(mp_layer,hidden=hidden,**kwargs) for _ in range(iters)])
 
     def forward(self, jets, **kwargs):
         jets, mask = batch_leaves(jets)
-
-        #if self.mp_layers[0].physics_based:
-        #    dij = self.physics_based_adjacency_matrix(jets)
-        #else:
-        #    dij = None
-
-        h = self.activation(self.embedding(jets))
-
+        h = self.embedding(jets)
         for mp in self.mp_layers:
             h, A = mp(h=h, mask=mask, **kwargs)
-        #return h
-        #h, A = self.multiple_iterations_of_message_passing(h=h, mask=mask, dij=dij,**kwargs)
         out = self.readout(h)
         return out, A

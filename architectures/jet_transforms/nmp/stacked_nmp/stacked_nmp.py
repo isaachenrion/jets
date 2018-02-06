@@ -6,7 +6,8 @@ from torch.autograd import Variable
 
 from data_ops.batching import batch_leaves
 
-from ..readout import construct_readout
+from architectures.readout import construct_readout
+from architectures.embedding import construct_embedding
 from .attention_pooling import construct_pooling_layer
 from ..message_passing import construct_mp_layer
 
@@ -20,7 +21,7 @@ class MultipleIterationMessagePassingLayer(nn.Module):
             h, A = mp(h=h,**kwargs)
         return h, A
 
-class StackedMPNNTransform(nn.Module):
+class StackedNMP(nn.Module):
     def __init__(
         self,
         scales=None,
@@ -34,7 +35,7 @@ class StackedMPNNTransform(nn.Module):
         **kwargs
         ):
         super().__init__()
-        self.embedding = nn.Linear(features+1, hidden)
+        self.embedding = construct_embedding('simple', features+1, hidden, act='tanh')
         self.activation = F.tanh
         self.mpnns = nn.ModuleList(
             [MultipleIterationMessagePassingLayer(
@@ -48,7 +49,7 @@ class StackedMPNNTransform(nn.Module):
 
     def forward(self, jets, **kwargs):
         jets, mask = batch_leaves(jets)
-        h = self.activation(self.embedding(jets))
+        h = self.embedding(jets)
         for i, (mpnn, pool) in enumerate(zip(self.mpnns, self.attn_pools)):
             if self.pool_first:
                 h = pool(h)

@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from ..readout import construct_readout
+from architectures.readout import construct_readout
 from architectures.utils import Attention
 
 from misc.abstract_constructor import construct_object

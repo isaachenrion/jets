@@ -1,6 +1,6 @@
-from .message_net import MPNNTransform
-from .message_net import StackedMPNNTransform
-from .message_net import PhysicsBasedMPNNTransform
+from .nmp import NMP
+from .nmp import StackedNMP
+from .nmp import PhysicsNMP
 from .recursive_net import GRNNTransformGated, GRNNTransformSimple
 from .relation_net import RelNNTransformConnected
 from .transformer import TransformerTransform
@@ -12,9 +12,9 @@ def construct_transform(key, *args, **kwargs):
         rel=RelNNTransformConnected,
         recs=GRNNTransformSimple,
         recg=GRNNTransformGated,
-        nmp=MPNNTransform,
-        stack=StackedMPNNTransform,
-        phy=PhysicsBasedMPNNTransform,
+        nmp=NMP,
+        stack=StackedNMP,
+        phy=PhysicsNMP,
         tra=TransformerTransform
     )
     try:
