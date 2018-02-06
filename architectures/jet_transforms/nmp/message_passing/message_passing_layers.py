@@ -3,8 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-from .vertex_update import GRUUpdate
-from .message import DTNNMessage
+from .vertex_update import GRUUpdate as Update
+from .message import TanhMessage as Message
 from .adjacency import construct_adjacency_matrix_layer
 
 from misc.abstract_constructor import construct_object
@@ -25,8 +25,8 @@ class MessagePassingLayer(nn.Module):
     def __init__(self, hidden=None, **kwargs):
         super().__init__()
         self.activation = F.tanh
-        self.vertex_update = GRUUpdate(hidden, hidden)
-        self.message = DTNNMessage(hidden, hidden, 0)
+        self.vertex_update = Update(hidden, hidden)
+        self.message = Message(hidden, hidden, 0)
         self.physics_based = False
 
     def get_adjacency_matrix(self, **kwargs):
@@ -71,7 +71,7 @@ class MPPhysics(MessagePassingLayer):
 class MPSet2Set(MPAdaptive):
     def __init__(self, hidden=None, **kwargs):
         super().__init__(hidden=hidden, **kwargs)
-        self.vertex_update = GRUUpdate(2 * hidden, hidden)
+        self.vertex_update = Update(2 * hidden, hidden)
 
     def forward(self, h=None, mask=None):
         A = self.get_adjacency_matrix(h, mask)

@@ -3,9 +3,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from architectures.embedding import construct_embedding
+
 class Message(nn.Module):
-    ''' Base class implementing neural message function for MPNNs. All subclasses
-        should implement build_nn, which returns a lambda function
+    ''' Base class implementing neural message function for MPNNs.
     '''
     def __init__(self, hidden_dim, message_dim, edge_dim):
         super().__init__()
@@ -20,10 +21,10 @@ class Message(nn.Module):
             return self._forward_with_edge(*args)
 
     def _forward_with_edge(self, vertices, edges):
-        pass
+        raise NotImplementedError
 
     def _forward_without_edge(self, vertices):
-        pass
+        raise NotImplementedError
 
 class DTNNMessage(Message):
     def __init__(self, *args):
@@ -42,6 +43,24 @@ class DTNNMessage(Message):
         message = self.vertex_wx_plus_b(vertices)
         return message
 
+class TanhMessage(Message):
+    def __init__(self,*args):
+        super().__init__(*args)
+        self.embedding = construct_embedding('simple', self.vertex_dim, self.message_dim, act='tanh')
+
+    def _forward_without_edge(self, vertices):
+        message = self.embedding(vertices)
+        return message
+    
+class ReLUMessage(Message):
+    def __init__(self,*args):
+        super().__init__(*args)
+        self.embedding = construct_embedding('simple', self.vertex_dim, self.message_dim, act='relu')
+
+    def _forward_without_edge(self, vertices):
+        message = self.embedding(vertices)
+        return message
+    
 class FullyConnectedMessage(Message):
     def __init__(self, *args):
         super().__init__(*args)
