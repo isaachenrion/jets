@@ -45,7 +45,7 @@ echo "$SRCDIR"
 echo "$DATADIR"
 echo "$SLURMARGS"
 
-source activate jets
+#source activate jets
 
 ##python -m visdom.server &
-python $SRCDIR/train.py $SLURMARGS
+#python $SRCDIR/train.py $SLURMARGS
