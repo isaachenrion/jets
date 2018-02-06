@@ -6,6 +6,7 @@ from data_ops.batching import batch_leaves
 
 from architectures.readout import construct_readout
 from architectures.embedding import construct_embedding
+from ..stacked_nmp.attention_pooling import construct_pooling_layer
 from .adjacency import construct_physics_based_adjacency_matrix
 from ..message_passing import construct_mp_layer
 
@@ -34,5 +35,32 @@ class PhysicsNMP(nn.Module):
         dij = self.physics_based_adjacency_matrix(jets)
         for mp in self.mp_layers:
             h, A = mp(h=h, mask=mask, dij=dij, **kwargs)
+        out = self.readout(h)
+        return out, A
+
+class PhysicsStackNMP(nn.Module):
+    def __init__(self,
+        features=None,
+        hidden=None,
+        iters=None,
+        readout=None,
+        scales=None,
+        mp_layer=None,
+        pooling_layer=None,
+        **kwargs
+        ):
+        super().__init__()
+        self.iters = iters
+        self.embedding = construct_embedding('simple', features + 1, hidden, act='tanh')
+        self.readout = construct_readout(readout, hidden, hidden)
+        self.physics_nmp = PhysicsNMP(features, hidden, 1, readout='constant', **kwargs)
+        self.attn_pools = nn.ModuleList([construct_pooling_layer(pooling_layer, scales[i], hidden) for i in range(len(scales))])
+        self.nmps = nn.ModuleList([construct_mp_layer(mp_layer, hidden=hidden, **kwargs) for _ in range(len(scales))])
+
+    def forward(self, jets, mask=None, **kwargs):
+        h, _ = self.physics_nmp(jets, mask, **kwargs)
+        for pool, nmp in zip(self.attn_pools, self.nmps):
+            h = pool(h)
+            h, A = nmp(h=h, mask=None, **kwargs)
         out = self.readout(h)
         return out, A

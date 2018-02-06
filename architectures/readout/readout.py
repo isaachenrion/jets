@@ -13,7 +13,8 @@ def construct_readout(key, *args, **kwargs):
         simple=SimpleReadout,
         set=SetReadout,
         mult=MultipleReadout,
-        clf=ClassificationReadout
+        clf=ClassificationReadout,
+        constant=Constant
     )
     try:
         return construct_object(key, dictionary, *args, **kwargs)
@@ -30,6 +31,12 @@ class Readout(nn.Module):
     def forward(self, h):
         pass
 
+class Constant(Readout):
+    def __init__(self, hidden_dim, target_dim):
+        super().__init__(hidden_dim, target_dim)
+
+    def forward(self, h):
+        return h
 
 class DTNNReadout(Readout):
     def __init__(self, hidden_dim, target_dim):

@@ -1,8 +1,8 @@
 def reset_unused_args(args):
-    if args.jet_transform not in ['stack', 'phy', 'nmp']:
+    if args.jet_transform not in ['stack', 'phy', 'nmp', 'physta']:
         args.iters = None
 
-    if not args.jet_transform == 'stack':
+    if args.jet_transform not in ['stack', 'physta']:
         args.pool = None
         args.scales = None
         args.pool_first = None
@@ -20,10 +20,7 @@ def reset_unused_args(args):
         if args.trainable_physics:
             #args.alpha = None
             args.R = None
-    else:
         #args.alpha = None
-        args.R = None
-        args.trainable_physics = None
 
     args.train = True
     if args.debug:
