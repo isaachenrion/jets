@@ -1,4 +1,7 @@
 def reset_unused_args(args):
+    if args.jet_transform not in ['stack', 'phy', 'nmp']:
+        args.iters = None
+        
     if not args.jet_transform == 'stack':
         args.pool = None
         args.scales = None

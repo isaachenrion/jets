@@ -38,7 +38,7 @@ def train(args):
     ''' OPTIMIZER AND LOSS '''
     '''----------------------------------------------------------------------- '''
     logging.info("Building optimizer...")
-    optimizer = Adam(model.parameters(), lr=settings['step_size'])
+    optimizer = Adam(model.parameters(), lr=settings['step_size'], weight_decay=args.reg)
     scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
     #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
 

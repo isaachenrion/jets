@@ -14,14 +14,14 @@ class JetClassifier(nn.Module):
     - Particle embedding - converts n particles to n embedded states
     - Dimensionality reduction - converts n_1 states to n_2 states
     - Transform - converts a number of states to a single jet embedding
-    - Readout - classifies according to the jet embedding
+    - Predictor - classifies according to the jet embedding
 
     Inputs: jets, a list of N jet data dictionaries
     Outputs: N-length binary tensor
     '''
     def __init__(self, **kwargs):
         super().__init__()
-        self.readout = construct_readout(
+        self.predictor = construct_readout(
                             'clf',
                             kwargs.get('hidden', None)
                         )
@@ -31,7 +31,7 @@ class JetClassifier(nn.Module):
 
     def forward(self, jets):
         h, _ = self.transform(jets)
-        outputs = self.readout(h)
+        outputs = self.predictor(h)
         return outputs
 
 

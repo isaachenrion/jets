@@ -28,6 +28,7 @@ parser.add_argument("-b", "--batch_size", type=int, default=BATCH_SIZE)
 parser.add_argument("-a", "--step_size", type=float, default=STEP_SIZE)
 parser.add_argument("-d", "--decay", type=float, default=DECAY)
 parser.add_argument("--clip", type=float, default=None)
+parser.add_argument("--reg", type=float, default=L2_REGULARIZATION)
 
 # computing args
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)
@@ -51,7 +52,7 @@ parser.add_argument("--predict", type=str, default='simple', help='type of predi
 parser.add_argument("-j", "--jet_transform", type=str, default="nmp", help="name of the model you want to train - look in constants.py for the model list")
 
 # NMP
-parser.add_argument("-i", "--iters", type=int, default=ITERS)
+parser.add_argument("-i", "--iters", type=int, default=2)
 parser.add_argument("--mp", type=str, default='van', help='type of message passing layer')
 parser.add_argument("--matrix", type=str, default='dm', help='type of adaptive matrix layer')
 parser.add_argument("--sym", action='store_true', default=False)
@@ -59,7 +60,7 @@ parser.add_argument("--readout", type=str, default='dtnn', help='type of readout
 
 # Stack NMP
 parser.add_argument("--pool_first", action='store_true', default=False)
-parser.add_argument("--scales", nargs='+', type=int, default=SCALES)
+parser.add_argument("--scales", nargs='+', type=int, default=None)
 parser.add_argument("--pool", type=str, default='attn', help='type of pooling layer')
 
 # Physics NMP
