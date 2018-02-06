@@ -18,7 +18,7 @@
 #SBATCH --time=24:00:00
 #################
 # --gres will give you one GPU, you can ask for more, up to 8 (or how ever many are on the node/card)
-#SBATCH --gres=gpu:1 
+#SBATCH --gres=gpu:1
 #################
 #number of nodes you are requesting
 #SBATCH --nodes=1
@@ -31,9 +31,10 @@
 #SBATCH --mail-user=henrion@nyu.edu
 
 
-HOME='/misc/kcgscratch1/ChoGroup/isaac'
+HOME='/home/ih692'
+SCRATCH='/scratch/ih692'
 SRCDIR=$HOME/jets
-DATADIR=$SRCDIR/data/w-vs-qcd/pickles
+DATADIR=$SCRATCH/data/w-vs-qcd/pickles
 
 SLURMARGS="$@"
 SLURMARGS="--data_dir $DATADIR --gpu 0 --slurm_job_id $SLURM_JOB_ID $SLURMARGS"
