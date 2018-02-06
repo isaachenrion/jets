@@ -7,7 +7,7 @@ def construct_model_kwargs(args):
         # model dimensions
         'features': args.features,
         'hidden': args.hidden,
-        
+
         # classifier on top
         'predict':args.predict,
 
@@ -34,6 +34,8 @@ def construct_model_kwargs(args):
         # Transformer
         'n_heads':args.n_heads,
         'n_layers':args.n_layers,
+        'dq':args.dq,
+        'dv':args.dv,
         'dropout':args.dropout
     }
     return model_kwargs

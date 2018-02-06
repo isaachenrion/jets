@@ -34,7 +34,7 @@ def build_parents(tree):
 
     return parents
 
-def batch(jets):
+def batch_trees(jets):
     # Batch the recursive activations across all nodes of a same level
     # !!! Assume that jets have at least one inner node.
     #     Leads to off-by-one errors otherwise :(
@@ -48,7 +48,7 @@ def batch(jets):
     # jet_contents: array of shape [n_nodes, n_features]
     #     jet_contents[node_id] is the feature vector of node_id
     jet_children = []
-
+    n_jets = len(jets)
     offset = 0
 
     for j, jet in enumerate(jets):
@@ -158,7 +158,7 @@ def batch(jets):
         level_children = level_children.cuda()
         n_inners = n_inners.cuda()
 
-    return (levels, level_children[:, [0, 2]], n_inners, contents)
+    return (levels, level_children[:, [0, 2]], n_inners, contents, n_jets)
 
 def batch_leaves(jets):
     # Batch the recursive activations across all nodes of a same level

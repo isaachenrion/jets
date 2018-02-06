@@ -6,7 +6,7 @@ from data_ops.batching import batch_leaves
 
 from architectures.readout import construct_readout
 from architectures.embedding import construct_embedding
-from ..message_passing import construct_mp_layer
+from .message_passing import construct_mp_layer
 
 class NMP(nn.Module):
     def __init__(self,
@@ -23,8 +23,7 @@ class NMP(nn.Module):
         self.readout = construct_readout(readout, hidden, hidden)
         self.mp_layers = nn.ModuleList([construct_mp_layer(mp_layer,hidden=hidden,**kwargs) for _ in range(iters)])
 
-    def forward(self, jets, **kwargs):
-        jets, mask = batch_leaves(jets)
+    def forward(self, jets, mask=None, **kwargs):
         h = self.embedding(jets)
         for mp in self.mp_layers:
             h, A = mp(h=h, mask=mask, **kwargs)

@@ -1,7 +1,7 @@
 def reset_unused_args(args):
     if args.jet_transform not in ['stack', 'phy', 'nmp']:
         args.iters = None
-        
+
     if not args.jet_transform == 'stack':
         args.pool = None
         args.scales = None
@@ -9,6 +9,8 @@ def reset_unused_args(args):
 
     if not args.jet_transform == 'tra':
         args.n_layers = None
+        args.dq = None
+        args.dv = None
         args.n_heads = None
 
     if args.jet_transform == 'phy':

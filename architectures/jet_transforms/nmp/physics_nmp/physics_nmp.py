@@ -29,13 +29,9 @@ class PhysicsNMP(nn.Module):
                                                     trainable_physics=kwargs.pop('trainable_physics', None)
                                                     )
 
-    def forward(self, jets, **kwargs):
-        jets, mask = batch_leaves(jets)
-
-        dij = self.physics_based_adjacency_matrix(jets)
-
+    def forward(self, jets, mask=None, **kwargs):
         h = self.embedding(jets)
-
+        dij = self.physics_based_adjacency_matrix(jets)
         for mp in self.mp_layers:
             h, A = mp(h=h, mask=mask, dij=dij, **kwargs)
         out = self.readout(h)

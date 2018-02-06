@@ -1,21 +1,11 @@
-
-#from .jet_transforms import TRANSFORMS, MESSAGE_PASSING_LAYERS, POOLINGS, ADAPTIVE_MATRICES
-#from .jet_transforms import construct_transform
-from .predict import PredictFromParticleEmbedding
-from .predict import JetClassifier
-
-
-#PREDICTORS = {
-#    'simple': (0, PredictFromParticleEmbedding)
-#}
-from misc.abstract_constructor import construct_object
+from .predict import TreeJetClassifier
+from .predict import LeafJetClassifier
 
 def construct_classifier(key, *args, **kwargs):
-    dictionary = dict(
-        simple=PredictFromParticleEmbedding
-    )
-    try:
-        #return construct_object(key, dictionary, *args, **kwargs)
-        return JetClassifier(**kwargs)
-    except ValueError as e:
-        raise ValueError('Classifier {}'.format(e))
+    jet_transform = kwargs.get('jet_transform', None)
+    assert jet_transform is not None
+    if jet_transform in ['recs', 'recg']:
+        return TreeJetClassifier(**kwargs)
+    else:
+        return LeafJetClassifier(**kwargs)
+    

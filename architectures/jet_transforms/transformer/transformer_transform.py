@@ -19,12 +19,11 @@ class TransformerTransform(nn.Module):
         ):
         super().__init__()
 
-        self.embedding = nn.Linear(features + 1, hidden)
+        self.embedding = construct_embedding('simple', features + 1, hidden, act='relu')
         self.readout = construct_readout(readout, hidden, hidden)
         self.transformer = Transformer(hidden, n_heads, n_layers, **kwargs)
 
     def forward(self, jets, **kwargs):
-        jets, mask = batch_leaves(jets)
         h = self.embedding(jets)
         h = self.transformer(h)
         out = self.readout(h)
