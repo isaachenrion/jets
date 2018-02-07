@@ -111,7 +111,8 @@ def train(args):
             idx = slice(start, start+args.batch_size)
             X, y = X_train[idx], y_train[idx]
             X_var = wrap_jet(X); y_var = wrap(y)
-            l = loss(model(X_var), y_var)
+            y_pred = model(X_var, logger=eh.stats_logger, epoch=i)
+            l = loss(y_pred, y_var)
             l.backward()
             if args.clip is not None:
                 torch.nn.utils.clip_grad_norm(model.parameters(), args.clip)

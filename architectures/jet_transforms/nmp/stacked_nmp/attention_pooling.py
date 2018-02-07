@@ -7,7 +7,7 @@ from architectures.readout import construct_readout
 from architectures.utils import Attention
 
 from misc.abstract_constructor import construct_object
-
+from visualizing import visualize_batch_2D
 def construct_pooling_layer(key, *args, **kwargs):
     dictionary = dict(
         recattn=RecurrentAttentionPooling,
@@ -47,7 +47,12 @@ class AttentionPooling(nn.Module):
         self.attn = Attention()
         #self.recurrent_cell = nn.GRUCell(hidden, hidden)
 
-    def forward(self, h):
+    def forward(self, h, **kwargs):
         z = self.readout(h)
-        new_hiddens, _ = self.attn(z, h, h)
+        new_hiddens, attns = self.attn(z, h, h)
+        
+        ep = kwargs.get('epoch', None)
+        logger = kwargs.get('logger', None)
+        if ep is not None and logger is not None and ep % 10 == 0:
+            visualize_batch_2D(attns, logger, 'epoch{}/attention-{}'.format(ep, self.nodes_out))
         return new_hiddens

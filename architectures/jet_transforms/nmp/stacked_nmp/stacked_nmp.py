@@ -50,7 +50,7 @@ class StackedNMP(nn.Module):
         h = self.embedding(jets)
         for i, (nmp, pool) in enumerate(zip(self.nmps, self.attn_pools)):
             if self.pool_first:
-                h = pool(h)
+                h = pool(h, **kwargs)
 
             if i == 0 and not self.pool_first:
                 h, A = nmp(h=h, mask=mask)
@@ -58,7 +58,7 @@ class StackedNMP(nn.Module):
                 h, A = nmp(h=h, mask=None)
 
             if not self.pool_first:
-                h = pool(h)
+                h = pool(h, **kwargs)
 
         out = self.readout(h)
         return out, A

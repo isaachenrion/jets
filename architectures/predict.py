@@ -36,9 +36,9 @@ class TreeJetClassifier(JetClassifier):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def forward(self, jets):
+    def forward(self, jets, **kwargs):
         jets = batch_trees(jets)
-        h, _ = self.transform(jets)
+        h, _ = self.transform(jets, **kwargs)
         outputs = self.predictor(h)
         return outputs
 
@@ -46,8 +46,8 @@ class LeafJetClassifier(JetClassifier):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def forward(self, jets):
+    def forward(self, jets, **kwargs):
         jets, mask = batch_leaves(jets)
-        h, _ = self.transform(jets=jets, mask=mask)
+        h, _ = self.transform(jets=jets, mask=mask, **kwargs)
         outputs = self.predictor(h)
         return outputs
