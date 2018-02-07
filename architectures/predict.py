@@ -11,9 +11,7 @@ from data_ops.batching import batch_leaves, batch_trees
 class JetClassifier(nn.Module):
     '''
     Top-level architecture for binary classification of jets.
-    A classifier comprises multiple possible parts:
-    - Particle embedding - converts n particles to n embedded states
-    - Dimensionality reduction - converts n_1 states to n_2 states
+    A classifier comprises these parts:
     - Transform - converts a number of states to a single jet embedding
     - Predictor - classifies according to the jet embedding
 
@@ -22,13 +20,13 @@ class JetClassifier(nn.Module):
     '''
     def __init__(self, **kwargs):
         super().__init__()
+        self.transform = construct_transform(
+                            kwargs.get('jet_transform', None),
+                            **kwargs)
         self.predictor = construct_readout(
                             'clf',
                             kwargs.get('hidden', None)
                         )
-        self.transform = construct_transform(
-                            kwargs.get('jet_transform', None),
-                            **kwargs)
 
     def forward(self, jets):
         raise NotImplementedError

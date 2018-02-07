@@ -66,7 +66,7 @@ parser.add_argument("--pool", type=str, default='attn', help='type of pooling la
 # Physics NMP
 parser.add_argument("-t", "--trainable_physics", action='store_true', default=False)
 parser.add_argument("--alpha", type=float, default=1)
-parser.add_argument("-R", type=int, default=1)
+parser.add_argument("-R", type=float, default=1)
 
 # Transformer
 parser.add_argument("--n_layers", type=int, default=3)

@@ -22,8 +22,8 @@ class PhysicsNMP(nn.Module):
         super().__init__()
         self.iters = iters
         self.embedding = construct_embedding('simple', features + 1, hidden, act='tanh')
-        self.readout = construct_readout(readout, hidden, hidden)
         self.mp_layers = nn.ModuleList([construct_mp_layer('physics', hidden=hidden,**kwargs) for _ in range(iters)])
+        self.readout = construct_readout(readout, hidden, hidden)
         self.physics_based_adjacency_matrix = construct_physics_based_adjacency_matrix(
                                                     alpha=kwargs.pop('alpha', None),
                                                     R=kwargs.pop('R', None),
@@ -33,6 +33,7 @@ class PhysicsNMP(nn.Module):
     def forward(self, jets, mask=None, **kwargs):
         h = self.embedding(jets)
         dij = self.physics_based_adjacency_matrix(jets)
+        #import ipdb; ipdb.set_trace()
         for mp in self.mp_layers:
             h, A = mp(h=h, mask=mask, dij=dij, **kwargs)
         out = self.readout(h)
@@ -52,8 +53,8 @@ class PhysicsStackNMP(nn.Module):
         super().__init__()
         self.iters = iters
         self.embedding = construct_embedding('simple', features + 1, hidden, act='tanh')
-        self.readout = construct_readout(readout, hidden, hidden)
         self.physics_nmp = PhysicsNMP(features, hidden, 1, readout='constant', **kwargs)
+        self.readout = construct_readout(readout, hidden, hidden)
         self.attn_pools = nn.ModuleList([construct_pooling_layer(pooling_layer, scales[i], hidden) for i in range(len(scales))])
         self.nmps = nn.ModuleList([construct_mp_layer(mp_layer, hidden=hidden, **kwargs) for _ in range(len(scales))])
 
