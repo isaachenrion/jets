@@ -1,6 +1,7 @@
 from .nmp import NMP
 from .nmp import StackedNMP
 from .nmp import PhysicsNMP
+from .nmp import OnesNMP
 from .nmp import PhysicsStackNMP
 from .recursive_net import GRNNTransformGated, GRNNTransformSimple
 from .relation_net import RelNNTransformConnected
@@ -17,7 +18,8 @@ def construct_transform(key, *args, **kwargs):
         stack=StackedNMP,
         phy=PhysicsNMP,
         physta=PhysicsStackNMP,
-        tra=TransformerTransform
+        tra=TransformerTransform,
+        one=OnesNMP
     )
     try:
         return construct_object(key, dictionary, *args, **kwargs)
