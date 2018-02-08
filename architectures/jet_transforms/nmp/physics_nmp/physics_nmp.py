@@ -53,7 +53,9 @@ class OnesNMP(PhysicsNMP):
     def adjacency_matrix(self):
         def ones(jets):
             bs, sz, _ = jets.size()
-            return Variable(torch.ones(bs, sz, sz))
+            matrix = Variable(torch.ones(bs, sz, sz))
+            if torch.cuda.is_available():
+                matrix = matrix.cuda()
         return ones
 
 class PhysicsStackNMP(nn.Module):
