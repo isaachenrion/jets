@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from .vertex_update import GRUUpdate as Update
-from .message import TanhMessage as Message
+from .message import SimpleMessage as Message
 from .adjacency import construct_adjacency_matrix_layer
 
 from misc.abstract_constructor import construct_object
@@ -26,7 +26,7 @@ class MessagePassingLayer(nn.Module):
         super().__init__()
         self.activation = F.tanh
         self.vertex_update = Update(hidden, hidden)
-        self.message = Message(hidden, hidden, 0)
+        self.message = Message(hidden, hidden, 0, act=kwargs.get('act', None))
         self.physics_based = False
 
     def get_adjacency_matrix(self, **kwargs):

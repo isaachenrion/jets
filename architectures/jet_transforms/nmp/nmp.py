@@ -19,10 +19,10 @@ class NMP(nn.Module):
         ):
         super().__init__()
         self.iters = iters
-        self.embedding = construct_embedding('simple', features + 1, hidden, act='tanh')
+        self.embedding = construct_embedding('simple', features + 1, hidden, act=kwargs.get('act', None))
         self.mp_layers = nn.ModuleList([construct_mp_layer(mp_layer,hidden=hidden,**kwargs) for _ in range(iters)])
         self.readout = construct_readout(readout, hidden, hidden)
-        
+
     def forward(self, jets, mask=None, **kwargs):
         h = self.embedding(jets)
         for mp in self.mp_layers:

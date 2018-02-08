@@ -21,7 +21,7 @@ class PhysicsNMP(nn.Module):
         ):
         super().__init__()
         self.iters = iters
-        self.embedding = construct_embedding('simple', features + 1, hidden, act='tanh')
+        self.embedding = construct_embedding('simple', features + 1, hidden, act=kwargs.get('act', None))
         self.mp_layers = nn.ModuleList([construct_mp_layer('physics', hidden=hidden,**kwargs) for _ in range(iters)])
         self.readout = construct_readout(readout, hidden, hidden)
         self.alpha = kwargs.pop('alpha', None)
@@ -71,7 +71,7 @@ class PhysicsStackNMP(nn.Module):
         ):
         super().__init__()
         self.iters = iters
-        self.embedding = construct_embedding('simple', features + 1, hidden, act='tanh')
+        self.embedding = construct_embedding('simple', features + 1, hidden, act=kwargs.get('act', None))
         self.physics_nmp = PhysicsNMP(features, hidden, 1, readout='constant', **kwargs)
         self.readout = construct_readout(readout, hidden, hidden)
         self.attn_pools = nn.ModuleList([construct_pooling_layer(pooling_layer, scales[i], hidden) for i in range(len(scales))])

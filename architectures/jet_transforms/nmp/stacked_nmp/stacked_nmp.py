@@ -35,7 +35,7 @@ class StackedNMP(nn.Module):
         **kwargs
         ):
         super().__init__()
-        self.embedding = construct_embedding('simple', features+1, hidden, act='tanh')
+        self.embedding = construct_embedding('simple', features+1, hidden, act=kwargs.get('act', None))
         self.nmps = nn.ModuleList(
             [MultipleIterationMessagePassingLayer(
                 iters=iters, hidden=hidden, mp_layer=mp_layer, **kwargs

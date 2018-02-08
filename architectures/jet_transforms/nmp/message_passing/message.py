@@ -43,15 +43,15 @@ class DTNNMessage(Message):
         message = self.vertex_wx_plus_b(vertices)
         return message
 
-class TanhMessage(Message):
-    def __init__(self,*args):
+class SimpleMessage(Message):
+    def __init__(self,*args, act=None):
         super().__init__(*args)
-        self.embedding = construct_embedding('simple', self.vertex_dim, self.message_dim, act='tanh')
+        self.embedding = construct_embedding('simple', self.vertex_dim, self.message_dim, act=act)
 
     def _forward_without_edge(self, vertices):
         message = self.embedding(vertices)
         return message
-    
+
 class ReLUMessage(Message):
     def __init__(self,*args):
         super().__init__(*args)
@@ -60,7 +60,7 @@ class ReLUMessage(Message):
     def _forward_without_edge(self, vertices):
         message = self.embedding(vertices)
         return message
-    
+
 class FullyConnectedMessage(Message):
     def __init__(self, *args):
         super().__init__(*args)

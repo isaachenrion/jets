@@ -16,10 +16,21 @@ class ParticleEmbedding(nn.Module):
         pass
 
 class Simple(ParticleEmbedding):
-    def __init__(self, features, hidden, act='relu', **kwargs):
+    def __init__(self, features, hidden, act=None):
         super().__init__(features, hidden)
         self.fc = nn.Linear(features, hidden)
-        self.activation = getattr(F, act)
+        if act == 'tanh':
+            self.activation = nn.Tanh()
+        elif act == 'relu':
+            self.activation = nn.ReLU()
+        elif act == 'sigmoid':
+            self.activation = nn.Sigmoid()
+        elif act == 'hardtanh':
+            self.activation = nn.HardTanh()
+        elif act is None:
+            self.activation = lambda x: x
+        else:
+            raise ValueError('Activation {} not found'.format(act))
 
     def forward(self, jets):
         return self.activation(self.fc(jets))

@@ -8,6 +8,9 @@ def construct_model_kwargs(args):
         'features': args.features,
         'hidden': args.hidden,
 
+        # activation
+        'act': args.act,
+
         # classifier on top
         'predict':args.predict,
 

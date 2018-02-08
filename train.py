@@ -41,9 +41,10 @@ parser.add_argument("--n_valid", type=int, default=VALID)
 parser.add_argument("-p", "--pileup", action='store_true', default=False)
 parser.add_argument("--root_dir", default=MODELS_DIR)
 
-# Dimension args
+# Dimension and activation args
 parser.add_argument("--features", type=int, default=FEATURES)
 parser.add_argument("--hidden", type=int, default=HIDDEN)
+parser.add_argument("--act", type=str, default='relu')
 
 # Classifier
 parser.add_argument("--predict", type=str, default='simple', help='type of prediction layer')
