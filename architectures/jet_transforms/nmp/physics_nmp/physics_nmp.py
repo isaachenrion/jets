@@ -56,6 +56,7 @@ class OnesNMP(PhysicsNMP):
             matrix = Variable(torch.ones(bs, sz, sz))
             if torch.cuda.is_available():
                 matrix = matrix.cuda()
+            return matrix
         return ones
 
 class PhysicsStackNMP(nn.Module):
