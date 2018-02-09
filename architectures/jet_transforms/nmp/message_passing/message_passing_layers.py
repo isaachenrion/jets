@@ -14,7 +14,7 @@ def construct_mp_layer(key, *args, **kwargs):
         van=MPAdaptive,
         set=MPSet2Set,
         id=MPIdentity,
-        physics=MPPhysics,
+        fixed=MPFixed,
     )
     try:
         return construct_object(key, dictionary, *args, **kwargs)
@@ -59,10 +59,9 @@ class MPAdaptive(MessagePassingLayer):
     def get_adjacency_matrix(self, h=None, mask=None, **kwargs):
         return self.adjacency_matrix(h, mask)
 
-class MPPhysics(MessagePassingLayer):
-    def __init__(self, hidden=None, **kwargs):
-        super().__init__(hidden=hidden, **kwargs)
-        self.physics_based = True
+class MPFixed(MessagePassingLayer):
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
 
     def get_adjacency_matrix(self, **kwargs):
         return kwargs.pop('dij', None)

@@ -11,7 +11,7 @@ from ..stacked_nmp.attention_pooling import construct_pooling_layer
 from .adjacency import construct_physics_based_adjacency_matrix
 from ..message_passing import construct_mp_layer
 
-class PhysicsNMP(nn.Module):
+class FixedAdjacencyNMP(nn.Module):
     def __init__(self,
         features=None,
         hidden=None,
@@ -22,35 +22,54 @@ class PhysicsNMP(nn.Module):
         super().__init__()
         self.iters = iters
         self.embedding = construct_embedding('simple', features + 1, hidden, act=kwargs.get('act', None))
-        self.mp_layers = nn.ModuleList([construct_mp_layer('physics', hidden=hidden,**kwargs) for _ in range(iters)])
+        self.mp_layers = nn.ModuleList([construct_mp_layer('fixed', hidden=hidden,**kwargs) for _ in range(iters)])
         self.readout = construct_readout(readout, hidden, hidden)
+        self.adjacency_matrix = self.set_adjacency_matrix(**kwargs)
+
+    def set_adjacency_matrix(self, **kwargs):
+        pass
+
+    def forward(self, jets, mask=None, **kwargs):
+        h = self.embedding(jets)
+        dij = self.adjacency_matrix(jets)
+        for mp in self.mp_layers:
+            h, _ = mp(h=h, mask=mask, dij=dij, **kwargs)
+        out = self.readout(h)
+        return out, _
+
+class PhysicsNMP(FixedAdjacencyNMP):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def set_adjacency_matrix(self, **kwargs):
         self.alpha = kwargs.pop('alpha', None)
         self.R = kwargs.pop('R', None)
         self.trainable_physics = kwargs.pop('trainable_physics', None)
 
-    @property
-    def adjacency_matrix(self):
         return construct_physics_based_adjacency_matrix(
                         alpha=self.alpha,
                         R=self.R,
                         trainable_physics=self.trainable_physics
                         )
 
-    def forward(self, jets, mask=None, **kwargs):
-        h = self.embedding(jets)
-        dij = self.adjacency_matrix(jets)
-        #import ipdb; ipdb.set_trace()
-        for mp in self.mp_layers:
-            h, A = mp(h=h, mask=mask, dij=dij, **kwargs)
-        out = self.readout(h)
-        return out, A
+class EyeNMP(FixedAdjacencyNMP):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-class OnesNMP(PhysicsNMP):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def set_adjacency_matrix(self, **kwargs):
+        def eye(jets):
+            bs, sz, _ = jets.size()
+            matrix = Variable(torch.eye(sz).unsqueeze(0).repeat(bs, 1, 1))
+            if torch.cuda.is_available():
+                matrix = matrix.cuda()
+            return matrix
+        return eye
 
-    @property
-    def adjacency_matrix(self):
+class OnesNMP(FixedAdjacencyNMP):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def set_adjacency_matrix(self, **kwargs):
         def ones(jets):
             bs, sz, _ = jets.size()
             matrix = Variable(torch.ones(bs, sz, sz))

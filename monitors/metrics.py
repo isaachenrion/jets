@@ -11,7 +11,10 @@ def inv_fpr_at_tpr_equals_half(tpr, fpr):
         print('fpr {} tpr {}'.format(fpr, tpr))
     fpr = fpr + 1e-20
     inv_fpr = interp(base_tpr, tpr, 1. / fpr)
-    return np.mean(inv_fpr[225])
+    out = np.mean(inv_fpr[225])
+    if out > 1e10:
+        return -np.inf
+    return out
 
 
 class ROCAUC(ScalarMonitor):
