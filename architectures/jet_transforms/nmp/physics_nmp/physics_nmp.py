@@ -71,21 +71,21 @@ class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
         self.learned_tradeoff = kwargs.pop('learned_tradeoff', False)
         self.physics_component = kwargs.pop('physics_component', None)
 
-        learned_matrix = construct_adjacency_matrix_layer(
+        self.learned_matrix = construct_adjacency_matrix_layer(
                     kwargs.get('adaptive_matrix', None),
                     hidden=kwargs.get('features', None) + 1,
                     symmetric=kwargs.get('symmetric', None)
                     )
 
-        physics_matrix = construct_physics_based_adjacency_matrix(
+        self.physics_matrix = construct_physics_based_adjacency_matrix(
                         alpha=kwargs.pop('alpha', None),
                         R=kwargs.pop('R', None),
                         trainable_physics=kwargs.pop('trainable_physics', None)
                         )
 
         def combined_matrix(jets, **kwargs):
-            out = self.physics_component * physics_matrix(jets, **kwargs) \
-                + (1 - self.physics_component) * learned_matrix(jets, **kwargs)
+            out = self.physics_component * self.physics_matrix(jets, **kwargs) \
+                + (1 - self.physics_component) * self.learned_matrix(jets, **kwargs)
             return out
         return combined_matrix
 
