@@ -1,5 +1,5 @@
 def reset_unused_args(args):
-    if args.jet_transform not in ['stack','one', 'eye', 'phy', 'nmp', 'physta']:
+    if args.jet_transform not in ['stack','one', 'lf', 'eye', 'phy', 'nmp', 'physta']:
         args.iters = None
 
     if args.jet_transform not in ['stack', 'physta']:

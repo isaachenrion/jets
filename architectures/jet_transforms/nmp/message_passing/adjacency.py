@@ -41,7 +41,6 @@ class SumMatrix(AdjacencyMatrix):
         h_l = h.view(shp[0], shp[1], 1, shp[2])
         h_r = h.view(shp[0], 1, shp[1], shp[2])
         A = self.edge_embedding(h_l + h_r).squeeze(-1)
-        #A = F.softmax(A).squeeze(-1)
         A = self.softmax(A, mask)
         return A
 

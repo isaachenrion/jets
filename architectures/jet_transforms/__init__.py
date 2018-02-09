@@ -3,6 +3,7 @@ from .nmp import StackedNMP
 from .nmp import PhysicsNMP
 from .nmp import EyeNMP
 from .nmp import OnesNMP
+from .nmp import LearnedFixedNMP
 from .nmp import PhysicsStackNMP
 from .recursive_net import GRNNTransformGated, GRNNTransformSimple
 from .relation_net import RelNNTransformConnected
@@ -21,7 +22,8 @@ def construct_transform(key, *args, **kwargs):
         physta=PhysicsStackNMP,
         tra=TransformerTransform,
         one=OnesNMP,
-        eye=EyeNMP
+        eye=EyeNMP,
+        lf=LearnedFixedNMP
     )
     try:
         return construct_object(key, dictionary, *args, **kwargs)
