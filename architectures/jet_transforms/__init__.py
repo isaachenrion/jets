@@ -5,6 +5,7 @@ from .nmp import EyeNMP
 from .nmp import OnesNMP
 from .nmp import LearnedFixedNMP
 from .nmp import PhysicsStackNMP
+from .nmp import PhysicsPlusLearnedNMP
 from .recursive_net import GRNNTransformGated, GRNNTransformSimple
 from .relation_net import RelNNTransformConnected
 from .transformer import TransformerTransform
@@ -23,7 +24,8 @@ def construct_transform(key, *args, **kwargs):
         tra=TransformerTransform,
         one=OnesNMP,
         eye=EyeNMP,
-        lf=LearnedFixedNMP
+        lf=LearnedFixedNMP,
+        plf=PhysicsPlusLearnedNMP
     )
     try:
         return construct_object(key, dictionary, *args, **kwargs)

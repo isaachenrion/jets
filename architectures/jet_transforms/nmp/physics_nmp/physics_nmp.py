@@ -43,15 +43,50 @@ class PhysicsNMP(FixedAdjacencyNMP):
         super().__init__(**kwargs)
 
     def set_adjacency_matrix(self, **kwargs):
-        self.alpha = kwargs.pop('alpha', None)
-        self.R = kwargs.pop('R', None)
-        self.trainable_physics = kwargs.pop('trainable_physics', None)
-
         return construct_physics_based_adjacency_matrix(
-                        alpha=self.alpha,
-                        R=self.R,
-                        trainable_physics=self.trainable_physics
+                        alpha=kwargs.pop('alpha', None),
+                        R=kwargs.pop('R', None),
+                        trainable_physics=kwargs.pop('trainable_physics', None)
                         )
+
+class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @property
+    def physics_component(self):
+        return torch.sigmoid(self._physics_component)
+
+    @physics_component.setter
+    def physics_component(self, value):
+        self._physics_component = torch.FloatTensor([value])
+        if self.learned_tradeoff:
+            self._physics_component = nn.Parameter(self._physics_component)
+        else:
+            self._physics_component = Variable(self._physics_component)
+
+    def set_adjacency_matrix(self, **kwargs):
+        self.learned_tradeoff = kwargs.pop('learned_tradeoff', False)
+        self.physics_component = kwargs.pop('physics_component', None)
+        
+        learned_matrix = construct_adjacency_matrix_layer(
+                    kwargs.get('adaptive_matrix', None),
+                    hidden=kwargs.get('features', None) + 1,
+                    symmetric=kwargs.get('symmetric', None)
+                    )
+
+        physics_matrix = construct_physics_based_adjacency_matrix(
+                        alpha=kwargs.pop('alpha', None),
+                        R=kwargs.pop('R', None),
+                        trainable_physics=kwargs.pop('trainable_physics', None)
+                        )
+
+        def combined_matrix(jets, **kwargs):
+            out = self.physics_component * physics_matrix(jets, **kwargs) \
+                + (1 - self.physics_component) * learned_matrix(jets, **kwargs)
+            return out
+        return combined_matrix
+
 
 class EyeNMP(FixedAdjacencyNMP):
     def __init__(self, **kwargs):

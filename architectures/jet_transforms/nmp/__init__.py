@@ -5,3 +5,4 @@ from .physics_nmp import OnesNMP
 from .physics_nmp import EyeNMP
 from .physics_nmp import LearnedFixedNMP
 from .stacked_nmp import StackedNMP
+from .physics_nmp import PhysicsPlusLearnedNMP
