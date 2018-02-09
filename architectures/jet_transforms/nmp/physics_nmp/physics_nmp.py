@@ -59,16 +59,18 @@ class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
 
     @physics_component.setter
     def physics_component(self, value):
-        self._physics_component = torch.FloatTensor([value])
+        self._physics_component = torch.FloatTensor([float(value)])
         if self.learned_tradeoff:
             self._physics_component = nn.Parameter(self._physics_component)
         else:
             self._physics_component = Variable(self._physics_component)
+            if torch.cuda.is_available():
+                self._physics_component = self._physics_component.cuda()
 
     def set_adjacency_matrix(self, **kwargs):
         self.learned_tradeoff = kwargs.pop('learned_tradeoff', False)
         self.physics_component = kwargs.pop('physics_component', None)
-        
+
         learned_matrix = construct_adjacency_matrix_layer(
                     kwargs.get('adaptive_matrix', None),
                     hidden=kwargs.get('features', None) + 1,

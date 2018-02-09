@@ -2,7 +2,7 @@ import csv
 import os
 import visdom
 import logging
-
+from analysis.plot_training_stats import plot_training_stats
 class StatsLogger:
     def __init__(self, directory, monitors, visualizing):
         self.visualizing = visualizing
@@ -17,6 +17,7 @@ class StatsLogger:
         os.makedirs(self.plotsdir)
         self.scalar_filename = os.path.join(self.statsdir, 'scalars.csv')
         self.monitors = monitors
+        self.scalar_monitors = [monitor.name for monitor in self.monitors.values() if monitor.scalar and not monitor.boolean]
 
         for monitor in self.monitors.values():
             monitor.initialize(self.statsdir, self.plotsdir, self.viz)
@@ -39,6 +40,7 @@ class StatsLogger:
         with open(self.scalar_filename, 'a', newline='') as f:
             writer = csv.DictWriter(f, self.headers)
             writer.writerow(stats_dict)
+        plot_training_stats(self.scalar_filename, self.scalar_monitors, self.plotsdir)
 
     def log(self, compute_monitors=True,**kwargs):
         if compute_monitors:
@@ -46,6 +48,7 @@ class StatsLogger:
             self.log_scalars(stats_dict)
         else:
             self.log_scalars(kwargs)
+
 
     def complete_logging(self):
         for monitor in self.monitors.values():

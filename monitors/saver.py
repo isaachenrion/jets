@@ -8,7 +8,7 @@ class Saver(ScalarMonitor):
         self.save_monitor = save_monitor
         self.model_file = model_file
         self.settings_file = settings_file
-        super().__init__('save', **kwargs)
+        super().__init__('save', boolean=True, **kwargs)
 
     def call(self, model=None, settings=None, **kwargs):
         if self.save_monitor.changed:

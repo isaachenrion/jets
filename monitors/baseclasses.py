@@ -5,6 +5,7 @@ class Monitor:
         self.value = None
         self.name = name
         self.scalar = None
+        self.boolean = None
         self.visualizing = visualizing
 
     def initialize(self, statsdir, plotsdir, viz):
@@ -32,9 +33,10 @@ class Monitor:
         pass
 
 class ScalarMonitor(Monitor):
-    def __init__(self, name, **kwargs):
+    def __init__(self, name, boolean=False, **kwargs):
         super().__init__(name, **kwargs)
         self.scalar = True
+        self.boolean = boolean
         self.counter = 0
 
     def visualize(self):
