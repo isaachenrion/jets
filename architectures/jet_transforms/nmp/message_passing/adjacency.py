@@ -51,7 +51,7 @@ class DistMult(AdjacencyMatrix):
         self.matrix = nn.Parameter(torch.zeros(hidden,hidden))
 
     def compute_adjacency_matrix(self, h, mask):
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
         A = torch.matmul(h, torch.matmul(self.matrix, h.transpose(1,2)))
         A = self.softmax(A, mask)
         return A
