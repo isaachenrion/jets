@@ -11,7 +11,8 @@ def summarize_training(jobdir):
     # collect final lines of training stats
     for i, csv_filename in enumerate(csv_filenames):
         with open(csv_filename, 'r', newline='') as f:
-            reader = csv.DictReader(f)
+            #reader = csv.DictReader(f)
+            reader = f.readlines()
             if i == 0:
                 headers = reader[0]
                 stats_dict = {name: [] for name in headers}
