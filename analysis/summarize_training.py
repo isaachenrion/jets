@@ -24,8 +24,10 @@ def summarize_training(jobdir):
         try:
             mean_stat = np.mean(np.array(stats_dict[name]))
             std_stat = np.std(np.array(stats_dict[name]))
-        except Exception:
-            mean_stat = None, std_stat = None
+        except Exception(e):
+            print(e)
+            mean_stat = None
+            std_stat = None
         aggregate_stats_dict[name] = mean_stat, std_stat
 
     # pretty print to results file
