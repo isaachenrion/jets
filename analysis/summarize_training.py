@@ -1,0 +1,39 @@
+import os
+import csv
+import numpy as np
+
+def get_scalars_csv_filename(model_dir):
+    return os.path.join(model_dir, 'stats', 'scalars.csv')
+
+def summarize_training(jobdir):
+    csv_filenames = [get_scalars_csv_filename(run) for run in os.listdir(jobdir)]
+
+    # collect final lines of training stats
+    for i, csv_filename in enumerate(csv_filenames):
+        with open(csv_filename, 'r', newline='') as f:
+            reader = csv.DictReader(f)
+            if i == 0:
+                headers = reader[0]
+                stats_dict = {name: [] for name in headers}
+            for name in headers:
+                stats_dict[name].append(reader[-1][name])
+
+    # compute aggregate stats
+    aggregate_stats_dict = {}
+    for name in headers:
+        try:
+            mean_stat = np.mean(np.array(stats_dict[name]))
+            std_stat = np.std(np.array(stats_dict[name]))
+        except Exception:
+            mean_stat = None, std_stat = None
+        aggregate_stats_dict[name] = mean_stat, std_stat
+
+    # pretty print to results file
+    with open(os.path.join(jobdir, 'stats.txt'), 'w') as f:
+        for name, (mean, std) in aggregate_stats_dict.items():
+            if mean is not None:
+                # first print the aggregated stats
+                f.write('{}: mean = {}, std = {}\n'.format(name, mean, std))
+                # then the collected stats
+                f.write('Individual statistics\n')
+                for s in stats_dict[name]: f.write('{}\n'.format(s))
