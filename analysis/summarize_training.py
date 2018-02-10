@@ -6,7 +6,7 @@ def get_scalars_csv_filename(model_dir):
     return os.path.join(model_dir, 'stats', 'scalars.csv')
 
 def summarize_training(jobdir):
-    csv_filenames = [get_scalars_csv_filename(run) for run in os.listdir(jobdir)]
+    csv_filenames = [os.path.join(jobdir, get_scalars_csv_filename(run)) for run in os.listdir(jobdir)]
 
     # collect final lines of training stats
     for i, csv_filename in enumerate(csv_filenames):
