@@ -20,17 +20,18 @@ def summarize_training(jobdir):
 
             #for i, row in enumerate(reader)
             if i == 0:
-                headers = reader[0].split(',')
+                headers = reader[0].strip().split(',')
                 stats_dict = {name: [] for name in headers}
             for j, name in enumerate(headers):
-                stats_dict[name].append(reader[-1].split(',')[j])
+                stats_dict[name].append(reader[-1].strip().split(',')[j])
 
     # compute aggregate stats
     aggregate_stats_dict = {}
     for name in headers:
         try:
-            mean_stat = np.mean(np.array(stats_dict[name]))
-            std_stat = np.std(np.array(stats_dict[name]))
+            arr = np.array(stats_dict[name]).astype(float)
+            mean_stat = np.mean(arr)
+            std_stat = np.std(arr)
         except TypeError as e:
             print(e, name, stats_dict[name])
             mean_stat = None
