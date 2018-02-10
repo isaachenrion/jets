@@ -33,10 +33,10 @@ class Monitor:
         pass
 
 class ScalarMonitor(Monitor):
-    def __init__(self, name, boolean=False, **kwargs):
+    def __init__(self, name, **kwargs):
         super().__init__(name, **kwargs)
         self.scalar = True
-        self.boolean = boolean
+        #self.boolean = boolean
         self.counter = 0
 
     def visualize(self):

@@ -127,7 +127,7 @@ class ExperimentHandler:
         ]
 
         monitors = {m.name: m for m in monitors}
-        self.stats_logger = StatsLogger(self.exp_dir, monitors, args.visualizing)
+        self.stats_logger = StatsLogger(self.exp_dir, monitors, args.visualizing, train=True)
 
     def record_settings(self, args):
         ''' RECORD SETTINGS '''
@@ -205,7 +205,7 @@ class EvaluationExperimentHandler(ExperimentHandler):
             logtimer
         ]
         monitors = {m.name: m for m in monitors}
-        self.stats_logger = StatsLogger(self.exp_dir, monitors, args.visualizing)
+        self.stats_logger = StatsLogger(self.exp_dir, monitors, args.visualizing, train=False)
 
     def log(self, **kwargs):
         self.stats_logger.log(**kwargs)
