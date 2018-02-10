@@ -47,5 +47,11 @@ def summarize_training(jobdir):
                 f.write('{}\nmean = {:.2f}\nstd = {:.2f}\n'.format(name, mean, std))
                 # then the collected stats
                 f.write('\nIndividual statistics\n')
-                for s in stats_dict[name]: f.write('{:.2f}\n'.format(s))
+                for s in stats_dict[name]:
+                    try:
+                        s = float(s)
+                        f.write('{:.2f}\n'.format(s))
+                    except (ValueError, TypeError):
+                        f.write('{}\n'.format(s))
+
                 f.write('\n***************\n\n')
