@@ -23,7 +23,7 @@ def summarize_training(jobdir):
                 headers = reader[0].split(',')
                 stats_dict = {name: [] for name in headers}
             for j, name in enumerate(headers):
-                stats_dict[name].append(reader[-1][j])
+                stats_dict[name].append(reader[-1].split(',')[j])
 
     # compute aggregate stats
     aggregate_stats_dict = {}
