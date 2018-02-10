@@ -9,9 +9,9 @@ def summarize_training(jobdir):
     csv_filenames = []
     for run in os.listdir(jobdir):
         csv_filename = os.path.join(jobdir, get_scalars_csv_filename(run))
-        if os.path.isdir(csv_filename):
+        if os.path.isdir(os.path.join(jobdir, run)):
             csv_filenames.append(csv_filename)
-            
+
     # collect final lines of training stats
     for i, csv_filename in enumerate(csv_filenames):
         with open(csv_filename, 'r', newline='') as f:
