@@ -44,7 +44,7 @@ def summarize_training(jobdir):
             (mean, std) = aggregate_stats_dict[name]
             if mean is not None:
                 # first print the aggregated stats
-                f.write('{}: mean = {}, std = {}\n'.format(name, mean, std))
+                f.write('{}: mean = {:.2f}, std = {:.2f}\n'.format(name, mean, std))
                 # then the collected stats
                 f.write('Individual statistics\n')
                 for s in stats_dict[name]: f.write('{}\n'.format(s))
