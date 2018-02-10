@@ -13,11 +13,13 @@ def summarize_training(jobdir):
         with open(csv_filename, 'r', newline='') as f:
             #reader = csv.DictReader(f)
             reader = f.readlines()
+
+            #for i, row in enumerate(reader)
             if i == 0:
-                headers = reader[0]
+                headers = reader[0].split(',')
                 stats_dict = {name: [] for name in headers}
-            for name in headers:
-                stats_dict[name].append(reader[-1][name])
+            for j, name in enumerate(headers):
+                stats_dict[name].append(reader[-1][j])
 
     # compute aggregate stats
     aggregate_stats_dict = {}
