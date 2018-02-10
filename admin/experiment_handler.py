@@ -46,8 +46,13 @@ class ExperimentHandler:
         self.root_dir = RUNNING_MODELS_DIR
         self.model_type_dir = os.path.join(args.dataset, args.jet_transform)
         dt = datetime.datetime.now()
-        self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.slurm_job_id)
-        self.leaf_dir = os.path.join(self.model_type_dir, self.filename_exp)
+        if args.slurm:
+            self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.slurm_array_job_id)
+            self.leaf_dir = os.path.join(self.model_type_dir, self.filename_exp, args.slurm_array_task_id)
+        else:
+            self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, self.pid)
+            self.leaf_dir = os.path.join(self.model_type_dir, self.filename_exp)
+
         self.exp_dir = os.path.join(self.root_dir,self.leaf_dir)
         os.makedirs(self.exp_dir)
         self.start_dt = dt
@@ -77,13 +82,18 @@ class ExperimentHandler:
             self.emailer = Emailer(sender, password, recipient)
         else:
             self.emailer = None
+        if args.slurm:
+            subject_string = '{} (Machine = {}, Logfile = {}, Slurm id = {}-{}, GPU = {})'.format("[DEBUGGING] " if args.debug else "", self.host, self.logfile, args.slurm_array_job_id, args.slurm_array_task_id, args.gpu)
+        else:
+            subject_string = '{} (Machine = {}, Logfile = {}, PID = {}, GPU = {})'.format("[DEBUGGING] " if args.debug else "", self.host, self.logfile, self.pid, args.gpu)
+
         self.signal_handler = SignalHandler(
                                 emailer=self.emailer,
                                 logfile=self.logfile,
                                 root_dir=self.root_dir,
                                 leaf_dir=self.leaf_dir,
                                 need_input=True,
-                                subject_string='{} (Machine = {}, Logfile = {}, PID = {}, GPU = {})'.format("[DEBUGGING] " if args.debug else "", self.host, self.logfile, self.pid, args.gpu),
+                                subject_string=subject_string,
                                 model=None,
                                 debug=args.debug,
                                 train=args.train,

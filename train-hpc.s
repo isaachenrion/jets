@@ -37,7 +37,7 @@ SRCDIR=$HOME/jets
 DATADIR=$SCRATCH/data/w-vs-qcd/pickles
 
 SLURMARGS="$@"
-SLURMARGS="--data_dir $DATADIR --gpu 0 --slurm_job_id $SLURM_JOB_ID $SLURMARGS"
+SLURMARGS="--data_dir $DATADIR --slurm --gpu 0 --slurm_array_job_id $SLURM_ARRAY_JOB_ID --slurm_array_task_id $SLURM_ARRAY_TASK_ID $SLURMARGS"
 cd $SRCDIR
 
 echo "$HOME"

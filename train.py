@@ -13,8 +13,12 @@ parser.add_argument("--debug", help="sets everything small for fast model debugg
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("--visualizing", action='store_true', default=False)
-parser.add_argument("--slurm_job_id", default=0)
 parser.add_argument("--no_email", action='store_true', default=False)
+
+# Slurm args
+parser.add_argument("--slurm", action='store_true', default=False)
+parser.add_argument("--slurm_array_job_id", default=0)
+parser.add_argument("--slurm_array_task_id", default=0)
 
 # Loading previous models args
 parser.add_argument("-l", "--load", help="model directory from which we load a state_dict", type=str, default=None)

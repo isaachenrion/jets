@@ -28,7 +28,7 @@ def plot_one_training_stat(name, values, plotsdir):
     plt.plot(x_range, values, color='blue')
     plt.xlabel("Epochs")
     plt.ylabel(name)
-    plt.legend(loc="best")
+    #plt.legend(loc="best")
     plt.grid()
 
     filename = os.path.join(plotsdir, name)
