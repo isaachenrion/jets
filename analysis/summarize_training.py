@@ -33,17 +33,19 @@ def summarize_training(jobdir):
             mean_stat = np.mean(arr)
             std_stat = np.std(arr)
         except (TypeError, ValueError) as e:
-            print(e, name, stats_dict[name])
+            #print(e, name, stats_dict[name])
             mean_stat = None
             std_stat = None
         aggregate_stats_dict[name] = mean_stat, std_stat
 
     # pretty print to results file
     with open(os.path.join(jobdir, 'stats.txt'), 'w') as f:
-        for name, (mean, std) in aggregate_stats_dict.items():
+        for name in sorted(headers):
+            (mean, std) = aggregate_stats_dict[name]
             if mean is not None:
                 # first print the aggregated stats
                 f.write('{}: mean = {}, std = {}\n'.format(name, mean, std))
                 # then the collected stats
                 f.write('Individual statistics\n')
                 for s in stats_dict[name]: f.write('{}\n'.format(s))
+                f.write('\n')
