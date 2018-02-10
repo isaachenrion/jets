@@ -27,7 +27,7 @@ def summarize_training(jobdir):
         try:
             mean_stat = np.mean(np.array(stats_dict[name]))
             std_stat = np.std(np.array(stats_dict[name]))
-        except Exception(e):
+        except TypeError as e:
             print(e)
             mean_stat = None
             std_stat = None
