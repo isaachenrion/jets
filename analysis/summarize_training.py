@@ -32,7 +32,7 @@ def summarize_training(jobdir):
             arr = np.array(stats_dict[name]).astype(float)
             mean_stat = np.mean(arr)
             std_stat = np.std(arr)
-        except TypeError as e:
+        except TypeError, ValueError as e:
             print(e, name, stats_dict[name])
             mean_stat = None
             std_stat = None
