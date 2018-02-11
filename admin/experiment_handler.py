@@ -47,14 +47,16 @@ class ExperimentHandler:
         self.model_type_dir = os.path.join(args.dataset, args.jet_transform)
         dt = datetime.datetime.now()
         if args.slurm:
-            self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.slurm_array_job_id)
+            self.filename_exp = '{}'.format(args.slurm_array_job_id)
+            #self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.slurm_array_job_id)
             self.leaf_dir = os.path.join(self.model_type_dir, self.filename_exp, args.slurm_array_task_id)
         else:
             self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, self.pid)
             self.leaf_dir = os.path.join(self.model_type_dir, self.filename_exp)
 
         self.exp_dir = os.path.join(self.root_dir,self.leaf_dir)
-        os.makedirs(self.exp_dir)
+        if not os.path.exists(self.exp_dir):
+            os.makedirs(self.exp_dir)
         self.start_dt = dt
 
     def create_all_model_dirs(self):
