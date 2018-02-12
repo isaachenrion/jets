@@ -15,7 +15,7 @@
 #in minutes
 # In this case, hh:mm:ss, select whatever time you want, the less you ask for the faster your job will run.
 # Default is one hour, this example will run in  less that 5 minutes.
-#SBATCH --time=1:00:00
+#SBATCH --time=0:01:00
 #################
 # --gres will give you one GPU, you can ask for more, up to 8 (or how ever many are on the node/card)
 # We are submitting to the gpu partition, if you can submit to the hns partition, change this to -p hns_gpu.
