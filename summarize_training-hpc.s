@@ -34,6 +34,8 @@ pattern="$1"
 for _dir in *"${pattern}"*; do
     [ -d "${_dir}" ] && dir="${_dir}" && break
 done
+
+echo "hello"
 echo "${dir}"
 
 PYTHONARGS="-j $dir"
@@ -43,4 +45,4 @@ SRCDIR=$HOME/jets
 cd $SRCDIR
 source activate jets
 
-python $SRCDIR/summary.py $PYTHONARGS
+#python $SRCDIR/summary.py $PYTHONARGS
