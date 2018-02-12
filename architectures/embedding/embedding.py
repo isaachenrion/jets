@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-class ParticleEmbedding(nn.Module):
+class Embedding(nn.Module):
     '''
-    Abstract base class for any module that embeds a jet of N particles into
+    Abstract base class for any module that embeds a collection of N vertices into
     N hidden states
     '''
     def __init__(self, features, hidden):
@@ -12,10 +12,10 @@ class ParticleEmbedding(nn.Module):
         self.features = features
         self.hidden = hidden
 
-    def forward(self, jets):
+    def forward(self, vertices):
         pass
 
-class Simple(ParticleEmbedding):
+class Simple(Embedding):
     def __init__(self, features, hidden, act=None):
         super().__init__(features, hidden)
         self.fc = nn.Linear(features, hidden)
@@ -32,5 +32,5 @@ class Simple(ParticleEmbedding):
         else:
             raise ValueError('Activation {} not found'.format(act))
 
-    def forward(self, jets):
-        return self.activation(self.fc(jets))
+    def forward(self, vertices):
+        return self.activation(self.fc(vertices))

@@ -1,4 +1,4 @@
-from .nmp import NMP
+from .nmp import LearnedVariableNMP
 from .nmp import StackedNMP
 from .nmp import PhysicsNMP
 from .nmp import EyeNMP
@@ -17,7 +17,7 @@ def construct_transform(key, *args, **kwargs):
         rel=RelNNTransformConnected,
         recs=GRNNTransformSimple,
         recg=GRNNTransformGated,
-        nmp=NMP,
+        nmp=LearnedVariableNMP,
         stack=StackedNMP,
         phy=PhysicsNMP,
         physta=PhysicsStackNMP,

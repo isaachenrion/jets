@@ -8,7 +8,7 @@ from architectures.readout import construct_readout
 from architectures.embedding import construct_embedding
 from .message_passing import construct_mp_layer
 
-class NMP(nn.Module):
+class LearnedVariableNMP(nn.Module):
     def __init__(self,
         features=None,
         hidden=None,

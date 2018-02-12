@@ -89,7 +89,6 @@ class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
             return out
         return combined_matrix
 
-
 class EyeNMP(FixedAdjacencyNMP):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
