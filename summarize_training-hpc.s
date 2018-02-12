@@ -34,7 +34,7 @@
 SLURMARGS="$@"
 PYTHONARGS="-j $SLURMARGS"
 
-HOME='/misc/kcgscratch1/ChoGroup/isaac'
+HOME='/home/ih692'
 SRCDIR=$HOME/jets
 
 cd $SRCDIR
