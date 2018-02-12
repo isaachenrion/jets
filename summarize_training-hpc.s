@@ -30,12 +30,16 @@
 #SBATCH --mail-type=END,FAIL # notifications for job done & fail
 #SBATCH --mail-user=henrion@nyu.edu
 
-SLURMARGS="$@"
-PYTHONARGS="-j $SLURMARGS"
+pattern="$1"
+for _dir in *"${pattern}"*; do
+    [ -d "${_dir}" ] && dir="${_dir}" && break
+done
+echo "${dir}"
+
+PYTHONARGS="-j $dir"
 
 HOME='/home/ih692'
 SRCDIR=$HOME/jets
-
 cd $SRCDIR
 source activate jets
 
