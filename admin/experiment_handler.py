@@ -76,9 +76,13 @@ class ExperimentHandler:
         ''' SIGNAL HANDLER '''
         '''----------------------------------------------------------------------- '''
 
-        with open('misc/email_addresses.txt', 'r') as f:
-            lines = f.readlines()
-            recipient, sender, password = (l.strip() for l in lines)
+        try:
+            with open('misc/email_addresses.txt', 'r') as f:
+                lines = f.readlines()
+                recipient, sender, password = (l.strip() for l in lines)
+        except FileNotFoundError as e:
+            logging.warning(e)
+            args.no_email = True
 
         if not args.no_email:
             self.emailer = Emailer(sender, password, recipient)

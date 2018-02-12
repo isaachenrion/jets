@@ -17,10 +17,6 @@ ALL_MODEL_DIRS = [
     ARCHIVED_MODELS_DIR,
 ]
 
-with open('misc/email_addresses.txt', 'r') as f:
-    lines = f.readlines()
-    RECIPIENT, SENDER, PASSWORD = (l.strip() for l in lines)
-
 REPORTS_DIR = "reports"
 DATASETS = {
     'original':'antikt-kt',

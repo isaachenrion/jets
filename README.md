@@ -10,7 +10,13 @@
 - scikit-learn
 
 ### Email results
-Change the RECIPIENT default in constants.py to your email address. Then you will get emails with results and logfiles. Otherwise you won't.
+If you want email results, you must create a file called email_addresses.txt
+in the misc directory. The file must contain:
+First line: recipient email address
+Second line: sender email address
+Third line: sender password
+(You are advised to create a dummy account to send results.)
+If you want to turn email off, add the flag --no_email.
 
 ### Data
 
