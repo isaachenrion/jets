@@ -1,6 +1,11 @@
-from .message_net import MPNNTransform
-from .message_net import StackedMPNNTransform
-from .message_net import PhysicsBasedMPNNTransform
+from .nmp import LearnedVariableNMP
+from .nmp import StackedNMP
+from .nmp import PhysicsNMP
+from .nmp import EyeNMP
+from .nmp import OnesNMP
+from .nmp import LearnedFixedNMP
+from .nmp import PhysicsStackNMP
+from .nmp import PhysicsPlusLearnedNMP
 from .recursive_net import GRNNTransformGated, GRNNTransformSimple
 from .relation_net import RelNNTransformConnected
 from .transformer import TransformerTransform
@@ -12,10 +17,15 @@ def construct_transform(key, *args, **kwargs):
         rel=RelNNTransformConnected,
         recs=GRNNTransformSimple,
         recg=GRNNTransformGated,
-        nmp=MPNNTransform,
-        stack=StackedMPNNTransform,
-        phy=PhysicsBasedMPNNTransform,
-        tra=TransformerTransform
+        nmp=LearnedVariableNMP,
+        stack=StackedNMP,
+        phy=PhysicsNMP,
+        physta=PhysicsStackNMP,
+        tra=TransformerTransform,
+        one=OnesNMP,
+        eye=EyeNMP,
+        lf=LearnedFixedNMP,
+        plf=PhysicsPlusLearnedNMP
     )
     try:
         return construct_object(key, dictionary, *args, **kwargs)

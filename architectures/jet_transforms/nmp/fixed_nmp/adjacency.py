@@ -44,9 +44,10 @@ class _PhysicsBasedAdjacencyMatrix(nn.Module):
     def R(self):
         pass
 
-    def forward(self, p):
+    def forward(self, p, **kwargs):
         dij = compute_dij(p, self.alpha(), self.R())
-        return torch.exp(-dij)
+        #return torch.exp(-dij)
+        return F.softmax(-dij.transpose(0, -1)).transpose(0, -1)
 
 class FixedPhysicsBasedAdjacencyMatrix(_PhysicsBasedAdjacencyMatrix):
     def __init__(self, alpha=1, R=1):

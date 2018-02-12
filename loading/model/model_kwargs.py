@@ -7,7 +7,10 @@ def construct_model_kwargs(args):
         # model dimensions
         'features': args.features,
         'hidden': args.hidden,
-        
+
+        # activation
+        'act': args.act,
+
         # classifier on top
         'predict':args.predict,
 
@@ -26,14 +29,21 @@ def construct_model_kwargs(args):
         'pooling_layer':args.pool,
         'pool_first':args.pool_first,
 
-        # Physics MPNN
+        # Physics NMP
         'alpha':args.alpha,
         'R':args.R,
         'trainable_physics':args.trainable_physics,
 
+        # Physics plus learned NMP
+        'physics_component':args.physics_component,
+        'learned_tradeoff':args.learned_tradeoff,
+
+
         # Transformer
         'n_heads':args.n_heads,
         'n_layers':args.n_layers,
+        'dq':args.dq,
+        'dv':args.dv,
         'dropout':args.dropout
     }
     return model_kwargs

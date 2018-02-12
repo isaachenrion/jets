@@ -26,9 +26,9 @@ class Transformer(nn.Module):
         return x
 
 class SelfAttentionLayer(nn.Module):
-    def __init__(self, hidden, n_heads, **kwargs):
+    def __init__(self, hidden, n_heads, dq=None, dv=None, **kwargs):
         super().__init__()
-        self.multihead_attention = MultiHeadAttention(n_heads, 64, 64, hidden, **kwargs)
+        self.multihead_attention = MultiHeadAttention(n_heads, dq, dv, hidden, **kwargs)
         self.ln1 = LayerNorm(hidden)
         self.ff = nn.Sequential(
                     nn.Linear(hidden, 4 * hidden),

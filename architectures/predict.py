@@ -3,37 +3,51 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .jet_transforms import construct_transform
+from .readout import construct_readout
+from .embedding import construct_embedding
+from .reduction import construct_reduction
+from data_ops.batching import batch_leaves, batch_trees
 
-class PredictFromParticleEmbedding(nn.Module):
-    def __init__(self, jet_transform=None, hidden=None, **kwargs):
+class JetClassifier(nn.Module):
+    '''
+    Top-level architecture for binary classification of jets.
+    A classifier comprises these parts:
+    - Transform - converts a number of states to a single jet embedding
+    - Predictor - classifies according to the jet embedding
+
+    Inputs: jets, a list of N jet data dictionaries
+    Outputs: N-length binary tensor
+    '''
+    def __init__(self, **kwargs):
         super().__init__()
-        self.transform = construct_transform(jet_transform, hidden=hidden, **kwargs)
+        self.transform = construct_transform(
+                            kwargs.get('jet_transform', None),
+                            **kwargs)
+        self.predictor = construct_readout(
+                            'clf',
+                            kwargs.get('hidden', None)
+                        )
 
-        activation_string = 'relu'
-        self.activation = getattr(F, activation_string)
+    def forward(self, jets):
+        raise NotImplementedError
 
-        self.fc1 = nn.Linear(hidden, hidden)
-        self.fc2 = nn.Linear(hidden, hidden)
-        self.fc3 = nn.Linear(hidden, 1)
 
-        gain = nn.init.calculate_gain(activation_string)
-        nn.init.xavier_uniform(self.fc1.weight, gain=gain)
-        nn.init.xavier_uniform(self.fc2.weight, gain=gain)
-        nn.init.xavier_uniform(self.fc3.weight, gain=gain)
-        nn.init.constant(self.fc3.bias, 1)
-
+class TreeJetClassifier(JetClassifier):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def forward(self, jets, **kwargs):
-        h, extras = self.transform(jets, **kwargs)
+        jets = batch_trees(jets)
+        h, _ = self.transform(jets, **kwargs)
+        outputs = self.predictor(h)
+        return outputs
 
-        h = self.fc1(h)
-        h = self.activation(h)
+class LeafJetClassifier(JetClassifier):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-        h = self.fc2(h)
-        h = self.activation(h)
-
-        h = F.sigmoid(self.fc3(h))
-        if kwargs.pop('return_extras', False):
-            return h, extras
-        else:
-            return h
+    def forward(self, jets, **kwargs):
+        jets, mask = batch_leaves(jets)
+        h, _ = self.transform(jets=jets, mask=mask, **kwargs)
+        outputs = self.predictor(h)
+        return outputs

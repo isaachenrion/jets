@@ -1,11 +1,16 @@
 def reset_unused_args(args):
-    if not args.jet_transform == 'stack':
+    if args.jet_transform not in ['stack','one', 'plf', 'lf', 'eye', 'phy', 'nmp', 'physta']:
+        args.iters = None
+
+    if args.jet_transform not in ['stack', 'physta']:
         args.pool = None
         args.scales = None
         args.pool_first = None
 
     if not args.jet_transform == 'tra':
         args.n_layers = None
+        args.dq = None
+        args.dv = None
         args.n_heads = None
 
     if args.jet_transform == 'phy':
@@ -15,10 +20,7 @@ def reset_unused_args(args):
         if args.trainable_physics:
             #args.alpha = None
             args.R = None
-    else:
         #args.alpha = None
-        args.R = None
-        args.trainable_physics = None
 
     args.train = True
     if args.debug:

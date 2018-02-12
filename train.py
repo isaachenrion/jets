@@ -13,8 +13,12 @@ parser.add_argument("--debug", help="sets everything small for fast model debugg
 parser.add_argument("-s", "--silent", action='store_true', default=False)
 parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("--visualizing", action='store_true', default=False)
-parser.add_argument("--slurm_job_id", default=0)
 parser.add_argument("--no_email", action='store_true', default=False)
+
+# Slurm args
+parser.add_argument("--slurm", action='store_true', default=False)
+parser.add_argument("--slurm_array_job_id", default=0)
+parser.add_argument("--slurm_array_task_id", default=0)
 
 # Loading previous models args
 parser.add_argument("-l", "--load", help="model directory from which we load a state_dict", type=str, default=None)
@@ -28,6 +32,7 @@ parser.add_argument("-b", "--batch_size", type=int, default=BATCH_SIZE)
 parser.add_argument("-a", "--step_size", type=float, default=STEP_SIZE)
 parser.add_argument("-d", "--decay", type=float, default=DECAY)
 parser.add_argument("--clip", type=float, default=None)
+parser.add_argument("--reg", type=float, default=L2_REGULARIZATION)
 
 # computing args
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)
@@ -40,9 +45,10 @@ parser.add_argument("--n_valid", type=int, default=VALID)
 parser.add_argument("-p", "--pileup", action='store_true', default=False)
 parser.add_argument("--root_dir", default=MODELS_DIR)
 
-# Dimension args
+# Dimension and activation args
 parser.add_argument("--features", type=int, default=FEATURES)
 parser.add_argument("--hidden", type=int, default=HIDDEN)
+parser.add_argument("--act", type=str, default='relu')
 
 # Classifier
 parser.add_argument("--predict", type=str, default='simple', help='type of prediction layer')
@@ -51,7 +57,7 @@ parser.add_argument("--predict", type=str, default='simple', help='type of predi
 parser.add_argument("-j", "--jet_transform", type=str, default="nmp", help="name of the model you want to train - look in constants.py for the model list")
 
 # NMP
-parser.add_argument("-i", "--iters", type=int, default=ITERS)
+parser.add_argument("-i", "--iters", type=int, default=2)
 parser.add_argument("--mp", type=str, default='van', help='type of message passing layer')
 parser.add_argument("--matrix", type=str, default='dm', help='type of adaptive matrix layer')
 parser.add_argument("--sym", action='store_true', default=False)
@@ -59,17 +65,23 @@ parser.add_argument("--readout", type=str, default='dtnn', help='type of readout
 
 # Stack NMP
 parser.add_argument("--pool_first", action='store_true', default=False)
-parser.add_argument("--scales", nargs='+', type=int, default=SCALES)
+parser.add_argument("--scales", nargs='+', type=int, default=None)
 parser.add_argument("--pool", type=str, default='attn', help='type of pooling layer')
 
 # Physics NMP
 parser.add_argument("-t", "--trainable_physics", action='store_true', default=False)
 parser.add_argument("--alpha", type=float, default=1)
-parser.add_argument("-R", type=int, default=1)
+parser.add_argument("-R", type=float, default=1)
+
+# Physics plus learned NMP
+parser.add_argument( "--physics_component", type=float, default=0.5)
+parser.add_argument("--learned_tradeoff", action='store_true', default=False)
 
 # Transformer
 parser.add_argument("--n_layers", type=int, default=3)
 parser.add_argument("--n_heads", type=int, default=8)
+parser.add_argument("--dq", type=int, default=32)
+parser.add_argument("--dv", type=int, default=32)
 parser.add_argument("--dropout", action='store_true', default=False)
 
 args = parser.parse_args()

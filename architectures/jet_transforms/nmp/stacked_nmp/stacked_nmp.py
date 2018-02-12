@@ -6,7 +6,8 @@ from torch.autograd import Variable
 
 from data_ops.batching import batch_leaves
 
-from ..readout import construct_readout
+from architectures.readout import construct_readout
+from architectures.embedding import construct_embedding
 from .attention_pooling import construct_pooling_layer
 from ..message_passing import construct_mp_layer
 
@@ -20,7 +21,7 @@ class MultipleIterationMessagePassingLayer(nn.Module):
             h, A = mp(h=h,**kwargs)
         return h, A
 
-class StackedMPNNTransform(nn.Module):
+class StackedNMP(nn.Module):
     def __init__(
         self,
         scales=None,
@@ -34,9 +35,8 @@ class StackedMPNNTransform(nn.Module):
         **kwargs
         ):
         super().__init__()
-        self.embedding = nn.Linear(features+1, hidden)
-        self.activation = F.tanh
-        self.mpnns = nn.ModuleList(
+        self.embedding = construct_embedding('simple', features+1, hidden, act=kwargs.get('act', None))
+        self.nmps = nn.ModuleList(
             [MultipleIterationMessagePassingLayer(
                 iters=iters, hidden=hidden, mp_layer=mp_layer, **kwargs
                 )
@@ -46,20 +46,19 @@ class StackedMPNNTransform(nn.Module):
         self.readout = construct_readout(readout, hidden, hidden)
         self.pool_first = pool_first
 
-    def forward(self, jets, **kwargs):
-        jets, mask = batch_leaves(jets)
-        h = self.activation(self.embedding(jets))
-        for i, (mpnn, pool) in enumerate(zip(self.mpnns, self.attn_pools)):
+    def forward(self, jets, mask=None, **kwargs):
+        h = self.embedding(jets)
+        for i, (nmp, pool) in enumerate(zip(self.nmps, self.attn_pools)):
             if self.pool_first:
-                h = pool(h)
+                h = pool(h, **kwargs)
 
             if i == 0 and not self.pool_first:
-                h, A = mpnn(h=h, mask=mask)
+                h, A = nmp(h=h, mask=mask)
             else:
-                h, A = mpnn(h=h, mask=None)
+                h, A = nmp(h=h, mask=None)
 
             if not self.pool_first:
-                h = pool(h)
+                h = pool(h, **kwargs)
 
         out = self.readout(h)
         return out, A

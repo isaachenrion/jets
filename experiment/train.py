@@ -38,7 +38,7 @@ def train(args):
     ''' OPTIMIZER AND LOSS '''
     '''----------------------------------------------------------------------- '''
     logging.info("Building optimizer...")
-    optimizer = Adam(model.parameters(), lr=settings['step_size'])
+    optimizer = Adam(model.parameters(), lr=settings['step_size'], weight_decay=args.reg)
     scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
     #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
 
@@ -111,7 +111,8 @@ def train(args):
             idx = slice(start, start+args.batch_size)
             X, y = X_train[idx], y_train[idx]
             X_var = wrap_jet(X); y_var = wrap(y)
-            l = loss(model(X_var), y_var)
+            y_pred = model(X_var, logger=eh.stats_logger, epoch=i)
+            l = loss(y_pred, y_var)
             l.backward()
             if args.clip is not None:
                 torch.nn.utils.clip_grad_norm(model.parameters(), args.clip)

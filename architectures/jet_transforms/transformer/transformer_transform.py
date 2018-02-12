@@ -5,7 +5,8 @@ import torch.nn.functional as F
 from .transformer import Transformer
 
 from data_ops.batching import batch_leaves
-from ..message_net.readout import construct_readout
+from architectures.readout import construct_readout
+from architectures.embedding import construct_embedding
 
 class TransformerTransform(nn.Module):
     def __init__(self,
@@ -18,14 +19,12 @@ class TransformerTransform(nn.Module):
         ):
         super().__init__()
 
-        self.activation = F.relu
-        self.embedding = nn.Linear(features + 1, hidden)
+        self.embedding = construct_embedding('simple', features + 1, hidden, act='relu')
         self.readout = construct_readout(readout, hidden, hidden)
         self.transformer = Transformer(hidden, n_heads, n_layers, **kwargs)
 
     def forward(self, jets, **kwargs):
-        jets, mask = batch_leaves(jets)
-        h = self.activation(self.embedding(jets))
+        h = self.embedding(jets)
         h = self.transformer(h)
         out = self.readout(h)
         return out, None

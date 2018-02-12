@@ -16,10 +16,9 @@ def prepare_train_data(data_dir, data_filename, n_train, n_valid, pileup):
     for ij, jet in enumerate(X):
         jet["content"] = tf.transform(jet["content"])
 
-    if n_train > 0:
-        indices = torch.randperm(len(X)).numpy()[:n_train]
-        X = [X[i] for i in indices]
-        y = y[indices]
+    indices = torch.randperm(len(X)).numpy()[:n_train]
+    X = [X[i] for i in indices]
+    y = y[indices]
 
     logging.warning("Splitting into train and validation...")
 

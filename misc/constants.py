@@ -17,10 +17,6 @@ ALL_MODEL_DIRS = [
     ARCHIVED_MODELS_DIR,
 ]
 
-with open('misc/email_addresses.txt', 'r') as f:
-    lines = f.readlines()
-    RECIPIENT, SENDER, PASSWORD = (l.strip() for l in lines)
-
 REPORTS_DIR = "reports"
 DATASETS = {
     'original':'antikt-kt',
@@ -28,13 +24,15 @@ DATASETS = {
 }
 
 ''' argparse args '''
-STEP_SIZE=0.001
-HIDDEN=40
-BATCH_SIZE=100
+STEP_SIZE=0.0002
+DECAY=1
+L2_REGULARIZATION=0.0
+
 FEATURES=7
-DECAY=0.96
-EPOCHS=50
-ITERS=2
-SCALES=-1
+HIDDEN=64
+
+BATCH_SIZE=100
+EPOCHS=100
+
 VALID=27000
 DATA_DIR = 'data/w-vs-qcd/pickles'
