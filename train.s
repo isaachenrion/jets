@@ -32,7 +32,7 @@
 
 read SRCDIR DATADIR GPU QOS < <(bash misc/paths.sh)
 
-#SBATCH --gres $GPU
+#SBATCH --gres=$GPU
 #SBATCH --qos=$QOS
 
 SLURMARGS="$@"
