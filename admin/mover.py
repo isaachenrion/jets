@@ -11,6 +11,7 @@ class Mover:
     def move_to_folder(self, folder):
         src = os.path.join(self.current_root, self.leaf_dir)
         dst = os.path.join(folder, self.leaf_dir)
+        os.makedirs(dst)
         shutil.move(src, dst)
         logging.info('Moved model directory to {}'.format(dst))
         self.current_root = folder
