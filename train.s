@@ -32,7 +32,7 @@
 #SBATCH --mail-type=END,FAIL # notifications for job done & fail
 #SBATCH --mail-user=henrion@nyu.edu
 
-read var1 var2 < $(bash misc/paths.sh)
+read var1 var2 < <(bash misc/paths.sh)
 echo $var1
 echo $var2
 
