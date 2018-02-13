@@ -33,9 +33,9 @@
 
 RES=$1
 
-MODEL_RUNDIR=$(find models/running $RES)
+MODEL_RUNDIR=$(find models/running -depth -name $RES)
 rm -rf $MODEL_RUNDIR
-MODEL_OUTDIR=$(find models $RES)
+MODEL_OUTDIR=$(find models -depth -name $RES)
 echo $MODEL_RUNDIR
 echo $MODEL_OUTDIR
 
