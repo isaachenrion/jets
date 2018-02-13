@@ -12,6 +12,8 @@ def visualize_batch_2D(tensor, logger, path_to_visualizations):
     if isinstance(tensor, torch.autograd.Variable):
         tensor = tensor.data
     if isinstance(tensor, torch.Tensor):
+        if torch.cuda.is_available():
+            tensor = tensor.cpu()
         tensor = tensor.numpy()
     assert isinstance(tensor, np.ndarray)
     assert tensor.max() <= 1.0
