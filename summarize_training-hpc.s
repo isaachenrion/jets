@@ -45,4 +45,4 @@ SRCDIR=$HOME/jets
 cd $SRCDIR
 source activate jets
 
-#python $SRCDIR/summary.py $PYTHONARGS
+    python $SRCDIR/summary.py $PYTHONARGS

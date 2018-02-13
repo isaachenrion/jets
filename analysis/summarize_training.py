@@ -2,10 +2,12 @@ import os
 import csv
 import numpy as np
 
+from admin.emailer import get_emailer
+
 def get_scalars_csv_filename(model_dir):
     return os.path.join(model_dir, 'stats', 'scalars.csv')
 
-def summarize_training(jobdir):
+def summarize_training(jobdir, email=False):
     csv_filenames = []
     for run in os.listdir(jobdir):
         csv_filename = os.path.join(jobdir, get_scalars_csv_filename(run))
@@ -38,21 +40,29 @@ def summarize_training(jobdir):
             std_stat = None
         aggregate_stats_dict[name] = mean_stat, std_stat
 
-    # pretty print to results file
-    with open(os.path.join(jobdir, 'stats.txt'), 'w') as f:
-        for name in sorted(headers):
-            (mean, std) = aggregate_stats_dict[name]
-            if mean is not None:
-                # first print the aggregated stats
-                f.write('\n********** {} **********\n'.format(name))
-                f.write('\nmean = {:.2f}\nstd = {:.2f}\n'.format(mean, std))
-                # then the collected stats
-                f.write('\n')
-                for s in stats_dict[name]:
-                    try:
-                        s = float(s)
-                        f.write('{:.2f}\n'.format(s))
-                    except (ValueError, TypeError):
-                        f.write('{}\n'.format(s))
+    # make out string
+    out_str = ''
+    for name in sorted(headers):
+        (mean, std) = aggregate_stats_dict[name]
+        if mean is not None:
+            # first print the aggregated stats
+            out_str += '\n********** {} **********\n'.format(name)
+            out_str += '\nmean = {:.2f}\nstd = {:.2f}\n'.format(mean, std)
+            # then the collected stats
+            out_str += '\n'
+            for s in stats_dict[name]:
+                try:
+                    s = float(s)
+                    out_str += '{:.2f}\n'.format(s)
+                except (ValueError, TypeError):
+                    out_str += '{}\n'.format(s)
 
-                #f.write('\n***************\n\n')
+    # pretty print to results file
+    statsfile = os.path.join(jobdir, 'stats.txt')
+    with open(statsfile, 'w') as f:
+        f.write(out_str)
+
+    # send email
+    if email:
+        emailer = get_emailer()
+        emailer.send_msg(out_str, '{}: training stats'.format(jobdir), statsfile)

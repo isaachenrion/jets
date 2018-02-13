@@ -6,7 +6,7 @@ import numpy as np
 import socket
 import shutil
 from .utils import get_logfile
-from .emailer import Emailer
+from .emailer import get_emailer
 from .signal_handler import SignalHandler
 from monitors import *
 from .logger import StatsLogger
@@ -76,18 +76,11 @@ class ExperimentHandler:
         ''' SIGNAL HANDLER '''
         '''----------------------------------------------------------------------- '''
 
-        try:
-            with open('misc/email_addresses.txt', 'r') as f:
-                lines = f.readlines()
-                recipient, sender, password = (l.strip() for l in lines)
-        except FileNotFoundError as e:
-            logging.warning(e)
-            args.no_email = True
-
         if not args.no_email:
-            self.emailer = Emailer(sender, password, recipient)
+            self.emailer = get_emailer()
         else:
             self.emailer = None
+
         if args.slurm:
             subject_string = '{} (Machine = {}, Logfile = {}, Slurm id = {}-{}, GPU = {})'.format("[DEBUGGING] " if args.debug else "", self.host, self.logfile, args.slurm_array_job_id, args.slurm_array_task_id, args.gpu)
         else:
