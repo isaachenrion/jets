@@ -39,7 +39,7 @@ MODEL_OUTDIR=$(find models -depth -name $RES)
 echo $MODEL_RUNDIR
 echo $MODEL_OUTDIR
 
-PYTHONARGS="-j $MODEL_OUTDIR"
+PYTHONARGS="-j $MODEL_OUTDIR -e"
 
 read SRCDIR _DATADIR _GPU _QOS < <(bash misc/paths.sh)
 
