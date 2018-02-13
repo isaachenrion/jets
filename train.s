@@ -33,6 +33,8 @@
 #SBATCH --mail-user=henrion@nyu.edu
 
 read var1 var2 < $(bash misc/paths.sh)
+echo $var1
+echo $var2
 
 SLURMARGS="$@"
 SLURMARGS="--data_dir $DATADIR --slurm --gpu 0 --slurm_array_job_id $SLURM_ARRAY_JOB_ID --slurm_array_task_id $SLURM_ARRAY_TASK_ID $SLURMARGS"
