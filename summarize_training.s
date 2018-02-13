@@ -19,7 +19,7 @@
 #################
 # --gres will give you one GPU, you can ask for more, up to 8 (or how ever many are on the node/card)
 # We are submitting to the gpu partition, if you can submit to the hns partition, change this to -p hns_gpu.
-##SBATCH --qos=batch
+
 #################
 #number of nodes you are requesting
 #SBATCH --nodes=1
@@ -31,8 +31,14 @@
 #SBATCH --mail-type=END,FAIL # notifications for job done & fail
 #SBATCH --mail-user=henrion@nyu.edu
 
-SLURMARGS="$@"
-PYTHONARGS="-j $SLURMARGS"
+RES=$1
+
+MODEL_RUNDIR=$(find models/running $RES)
+MODEL_OUTDIR=$(find models/finished $RES)
+echo $MODEL_RUNDIR
+echo $MODEL_OUTDIR
+
+PYTHONARGS="-j $MODEL_OUTDIR"
 
 read SRCDIR _DATADIR _GPU _QOS < <(bash misc/paths.sh)
 
