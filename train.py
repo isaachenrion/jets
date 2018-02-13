@@ -1,7 +1,7 @@
 import argparse
-from experiment import train
-from experiment import reset_unused_args
-from misc.constants import *
+from src.experiment import train
+from src.experiment import reset_unused_args
+from src.misc.constants import *
 
 ''' ARGUMENTS '''
 '''----------------------------------------------------------------------- '''
