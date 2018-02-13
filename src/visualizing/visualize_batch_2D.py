@@ -3,6 +3,7 @@ from PIL import Image
 import torch
 import os
 import numpy as np
+import logging
 
 def visualize_batch_2D(tensor, logger, path_to_visualizations):
     '''
@@ -11,10 +12,13 @@ def visualize_batch_2D(tensor, logger, path_to_visualizations):
     '''
     if isinstance(tensor, torch.autograd.Variable):
         tensor = tensor.data
+        logging.warning('unwrapped')
     if isinstance(tensor, torch.Tensor):
         if torch.cuda.is_available():
             tensor = tensor.cpu()
+            logging.warning('moved to cpu')
         tensor = tensor.numpy()
+        logging.warning('to nump')
     assert isinstance(tensor, np.ndarray)
     assert tensor.max() <= 1.0
     assert tensor.min() >= 0.0
@@ -31,3 +35,5 @@ def visualize_batch_2D(tensor, logger, path_to_visualizations):
     for i, t in enumerate(tensor):
         im = Image.fromarray(t)
         im.save("{}/{}.tiff".format(savedir, i+1))
+
+18154 18159 18167
