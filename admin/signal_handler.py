@@ -10,6 +10,7 @@ class SignalHandler:
             emailer=None,
             root_dir=None,
             leaf_dir=None,
+            intermediate_dir=None,
             logfile=None,
             need_input=False,
             subject_string="",
@@ -18,7 +19,7 @@ class SignalHandler:
             train=None,
         ):
         self.emailer = emailer
-        self.mover = Mover(root_dir=root_dir, leaf_dir=leaf_dir)
+        self.mover = Mover(root_dir, intermediate_dir, leaf_dir)
         self.results_strings = ["FAILURE: No results to print!"]
         self.need_input = need_input
         self.model = model

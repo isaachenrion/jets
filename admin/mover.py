@@ -4,14 +4,15 @@ import logging
 from misc.constants import FINISHED_MODELS_DIR, DEBUG_MODELS_DIR, KILLED_MODELS_DIR, INTERRUPTED_MODELS_DIR
 
 class Mover:
-    def __init__(self, root_dir, leaf_dir):
+    def __init__(self, root_dir, intermediate_dir, leaf_dir):
         self.current_root = root_dir
         self.leaf_dir = leaf_dir
+        self.intermediate_dir = intermediate_dir
 
     def move_to_folder(self, folder):
-        src = os.path.join(self.current_root, self.leaf_dir)
-        dst = os.path.join(folder, self.leaf_dir)
-        os.makedirs(dst)
+        src = os.path.join(self.current_root, self.intermediate_dir, self.leaf_dir)
+        dst = os.path.join(folder, self.intermediate_dir, self.leaf_dir)
+        os.makedirs(os.path.join(folder, self.intermediate_dir))
         shutil.move(src, dst)
         logging.info('Moved model directory to {}'.format(dst))
         self.current_root = folder

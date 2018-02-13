@@ -16,6 +16,7 @@ from misc.constants import RUNNING_MODELS_DIR, ALL_MODEL_DIRS
 class ExperimentHandler:
     def __init__(self, args):
         #self.debug = args.debug
+        self.slurm = args.slurm
         self.pid = os.getpid()
         self.cuda_and_random_seed(args)
         self.create_all_model_dirs()
@@ -46,17 +47,20 @@ class ExperimentHandler:
         self.root_dir = RUNNING_MODELS_DIR
         self.model_type_dir = os.path.join(args.dataset, args.jet_transform)
         dt = datetime.datetime.now()
+
         if args.slurm:
             self.filename_exp = '{}'.format(args.slurm_array_job_id)
-            #self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, args.slurm_array_job_id)
-            self.leaf_dir = os.path.join(self.model_type_dir, self.filename_exp, args.slurm_array_task_id)
+            self.leaf_dir = args.slurm_array_task_id
         else:
             self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, self.pid)
-            self.leaf_dir = os.path.join(self.model_type_dir, self.filename_exp)
+            self.leaf_dir = str(0)
 
-        self.exp_dir = os.path.join(self.root_dir,self.leaf_dir)
+        self.intermediate_dir = os.path.join(self.model_type_dir, self.filename_exp)
+        self.exp_dir = os.path.join(self.root_dir,self.intermediate_dir,self.leaf_dir)
+
         if not os.path.exists(self.exp_dir):
             os.makedirs(self.exp_dir)
+
         self.start_dt = dt
 
     def create_all_model_dirs(self):
@@ -90,6 +94,7 @@ class ExperimentHandler:
                                 emailer=self.emailer,
                                 logfile=self.logfile,
                                 root_dir=self.root_dir,
+                                intermediate_dir=self.intermediate_dir,
                                 leaf_dir=self.leaf_dir,
                                 need_input=True,
                                 subject_string=subject_string,
@@ -169,6 +174,9 @@ class ExperimentHandler:
     def finished(self):
         self.stats_logger.complete_logging()
         self.signal_handler.completed()
+        if not self.slurm:
+            os.rmdir(os.path.join(self.root_dir, self.intermediate_dir))
+
 
     def initial_email(self):
         text = ['JOB STARTED', self.exp_dir, self.host.split('.')[0], str(self.pid)]
