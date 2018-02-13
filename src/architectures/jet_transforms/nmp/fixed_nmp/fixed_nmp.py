@@ -12,6 +12,7 @@ from ..message_passing.adjacency import construct_adjacency_matrix_layer
 
 from .....architectures.readout import construct_readout
 from .....architectures.embedding import construct_embedding
+from .....visualizing import visualize_batch_2D
 
 class FixedAdjacencyNMP(nn.Module):
     def __init__(self,
@@ -34,6 +35,12 @@ class FixedAdjacencyNMP(nn.Module):
     def forward(self, jets, mask=None, **kwargs):
         h = self.embedding(jets)
         dij = self.adjacency_matrix(jets, mask=mask)
+
+        ep = kwargs.get('epoch', None)
+        logger = kwargs.get('logger', None)
+        if ep is not None and logger is not None and ep % 10 == 0:
+            visualize_batch_2D(dij, logger, 'epoch{}/adjacency'.format(ep))
+
         for mp in self.mp_layers:
             h, _ = mp(h=h, mask=mask, dij=dij, **kwargs)
         out = self.readout(h)
@@ -100,7 +107,9 @@ class EyeNMP(FixedAdjacencyNMP):
             matrix = Variable(torch.eye(sz).unsqueeze(0).repeat(bs, 1, 1))
             if torch.cuda.is_available():
                 matrix = matrix.cuda()
-            return matrix
+            if mask is None:
+                return matrix
+            return mask * matrix
         return eye
 
 class OnesNMP(FixedAdjacencyNMP):
@@ -108,12 +117,14 @@ class OnesNMP(FixedAdjacencyNMP):
         super().__init__(**kwargs)
 
     def set_adjacency_matrix(self, **kwargs):
-        def ones(jets, **kwargs):
+        def ones(jets, mask=mask, **kwargs):
             bs, sz, _ = jets.size()
             matrix = Variable(torch.ones(bs, sz, sz))
             if torch.cuda.is_available():
                 matrix = matrix.cuda()
-            return matrix
+            if mask is None:
+                return matrix
+            return mask * matrix
         return ones
 
 class LearnedFixedNMP(FixedAdjacencyNMP):

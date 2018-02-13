@@ -64,7 +64,8 @@ class MPFixed(MessagePassingLayer):
         super().__init__(**kwargs)
 
     def get_adjacency_matrix(self, **kwargs):
-        return kwargs.pop('dij', None)
+        dij = kwargs.pop('dij', None)
+        return dij
 
 
 class MPSet2Set(MPAdaptive):

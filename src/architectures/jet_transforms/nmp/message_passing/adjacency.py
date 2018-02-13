@@ -52,8 +52,10 @@ class DistMult(AdjacencyMatrix):
 
     def compute_adjacency_matrix(self, h, mask):
         A = torch.matmul(h, torch.matmul(self.matrix, h.transpose(1,2)))
-        A = self.softmax(A, mask)
-        return A
+        A = F.sigmoid(A)
+        if mask is None:
+            return A
+        return mask * A
 
 class Siamese(AdjacencyMatrix):
     def __init__(self, hidden=None, **kwargs):
