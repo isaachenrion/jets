@@ -13,7 +13,7 @@ class Mover:
         src = os.path.join(self.current_root, self.intermediate_dir, self.leaf_dir)
         dst = os.path.join(folder, self.intermediate_dir, self.leaf_dir)
         intermediate_path = os.path.join(folder, self.intermediate_dir)
-        if not os.path.exists(os.makedirs(intermediate_path)):
+        if not os.path.exists(intermediate_path):
             os.makedirs(intermediate_path)
         shutil.move(src, dst)
         logging.info('Moved model directory to {}'.format(dst))
