@@ -19,7 +19,7 @@
 #################
 # --gres will give you one GPU, you can ask for more, up to 8 (or how ever many are on the node/card)
 # We are submitting to the gpu partition, if you can submit to the hns partition, change this to -p hns_gpu.
-#SBATCH --qos=batch
+##SBATCH --qos=batch
 #################
 #number of nodes you are requesting
 #SBATCH --nodes=1
