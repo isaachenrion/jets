@@ -34,8 +34,7 @@
 SLURMARGS="$@"
 PYTHONARGS="-j $SLURMARGS"
 
-HOME='/misc/kcgscratch1/ChoGroup/isaac'
-SRCDIR=$HOME/jets
+read SRCDIR _DATADIR _GPU _QOS < <(bash misc/paths.sh)
 
 cd $SRCDIR
 source activate jets
