@@ -32,19 +32,12 @@
 #SBATCH --mail-type=END,FAIL # notifications for job done & fail
 #SBATCH --mail-user=henrion@nyu.edu
 
-
-HOME='/misc/kcgscratch1/ChoGroup/isaac'
-SRCDIR=$HOME/jets
-DATADIR=$SRCDIR/data/w-vs-qcd/pickles
+bash misc/paths.sh
 
 SLURMARGS="$@"
 SLURMARGS="--data_dir $DATADIR --slurm --gpu 0 --slurm_array_job_id $SLURM_ARRAY_JOB_ID --slurm_array_task_id $SLURM_ARRAY_TASK_ID $SLURMARGS"
 cd $SRCDIR
 
-echo "$HOME"
-echo "$SRCDIR"
-echo "$DATADIR"
-echo "$SLURMARGS"
 
 source activate jets
 
