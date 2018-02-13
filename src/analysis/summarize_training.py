@@ -2,7 +2,7 @@ import os
 import csv
 import numpy as np
 
-from admin.emailer import get_emailer
+from ..admin.emailer import get_emailer
 
 def get_scalars_csv_filename(model_dir):
     return os.path.join(model_dir, 'stats', 'scalars.csv')
