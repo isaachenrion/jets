@@ -66,4 +66,4 @@ def summarize_training(jobdir, email=False):
     if email:
         print('Emailing')
         emailer = get_emailer()
-        emailer.send_msg(out_str, '{}: training stats'.format(jobdir), statsfile)
+        emailer.send_msg(out_str, '{}: training stats'.format(jobdir), [statsfile])
