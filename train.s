@@ -32,7 +32,7 @@
 #SBATCH --mail-type=END,FAIL # notifications for job done & fail
 #SBATCH --mail-user=henrion@nyu.edu
 
-bash misc/paths.sh
+read var1 var2 < $(bash misc/paths.sh)
 
 SLURMARGS="$@"
 SLURMARGS="--data_dir $DATADIR --slurm --gpu 0 --slurm_array_job_id $SLURM_ARRAY_JOB_ID --slurm_array_task_id $SLURM_ARRAY_TASK_ID $SLURMARGS"
