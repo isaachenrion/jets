@@ -18,7 +18,6 @@
 #SBATCH --time=24:00:00
 #################
 # --gres will give you one GPU, you can ask for more, up to 8 (or how ever many are on the node/card)
-#SBATCH --gres gpu:1080ti:1
 # We are submitting to the gpu partition, if you can submit to the hns partition, change this to -p hns_gpu.
 #SBATCH --qos=batch
 #################
@@ -32,9 +31,11 @@
 #SBATCH --mail-type=END,FAIL # notifications for job done & fail
 #SBATCH --mail-user=henrion@nyu.edu
 
-read SRCDIR DATADIR < <(bash misc/paths.sh)
-echo $SRCDIR
-echo $DATADIR
+read SRCDIR DATADIR GPU < <(bash misc/paths.sh)
+echo "$SRCDIR"
+echo "$DATADIR"
+
+#SBATCH --gres $GPU
 
 SLURMARGS="$@"
 SLURMARGS="--data_dir $DATADIR --slurm --gpu 0 --slurm_array_job_id $SLURM_ARRAY_JOB_ID --slurm_array_task_id $SLURM_ARRAY_TASK_ID $SLURMARGS"
