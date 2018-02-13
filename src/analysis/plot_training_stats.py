@@ -21,6 +21,25 @@ def read_training_stats(csv_filename, stats_names):
 def plot_training_stats_dict(stats_dict, plotsdir):
     for k, v in stats_dict.items():
         plot_one_training_stat(k, v, plotsdir)
+    tl = stats_dict['train_loss']
+    vl = stats_dict['valid_loss']
+    plot_training_versus_validation_loss(tl, vl, plotsdir)
+
+def plot_training_versus_validation_loss(training_loss, validation_loss, plotsdir):
+    assert len(training_loss) == len(validation_loss)
+    plt.figure()
+    x_range = np.array([int(i) for i in range(len(training_loss))])
+    line, = plt.plot(x_range, training_loss, label='Training', color='blue')
+    line, = plt.plot(x_range, validation_loss, label='Validation', color='red')
+    #plt.plot(x_range, training_loss, color='blue')
+    #plt.plot(x_range, validation_loss, color='red')
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.legend(loc="best")
+    plt.grid()
+
+    filename = os.path.join(plotsdir, 'training_curves')
+    plt.savefig(filename)
 
 def plot_one_training_stat(name, values, plotsdir):
     plt.figure()
@@ -33,6 +52,7 @@ def plot_one_training_stat(name, values, plotsdir):
 
     filename = os.path.join(plotsdir, name)
     plt.savefig(filename)
+    plt.close()
 
 def plot_training_stats(csv_filename, stats_names, plotsdir):
     stats_dict = read_training_stats(csv_filename, stats_names)

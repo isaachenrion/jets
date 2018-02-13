@@ -55,7 +55,7 @@ class ExperimentHandler:
             self.leaf_dir = args.slurm_array_task_id
         else:
             self.filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, self.pid)
-            self.leaf_dir = str(0)
+            self.leaf_dir = ''
 
         self.intermediate_dir = os.path.join(self.model_type_dir, self.filename_exp)
         self.exp_dir = os.path.join(self.root_dir,self.intermediate_dir,self.leaf_dir)
@@ -176,8 +176,8 @@ class ExperimentHandler:
     def finished(self):
         self.stats_logger.complete_logging()
         self.signal_handler.completed()
-        if not self.slurm:
-            os.rmdir(os.path.join(self.root_dir, self.intermediate_dir))
+        #if not self.slurm:
+        #    os.rmdir(os.path.join(self.root_dir, self.intermediate_dir))
 
 
     def initial_email(self):
