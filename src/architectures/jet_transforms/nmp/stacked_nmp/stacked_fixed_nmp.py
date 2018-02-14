@@ -61,10 +61,14 @@ class StackedFixedNMP(nn.Module):
         for i, (nmp, pool, adj) in enumerate(zip(self.nmps, self.attn_pools, self.adjs)):
             if i > 0:
                 mask = None
+                dij = adj(h, mask=mask)
+            else:
+                dij = adj(jets, mask=mask)
+                
             if self.pool_first:
                 h = pool(h, **kwargs)
 
-            dij = adj(h, mask=mask)
+            #dij = adj(h, mask=mask)
             for mp in nmp:
                 h, _ = mp(h=h, mask=mask, dij=dij)
 
