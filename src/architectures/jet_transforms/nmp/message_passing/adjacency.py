@@ -41,8 +41,10 @@ class SumMatrix(AdjacencyMatrix):
         h_l = h.view(shp[0], shp[1], 1, shp[2])
         h_r = h.view(shp[0], 1, shp[1], shp[2])
         A = self.edge_embedding(h_l + h_r).squeeze(-1)
-        A = self.softmax(A, mask)
-        return A
+        A = F.sigmoid(A)
+        if mask is None:
+            return A
+        return mask * A
 
 class DistMult(AdjacencyMatrix):
     def __init__(self, hidden=None, **kwargs):
@@ -67,8 +69,10 @@ class Siamese(AdjacencyMatrix):
         h_l = h.view(shp[0], shp[1], 1, shp[2])
         h_r = h.view(shp[0], 1, shp[1], shp[2])
         A = torch.norm(h_l - h_r, 2, 3)
-        A = self.softmax(A, mask)
-        return A
+        A = F.sigmoid(A)
+        if mask is None:
+            return A
+        return mask * A
 
 class PaddedMatrixSoftmax(nn.Module):
     def __init__(self):
