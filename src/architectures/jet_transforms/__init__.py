@@ -1,6 +1,7 @@
 from .nmp import LearnedVariableNMP
 from .nmp import StackedNMP
 from .nmp import StackedFixedNMP
+from .nmp import PhysicsStackedFixedNMP
 from .nmp import PhysicsNMP
 from .nmp import EyeNMP
 from .nmp import OnesNMP
@@ -19,15 +20,16 @@ def construct_transform(key, *args, **kwargs):
         recs=GRNNTransformSimple,
         recg=GRNNTransformGated,
         nmp=LearnedVariableNMP,
-        stack=StackedNMP,
+        #stack=StackedNMP,
         phy=PhysicsNMP,
-        physta=PhysicsStackNMP,
+        #phystaold=PhysicsStackNMP,
         tra=TransformerTransform,
         one=OnesNMP,
         eye=EyeNMP,
         lf=LearnedFixedNMP,
         plf=PhysicsPlusLearnedNMP,
-        sta=StackedFixedNMP
+        sta=StackedFixedNMP,
+        physta=PhysicsStackedFixedNMP
     )
     try:
         return construct_object(key, dictionary, *args, **kwargs)

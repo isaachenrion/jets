@@ -11,6 +11,8 @@ from ..message_passing import construct_mp_layer
 from ..message_passing import construct_adjacency_matrix_layer
 from ..fixed_nmp.adjacency import construct_physics_based_adjacency_matrix
 
+from .....visualizing import visualize_batch_2D
+from .....monitors import Histogram
 
 class StackedFixedNMP(nn.Module):
     def __init__(
@@ -38,15 +40,20 @@ class StackedFixedNMP(nn.Module):
         self.attn_pools = nn.ModuleList([construct_pooling_layer(pooling_layer, scales[i], hidden) for i in range(len(scales))])
         self.readout = construct_readout(readout, hidden, hidden)
         self.pool_first = pool_first
-        self.adjs = [self.set_adjacency_matrix(hidden=hidden, **kwargs) for _ in scales]
+        self.adjs = self.set_adjacency_matrices(hidden=hidden,scales=scales, **kwargs)
 
-    def set_adjacency_matrix(self, **kwargs):
-        matrix = construct_adjacency_matrix_layer(
+        self.logger = kwargs.get('logger', None)
+        self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True)
+        self.dij_histogram.initialize(None, self.logger.plotsdir)
+
+    def set_adjacency_matrix(self, scales=None, hidden=None, symmetric=None, **kwargs):
+        matrices = [construct_adjacency_matrix_layer(
                     kwargs.get('adaptive_matrix', None),
-                    hidden=kwargs.get('hidden', None),
-                    symmetric=kwargs.get('symmetric', None)
+                    hidden=hidden,
+                    symmetric=symmetric
                     )
-        return matrix
+                    for _ in scales]
+        return nn.ModuleList(matrices)
 
     def forward(self, jets, mask=None, **kwargs):
         h = self.embedding(jets)
@@ -61,8 +68,40 @@ class StackedFixedNMP(nn.Module):
             for mp in nmp:
                 h, _ = mp(h=h, mask=mask, dij=dij)
 
+            # logging
+            ep = kwargs.get('epoch', None)
+            iters_left = kwargs.get('iters_left', None)
+            if self.logger is not None:
+                if ep is not None and ep % 1 == 0:
+                    self.dij_histogram(values=dij.view(-1))
+                    if iters_left == 0:
+                        self.dij_histogram.visualize('dij-epoch-{}-layer-{}'.format(ep, i))
+                        self.dij_histogram.clear()
+                        visualize_batch_2D(dij, self.logger, 'epoch{}/adjacency-{}'.format(ep, i))
+
+
             if not self.pool_first:
                 h = pool(h, **kwargs)
 
         out = self.readout(h)
         return out, _
+
+
+class PhysicsStackedFixedNMP(StackedFixedNMP):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def set_adjacency_matrices(self, scales=None, hidden=None, symmetric=None, **kwargs):
+        m1 = construct_physics_based_adjacency_matrix(
+                alpha=kwargs.pop('alpha', None),
+                R=kwargs.pop('R', None),
+                trainable_physics=kwargs.pop('trainable_physics', None)
+                )
+        matrices = [construct_adjacency_matrix_layer(
+                    kwargs.get('adaptive_matrix', None),
+                    hidden=hidden,
+                    symmetric=symmetric
+                    )
+                    for _ in range(len(scales)-1)]
+        matrices = [m1] + matrices
+        return nn.ModuleList(matrices)

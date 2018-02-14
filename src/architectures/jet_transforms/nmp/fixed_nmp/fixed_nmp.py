@@ -49,7 +49,6 @@ class FixedAdjacencyNMP(nn.Module):
         if self.logger is not None:
             if ep is not None and ep % 1 == 0:
                 self.dij_histogram(values=dij.view(-1))
-                #print(ep, iters_left)
                 if iters_left == 0:
                     self.dij_histogram.visualize('dij-{}'.format(ep))
                     self.dij_histogram.clear()
