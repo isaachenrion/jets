@@ -1,4 +1,7 @@
 def reset_unused_args(args):
+
+    args.sym = not args.asym
+
     if args.jet_transform not in ['stack','one', 'plf', 'lf', 'eye', 'phy', 'nmp', 'physta']:
         args.iters = None
 
@@ -40,4 +43,5 @@ def reset_unused_args(args):
         args.dataset = 'pileup'
     else:
         args.dataset = 'original'
+
     return args

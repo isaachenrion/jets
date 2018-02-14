@@ -1,4 +1,5 @@
 import os
+
 ''' CONSTANTS '''
 '''----------------------------------------------------------------------- '''
 MODELS_DIR = 'models'
@@ -24,7 +25,7 @@ DATASETS = {
 }
 
 ''' argparse args '''
-STEP_SIZE=0.0002
+STEP_SIZE=0.0003
 DECAY=1
 L2_REGULARIZATION=0.0
 
@@ -32,7 +33,7 @@ FEATURES=7
 HIDDEN=64
 
 BATCH_SIZE=100
-EPOCHS=100
+EPOCHS=150
 
 VALID=27000
 DATA_DIR = 'data/w-vs-qcd/pickles'

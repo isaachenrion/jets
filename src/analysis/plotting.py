@@ -5,6 +5,8 @@ plt.rcParams["figure.figsize"] = (6, 6)
 
 from scipy import interp
 
+import os
+import pickle
 import numpy as np
 
 def plot_rocs(rocs, fprs, tprs, label=None, color=None, show_all=False):
@@ -38,3 +40,15 @@ def plot_save(filename):
 
 def plot_show():
     plt.show()
+
+# saving
+def image_and_pickle(fig, name, imgdir, pkldir):
+
+    img_filename = os.path.join(imgdir, name)
+    plt.savefig(img_filename)
+
+    pkl_filename = os.path.join(pkldir, name + '.pkl')
+    with open(pkl_filename, 'wb') as f:
+        pickle.dump(fig, f)
+
+    return None

@@ -7,7 +7,7 @@ from src.misc.constants import *
 '''----------------------------------------------------------------------- '''
 parser = argparse.ArgumentParser(description='Jets')
 # Debugging
-parser.add_argument("--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
+parser.add_argument("-d", "--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
 
 # Admin args
 parser.add_argument("-s", "--silent", action='store_true', default=False)
@@ -30,7 +30,7 @@ parser.add_argument("-b", "--batch_size", type=int, default=BATCH_SIZE)
 
 # Optimization args
 parser.add_argument("-a", "--step_size", type=float, default=STEP_SIZE)
-parser.add_argument("-d", "--decay", type=float, default=DECAY)
+parser.add_argument("--decay", type=float, default=DECAY)
 parser.add_argument("--clip", type=float, default=None)
 parser.add_argument("--reg", type=float, default=L2_REGULARIZATION)
 
@@ -60,7 +60,7 @@ parser.add_argument("-j", "--jet_transform", type=str, default="nmp", help="name
 parser.add_argument("-i", "--iters", type=int, default=2)
 parser.add_argument("--mp", type=str, default='van', help='type of message passing layer')
 parser.add_argument("--matrix", type=str, default='dm', help='type of adaptive matrix layer')
-parser.add_argument("--sym", action='store_true', default=False)
+parser.add_argument("--asym", action='store_true', default=False)
 parser.add_argument("--readout", type=str, default='dtnn', help='type of readout layer')
 
 # Stack NMP
