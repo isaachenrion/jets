@@ -40,20 +40,25 @@ class StackedFixedNMP(nn.Module):
         self.attn_pools = nn.ModuleList([construct_pooling_layer(pooling_layer, scales[i], hidden) for i in range(len(scales))])
         self.readout = construct_readout(readout, hidden, hidden)
         self.pool_first = pool_first
-        self.adjs = self.set_adjacency_matrices(hidden=hidden,scales=scales, **kwargs)
+        self.adjs = self.set_adjacency_matrices(hidden=hidden,features=features, scales=scales, **kwargs)
 
         self.logger = kwargs.get('logger', None)
         self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True)
         self.dij_histogram.initialize(None, self.logger.plotsdir)
 
     def set_adjacency_matrices(self, scales=None, hidden=None, symmetric=None, **kwargs):
+        m1 = construct_adjacency_matrix_layer(
+                    kwargs.get('adaptive_matrix', None),
+                    hidden=kwargs.get('features') + 1,
+                    symmetric=symmetric
+                    )
         matrices = [construct_adjacency_matrix_layer(
                     kwargs.get('adaptive_matrix', None),
                     hidden=hidden,
                     symmetric=symmetric
                     )
-                    for _ in scales]
-        return nn.ModuleList(matrices)
+                    for _ in range(len(scales) -1 )]
+        return nn.ModuleList([m1] + matrices)
 
     def forward(self, jets, mask=None, **kwargs):
         h = self.embedding(jets)
@@ -64,7 +69,7 @@ class StackedFixedNMP(nn.Module):
                 dij = adj(h, mask=mask)
             else:
                 dij = adj(jets, mask=mask)
-                
+
             if self.pool_first:
                 h = pool(h, **kwargs)
 
