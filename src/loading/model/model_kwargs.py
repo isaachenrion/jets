@@ -38,7 +38,6 @@ def construct_model_kwargs(args):
         'physics_component':args.physics_component,
         'learned_tradeoff':args.learned_tradeoff,
 
-
         # Transformer
         'n_heads':args.n_heads,
         'n_layers':args.n_layers,
@@ -54,6 +53,6 @@ def load_model_kwargs(filename):
         model_kwargs = settings["model_kwargs"]
     return model_kwargs
 
-def build_model_from_kwargs(model_kwargs):
-    model = construct_classifier(model_kwargs.get('predict'), **model_kwargs)
+def build_model_from_kwargs(model_kwargs, **kwargs):
+    model = construct_classifier(model_kwargs.get('predict'), **model_kwargs, **kwargs)
     return model

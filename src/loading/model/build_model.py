@@ -9,7 +9,7 @@ from .model_kwargs import load_model_kwargs
 from .model_kwargs import build_model_from_kwargs
 from .load_model_state_dict import load_model_state_dict
 
-def build_model(filename, restart, args):
+def build_model(filename, restart, args, **kwargs):
     if filename is None:
         logging.info("Initializing model...")
         model_kwargs = construct_model_kwargs(args)
@@ -17,7 +17,7 @@ def build_model(filename, restart, args):
         logging.info("Loading model...")
         model_kwargs = load_model_kwargs(filename)
 
-    model = build_model_from_kwargs(model_kwargs)
+    model = build_model_from_kwargs(model_kwargs, **kwargs)
 
     if filename is None:
         logging.warning(model)

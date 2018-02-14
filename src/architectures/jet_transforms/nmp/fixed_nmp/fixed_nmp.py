@@ -13,6 +13,7 @@ from ..message_passing.adjacency import construct_adjacency_matrix_layer
 from .....architectures.readout import construct_readout
 from .....architectures.embedding import construct_embedding
 from .....visualizing import visualize_batch_2D
+from .....monitors import Histogram
 
 class FixedAdjacencyNMP(nn.Module):
     def __init__(self,
@@ -28,6 +29,9 @@ class FixedAdjacencyNMP(nn.Module):
         self.mp_layers = nn.ModuleList([construct_mp_layer('fixed', hidden=hidden,**kwargs) for _ in range(iters)])
         self.readout = construct_readout(readout, hidden, hidden)
         self.adjacency_matrix = self.set_adjacency_matrix(features=features, **kwargs)
+        self.logger = kwargs.get('logger', None)
+        self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True)
+        self.dij_histogram.initialize(None, self.logger.plotsdir)
 
     def set_adjacency_matrix(self, **kwargs):
         pass
@@ -35,15 +39,22 @@ class FixedAdjacencyNMP(nn.Module):
     def forward(self, jets, mask=None, **kwargs):
         h = self.embedding(jets)
         dij = self.adjacency_matrix(jets, mask=mask)
-
-        ep = kwargs.get('epoch', None)
-        logger = kwargs.get('logger', None)
-        if ep is not None and logger is not None and ep % 10 == 0:
-            visualize_batch_2D(dij, logger, 'epoch{}/adjacency'.format(ep))
-
         for mp in self.mp_layers:
             h, _ = mp(h=h, mask=mask, dij=dij, **kwargs)
         out = self.readout(h)
+
+        # logging
+        ep = kwargs.get('epoch', None)
+        iters_left = kwargs.get('iters_left', None)
+        if self.logger is not None:
+            if ep is not None and ep % 1 == 0:
+                self.dij_histogram(values=dij.view(-1))
+                #print(ep, iters_left)
+                if iters_left == 0:
+                    self.dij_histogram.visualize('dij-{}'.format(ep))
+                    self.dij_histogram.clear()
+                    visualize_batch_2D(dij, self.logger, 'epoch{}/adjacency'.format(ep))
+
         return out, _
 
 class PhysicsNMP(FixedAdjacencyNMP):

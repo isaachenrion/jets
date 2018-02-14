@@ -5,22 +5,16 @@ import os
 import numpy as np
 import logging
 
+from .utils import ensure_numpy_array
+
 def visualize_batch_2D(tensor, logger, path_to_visualizations):
     '''
     Input: B x N x M tensor with values in [0, 1]
     Saves B grayscale images to the savedir
     '''
-    if isinstance(tensor, torch.autograd.Variable):
-        tensor = tensor.data
-    if torch.cuda.is_available() and isinstance(tensor, torch.cuda.FloatTensor):
-        tensor = tensor.cpu()
-    if isinstance(tensor, torch.Tensor):
-        tensor = tensor.numpy()
-    assert isinstance(tensor, np.ndarray)
+    tensor = ensure_numpy_array(tensor)
     assert tensor.max() <= 1.0
     assert tensor.min() >= 0.0
-    #import ipdb; ipdb.set_trace()
-    #tensor = np.random.uniform(0, 1, (10, 10, 10))
 
     cm_hot = mpl.cm.get_cmap('hot')
     tensor = cm_hot(tensor)

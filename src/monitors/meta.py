@@ -1,5 +1,11 @@
-from .baseclasses import ScalarMonitor, Monitor
+import os
+
 import numpy as np
+import matplotlib.pyplot as plt
+
+from .baseclasses import ScalarMonitor, Monitor
+from ..visualizing import ensure_numpy_array
+from ..analysis.plotting import image_and_pickle
 
 class Best(ScalarMonitor):
     def __init__(self, monitor, track='max', **kwargs):
@@ -62,34 +68,48 @@ class Collect(ScalarMonitor):
 
 class Histogram(Monitor):
     def __init__(self, name, n_bins=30, rootname=None, append=False, **kwargs):
-        super().__init__('histogram-{}'.format(name), **kwargs)
-        self.value = []
+        super().__init__('{}'.format(name), **kwargs)
+        self.value = None
         self.n_bins = n_bins
         self.append = append
         if rootname is None:
             self.rootname = name
         else:
             self.rootname = rootname
+        self.visualize_count = 1
 
     def call(self, values=None,**kwargs):
+        values = ensure_numpy_array(values)
         if self.append:
-            self.value += values
+            if self.value is None:
+                self.value = values
+            else:
+                self.value = np.append(self.value, values)
         else:
             self.value = values
         return self.value
 
-    def visualize(self):
-        self.viz.histogram(
-            X=self.value,
-            win=self.rootname,
-            opts=dict(
-                numbins=30,
-                xlabel='Epochs',
-                ylabel='Probability density',
-                title=self.rootname,
-                showlegend=True
-            )
-        )
+    def visualize(self, plotname=None):
+        fig, ax = plt.subplots()
+        hist, bin_edges = np.histogram(self.value, bins=self.n_bins, range=(0, 1), density=True)
+        #import ipdb; ipdb.set_trace()
+        plt.bar(bin_edges[:-1], hist, width=0.7 / self.n_bins)
+        # labelling
+        plt.suptitle('Histogram of {}'.format(self.name))
+        plt.xlabel("Range of {}".format(self.name))
+        plt.ylabel("Density")
+
+        if plotname is None:
+            plotname = self.name + str(self.visualize_count)
+
+        image_and_pickle(fig, plotname, self.plotsdir, os.path.join(self.plotsdir, 'pkl'))
+        plt.close(fig)
+
+        self.visualize_count += 1
+
+
+    def clear(self):
+        self.value = None
 
     #def finish(self):
     #    self.hist, self.bins = np.histogram(self.value, bins=self.n_bins, density=True)

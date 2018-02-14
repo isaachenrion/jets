@@ -43,10 +43,14 @@ def plot_show():
 
 # saving
 def image_and_pickle(fig, name, imgdir, pkldir):
+    if not os.path.exists(imgdir):
+        os.makedirs(imgdir)
 
     img_filename = os.path.join(imgdir, name)
     plt.savefig(img_filename)
 
+    if not os.path.exists(pkldir):
+        os.makedirs(pkldir)
     pkl_filename = os.path.join(pkldir, name + '.pkl')
     with open(pkl_filename, 'wb') as f:
         pickle.dump(fig, f)

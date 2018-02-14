@@ -32,7 +32,7 @@ def train(args):
 
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
-    model, settings = build_model(args.load, args.restart, args)
+    model, settings = build_model(args.load, args.restart, args, logger=eh.stats_logger)
     eh.signal_handler.set_model(model)
 
     ''' OPTIMIZER AND LOSS '''
@@ -103,7 +103,9 @@ def train(args):
         logging.info("epoch = %d" % i)
         logging.info("step_size = %.8f" % settings['step_size'])
         t0 = time.time()
+        iters_left = n_batches
         for _ in range(n_batches):
+            iters_left -= 1
             iteration += 1
             model.train()
             optimizer.zero_grad()
@@ -111,7 +113,7 @@ def train(args):
             idx = slice(start, start+args.batch_size)
             X, y = X_train[idx], y_train[idx]
             X_var = wrap_jet(X); y_var = wrap(y)
-            y_pred = model(X_var, logger=eh.stats_logger, epoch=i)
+            y_pred = model(X_var, logger=eh.stats_logger, epoch=i, iters_left=iters_left)
             l = loss(y_pred, y_var)
             l.backward()
             if args.clip is not None:

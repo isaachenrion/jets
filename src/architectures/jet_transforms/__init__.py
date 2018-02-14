@@ -1,5 +1,6 @@
 from .nmp import LearnedVariableNMP
 from .nmp import StackedNMP
+from .nmp import StackedFixedNMP
 from .nmp import PhysicsNMP
 from .nmp import EyeNMP
 from .nmp import OnesNMP
@@ -25,7 +26,8 @@ def construct_transform(key, *args, **kwargs):
         one=OnesNMP,
         eye=EyeNMP,
         lf=LearnedFixedNMP,
-        plf=PhysicsPlusLearnedNMP
+        plf=PhysicsPlusLearnedNMP,
+        sta=StackedFixedNMP
     )
     try:
         return construct_object(key, dictionary, *args, **kwargs)

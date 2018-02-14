@@ -108,13 +108,13 @@ class ExperimentHandler:
     def setup_stats_logger(self, args):
         ''' STATS LOGGER '''
         '''----------------------------------------------------------------------- '''
-        roc_auc = ROCAUC()
-        inv_fpr = InvFPR()
+        roc_auc = ROCAUC(visualizing=True)
+        inv_fpr = InvFPR(visualizing=True)
         best_inv_fpr = Best(inv_fpr)
         epoch_counter = Regurgitate('epoch', visualizing=False)
         batch_counter = Regurgitate('iteration', visualizing=False)
-        valid_loss = Regurgitate('valid_loss')
-        train_loss = Regurgitate('train_loss')
+        valid_loss = Regurgitate('valid_loss', visualizing=True)
+        train_loss = Regurgitate('train_loss', visualizing=True)
         #prediction_histogram = EachClassHistogram([0,1], 'yy', 'yy_pred', append=False)
         #logtimer = Regurgitate('logtime')
         logtimer=Collect('logtime', fn='last', visualizing=False)
