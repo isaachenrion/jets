@@ -46,7 +46,7 @@ class StackedFixedNMP(nn.Module):
         self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True)
         self.dij_histogram.initialize(None, self.logger.plotsdir)
 
-    def set_adjacency_matrix(self, scales=None, hidden=None, symmetric=None, **kwargs):
+    def set_adjacency_matrices(self, scales=None, hidden=None, symmetric=None, **kwargs):
         matrices = [construct_adjacency_matrix_layer(
                     kwargs.get('adaptive_matrix', None),
                     hidden=hidden,
