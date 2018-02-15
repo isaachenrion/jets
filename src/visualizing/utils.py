@@ -20,6 +20,7 @@ def ensure_numpy_float(one_d_tensor):
         tensor = tensor.data
     if torch.cuda.is_available() and isinstance(tensor, torch.cuda.FloatTensor):
         tensor = tensor.cpu()
+        tensor = tensor.float()
     if isinstance(tensor, torch.Tensor):
         assert np.prod([s for s in tensor.size()]) == 1
         tensor = tensor.squeeze()
