@@ -1,4 +1,5 @@
 import matplotlib as mpl
+mpl.use('Agg')
 from PIL import Image
 import torch
 import os
