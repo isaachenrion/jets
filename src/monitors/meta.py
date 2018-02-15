@@ -86,31 +86,32 @@ class Histogram(Monitor):
         self.value = None
         self.max_capacity = max_capacity if max_capacity is not None else np.inf
         self.n_bins = n_bins
+        self.bin_edges = None
+        self.hist = np.zeros((n_bins,))
         self.append = append
         if rootname is None:
             self.rootname = name
         else:
             self.rootname = rootname
 
+    def normalize(self):
+        Z = self.hist.sum()
+        bin_width = self.bin_edges[1] - self.bin_edges[0]
+        self.hist /= (Z * bin_width)
 
     def call(self, values=None,**kwargs):
         values = ensure_numpy_array(values)
-        if self.append:
-            if self.value is None:
-                self.value = values
-            else:
-                self.value = np.append(self.value, values)
-                if len(self.value) > self.max_capacity:
-                    self.value = values
-        else:
-            self.value = values
-        return self.value
+        hist, self.bin_edges = np.histogram(values, bins=self.n_bins, range=(0, 1), density=True)
+        self.hist += hist
+        return None
 
     def visualize(self, plotname=None):
         super().visualize()
         fig, ax = plt.subplots()
-        hist, bin_edges = np.histogram(self.value, bins=self.n_bins, range=(0, 1), density=True)
+        #hist, bin_edges = np.histogram(self.value, bins=self.n_bins, range=(0, 1), density=True)
         #import ipdb; ipdb.set_trace()
+        self.normalize()
+        hist, bin_edges = self.hist, self.bin_edges
         plt.bar(bin_edges[:-1], hist, width=0.7 / self.n_bins)
         # labelling
         plt.suptitle('Histogram of {}'.format(self.name))

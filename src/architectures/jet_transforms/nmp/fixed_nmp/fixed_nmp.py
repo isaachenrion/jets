@@ -35,7 +35,7 @@ class FixedAdjacencyNMP(nn.Module):
         self.set_monitors(kwargs.get('logger', None))
 
     def set_monitors(self, logger):
-        self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True, max_capacity=1000)
+        self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True)
         self.dij_matrix_monitor = BatchMatrixMonitor('dij')
         self.dij_histogram.initialize(None, os.path.join(logger.plotsdir, 'dij_histogram'))
         self.dij_matrix_monitor.initialize(None, os.path.join(logger.plotsdir, 'adjacency_matrix'))
@@ -56,11 +56,11 @@ class FixedAdjacencyNMP(nn.Module):
         return out, _
 
     def logging(self, dij=None, epoch=None, iters_left=None, **kwargs):
-        if epoch is not None and epoch % 1 == 0:
+        if epoch is not None and epoch % 10 == 0:
             self.dij_histogram(values=dij.view(-1))
             if iters_left == 0:
                 self.dij_histogram.visualize('epoch-{}'.format(epoch))
-                self.dij_histogram.clear()
+                #self.dij_histogram.clear()
                 self.dij_matrix_monitor(dij=dij)
                 self.dij_matrix_monitor.visualize('epoch-{}'.format(epoch))
 
