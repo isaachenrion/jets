@@ -4,15 +4,15 @@ import torch
 import os
 import numpy as np
 import logging
-
-#from .utils import ensure_numpy_array
+from .utils import ensure_numpy_array
 
 def visualize_batch_matrix(tensor, plotsdir, path_to_visualizations):
     '''
     Input: B x N x M tensor with values in [0, 1]
     Saves B grayscale images to the savedir
     '''
-    #tensor = ensure_numpy_array(tensor)
+    #import ipdb; ipdb.set_trace()
+    tensor = ensure_numpy_array(tensor)
     assert tensor.max() <= 1.0
     assert tensor.min() >= 0.0
 
