@@ -5,14 +5,14 @@ import os
 import numpy as np
 import logging
 
-from .utils import ensure_numpy_array
+#from .utils import ensure_numpy_array
 
-def visualize_batch_2D(tensor, logger, path_to_visualizations):
+def visualize_batch_matrix(tensor, plotsdir, path_to_visualizations):
     '''
     Input: B x N x M tensor with values in [0, 1]
     Saves B grayscale images to the savedir
     '''
-    tensor = ensure_numpy_array(tensor)
+    #tensor = ensure_numpy_array(tensor)
     assert tensor.max() <= 1.0
     assert tensor.min() >= 0.0
 
@@ -20,7 +20,7 @@ def visualize_batch_2D(tensor, logger, path_to_visualizations):
     tensor = cm_hot(tensor)
     tensor = np.uint8(tensor * 255)
 
-    savedir = os.path.join(logger.plotsdir, path_to_visualizations)
+    savedir = os.path.join(plotsdir, path_to_visualizations)
     if not os.path.exists(savedir):
         os.makedirs(savedir)
     for i, t in enumerate(tensor):

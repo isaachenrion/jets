@@ -2,7 +2,7 @@ import csv
 import os
 import logging
 
-from ..analysis.plot_training_stats import plot_training_stats
+from ..visualizing.plot_training_stats import plot_training_stats
 
 
 class StatsLogger:

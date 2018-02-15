@@ -1,3 +1,5 @@
+import os
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -12,8 +14,9 @@ from ..message_passing.adjacency import construct_adjacency_matrix_layer
 
 from .....architectures.readout import construct_readout
 from .....architectures.embedding import construct_embedding
-from .....visualizing import visualize_batch_2D
 from .....monitors import Histogram
+from .....monitors import Collect
+from .....monitors import BatchMatrixMonitor
 
 class FixedAdjacencyNMP(nn.Module):
     def __init__(self,
@@ -29,9 +32,13 @@ class FixedAdjacencyNMP(nn.Module):
         self.mp_layers = nn.ModuleList([construct_mp_layer('fixed', hidden=hidden,**kwargs) for _ in range(iters)])
         self.readout = construct_readout(readout, hidden, hidden)
         self.adjacency_matrix = self.set_adjacency_matrix(features=features, **kwargs)
-        self.logger = kwargs.get('logger', None)
-        self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True)
-        self.dij_histogram.initialize(None, self.logger.plotsdir)
+        self.set_monitors(kwargs.get('logger', None))
+
+    def set_monitors(self, logger):
+        self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True, max_capacity=1000)
+        self.dij_matrix_monitor = BatchMatrixMonitor('dij')
+        self.dij_histogram.initialize(None, os.path.join(logger.plotsdir, 'dij_histogram'))
+        self.dij_matrix_monitor.initialize(None, os.path.join(logger.plotsdir, 'adjacency_matrix'))
 
     def set_adjacency_matrix(self, **kwargs):
         pass
@@ -44,17 +51,19 @@ class FixedAdjacencyNMP(nn.Module):
         out = self.readout(h)
 
         # logging
-        ep = kwargs.get('epoch', None)
-        iters_left = kwargs.get('iters_left', None)
-        if self.logger is not None:
-            if ep is not None and ep % 1 == 0:
-                self.dij_histogram(values=dij.view(-1))
-                if iters_left == 0:
-                    self.dij_histogram.visualize('dij-{}'.format(ep))
-                    self.dij_histogram.clear()
-                    visualize_batch_2D(dij, self.logger, 'epoch{}/adjacency'.format(ep))
+        self.logging(dij=dij, **kwargs)
 
         return out, _
+
+    def logging(self, dij=None, epoch=None, iters_left=None, **kwargs):
+        if epoch is not None and epoch % 1 == 0:
+            self.dij_histogram(values=dij.view(-1))
+            if iters_left == 0:
+                self.dij_histogram.visualize('epoch-{}'.format(epoch))
+                self.dij_histogram.clear()
+                self.dij_matrix_monitor(dij=dij)
+                self.dij_matrix_monitor.visualize('epoch-{}'.format(epoch))
+
 
 class PhysicsNMP(FixedAdjacencyNMP):
     def __init__(self, **kwargs):
@@ -70,6 +79,9 @@ class PhysicsNMP(FixedAdjacencyNMP):
 class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        logger = kwargs.get('logger', None)
+        self.set_monitors(logger)
 
     @property
     def physics_component(self):
@@ -107,7 +119,20 @@ class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
             return out
         return combined_matrix
 
-    #def forward(self, **kwargs):
+    def set_monitors(self, logger):
+        super().set_monitors(logger)
+        if logger is not None:
+            self.component_monitor = Collect('physics_component', fn='last')
+            self.component_monitor.initialize(logger.statsdir, logger.plotsdir)
+        else:
+            self.component_monitor = None
+
+    def logging(self, epoch=None, iters_left=None, **kwargs):
+        super().logging(epoch=epoch, iters_left=iters_left, **kwargs)
+        if self.component_monitor is not None:
+            if epoch is not None and epoch % 1 == 0 and iters_left == 0:
+                self.component_monitor(physics_component=self.physics_component)
+                self.component_monitor.visualize('physics_component')
 
 
 class EyeNMP(FixedAdjacencyNMP):

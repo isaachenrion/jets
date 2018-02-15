@@ -1,9 +1,9 @@
-from .baseclasses import ScalarMonitor, Monitor
-
 import numpy as np
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 from scipy import interp
+
+from .baseclasses import ScalarMonitor, Monitor
 
 def inv_fpr_at_tpr_equals_half(tpr, fpr):
     base_tpr = np.linspace(0.05, 1, 476)

@@ -4,8 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from .baseclasses import ScalarMonitor, Monitor
-from ..visualizing import ensure_numpy_array
-from ..analysis.plotting import image_and_pickle
+from ..visualizing.utils import ensure_numpy_array
+from ..visualizing.utils import ensure_numpy_float
+from ..visualizing.plot_training_stats import plot_one_training_stat
+from ..visualizing.utils import image_and_pickle
 
 class Best(ScalarMonitor):
     def __init__(self, monitor, track='max', **kwargs):
@@ -20,7 +22,7 @@ class Best(ScalarMonitor):
             raise ValueError("track must be max or min")
         self.changed = False
 
-    def call(self, yy=None, yy_pred=None, w_valid=None, **kwargs):
+    def call(self, **kwargs):
         value = self.monitor.value
         if self.track == 'max':
             if value > self.best_value:
@@ -42,7 +44,7 @@ class Regurgitate(ScalarMonitor):
         super().__init__(value_name, **kwargs)
 
     def call(self, **kwargs):
-        self.value = kwargs[self.value_name]
+        self.value = ensure_numpy_float(kwargs[self.value_name])
         return self.value
 
 class Collect(ScalarMonitor):
@@ -60,23 +62,36 @@ class Collect(ScalarMonitor):
         self.collection = []
 
     def call(self, **kwargs):
-        self.collection.append(kwargs[self.value_name])
+        value = ensure_numpy_float(kwargs[self.value_name])
+        self.collection.append(value)
         self.value = self.fn(self.collection)
         return self.value
+
+    def visualize(self, plotname=None, **kwargs):
+        super().visualize()
+        if plotname is None:
+            plotname = self.name
+        plot_one_training_stat(
+            plotname,
+            self.collection,
+            self.plotsdir,
+            **kwargs
+            )
 
 
 
 class Histogram(Monitor):
-    def __init__(self, name, n_bins=30, rootname=None, append=False, **kwargs):
+    def __init__(self, name, n_bins=30, rootname=None, append=False, max_capacity=None, **kwargs):
         super().__init__('{}'.format(name), **kwargs)
         self.value = None
+        self.max_capacity = max_capacity if max_capacity is not None else np.inf
         self.n_bins = n_bins
         self.append = append
         if rootname is None:
             self.rootname = name
         else:
             self.rootname = rootname
-        self.visualize_count = 1
+
 
     def call(self, values=None,**kwargs):
         values = ensure_numpy_array(values)
@@ -85,11 +100,14 @@ class Histogram(Monitor):
                 self.value = values
             else:
                 self.value = np.append(self.value, values)
+                if len(self.value) > self.max_capacity:
+                    self.value = values
         else:
             self.value = values
         return self.value
 
     def visualize(self, plotname=None):
+        super().visualize()
         fig, ax = plt.subplots()
         hist, bin_edges = np.histogram(self.value, bins=self.n_bins, range=(0, 1), density=True)
         #import ipdb; ipdb.set_trace()
@@ -105,15 +123,11 @@ class Histogram(Monitor):
         image_and_pickle(fig, plotname, self.plotsdir, os.path.join(self.plotsdir, 'pkl'))
         plt.close(fig)
 
-        self.visualize_count += 1
+        #self.visualize_count += 1
 
 
     def clear(self):
         self.value = None
-
-    #def finish(self):
-    #    self.hist, self.bins = np.histogram(self.value, bins=self.n_bins, density=True)
-    #    np.savez(os.path.join(self.statsdir, self.name), values=self.value, hist=self.hist,bins=self.bins)
 
 class EachClassHistogram(Monitor):
     def __init__(self, target_values, target_name, output_name, append=False, **kwargs):

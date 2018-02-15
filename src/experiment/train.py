@@ -1,11 +1,11 @@
+import logging
+import time
+
 import torch
 from torch.optim import Adam, lr_scheduler
-import copy
+import torch.nn.functional as F
+
 import numpy as np
-import logging
-import pickle
-import time
-import os
 
 from ..data_ops.wrapping import wrap
 from ..data_ops.wrapping import unwrap
@@ -14,8 +14,6 @@ from ..data_ops.wrapping import unwrap_jet
 
 from ..misc.constants import *
 from ..admin import ExperimentHandler
-
-from ..monitors.losses import *
 
 from ..loading.data import prepare_train_data
 from ..loading.model import build_model
@@ -44,8 +42,7 @@ def train(args):
 
 
     def loss(y_pred, y):
-        l = log_loss(y, y_pred.squeeze(1)).mean()
-        return l
+        return F.binary_cross_entropy(y_pred.squeeze(1), y)
 
     def callback(epoch, model):
 

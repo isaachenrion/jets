@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from .....architectures.readout import construct_readout
 from .....architectures.utils import Attention
 from .....misc.abstract_constructor import construct_object
-from .....visualizing import visualize_batch_2D
+from .....visualizing import visualize_batch_matrix
 
 def construct_pooling_layer(key, *args, **kwargs):
     dictionary = dict(
@@ -54,5 +54,5 @@ class AttentionPooling(nn.Module):
         ep = kwargs.get('epoch', None)
         logger = kwargs.get('logger', None)
         if ep is not None and logger is not None and ep % 10 == 0:
-            visualize_batch_2D(attns, logger, 'epoch{}/attention-{}'.format(ep, self.nodes_out))
+            visualize_batch_matrix(attns, logger.plotsdir, 'epoch{}/attention-{}'.format(ep, self.nodes_out))
         return new_hiddens

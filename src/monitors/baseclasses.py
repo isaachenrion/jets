@@ -7,6 +7,7 @@ class Monitor:
         self.scalar = None
         self.boolean = None
         self.visualizing = visualizing
+        self.visualize_count = 0
 
     def initialize(self, statsdir, plotsdir):
         #print("INIT, {}, {}".format(savedir, self.name))
@@ -15,12 +16,10 @@ class Monitor:
 
     def __call__(self, **kwargs):
         self.value = self.call(**kwargs)
-        if self.visualizing:
-            self.visualize()
         return self.value
 
     def visualize(self):
-        pass
+        self.visualize_count += 1
 
     def call(self, **kwargs):
         pass
@@ -34,4 +33,6 @@ class ScalarMonitor(Monitor):
         self.scalar = True
 
     def visualize(self):
-        pass
+        super().visualize()
+
+        #self.visualize_count += 1

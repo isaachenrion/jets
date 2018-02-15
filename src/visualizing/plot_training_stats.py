@@ -1,9 +1,5 @@
 import os
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import matplotlib.ticker as plticker
-plt.rcParams["figure.figsize"] = (6, 6)
 
 from scipy import interp
 
@@ -11,7 +7,9 @@ import numpy as np
 import csv
 
 from .utils import exponential_moving_average
-from .plotting import image_and_pickle
+from .utils import image_and_pickle
+from .line_graph import line_graph
+from .utils import is_number
 
 def read_training_stats(csv_filename, stats_names):
     with open(csv_filename, 'r', newline='') as f:
@@ -22,7 +20,13 @@ def read_training_stats(csv_filename, stats_names):
                 stats_dict[name].append(row[name])
     return stats_dict
 
+def convert_strings_to_numbers(stats_dict):
+    for k, v in stats_dict.items():
+        stats_dict[k] = [float(x) for x in v if is_number(x)]
+    return stats_dict
+
 def plot_training_stats_dict(stats_dict, plotsdir):
+
     for k, v in stats_dict.items():
         plot_one_training_stat(k, v, plotsdir)
     tl = [float(x) for x in stats_dict['train_loss']]
@@ -31,6 +35,7 @@ def plot_training_stats_dict(stats_dict, plotsdir):
 
 def plot_training_versus_validation_loss(training_loss, validation_loss, plotsdir):
     assert len(training_loss) == len(validation_loss)
+
     # smoothing
     training_loss = exponential_moving_average(training_loss, 0.5)
     validation_loss = exponential_moving_average(validation_loss, 0.5)
@@ -55,24 +60,14 @@ def plot_training_versus_validation_loss(training_loss, validation_loss, plotsdi
 
     imgdir = plotsdir
     pkldir = os.path.join(plotsdir, 'pkl')
-    if not os.path.exists(pkldir):
-        os.makedirs(pkldir)
     image_and_pickle(fig, 'tv_curves', imgdir, pkldir)
+    plt.close(fig)
 
 
-def plot_one_training_stat(name, values, plotsdir):
-    plt.figure()
-    x_range = np.array([int(i) for i in range(len(values))])
-    plt.plot(x_range, values, color='blue')
-    plt.xlabel("Epochs")
-    plt.ylabel(name)
-    #plt.legend(loc="best")
-    plt.grid()
-
-    filename = os.path.join(plotsdir, name)
-    plt.savefig(filename)
-    plt.close()
+def plot_one_training_stat(name, values, plotsdir, **kwargs):
+    line_graph(values, name, plotsdir, smoothing=0.7, xname='Epochs', **kwargs)
 
 def plot_training_stats(csv_filename, stats_names, plotsdir):
     stats_dict = read_training_stats(csv_filename, stats_names)
+    stats_dict = convert_strings_to_numbers(stats_dict)
     plot_training_stats_dict(stats_dict, plotsdir)

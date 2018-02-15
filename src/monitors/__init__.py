@@ -12,3 +12,5 @@ from .saver import Saver
 
 from .time import ETA
 from .time import Hours
+
+from .batch_matrix_monitor import BatchMatrixMonitor

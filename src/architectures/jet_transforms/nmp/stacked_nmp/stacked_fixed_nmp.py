@@ -11,7 +11,7 @@ from ..message_passing import construct_mp_layer
 from ..message_passing import construct_adjacency_matrix_layer
 from ..fixed_nmp.adjacency import construct_physics_based_adjacency_matrix
 
-from .....visualizing import visualize_batch_2D
+from .....visualizing import visualize_batch_matrix
 from .....monitors import Histogram
 
 class StackedFixedNMP(nn.Module):
@@ -57,7 +57,7 @@ class StackedFixedNMP(nn.Module):
                     hidden=hidden,
                     symmetric=symmetric
                     )
-                    for _ in range(len(scales) -1 )]
+                    for _ in range(len(scales) - 1)]
         return nn.ModuleList([m1] + matrices)
 
     def forward(self, jets, mask=None, **kwargs):
@@ -86,7 +86,7 @@ class StackedFixedNMP(nn.Module):
                     if iters_left == 0:
                         self.dij_histogram.visualize('dij-epoch-{}-layer-{}'.format(ep, i))
                         self.dij_histogram.clear()
-                        visualize_batch_2D(dij, self.logger, 'epoch{}/adjacency-{}'.format(ep, i))
+                        visualize_batch_matrix(dij, self.logger.plotsdir, 'epoch{}/adjacency-{}'.format(ep, i))
 
 
             if not self.pool_first:

@@ -1,4 +1,5 @@
 import datetime
+
 from .baseclasses import ScalarMonitor
 from .baseclasses import Monitor
 
