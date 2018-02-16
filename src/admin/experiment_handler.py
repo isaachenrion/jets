@@ -110,7 +110,7 @@ class ExperimentHandler:
         '''----------------------------------------------------------------------- '''
         roc_auc = ROCAUC(visualizing=True)
         inv_fpr = InvFPR(visualizing=True)
-        best_inv_fpr = Best(inv_fpr)
+        best_roc_auc = Best(roc_auc)
         epoch_counter = Regurgitate('epoch', visualizing=False)
         batch_counter = Regurgitate('iteration', visualizing=False)
         valid_loss = Regurgitate('valid_loss', visualizing=True)
@@ -124,14 +124,14 @@ class ExperimentHandler:
 
         model_file = os.path.join(self.exp_dir, 'model_state_dict.pt')
         settings_file = os.path.join(self.exp_dir, 'settings.pickle')
-        self.saver = Saver(best_inv_fpr, model_file, settings_file, visualizing=False)
+        self.saver = Saver(best_roc_auc, model_file, settings_file, visualizing=False)
 
         monitors = [
             epoch_counter,
             batch_counter,
             roc_auc,
             inv_fpr,
-            best_inv_fpr,
+            best_roc_auc,
             valid_loss,
             train_loss,
             self.saver,
@@ -166,7 +166,7 @@ class ExperimentHandler:
                 kwargs['valid_loss'],
                 self.stats_logger.monitors['roc_auc'].value)
 
-        out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.2f}".format(self.stats_logger.monitors['inv_fpr'].value, self.stats_logger.monitors['best_inv_fpr'].value)
+        out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest roc_auc: {:.5f}".format(self.stats_logger.monitors['inv_fpr'].value, self.stats_logger.monitors['best_roc_auc'].value)
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)
 

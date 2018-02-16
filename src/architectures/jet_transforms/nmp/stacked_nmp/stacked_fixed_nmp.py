@@ -81,7 +81,7 @@ class StackedFixedNMP(nn.Module):
             ep = kwargs.get('epoch', None)
             iters_left = kwargs.get('iters_left', None)
             if self.logger is not None:
-                if ep is not None and ep % 1 == 0:
+                if ep is not None and ep % 20 == 0:
                     self.dij_histogram(values=dij.view(-1))
                     if iters_left == 0:
                         self.dij_histogram.visualize('dij-epoch-{}-layer-{}'.format(ep, i))
