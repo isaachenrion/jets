@@ -1,3 +1,4 @@
+import os
 import logging
 import torch
 import torch.nn as nn
@@ -6,7 +7,8 @@ import torch.nn.functional as F
 from .....architectures.readout import construct_readout
 from .....architectures.utils import Attention
 from .....misc.abstract_constructor import construct_object
-from .....visualizing import visualize_batch_matrix
+from .....monitors import BatchMatrixMonitor
+#from .....visualizing import visualize_batch_matrix
 
 def construct_pooling_layer(key, *args, **kwargs):
     dictionary = dict(
@@ -40,19 +42,36 @@ class RecurrentAttentionPooling(nn.Module):
         return new_hiddens
 
 class AttentionPooling(nn.Module):
-    def __init__(self, nodes_out, hidden):
+    def __init__(self, nodes_out, hidden, **kwargs):
         super().__init__()
         self.nodes_out = nodes_out
         self.readout = construct_readout('mult', hidden, hidden, nodes_out)
         self.attn = Attention()
         #self.recurrent_cell = nn.GRUCell(hidden, hidden)
+        self.set_monitors(kwargs.get('logger', None))
+
+    def set_monitors(self, logger):
+        #self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True)
+        self.monitor = BatchMatrixMonitor('attn')
+        #self.dij_histogram.initialize(None, os.path.join(logger.plotsdir, 'dij_histogram'))
+        self.monitor.initialize(None, os.path.join(logger.plotsdir, 'attention'))
+
 
     def forward(self, h, **kwargs):
         z = self.readout(h)
         new_hiddens, attns = self.attn(z, h, h)
 
-        ep = kwargs.get('epoch', None)
-        logger = kwargs.get('logger', None)
-        if ep is not None and logger is not None and ep % 10 == 0:
-            visualize_batch_matrix(attns, logger.plotsdir, 'epoch{}/attention-{}'.format(ep, self.nodes_out))
+        self.logging(attn=attns)
+
+        #ep = kwargs.get('epoch', None)
+        #logger = kwargs.get('logger', None)
+        #if ep is not None and logger is not None and ep % 10 == 0:
+        #    visualize_batch_matrix(attns, logger.plotsdir, 'attention-{}'.format(ep, self.nodes_out))
         return new_hiddens
+
+    def logging(self, dij=None, epoch=None, iters_left=None, **kwargs):
+        if epoch is not None and epoch % 20 == 0:
+            #self.dij_histogram(values=dij.view(-1))
+            if iters_left == 0:
+                self.monitor(attn=attn)
+                self.monitor.visualize('epoch-{}'.format(epoch), n=10)

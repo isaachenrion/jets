@@ -19,6 +19,10 @@ class BatchMatrixMonitor(Monitor):
         assert self.value.ndim == 3
         return self.value
 
-    def visualize(self, plotname=None, **kwargs):
+    def visualize(self, plotname=None, n=None, **kwargs):
         super().visualize()
-        visualize_batch_matrix(self.value, self.plotsdir, plotname)
+        if n is None:
+            matrices = self.value
+        else:
+            matrices = self.value[:n]
+        visualize_batch_matrix(matrices, self.plotsdir, plotname)

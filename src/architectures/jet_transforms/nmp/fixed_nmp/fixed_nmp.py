@@ -56,13 +56,13 @@ class FixedAdjacencyNMP(nn.Module):
         return out, _
 
     def logging(self, dij=None, epoch=None, iters_left=None, **kwargs):
-        if epoch is not None and epoch % 10 == 0:
+        if epoch is not None and epoch % 20 == 0:
             self.dij_histogram(values=dij.view(-1))
             if iters_left == 0:
                 self.dij_histogram.visualize('epoch-{}'.format(epoch))
                 #self.dij_histogram.clear()
                 self.dij_matrix_monitor(dij=dij)
-                self.dij_matrix_monitor.visualize('epoch-{}'.format(epoch))
+                self.dij_matrix_monitor.visualize('epoch-{}'.format(epoch), n=10)
 
 
 class PhysicsNMP(FixedAdjacencyNMP):
