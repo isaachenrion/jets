@@ -47,13 +47,13 @@ def summarize_training(jobdir, email=False):
         if mean is not None:
             # first print the aggregated stats
             out_str += '\n********** {} **********\n'.format(name)
-            out_str += '\nmean = {:.2f}\nstd = {:.2f}\n'.format(mean, std)
+            out_str += '\nmean = {:.5f}\nstd = {:.5f}\n'.format(mean, std)
             # then the collected stats
             out_str += '\n'
             for s in stats_dict[name]:
                 try:
                     s = float(s)
-                    out_str += '{:.2f}\n'.format(s)
+                    out_str += '{:.5f}\n'.format(s)
                 except (ValueError, TypeError):
                     out_str += '{}\n'.format(s)
 
