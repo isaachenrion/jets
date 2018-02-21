@@ -130,6 +130,6 @@ def train(args):
         settings['step_size'] = settings['step_size'] * (args.decay) ** (i + 1)
 
         if t1 - t_start > args.experiment_time - 60:
-            eh.finished()
-            
+            break
+
     eh.finished()
