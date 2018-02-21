@@ -20,7 +20,7 @@ class GRNNTransformSimple(nn.Module):
         nn.init.orthogonal(self.fc_h.weight, gain=gain)
 
 
-    def forward(self, jets):
+    def forward(self, jets, **kwargs):
         #n_jets = len(jets)
         #levels, children, n_inners, contents = batch(jets)
         levels, children, n_inners, contents, n_jets = jets
@@ -90,7 +90,7 @@ class GRNNTransformGated(nn.Module):
             self.down_gru = AnyBatchGRUCell(hidden, hidden)
 
 
-    def forward(self, jets, return_states=False):
+    def forward(self, jets, return_states=False, **kwargs):
 
         #n_jets = len(conte)
         levels, children, n_inners, contents, n_jets = jets
