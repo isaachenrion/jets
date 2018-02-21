@@ -52,9 +52,9 @@ class Emailer:
               try:
                   server.sendmail(self.sender, self.recipient, msg.as_string())
                   sent = True
-              except smtplib.SMTPDataError:
+              except smtplib.SMTPException:
                   time.sleep(5)
                   attempts += 1
-                  
+
           server.close()
           logging.info("SENT EMAIL")
