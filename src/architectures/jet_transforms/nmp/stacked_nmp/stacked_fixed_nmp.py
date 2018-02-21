@@ -122,7 +122,7 @@ class StackedFixedNMP(AbstractStackedFixedNMP):
             self.logging(dij=dij, **kwargs)
 
             if not self.pool_first:
-                h = pool(h, **kwargs)
+                h, attns = pool(h, **kwargs)
 
         out = self.readout(h)
         return out, _
