@@ -89,12 +89,12 @@ class StackedFixedNMP(AbstractStackedFixedNMP):
 
     def set_adjacency_matrices(self, scales=None, features=None, hidden=None, symmetric=None,adaptive_matrix=None, **kwargs):
         m1 = construct_adjacency_matrix_layer(
-                    adaptive_matrix=adaptive_matrix,
+                    key=adaptive_matrix,
                     hidden=features+1,
                     symmetric=symmetric
                     )
         matrices = [construct_adjacency_matrix_layer(
-                    adaptive_matrix=adaptive_matrix,
+                    key=adaptive_matrix,
                     hidden=hidden,
                     symmetric=symmetric
                     )
@@ -140,7 +140,7 @@ class PhysicsPlusLearnedStackedFixedNMP(StackedFixedNMP):
                 trainable_physics=trainable_physics
                 )
         matrices = [construct_adjacency_matrix_layer(
-                    adaptive_matrix=adaptive_matrix,
+                    key=adaptive_matrix,
                     hidden=hidden,
                     symmetric=symmetric
                     )
