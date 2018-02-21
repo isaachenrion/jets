@@ -45,12 +45,16 @@ class Emailer:
           server.ehlo()
           server.starttls()
           server.login(self.sender, self.password)
+
           sent = False
-          while not sent:
+          attempts = 0
+          while not sent and attempts < 10:
               try:
                   server.sendmail(self.sender, self.recipient, msg.as_string())
                   sent = True
-              except SMTPDataError:
+              except smtplib.SMTPDataError:
                   time.sleep(5)
+                  attempts += 1
+                  
           server.close()
           logging.info("SENT EMAIL")
