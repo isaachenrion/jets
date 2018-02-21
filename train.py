@@ -27,6 +27,7 @@ parser.add_argument("-r", "--restart", help="restart a loaded model from where i
 # Training args
 parser.add_argument("-e", "--epochs", type=int, default=EPOCHS)
 parser.add_argument("-b", "--batch_size", type=int, default=BATCH_SIZE)
+parser.add_argument("--experiment_time", type=int, default=1000000)
 
 # Optimization args
 parser.add_argument("-a", "--step_size", type=float, default=STEP_SIZE)

@@ -25,6 +25,8 @@ def reset_unused_args(args):
     #        args.R = None
     #    #args.alpha = None
 
+    args.experiment_time *= 60
+
     args.train = True
     if args.debug:
         args.no_email = True
