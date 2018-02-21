@@ -1,12 +1,13 @@
 import csv
 import os
 import logging
+from collections import OrderedDict
 
 from ..visualizing.plot_training_stats import plot_training_stats
 
 
 class StatsLogger:
-    def __init__(self, directory, monitors, visualizing, train):
+    def __init__(self, directory, monitor_dict, visualizing, train):
         self.train = train
         self.visualizing = visualizing
 
@@ -16,10 +17,10 @@ class StatsLogger:
         os.makedirs(self.plotsdir)
         self.scalar_filename = os.path.join(self.statsdir, 'scalars.csv')
 
-        self.monitors = {}
+        self.monitors = OrderedDict()
         self.visualized_scalar_monitors = []
         self.headers = []
-        self.add_many_monitors(**monitors)
+        self.add_many_monitors(**monitor_dict)
 
         with open(self.scalar_filename, 'a', newline='') as f:
             writer = csv.DictWriter(f, self.headers)

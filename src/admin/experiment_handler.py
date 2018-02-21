@@ -6,6 +6,8 @@ import numpy as np
 import socket
 import shutil
 
+from collections import OrderedDict
+
 from .utils import get_logfile
 from .emailer import get_emailer
 from .signal_handler import SignalHandler
@@ -111,6 +113,7 @@ class ExperimentHandler:
         roc_auc = ROCAUC(visualizing=True)
         inv_fpr = InvFPR(visualizing=True)
         best_roc_auc = Best(roc_auc)
+        inv_fpr_at_best_roc_auc = LogOnImprovement(inv_fpr, best_roc_auc)
         epoch_counter = Regurgitate('epoch', visualizing=False)
         batch_counter = Regurgitate('iteration', visualizing=False)
         valid_loss = Regurgitate('valid_loss', visualizing=True)
@@ -132,6 +135,7 @@ class ExperimentHandler:
             roc_auc,
             inv_fpr,
             best_roc_auc,
+            inv_fpr_at_best_roc_auc,
             valid_loss,
             train_loss,
             self.saver,
@@ -142,8 +146,9 @@ class ExperimentHandler:
             eta
         ]
 
-        monitors = {m.name: m for m in monitors}
-        self.stats_logger = StatsLogger(self.exp_dir, monitors, args.visualizing, train=True)
+        monitor_dict = OrderedDict()
+        for m in monitors: monitor_dict[m.name] = m
+        self.stats_logger = StatsLogger(self.exp_dir, monitor_dict, args.visualizing, train=True)
 
     def record_settings(self, args):
         ''' RECORD SETTINGS '''
