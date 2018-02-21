@@ -67,7 +67,7 @@ class AttentionPooling(nn.Module):
         #logger = kwargs.get('logger', None)
         #if ep is not None and logger is not None and ep % 10 == 0:
         #    visualize_batch_matrix(attns, logger.plotsdir, 'attention-{}'.format(ep, self.nodes_out))
-        return new_hiddens
+        return new_hiddens, attns
 
     def logging(self, dij=None, epoch=None, iters_left=None, **kwargs):
         if epoch is not None and epoch % 20 == 0:

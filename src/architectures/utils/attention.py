@@ -71,6 +71,8 @@ class Attention(nn.Module):
         if torch.cuda.is_available():
             dimensions = dimensions.cuda()
         scaling_factor = torch.sqrt(1 / dimensions)
-        alpha = F.softmax(s / scaling_factor)
+        alpha = F.softmax(s.transpose(0, 2) / scaling_factor)
+        alpha = alpha.transpose(0,2)
+        #import ipdb; ipdb.set_trace()
         output = torch.bmm(alpha, value)
         return output, alpha
