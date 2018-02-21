@@ -1,6 +1,6 @@
 import logging
 import os
-
+import time
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -45,6 +45,12 @@ class Emailer:
           server.ehlo()
           server.starttls()
           server.login(self.sender, self.password)
-          server.sendmail(self.sender, self.recipient, msg.as_string())
+          sent = False
+          while not sent:
+              try:
+                  server.sendmail(self.sender, self.recipient, msg.as_string())
+                  sent = True
+              except SMTPDataError:
+                  time.sleep(5)
           server.close()
           logging.info("SENT EMAIL")
