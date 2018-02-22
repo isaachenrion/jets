@@ -31,7 +31,7 @@ class FixedAdjacencyNMP(nn.Module):
         self.embedding = construct_embedding('simple', features + 1, hidden, act=kwargs.get('act', None))
         self.mp_layers = nn.ModuleList([construct_mp_layer('fixed', hidden=hidden,**kwargs) for _ in range(iters)])
         self.readout = construct_readout(readout, hidden, hidden)
-        self.adjacency_matrix = self.set_adjacency_matrix(features=features, **kwargs)
+        self.adjacency_matrix = self.set_adjacency_matrix(features=features,**kwargs)
         self.set_monitors(kwargs.get('logger', None))
 
     def set_monitors(self, logger):
@@ -55,14 +55,14 @@ class FixedAdjacencyNMP(nn.Module):
 
         return out, _
 
-    def logging(self, dij=None, mask=None, epoch=None, iters_left=None, **kwargs):
-        if epoch is not None and epoch % 1 == 0:
+    def logging(self, dij=None, mask=None, epoch=None, iters=None, **kwargs):
+        if epoch is not None and epoch % 20 == 0:
             #import ipdb; ipdb.set_trace()
             nonmask_ends = [int(torch.sum(m,0)[0]) for m in mask.data]
             dij_hist = [d[:nme, :nme].contiguous().view(-1) for d, nme in zip(dij, nonmask_ends)]
             dij_hist = torch.cat(dij_hist,0)
             self.dij_histogram(values=dij_hist)
-            if iters_left == 0:
+            if iters == 0:
                 self.dij_histogram.visualize('epoch-{}'.format(epoch))
                 #self.dij_histogram.clear()
                 self.dij_matrix_monitor(dij=dij)
@@ -131,10 +131,10 @@ class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
         else:
             self.component_monitor = None
 
-    def logging(self, epoch=None, iters_left=None, **kwargs):
-        super().logging(epoch=epoch, iters_left=iters_left, **kwargs)
+    def logging(self, epoch=None, iters=None, iters_left=None, **kwargs):
+        super().logging(epoch=epoch, iters_left=iters_left, iters=iters, **kwargs)
         if self.component_monitor is not None:
-            if epoch is not None and epoch % 1 == 0 and iters_left == 0:
+            if epoch is not None and epoch % 1 == 0 and iters == 0:
                 self.component_monitor(physics_component=self.physics_component)
                 self.component_monitor.visualize('physics_component')
 

@@ -110,7 +110,7 @@ def train(args):
             idx = slice(start, start+args.batch_size)
             X, y = X_train[idx], y_train[idx]
             X_var = wrap_jet(X); y_var = wrap(y)
-            y_pred = model(X_var, logger=eh.stats_logger, epoch=i, iters_left=iters_left)
+            y_pred = model(X_var, logger=eh.stats_logger, epoch=i, iters=n_batches-iters_left-1, iters_left=iters_left)
             l = loss(y_pred, y_var)
             l.backward()
             if args.clip is not None:

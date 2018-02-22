@@ -215,7 +215,7 @@ def save_pickle(filename):
         pickle.dump((x, y), f)
         print('Saved to {}'.format(savefile))
 
-def mixed_datasets():
+#def mixed_datasets():
 
     #jet_dataset = SupervisedDataset(x, y)
     #jet_dataset.extract()

@@ -42,14 +42,14 @@ class Best(ScalarMonitor):
 
 class LogOnImprovement(ScalarMonitor):
     def __init__(self, monitor, trigger_monitor):
-        super().__init__('{}_at_best_{}'.format(monitor.name, trigger_monitor.name))
+        super().__init__('{}_at_{}'.format(monitor.name, trigger_monitor.name))
         self.monitor = monitor
         self.trigger_monitor = trigger_monitor
 
     def call(self, **kwargs):
         if self.trigger_monitor.changed:
             self.value = self.monitor.value
-        return self.value 
+        return self.value
 
 class Regurgitate(ScalarMonitor):
     def __init__(self, value_name, **kwargs):

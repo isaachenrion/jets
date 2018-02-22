@@ -113,6 +113,7 @@ class ExperimentHandler:
         roc_auc = ROCAUC(visualizing=True)
         inv_fpr = InvFPR(visualizing=True)
         best_roc_auc = Best(roc_auc)
+        best_inv_fpr = Best(inv_fpr)
         inv_fpr_at_best_roc_auc = LogOnImprovement(inv_fpr, best_roc_auc)
         epoch_counter = Regurgitate('epoch', visualizing=False)
         batch_counter = Regurgitate('iteration', visualizing=False)
@@ -127,7 +128,7 @@ class ExperimentHandler:
 
         model_file = os.path.join(self.exp_dir, 'model_state_dict.pt')
         settings_file = os.path.join(self.exp_dir, 'settings.pickle')
-        self.saver = Saver(best_roc_auc, model_file, settings_file, visualizing=False)
+        saver = Saver(best_roc_auc, model_file, settings_file, visualizing=False)
 
         monitors = [
             epoch_counter,
@@ -135,10 +136,11 @@ class ExperimentHandler:
             roc_auc,
             inv_fpr,
             best_roc_auc,
+            best_inv_fpr,
             inv_fpr_at_best_roc_auc,
             valid_loss,
             train_loss,
-            self.saver,
+            saver,
             #prediction_histogram,
             logtimer,
             cumulative_timer,
@@ -148,7 +150,9 @@ class ExperimentHandler:
 
         monitor_dict = OrderedDict()
         for m in monitors: monitor_dict[m.name] = m
+        
         self.stats_logger = StatsLogger(self.exp_dir, monitor_dict, args.visualizing, train=True)
+        self.saver = saver
 
     def record_settings(self, args):
         ''' RECORD SETTINGS '''

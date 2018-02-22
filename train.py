@@ -75,7 +75,7 @@ parser.add_argument("--alpha", type=float, default=1)
 parser.add_argument("-R", type=float, default=1)
 
 # Physics plus learned NMP
-parser.add_argument( "--physics_component", type=float, default=0.5)
+parser.add_argument( "--physics_component", type=float, default=0.)
 parser.add_argument("--learned_tradeoff", action='store_true', default=False)
 
 # Transformer

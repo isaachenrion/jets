@@ -51,7 +51,7 @@ def plot_training_versus_validation_loss(training_loss, validation_loss, plotsdi
         ax.set_xticks(x_range)
     else:
         ax.set_xticks([i for i in range(len(training_loss)) if i % 10 == 0])
-    ax.set_yticks(np.linspace(0.0, 1.0, num=21))
+    ax.set_yticks(np.linspace(0.2, 0.5, num=7))
     plt.grid()
 
     # labelling
