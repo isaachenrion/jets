@@ -51,13 +51,17 @@ class FixedAdjacencyNMP(nn.Module):
         out = self.readout(h)
 
         # logging
-        self.logging(dij=dij, **kwargs)
+        self.logging(dij=dij, mask=mask, **kwargs)
 
         return out, _
 
-    def logging(self, dij=None, epoch=None, iters_left=None, **kwargs):
-        if epoch is not None and epoch % 20 == 0:
-            self.dij_histogram(values=dij.view(-1))
+    def logging(self, dij=None, mask=None, epoch=None, iters_left=None, **kwargs):
+        if epoch is not None and epoch % 1 == 0:
+            #import ipdb; ipdb.set_trace()
+            nonmask_ends = [int(torch.sum(m,0)[0]) for m in mask.data]
+            dij_hist = [d[:nme, :nme].contiguous().view(-1) for d, nme in zip(dij, nonmask_ends)]
+            dij_hist = torch.cat(dij_hist,0)
+            self.dij_histogram(values=dij_hist)
             if iters_left == 0:
                 self.dij_histogram.visualize('epoch-{}'.format(epoch))
                 #self.dij_histogram.clear()
