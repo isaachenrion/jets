@@ -94,7 +94,7 @@ class GRNNTransformGated(nn.Module):
 
         #n_jets = len(conte)
         levels, children, n_inners, contents, n_jets = jets
-        n_jets = len(contents)
+        #n_jets = len(contents)
         #parents= batch_parents(jets)
 
         up_embeddings = [None for _ in range(len(levels))]

@@ -95,7 +95,7 @@ class Collect(ScalarMonitor):
 
 class Histogram(Monitor):
     def __init__(self, name, n_bins=30, rootname=None, append=False, max_capacity=None, **kwargs):
-        super().__init__('{}'.format(name), **kwargs)
+        super().__init__('{}'.format(name + '_histogram'), **kwargs)
         self.value = None
         self.max_capacity = max_capacity if max_capacity is not None else np.inf
         self.n_bins = n_bins

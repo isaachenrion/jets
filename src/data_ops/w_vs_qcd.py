@@ -5,7 +5,7 @@ import numpy as np
 from .batching import *
 from .Jet import Jet
 
-def convert_entry_to_class_format(x, y):
+def convert_to_jet(x, y):
     tree_content = x['content']
     tree = x['tree']
     root_id = x['root_id']
@@ -27,6 +27,9 @@ def convert_entry_to_class_format(x, y):
         eta=eta,
         phi=phi,
         y=y,
+        tree=tree,
+        root_id=root_id,
+        tree_content=tree_content
     )
     return jet
 

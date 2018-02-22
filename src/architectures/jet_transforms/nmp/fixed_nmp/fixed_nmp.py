@@ -32,13 +32,19 @@ class FixedAdjacencyNMP(nn.Module):
         self.mp_layers = nn.ModuleList([construct_mp_layer('fixed', hidden=hidden,**kwargs) for _ in range(iters)])
         self.readout = construct_readout(readout, hidden, hidden)
         self.adjacency_matrix = self.set_adjacency_matrix(features=features,**kwargs)
-        self.set_monitors(kwargs.get('logger', None))
+        self.set_monitors()
+        self.initialize_monitors(kwargs.get('logger', None))
 
-    def set_monitors(self, logger):
+    def set_monitors(self):
         self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True)
         self.dij_matrix_monitor = BatchMatrixMonitor('dij')
-        self.dij_histogram.initialize(None, os.path.join(logger.plotsdir, 'dij_histogram'))
-        self.dij_matrix_monitor.initialize(None, os.path.join(logger.plotsdir, 'adjacency_matrix'))
+        #self.dij_histogram.initialize(None, os.path.join(logger.plotsdir, 'dij_histogram'))
+        #self.dij_matrix_monitor.initialize(None, os.path.join(logger.plotsdir, 'adjacency_matrix'))
+
+        self.monitors = [self.dij_matrix_monitor, self.dij_histogram]
+
+    def initialize_monitors(self, logger):
+        for m in self.monitors: m.initialize(logger.plotsdir, m.name)
 
     def set_adjacency_matrix(self, **kwargs):
         pass
@@ -84,9 +90,6 @@ class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        logger = kwargs.get('logger', None)
-        self.set_monitors(logger)
-
     @property
     def physics_component(self):
         return torch.sigmoid(self._physics_component)
@@ -117,26 +120,33 @@ class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
                         trainable_physics=kwargs.pop('trainable_physics', None)
                         )
 
-        def combined_matrix(jets, **kwargs):
-            out = self.physics_component * self.physics_matrix(jets, **kwargs) \
-                + (1 - self.physics_component) * self.learned_matrix(jets, **kwargs)
+        def combined_matrix(jets, epoch=None, iters=None, **kwargs):
+            P = self.physics_matrix(jets, **kwargs)
+            L = self.learned_matrix(jets, **kwargs)
+            x = self.physics_component
+            out = x * P + (1 - x) * L
+
+            # logging
+            if epoch is not None and iters == 0:
+                self.component_monitor(physics_component=self.physics_component)
+                self.component_monitor.visualize('physics_component')
+                if epoch % 20 == 0:
+                    self.physics_matrix_monitor(physics=P)
+                    self.physics_matrix_monitor.visualize('epoch-{}'.format(epoch), n=10)
+                    self.learned_matrix_monitor(learned=L)
+                    self.learned_matrix_monitor.visualize('epoch-{}'.format(epoch), n=10)
+
             return out
         return combined_matrix
 
-    def set_monitors(self, logger):
-        super().set_monitors(logger)
-        if logger is not None:
-            self.component_monitor = Collect('physics_component', fn='last')
-            self.component_monitor.initialize(logger.statsdir, logger.plotsdir)
-        else:
-            self.component_monitor = None
+    def set_monitors(self):
+        super().set_monitors()
+        self.component_monitor = Collect('physics_component', fn='last')
+        self.physics_matrix_monitor = BatchMatrixMonitor('physics')
+        self.learned_matrix_monitor = BatchMatrixMonitor('learned')
 
-    def logging(self, epoch=None, iters=None, iters_left=None, **kwargs):
-        super().logging(epoch=epoch, iters_left=iters_left, iters=iters, **kwargs)
-        if self.component_monitor is not None:
-            if epoch is not None and epoch % 1 == 0 and iters == 0:
-                self.component_monitor(physics_component=self.physics_component)
-                self.component_monitor.visualize('physics_component')
+        self.monitors.extend([self.component_monitor, self.physics_matrix_monitor, self.learned_matrix_monitor])
+
 
 
 class EyeNMP(FixedAdjacencyNMP):

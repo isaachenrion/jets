@@ -12,7 +12,7 @@ class BatchMatrixMonitor(Monitor):
     ''' Collects a batch of matrices, usually for visualization'''
     def __init__(self, value_name, **kwargs):
         self.value_name = value_name
-        super().__init__(value_name, **kwargs)
+        super().__init__(value_name + '_matrix', **kwargs)
 
     def call(self, **kwargs):
         self.value = ensure_numpy_array(kwargs[self.value_name])
