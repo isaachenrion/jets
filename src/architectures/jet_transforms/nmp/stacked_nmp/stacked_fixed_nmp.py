@@ -128,7 +128,7 @@ class StackedFixedNMP(AbstractStackedFixedNMP):
         return out, _
 
 
-
+#deprecated
 class PhysicsPlusLearnedStackedFixedNMP(StackedFixedNMP):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

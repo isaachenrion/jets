@@ -140,7 +140,7 @@ class EyeNMP(FixedAdjacencyNMP):
         super().__init__(**kwargs)
 
     def set_adjacency_matrix(self, **kwargs):
-        def eye(jets, **kwargs):
+        def eye(jets, mask=None, **kwargs):
             bs, sz, _ = jets.size()
             matrix = Variable(torch.eye(sz).unsqueeze(0).repeat(bs, 1, 1))
             if torch.cuda.is_available():
@@ -155,7 +155,7 @@ class OnesNMP(FixedAdjacencyNMP):
         super().__init__(**kwargs)
 
     def set_adjacency_matrix(self, **kwargs):
-        def ones(jets, mask=mask, **kwargs):
+        def ones(jets, mask=None, **kwargs):
             bs, sz, _ = jets.size()
             matrix = Variable(torch.ones(bs, sz, sz))
             if torch.cuda.is_available():

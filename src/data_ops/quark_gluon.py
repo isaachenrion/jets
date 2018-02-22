@@ -16,7 +16,9 @@ class Jet:
             photon_phi,
             jet_pt,
             jet_eta,
-            jet_phi
+            jet_phi,
+            y,
+            env
             ):
 
         self.constituents = constituents
@@ -27,7 +29,9 @@ class Jet:
         self.pt = jet_pt
         self.eta = jet_eta
         self.phi = jet_phi
+        self.y = y
         self.progenitor = progenitor
+        self.env = env
 
     def to_tensor(self):
         return torch.Tensor(self.constituents)
@@ -62,37 +66,42 @@ class Jet:
         return len(self.constituents)
 
 
-class JetDataset(Dataset):
-    def __init__(self, jets):
+class SupervisedDataset(Dataset):
+    def __init__(self, x, y):
         super().__init__()
-        self.jets = jets
-        self.extracted = False
+        self.x = x
+        self.y = y
 
     def shuffle(self):
-        self.jets = [self.jets[i] for i in np.random.permutation(len(self.jets))]
+        perm = np.random.permutation(len(self.x))
+        self.x = [self.x[i] for i in perm]
+        self.y = [self.y[i] for i in perm]
+
+    @classmethod
+    def concatenate(cls, dataset1, dataset2):
+        return cls(dataset1.x + dataset2.x, dataset1.y + dataset2.y)
 
     @property
     def dim(self):
-        return self.jets[0].size()[1]
-
-    def extract(self):
-        if not self.extracted:
-            self.jets = [j.extract().to_tensor() for j in self.jets]
-            self.extracted = True
-        return self
+        return self.x[0].size()[1]
 
     def __len__(self):
-        return len(self.jets)
+        return len(self.x)
 
     def __getitem__(self, idx):
-        return self.jets[idx]
+        return self.x[idx], self.y[idx]
 
 class VariableLengthDataLoader(DataLoader):
     def __init__(self, dataset, batch_size, return_mask=False):
         self.return_mask = return_mask
         super().__init__(dataset, batch_size, collate_fn=self.collate)
 
-    def collate(self, data):
+    def collate(self, xy_pairs):
+        data = [x for x, y in xy_pairs]
+        y = torch.stack([y for x, y in xy_pairs], 0)
+        if y.size()[1] == 1:
+            y = y.squeeze(1)
+
         seq_lengths = [len(x) for x in data]
         max_seq_length = max(seq_lengths)
         padded_data = torch.zeros(len(data), max_seq_length, self.dataset.dim)
@@ -107,9 +116,9 @@ class VariableLengthDataLoader(DataLoader):
                     mask[i, seq_length:, :].fill_(0)
                     mask[i, :, seq_length:].fill_(0)
             return padded_data, mask
-        return padded_data
+        return padded_data, y
 
-def convert_entry_to_class_format(entry, progenitor):
+def convert_entry_to_class_format(entry, progenitor, y, env):
     constituents, header = entry
 
     header = [float(x) for x in header.split('\t')]
@@ -138,7 +147,9 @@ def convert_entry_to_class_format(entry, progenitor):
         photon_phi=photon_phi,
         jet_pt=jet_pt,
         jet_eta=jet_eta,
-        jet_phi=jet_phi
+        jet_phi=jet_phi,
+        y=y,
+        env=env
     )
     #import ipdb; ipdb.set_trace()
     return jet
@@ -168,13 +179,21 @@ def split_contents(contents):
             jet_contents.append((constituents, header))
     return jet_contents
 
-def preprocess(filename):
+def save_pickle(filename):
     if 'quark' in filename:
         progenitor = 'quark'
+        y = 0
     elif 'gluon' in filename:
         progenitor = 'gluon'
+        y = 1
     else:
         raise ValueError('could not recognize particle in filename')
+    if 'pp' in filename:
+        env = 0
+    elif 'pbpb' in filename:
+        env = 1
+    else:
+        raise ValueError('unrecognised env')
 
     with open(filename, 'r') as f:
         contents = [l.strip() for l in f.read().split('\n')]
@@ -183,35 +202,47 @@ def preprocess(filename):
 
     jets = []
     for entry in entries:
-        jet = convert_entry_to_class_format(entry, progenitor)
+        jet = convert_entry_to_class_format(entry, progenitor, y, env)
         jets.append(jet)
 
-    jet_dataset = JetDataset(jets[:10])
+    jet = jets[:10]
+    x = [j.extract().to_tensor() for j in jets]
+    y = [torch.LongTensor([j.y, j.env]) for j in jets]
+
+    # saving the data
+    savefile = filename.split('.')[0] + '.pickle'
+    with open(savefile, 'wb') as f:
+        pickle.dump((x, y), f)
+        print('Saved to {}'.format(savefile))
+
+def mixed_datasets():
+
+    #jet_dataset = SupervisedDataset(x, y)
+    #jet_dataset.extract()
     #dataloader = VariableLengthDataLoader(jet_dataset, batch_size=7)
     #for d in dataloader:
-    #    print(len(d))
+    #    #print(len(d))
     #    print(d)
 
     #import ipdb; ipdb.set_trace()
-    return jet_dataset
+    #return jet_dataset
 
 def mix(dataset1, dataset2):
-    new_dataset = JetDataset(dataset1.jets + dataset2.jets)
+    new_dataset = SupervisedDataset.concatenate(dataset1, dataset2)
     new_dataset.shuffle()
     return new_dataset
 
-def main(data_dir):
+def convert_all_to_pickle(data_dir):
     filenames = (
-        #'quark_pp.txt',
+        'quark_pp.txt',
         'quark_pbpb.txt',
-        #'gluon_pp.txt',
+        'gluon_pp.txt',
         'gluon_pbpb.txt'
     )
 
-    #for fn in filenames:
-    quark_jet_dataset = preprocess(os.path.join(data_dir, filenames[0]))
-    gluon_jet_dataset = preprocess(os.path.join(data_dir, filenames[0]))
-
-    mixed_jet_dataset = mix(quark_jet_dataset, gluon_jet_dataset)
-
-    
+    for fn in filenames:
+        save_pickle(os.path.join(data_dir, fn))
+    #quark_jet_dataset = save_pickle(os.path.join(data_dir, filenames[0]))
+    #gluon_jet_dataset = save_pickle(os.path.join(data_dir, filenames[0]))
+    #mixed_jet_dataset = mix(quark_jet_dataset, gluon_jet_dataset)
+    #import ipdb; ipdb.set_trace()
