@@ -1,122 +1,9 @@
-import os
-import pickle
-import numpy as np
+
 import torch
-from torch.utils.data import Dataset
-from torch.utils.data import DataLoader
 
-class Jet:
-    def __init__(
-            self,
-            progenitor,
-            constituents,
-            mc_weight,
-            photon_pt,
-            photon_eta,
-            photon_phi,
-            jet_pt,
-            jet_eta,
-            jet_phi,
-            y,
-            env
-            ):
-
-        self.constituents = constituents
-        self.mc_weight = mc_weight
-        self.photon_pt = photon_pt
-        self.photon_eta = photon_eta
-        self.photon_phi = photon_phi
-        self.pt = jet_pt
-        self.eta = jet_eta
-        self.phi = jet_phi
-        self.y = y
-        self.progenitor = progenitor
-        self.env = env
-
-    def to_tensor(self):
-        return torch.Tensor(self.constituents)
-
-    def extract(self):
-        content = np.zeros((len(self), 7))
-
-        for i in range(len(self)):
-            px = self.constituents[i, 0]
-            py = self.constituents[i, 1]
-            pz = self.constituents[i, 2]
-
-            p = (self.constituents[i, 0:3] ** 2).sum() ** 0.5
-            eta = 0.5 * (np.log(p + pz) - np.log(p - pz))
-            theta = 2 * np.arctan(np.exp(-eta))
-            pt = p / np.cosh(eta)
-            phi = np.arctan2(py, px)
-
-            content[i, 0] = p
-            content[i, 1] = eta if np.isfinite(eta) else 0.0
-            content[i, 2] = phi
-            content[i, 3] = self.constituents[i, 3]
-            content[i, 4] = 0
-            content[i, 5] = pt if np.isfinite(pt) else 0.0
-            content[i, 6] = theta if np.isfinite(theta) else 0.0
-
-        self.constituents = content
-        return self
-
-
-    def __len__(self):
-        return len(self.constituents)
-
-
-class SupervisedDataset(Dataset):
-    def __init__(self, x, y):
-        super().__init__()
-        self.x = x
-        self.y = y
-
-    def shuffle(self):
-        perm = np.random.permutation(len(self.x))
-        self.x = [self.x[i] for i in perm]
-        self.y = [self.y[i] for i in perm]
-
-    @classmethod
-    def concatenate(cls, dataset1, dataset2):
-        return cls(dataset1.x + dataset2.x, dataset1.y + dataset2.y)
-
-    @property
-    def dim(self):
-        return self.x[0].size()[1]
-
-    def __len__(self):
-        return len(self.x)
-
-    def __getitem__(self, idx):
-        return self.x[idx], self.y[idx]
-
-class VariableLengthDataLoader(DataLoader):
-    def __init__(self, dataset, batch_size, return_mask=False):
-        self.return_mask = return_mask
-        super().__init__(dataset, batch_size, collate_fn=self.collate)
-
-    def collate(self, xy_pairs):
-        data = [x for x, y in xy_pairs]
-        y = torch.stack([y for x, y in xy_pairs], 0)
-        if y.size()[1] == 1:
-            y = y.squeeze(1)
-
-        seq_lengths = [len(x) for x in data]
-        max_seq_length = max(seq_lengths)
-        padded_data = torch.zeros(len(data), max_seq_length, self.dataset.dim)
-        for i, x in enumerate(data):
-            padded_data[i][:len(x)] = x
-
-        if self.return_mask:
-            mask = torch.ones(len(data), max_seq_length, max_seq_length)
-            for i, x in enumerate(data):
-                seq_length = len(x)
-                if seq_length < max_seq_length:
-                    mask[i, seq_length:, :].fill_(0)
-                    mask[i, :, seq_length:].fill_(0)
-            return padded_data, mask
-        return padded_data, y
+from .SupervisedDataset import SupervisedDataset
+from .VariableLengthDataLoader import VariableLengthDataLoader as DataLoader
+from .Jet import Jet
 
 def convert_entry_to_class_format(entry, progenitor, y, env):
     constituents, header = entry
@@ -227,10 +114,10 @@ def save_pickle(filename):
     #import ipdb; ipdb.set_trace()
     #return jet_dataset
 
-def mix(dataset1, dataset2):
-    new_dataset = SupervisedDataset.concatenate(dataset1, dataset2)
-    new_dataset.shuffle()
-    return new_dataset
+#def mix(dataset1, dataset2):
+#    new_dataset = SupervisedDataset.concatenate(dataset1, dataset2)
+#    new_dataset.shuffle()
+#    return new_dataset
 
 def convert_all_to_pickle(data_dir):
     filenames = (
