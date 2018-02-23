@@ -44,7 +44,7 @@ class FixedAdjacencyNMP(nn.Module):
         self.monitors = [self.dij_matrix_monitor, self.dij_histogram]
 
     def initialize_monitors(self, logger):
-        for m in self.monitors: m.initialize(logger.plotsdir, m.name)
+        for m in self.monitors: m.initialize(None, logger.plotsdir)
 
     def set_adjacency_matrix(self, **kwargs):
         pass
