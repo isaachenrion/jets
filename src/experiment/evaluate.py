@@ -15,14 +15,16 @@ from collections import OrderedDict
 from ..admin import EvaluationExperimentHandler
 from ..misc.constants import *
 
-#from ..loading.data import prepare_test_data
+from ..data_ops.load_dataset import load_test_dataset
+from ..data_ops.wrapping import unwrap
+from ..data_ops.dataloaders import LeafJetLoader
+from ..data_ops.dataloaders import TreeJetLoader
+
 from ..loading.model import load_model
 
 from ..analysis.reports import report_score
 from ..analysis.reports import remove_outliers
 from ..analysis.scraping import remove_outliers_csv
-
-#from ..data_ops.wrapping import wrap, unwrap, wrap_jet, unwrap_jet
 
 from ..analysis.plotting import plot_rocs
 from ..analysis.plotting import plot_show
@@ -46,7 +48,7 @@ def evaluate(args):
     logging.info("MODEL PATHS\n{}".format("\n".join(mp for (_,mp) in model_type_paths)))
 
 
-    def evaluate_models(X, yy, w, model_filenames, batch_size=64):
+    def evaluate_models(dataloader, model_filenames, batch_size=64):
         rocs = []
         fprs = []
         tprs = []
@@ -56,17 +58,16 @@ def evaluate(args):
             if 'DS_Store' not in filename:
                 logging.info("\t[{}] Loading {}".format(i, filename)),
                 model = load_model(filename)
-                #if torch.cuda.is_available():
-                #    model.cuda()
+
                 model_test_file = os.path.join(filename, 'test-rocs.pickle')
                 work = args.recompute or not os.path.exists(model_test_file)
                 if work:
                     t0 = time.time()
                     model.eval()
 
-                    offset = 0
+                    #offset = 0
                     yy_pred = []
-                    n_batches, remainder = np.divmod(len(X), batch_size)
+                    #n_batches, remainder = np.divmod(len(X), batch_size)
                     for i in range(n_batches):
                         X_batch = X[offset:offset+batch_size]
                         X_var = wrap_jet(X_batch)
@@ -123,11 +124,18 @@ def evaluate(args):
 
     ''' BUILD ROCS '''
     '''----------------------------------------------------------------------- '''
-    dataset = DATASETS[args.dataset]
+    #dataset = DATASETS[args.dataset]
+    intermediate_dir, data_filename = DATASETS[args.dataset]
     if args.recompute or args.inventory is None:
 
-        logging.info('Building ROCs for models trained on {}'.format(dataset))
+        logging.info('Building ROCs for models trained on {}'.format(data_filename))
         X_test, y_test, w_test = prepare_test_data(args.data_dir, "{}-train.pickle".format(dataset), args.n_test, args.pileup)
+        test_dataset = load_test_dataset(data_dir, data_filename, args.n_test, args.pileup)
+        if args.jet_transform in ['recs', 'recg']:
+            DataLoader = TreeJetLoader
+        else:
+            DataLoader = LeafJetLoader
+        test_data_loader = DataLoader(test_dataset, batch_size = args.batch_size)
         #tf = load_tf(args.data_dir, "{}-train.pickle".format(dataset))
         #X, y = load_data(args.data_dir, "{}-{}.pickle".format(dataset, args.dataset_type))
         #for ij, jet in enumerate(X):
