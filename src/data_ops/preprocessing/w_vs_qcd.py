@@ -33,30 +33,9 @@ def convert_to_jet(x, y):
     )
     return jet
 
-def null():
+def preprocess(raw_data_dir, filename):
+    filename = os.path.join(raw_data_dir, filename)
     with open(filename, 'rb') as f:
         X, Y = pickle.load(f, encoding='latin-1')
-    jets = []
-    for x, y in zip(X, Y):
-        jet = convert_entry_to_class_format(x, y)
-        jets.append(jet)
-    jet = jets[:10]
-    x = [j.extract().to_tensor() for j in jets]
-    y = [torch.LongTensor([j.y, j.env]) for j in jets]
-    # saving the data
-    savefile = filename.split('.')[0] + '-newformat.pickle'
-    with open(savefile, 'wb') as f:
-        pickle.dump((x, y), f)
-        print('Saved to {}'.format(savefile))
-
-def convert_all_to_pickle(data_dir):
-    filenames = (
-        'antikt-kt-train.pickle',
-        'antikt-kt-test.pickle'
-        #'quark_pbpb.txt',
-        #'gluon_pp.txt',
-        #'gluon_pbpb.txt'
-    )
-
-    for fn in filenames:
-        save_pickle(os.path.join(data_dir, fn))
+    jets = [convert_to_jet(x, y) for x, y in zip(X, Y)]
+    return jets

@@ -41,9 +41,9 @@ def reset_unused_args(args):
     if args.n_train <= 5 * args.n_valid and args.n_train > 0:
         args.n_valid = args.n_train // 5
 
-    if args.pileup:
-        args.dataset = 'pileup'
-    else:
-        args.dataset = 'original'
+    #if args.pileup:
+    #    args.dataset = 'pileup'
+    #else:
+    #    args.dataset = 'original'
 
     return args

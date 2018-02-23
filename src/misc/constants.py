@@ -19,9 +19,18 @@ ALL_MODEL_DIRS = [
 ]
 
 REPORTS_DIR = "reports"
+
+w_vs_qcd = 'w-vs-qcd'
+quark_gluon = 'quark-gluon'
 DATASETS = {
-    'original':'antikt-kt',
-    'pileup':'antikt-kt-pileup25-new'
+    'w':(w_vs_qcd,'antikt-kt'),
+    'wp':(w_vs_qcd,'antikt-kt-pileup25-new'),
+    'pp': (quark_gluon,'pp'),
+    'pbpb': (quark_gluon,'pbpb'),
+    #'quark_pp':(quark_gluon,'quark_pp'),
+    #'quark_pbpb':(quark_gluon,'quark_pbpb'),
+    #'gluon_pbpb':(quark_gluon,'gluon_pbpb'),
+    #'gluon_pp':(quark_gluon,'gluon_pp')
 }
 
 ''' argparse args '''
@@ -36,4 +45,4 @@ BATCH_SIZE=100
 EPOCHS=100
 
 VALID=27000
-DATA_DIR = 'data/w-vs-qcd/pickles'
+DATA_DIR = 'data'

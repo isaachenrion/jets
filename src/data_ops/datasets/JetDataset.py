@@ -1,9 +1,10 @@
 from torch.utils.data import Dataset
 
 class JetDataset(Dataset):
-    def __init__(self, jets):
+    def __init__(self, jets, weights=None):
         super().__init__()
         self.jets = jets
+        self.weights = weights
 
     def __len__(self):
         return len(self.jets)
@@ -21,9 +22,3 @@ class JetDataset(Dataset):
     @classmethod
     def concatenate(cls, dataset1, dataset2):
         return cls(dataset1.jet + dataset2.jets)
-
-
-class WeightedJetDataset(JetDataset):
-    def __init__(self, jets, w):
-        super().__init__(jets)
-        self.w = w

@@ -1,6 +1,5 @@
 import logging
 import numpy as np
-from ..datasets import WeightedJetDataset
 from ..datasets import JetDataset
 
 def crop(jets, pileup=False):
@@ -50,5 +49,5 @@ def crop(jets, pileup=False):
 def crop_dataset(dataset, pileup):
     good_jets, bad_jets, w = crop(dataset.jets, pileup)
     cropped_dataset = JetDataset(bad_jets)
-    new_dataset = WeightedJetDataset(good_jets, w)
+    new_dataset = JetDataset(good_jets, w)
     return new_dataset, cropped_dataset
