@@ -2,8 +2,8 @@ import os
 import pickle
 import numpy as np
 
-from .batching import *
-from .Jet import Jet
+from ..Jet import Jet
+from .extract_four_vectors import extract_four_vectors
 
 def convert_to_jet(x, y):
     tree_content = x['content']
@@ -15,7 +15,7 @@ def convert_to_jet(x, y):
     mass = x['mass']
 
     outers = [node for node in range(len(x['content'])) if x['tree'][node,0] == -1]
-    constituents = np.stack([tree_content[i] for i in outers], 0)
+    constituents = extract_four_vectors(np.stack([tree_content[i] for i in outers], 0))
 
     progenitor = 'w' if y == 1 else 'qcd'
 
@@ -33,7 +33,7 @@ def convert_to_jet(x, y):
     )
     return jet
 
-def save_pickle(filename):
+def null():
     with open(filename, 'rb') as f:
         X, Y = pickle.load(f, encoding='latin-1')
     jets = []

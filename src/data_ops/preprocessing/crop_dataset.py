@@ -1,7 +1,7 @@
 import logging
 import numpy as np
-from src.data_ops.SupervisedDataset import WeightedJetDataset
-from src.data_ops.SupervisedDataset import JetDataset
+from ..datasets import WeightedJetDataset
+from ..datasets import JetDataset
 
 def crop(jets, pileup=False):
     #logging.warning("Cropping...")

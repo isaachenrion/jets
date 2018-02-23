@@ -3,9 +3,7 @@ import torch
 import os
 import pickle
 import numpy as np
-#from .SupervisedDataset import SupervisedDataset
-#from .VariableLengthDataLoader import VariableLengthDataLoader as DataLoader
-from .Jet import QuarkGluonJet
+from ..Jet import QuarkGluonJet
 
 def convert_to_jet(entry, progenitor, y, env):
     constituents, header = entry

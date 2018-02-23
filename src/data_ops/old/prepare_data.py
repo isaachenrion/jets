@@ -2,26 +2,18 @@ import logging
 import torch
 import numpy as np
 
-from .load_data import load_data
-#from .load_tf import load_tf
-#from .crop import crop
+from .load_data import load_jet_dicts
 from .crop import crop_dataset
 
 from src.data_ops.w_vs_qcd import convert_to_jet
+from src.data_ops.Jet import Jet
 from src.data_ops.SupervisedDataset import JetDataset
-#from src.data_ops.VariableLengthDataLoader import VariableLengthDataLoader as DataLoader
-
-#from sklearn.model_selection import train_test_split
 
 def prepare_train_data(data_dir, data_filename, n_train, n_valid, pileup):
     logging.warning("Loading data...")
 
-    X, Y = load_data(data_dir, data_filename)
-    jets = []
-    for x, y in zip(X[:n_train], Y[:n_train]):
-        jet = convert_to_jet(x, y)
-        jets.append(jet)
-
+    jets = [Jet(**jd) for jd in load_jet_dicts(data_dir, data_filename)]
+    jets = jets[:n_train]
     logging.warning("Splitting into train and validation...")
 
     train_jets = jets[n_valid:]
@@ -37,7 +29,6 @@ def prepare_train_data(data_dir, data_filename, n_train, n_valid, pileup):
     # add cropped indices to training data
     logging.warning("\tfinal train size = %d" % len(train_dataset))
     logging.warning("\tfinal valid size = %d" % len(valid_dataset))
-
 
     return train_dataset, valid_dataset
 

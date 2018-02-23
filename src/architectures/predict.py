@@ -7,7 +7,7 @@ from .readout import construct_readout
 from .embedding import construct_embedding
 from .reduction import construct_reduction
 
-from ..data_ops.batching import batch_leaves, batch_trees
+#from ..data_ops.batching import batch_leaves, batch_trees
 
 class JetClassifier(nn.Module):
     '''
