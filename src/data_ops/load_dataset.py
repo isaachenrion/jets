@@ -6,6 +6,7 @@ import numpy as np
 from .io import load_jets_from_pickle, save_jets_to_pickle
 from .datasets import JetDataset
 from .preprocessing import crop_dataset
+from .preprocessing.w_vs_qcd import convert_to_jet
 
 def load_jets(data_dir, filename):
 
@@ -17,6 +18,7 @@ def load_jets(data_dir, filename):
             os.makedirs(path_to_preprocessed_dir)
 
         logging.warning("Preprocessing...")
+
         with open(os.path.join(data_dir, 'raw', filename), mode="rb") as fd:
             X, Y = pickle.load(fd, encoding='latin-1')
 
