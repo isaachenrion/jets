@@ -60,7 +60,7 @@ class Jet:
         return len(self.constituents)
 
 class QuarkGluonJet(Jet):
-    def __init__(photon_pt=None, photon_eta=None, photon_phi=None, env=None, **kwargs):
+    def __init__(self, photon_pt, photon_eta, photon_phi, env, **kwargs):
         self.photon_pt = photon_pt
         self.photon_eta = photon_eta
         self.photon_phi = photon_phi

@@ -1,16 +1,18 @@
 
 import torch
+import os
+import pickle
+import numpy as np
+#from .SupervisedDataset import SupervisedDataset
+#from .VariableLengthDataLoader import VariableLengthDataLoader as DataLoader
+from .Jet import QuarkGluonJet
 
-from .SupervisedDataset import SupervisedDataset
-from .VariableLengthDataLoader import VariableLengthDataLoader as DataLoader
-from .Jet import Jet
-
-def convert_entry_to_class_format(entry, progenitor, y, env):
+def convert_to_jet(entry, progenitor, y, env):
     constituents, header = entry
 
     header = [float(x) for x in header.split('\t')]
 
-    (mc_weight,
+    (mass,
     photon_pt,
     photon_eta,
     photon_phi,
@@ -25,16 +27,16 @@ def convert_entry_to_class_format(entry, progenitor, y, env):
 
     assert len(constituents) == n_constituents
 
-    jet = Jet(
+    jet = QuarkGluonJet(
         progenitor=progenitor,
         constituents=constituents,
-        mc_weight=mc_weight,
+        mass=mass,
         photon_pt=photon_pt,
         photon_eta=photon_eta,
         photon_phi=photon_phi,
-        jet_pt=jet_pt,
-        jet_eta=jet_eta,
-        jet_phi=jet_phi,
+        pt=jet_pt,
+        eta=jet_eta,
+        phi=jet_phi,
         y=y,
         env=env
     )
@@ -89,17 +91,15 @@ def save_pickle(filename):
 
     jets = []
     for entry in entries:
-        jet = convert_entry_to_class_format(entry, progenitor, y, env)
+        jet = convert_to_jet(entry, progenitor, y, env)
         jets.append(jet)
 
-    jet = jets[:10]
-    x = [j.extract().to_tensor() for j in jets]
-    y = [torch.LongTensor([j.y, j.env]) for j in jets]
-
+    jet_dicts = [vars(jet) for jet in jets]
+    print(jet_dicts[0])
     # saving the data
     savefile = filename.split('.')[0] + '.pickle'
     with open(savefile, 'wb') as f:
-        pickle.dump((x, y), f)
+        pickle.dump(jet_dicts, f)
         print('Saved to {}'.format(savefile))
 
 #def mixed_datasets():
@@ -133,3 +133,33 @@ def convert_all_to_pickle(data_dir):
     #gluon_jet_dataset = save_pickle(os.path.join(data_dir, filenames[0]))
     #mixed_jet_dataset = mix(quark_jet_dataset, gluon_jet_dataset)
     #import ipdb; ipdb.set_trace()
+
+def mix_and_pickle(data_dir, env):
+    quark_fn = os.path.join(data_dir, 'quark_' + env + '.pickle')
+    gluon_fn = os.path.join(data_dir, 'gluon_' + env + '.pickle')
+
+    def get_jets(fn):
+        with open(fn, 'rb') as f:
+            jet_dicts = pickle.load(f, encoding='latin-1')
+        jets = [QuarkGluonJet(**jd) for jd in jet_dicts]
+        print(len(jets))
+        return jets
+
+    quark_jets = get_jets(quark_fn)
+    gluon_jets = get_jets(gluon_fn)
+    jets = quark_jets + gluon_jets
+
+    perm = np.random.permutation(len(jets))
+    jets = [jets[i] for i in perm]
+
+    with open(os.path.join(data_dir, env + '.pickle'), 'wb') as f:
+        pickle.dump(jets, f)
+
+    with open(os.path.join(data_dir, env + '.pickle'), 'rb') as f:
+        jet_dicts = pickle.load(f, encoding='latin-1')
+        jets = [QuarkGluonJet(**jd) for jd in jet_dicts]
+        print(len(jets))
+
+    #quark_jet_dataset = save_pickle(os.path.join(data_dir, filenames[0]))
+    #gluon_jet_dataset = save_pickle(os.path.join(data_dir, filenames[0]))
+    #mixed_jet_dataset = mix(quark_jet_dataset, gluon_jet_dataset)
