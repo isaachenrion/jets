@@ -70,6 +70,7 @@ def train(args):
             yy_pred = np.concatenate(yy_pred, 0)
 
             t1=time.time()
+            import ipdb; ipdb.set_trace()
             logdict = dict(
                 epoch=epoch,
                 iteration=iteration,

@@ -66,7 +66,7 @@ class FixedAdjacencyNMP(nn.Module):
         return out, _
 
     def logging(self, dij=None, mask=None, epoch=None, iters=None, **kwargs):
-        if epoch % 20 == 0:
+        if epoch is not None and epoch % 20 == 0:
             #import ipdb; ipdb.set_trace()
             nonmask_ends = [int(torch.sum(m,0)[0]) for m in mask.data]
             dij_hist = [d[:nme, :nme].contiguous().view(-1) for d, nme in zip(dij, nonmask_ends)]
@@ -131,7 +131,7 @@ class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
             out = x * P + (1 - x) * L
 
             # logging
-            if self.monitoring and iters == 0:
+            if self.monitoring and epoch is not None and iters == 0:
                 self.component_monitor(physics_component=self.physics_component)
                 self.component_monitor.visualize('physics_component')
                 if epoch % 20 == 0:
