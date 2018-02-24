@@ -21,6 +21,8 @@ class ExperimentHandler:
     def __init__(self, args):
         #self.debug = args.debug
         self.slurm = args.slurm
+        self.slurm_array_task_id = args.slurm_array_task_id
+        self.slurm_array_job_id = args.slurm_array_job_id
         self.pid = os.getpid()
         self.cuda_and_random_seed(args)
         self.create_all_model_dirs()
@@ -165,7 +167,7 @@ class ExperimentHandler:
     def log(self, **kwargs):
         self.stats_logger.log(**kwargs)
         if kwargs['epoch'] == 1 and self.emailer is not None:
-            self.emailer.send_msg(self.stats_logger.monitors['eta'].value, "Job {}-{} on {} ETA: {}".format(args.slurm_array_job_id, args.slurm_array_task_id, self.host.split('.')[0], self.stats_logger.monitors['eta'].value))
+            self.emailer.send_msg(self.stats_logger.monitors['eta'].value, "Job {}-{} on {} ETA: {}".format(self.slurm_array_job_id, self.slurm_array_task_id, self.host.split('.')[0], self.stats_logger.monitors['eta'].value))
         if np.isnan(self.stats_logger.monitors['inv_fpr'].value):
             logging.warning("NaN in 1/FPR\n")
 

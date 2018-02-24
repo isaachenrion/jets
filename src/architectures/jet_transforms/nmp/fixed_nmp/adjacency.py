@@ -15,7 +15,7 @@ import torch.nn.functional as F
 def construct_physics_based_adjacency_matrix(alpha=None, R=None, trainable_physics=False):
     if trainable_physics:
         #assert R is None
-        return TrainablePhysicsBasedAdjacencyMatrix(alpha=alpha, R=R)
+        return TrainablePhysicsBasedAdjacencyMatrix(alpha_init=alpha, R_init=R)
     else:
         return FixedPhysicsBasedAdjacencyMatrix(alpha=alpha, R=R)
 
