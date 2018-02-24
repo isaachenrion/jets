@@ -15,7 +15,7 @@ def construct_model_kwargs(args):
         'predict':args.predict,
 
         # jet transform
-        'jet_transform':args.jet_transform,
+        'jet_transform':args.model,
 
         # NMP
         'iters': args.iters,
