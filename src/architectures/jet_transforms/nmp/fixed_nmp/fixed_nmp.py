@@ -205,7 +205,7 @@ class PhysicsStackNMP(nn.Module):
         mp_layer=None,
         pooling_layer=None,
         **kwargs
-        ):
+        ):  
         super().__init__()
         self.iters = iters
         self.embedding = construct_embedding('simple', features + 1, hidden, act=kwargs.get('act', None))
