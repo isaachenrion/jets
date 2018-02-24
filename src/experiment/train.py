@@ -7,6 +7,7 @@ import torch.nn.functional as F
 
 import numpy as np
 
+from ..data_ops.load_dataset import load_train_dataset
 from ..data_ops.wrapping import unwrap
 from ..data_ops.dataloaders import LeafJetLoader
 from ..data_ops.dataloaders import TreeJetLoader
@@ -14,7 +15,6 @@ from ..data_ops.dataloaders import TreeJetLoader
 from ..misc.constants import *
 from ..admin import ExperimentHandler
 
-from ..data_ops.load_dataset import load_train_dataset
 from ..loading.model import build_model
 
 def train(args):
@@ -29,7 +29,7 @@ def train(args):
     #X_train, y_train, X_valid, y_valid, w_valid = prepare_train_data(args.data_dir, data_filename, args.n_train, args.n_valid, args.pileup)
     train_dataset, valid_dataset = load_train_dataset(data_dir, data_filename, args.n_train, args.n_valid, args.pileup)
 
-    if args.jet_transform in ['recs', 'recg']:
+    if args.model in ['recs', 'recg']:
         DataLoader = TreeJetLoader
     else:
         DataLoader = LeafJetLoader

@@ -152,10 +152,10 @@ class EachClassHistogram(Monitor):
         self.target_values = target_values
         self.histogram_monitors = {val: Histogram(self.target_name + str(val), rootname=self.name, append=append,**kwargs) for val in self.target_values}
 
-    def initialize(self, statsdir, plotsdir, viz):
-        super().initialize(statsdir, plotsdir, viz)
+    def initialize(self, statsdir, plotsdir):
+        super().initialize(statsdir, plotsdir)
         for child in self.histogram_monitors.values():
-            child.initialize(statsdir, plotsdir, viz)
+            child.initialize(statsdir, plotsdir)
 
     def call(self, **kwargs):
         targets = kwargs[self.target_name]

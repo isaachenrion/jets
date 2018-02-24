@@ -56,7 +56,7 @@ parser.add_argument("--act", type=str, default='relu')
 parser.add_argument("--predict", type=str, default='simple', help='type of prediction layer')
 
 # Transform
-parser.add_argument("-j", "--jet_transform", type=str, default="nmp", help="name of the model you want to train - look in constants.py for the model list")
+parser.add_argument("-j", "--model", type=str, default="nmp", help="name of the model you want to train - look in constants.py for the model list")
 
 # NMP
 parser.add_argument("-i", "--iters", type=int, default=2)

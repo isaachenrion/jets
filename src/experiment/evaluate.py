@@ -37,7 +37,7 @@ def evaluate(args):
     ''' GET RELATIVE PATHS TO DATA AND MODELS '''
     '''----------------------------------------------------------------------- '''
     if args.inventory is None:
-        model_type_paths = [(args.model_dir,args.model_dir)]
+        model_type_paths = [(args.model,args.model)]
     else:
         with open(args.inventory, newline='') as f:
             reader = csv.DictReader(f)
@@ -67,18 +67,25 @@ def evaluate(args):
 
                     #offset = 0
                     yy_pred = []
+                    yy = []
                     #n_batches, remainder = np.divmod(len(X), batch_size)
-                    for i in range(n_batches):
-                        X_batch = X[offset:offset+batch_size]
-                        X_var = wrap_jet(X_batch)
-                        yy_pred.append(unwrap(model(X_var)))
-                        unwrap_jet(X_var)
-                        offset+=batch_size
-                    if remainder > 0:
-                        X_batch = X[-remainder:]
-                        X_var = wrap_jet(X_batch)
-                        yy_pred.append(unwrap(model(X_var)))
-                        unwrap_jet(X_var)
+                    for i, (x, y) in enumerate(test_data_loader):
+                        y_pred = model(x)
+                        vl = unwrap(loss(y_pred, y)); valid_loss.append(vl)
+                        y = unwrap(y); y_pred = unwrap(y_pred)
+                        yy.append(y); yy_pred.append(y_pred)
+
+                    #for i in range(n_batches):
+                    #    X_batch = X[offset:offset+batch_size]
+                    #    X_var = wrap_jet(X_batch)
+                    #    yy_pred.append(unwrap(model(X_var)))
+                    #    unwrap_jet(X_var)
+                    #    offset+=batch_size
+                    #if remainder > 0:
+                    #    X_batch = X[-remainder:]
+                    #    X_var = wrap_jet(X_batch)
+                    #    yy_pred.append(unwrap(model(X_var)))
+                    #    unwrap_jet(X_var)
                     yy_pred = np.squeeze(np.concatenate(yy_pred, 0), 1)
                     t1 = time.time()
 
@@ -125,17 +132,18 @@ def evaluate(args):
     ''' BUILD ROCS '''
     '''----------------------------------------------------------------------- '''
     #dataset = DATASETS[args.dataset]
-    intermediate_dir, data_filename = DATASETS[args.dataset]
     if args.recompute or args.inventory is None:
-
+        intermediate_dir, data_filename = DATASETS[args.dataset]
+        data_dir = os.path.join(args.data_dir, intermediate_dir)
+        
         logging.info('Building ROCs for models trained on {}'.format(data_filename))
-        X_test, y_test, w_test = prepare_test_data(args.data_dir, "{}-train.pickle".format(dataset), args.n_test, args.pileup)
+        #X_test, y_test, w_test = load_test_dataset(args.data_dir, "{}-train.pickle".format(dataset), args.n_test, args.pileup)
         test_dataset = load_test_dataset(data_dir, data_filename, args.n_test, args.pileup)
-        if args.jet_transform in ['recs', 'recg']:
+        if '/rec' in args.model:
             DataLoader = TreeJetLoader
         else:
             DataLoader = LeafJetLoader
-        test_data_loader = DataLoader(test_dataset, batch_size = args.batch_size)
+        test_dataloader = DataLoader(test_dataset, batch_size = args.batch_size)
         #tf = load_tf(args.data_dir, "{}-train.pickle".format(dataset))
         #X, y = load_data(args.data_dir, "{}-{}.pickle".format(dataset, args.dataset_type))
         #for ij, jet in enumerate(X):
@@ -146,10 +154,10 @@ def evaluate(args):
         #    y = y[indices]
         #X_test, y_test, w_test = crop(X, y, pileup=args.pileup)
 
-        data = (X_test, y_test, w_test)
+        #data = (X_test, y_test, w_test)
         for _, model_type_path in model_type_paths:
             logging.info('\tBuilding ROCs for instances of {}'.format(model_type_path))
-            r, f, t, inv_fprs = build_rocs(data, model_type_path, args.batch_size)
+            r, f, t, inv_fprs = build_rocs(test_dataloader, model_type_path, args.batch_size)
             #remove_outliers_csv(os.path.join(args.finished_models_dir, model_type_path))
             absolute_roc_path = os.path.join(eh.exp_dir, "rocs-{}-{}.pickle".format("-".join(model_type_path.split('/')), dataset))
             with open(absolute_roc_path, "wb") as fd:

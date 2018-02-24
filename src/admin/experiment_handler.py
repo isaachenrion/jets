@@ -49,10 +49,10 @@ class ExperimentHandler:
 
     def model_directory(self, args):
         self.root_dir = RUNNING_MODELS_DIR
-        self.model_type_dir = os.path.join(args.dataset, args.jet_transform)
+        self.model_type_dir = os.path.join(args.dataset, args.model)
         dt = datetime.datetime.now()
 
-        if args.slurm:
+        if args.slurm and args.train:
             self.filename_exp = '{}'.format(args.slurm_array_job_id)
             self.leaf_dir = args.slurm_array_task_id
         else:
@@ -200,20 +200,19 @@ class EvaluationExperimentHandler(ExperimentHandler):
         super().__init__(args)
         self.latex = args.latex
 
-    def model_directory(self, args):
-        self.root_dir = args.root_dir
-        self.model_type_dir = args.model_dir
-        self.leaf_dir = self.model_type_dir
-        i = 0
-        temp = self.leaf_dir + '/run' + str(i)
-        while os.path.exists(os.path.join(self.root_dir,temp)):
-            i += 1
-            temp = self.leaf_dir + '/run' + str(i)
-        self.leaf_dir = temp
-
-        self.exp_dir = os.path.join(self.root_dir,self.leaf_dir)
-        print(self.exp_dir)
-        os.makedirs(self.exp_dir)
+    #def model_directory(self, args):
+    #    self.root_dir = args.root_dir
+    #    self.model_type_dir = args.model_dir
+    #    self.leaf_dir = self.model_type_dir
+    #    i = 0
+    #    temp = self.leaf_dir + '/run' + str(i)
+    #    while os.path.exists(os.path.join(self.root_dir,temp)):
+    #        i += 1
+    #        temp = self.leaf_dir + '/run' + str(i)
+    #    self.leaf_dir = temp
+    #    self.exp_dir = os.path.join(self.root_dir,self.leaf_dir)
+    #    print(self.exp_dir)
+    #    os.makedirs(self.exp_dir)
 
     def setup_stats_logger(self, args):
         ''' STATS LOGGER '''
