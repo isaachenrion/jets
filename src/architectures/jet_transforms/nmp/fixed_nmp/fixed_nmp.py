@@ -32,15 +32,18 @@ class FixedAdjacencyNMP(nn.Module):
         self.mp_layers = nn.ModuleList([construct_mp_layer('fixed', hidden=hidden,**kwargs) for _ in range(iters)])
         self.readout = construct_readout(readout, hidden, hidden)
         self.adjacency_matrix = self.set_adjacency_matrix(features=features,**kwargs)
-        self.set_monitors()
-        self.initialize_monitors(kwargs.get('logger', None))
+
+        logger = kwargs.get('logger', None)
+        self.monitoring = logger is not None
+        if self.monitoring:
+            self.set_monitors()
+            self.initialize_monitors(logger)
 
     def set_monitors(self):
         self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True)
         self.dij_matrix_monitor = BatchMatrixMonitor('dij')
         #self.dij_histogram.initialize(None, os.path.join(logger.plotsdir, 'dij_histogram'))
         #self.dij_matrix_monitor.initialize(None, os.path.join(logger.plotsdir, 'adjacency_matrix'))
-
         self.monitors = [self.dij_matrix_monitor, self.dij_histogram]
 
     def initialize_monitors(self, logger):
@@ -57,12 +60,13 @@ class FixedAdjacencyNMP(nn.Module):
         out = self.readout(h)
 
         # logging
-        self.logging(dij=dij, mask=mask, **kwargs)
+        if self.monitoring:
+            self.logging(dij=dij, mask=mask, **kwargs)
 
         return out, _
 
     def logging(self, dij=None, mask=None, epoch=None, iters=None, **kwargs):
-        if epoch is not None and epoch % 20 == 0:
+        if epoch % 20 == 0:
             #import ipdb; ipdb.set_trace()
             nonmask_ends = [int(torch.sum(m,0)[0]) for m in mask.data]
             dij_hist = [d[:nme, :nme].contiguous().view(-1) for d, nme in zip(dij, nonmask_ends)]
@@ -127,7 +131,7 @@ class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
             out = x * P + (1 - x) * L
 
             # logging
-            if epoch is not None and iters == 0:
+            if self.monitoring and iters == 0:
                 self.component_monitor(physics_component=self.physics_component)
                 self.component_monitor.visualize('physics_component')
                 if epoch % 20 == 0:

@@ -9,8 +9,8 @@ import numpy as np
 
 from ..data_ops.load_dataset import load_train_dataset
 from ..data_ops.wrapping import unwrap
-from ..data_ops.dataloaders import LeafJetLoader
-from ..data_ops.dataloaders import TreeJetLoader
+from ..data_ops.data_loaders import LeafJetLoader
+from ..data_ops.data_loaders import TreeJetLoader
 
 from ..misc.constants import *
 from ..admin import ExperimentHandler
@@ -20,7 +20,7 @@ from ..loading.model import build_model
 def train(args):
     t_start = time.time()
 
-    eh = ExperimentHandler(args)
+    eh = ExperimentHandler(**vars(args))
 
     ''' DATA '''
     '''----------------------------------------------------------------------- '''

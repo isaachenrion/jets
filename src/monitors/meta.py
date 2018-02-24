@@ -161,7 +161,7 @@ class EachClassHistogram(Monitor):
         targets = kwargs[self.target_name]
         outputs = kwargs[self.output_name]
         for val, hm in self.histogram_monitors.items():
-            values = [o for (t,o) in zip(targets, outputs) if t == val]
+            values = np.array([o for (t,o) in zip(targets, outputs) if t == val])
             hm(values=values)
 
 
