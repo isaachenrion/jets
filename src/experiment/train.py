@@ -45,8 +45,8 @@ def train(args):
     '''----------------------------------------------------------------------- '''
     logging.info("Building optimizer...")
     optimizer = Adam(model.parameters(), lr=settings['step_size'], weight_decay=args.reg)
-    scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
-    #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
+    #scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
+    scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
 
 
     def loss(y_pred, y):
@@ -125,8 +125,8 @@ def train(args):
         t1 = time.time()
         logging.info("Epoch took {} seconds".format(t1-t0))
 
-        scheduler.step()
-        settings['step_size'] = settings['step_size'] * (args.decay) ** (i + 1)
+        scheduler.step(logdict['valid_loss'])
+        #settings['step_size'] = settings['step_size'] * (args.decay) ** (i + 1)
 
         if t1 - t_start > args.experiment_time - 60:
             break

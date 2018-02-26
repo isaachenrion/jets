@@ -132,7 +132,7 @@ class StackedFixedNMP(AbstractStackedFixedNMP):
                 h, _ = mp(h=h, mask=mask, dij=dij)
 
             # logging
-            self.logging(dij=dij, **kwargs)
+            self.logging(dij=dij, mask=mask,**kwargs)
 
             if not self.pool_first:
                 h, attns = pool(h, **kwargs)
@@ -192,7 +192,7 @@ class PhysicsStackedFixedNMP(AbstractStackedFixedNMP):
             h, attns = pool(h, **kwargs)
 
             # logging
-            self.logging(dij=dij, **kwargs)
+            self.logging(dij=dij, mask=mask, **kwargs)
 
 
 
