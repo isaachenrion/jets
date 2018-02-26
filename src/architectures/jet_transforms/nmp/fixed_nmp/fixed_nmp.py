@@ -54,7 +54,7 @@ class FixedAdjacencyNMP(nn.Module):
 
     def forward(self, jets, mask=None, **kwargs):
         h = self.embedding(jets)
-        dij = self.adjacency_matrix(jets, mask=mask)
+        dij = self.adjacency_matrix(jets, mask=mask, **kwargs)
         for mp in self.mp_layers:
             h, _ = mp(h=h, mask=mask, dij=dij, **kwargs)
         out = self.readout(h)
@@ -125,20 +125,21 @@ class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
                         )
 
         def combined_matrix(jets, epoch=None, iters=None, **kwargs):
-            P = self.physics_matrix(jets, **kwargs)
-            L = self.learned_matrix(jets, **kwargs)
+            P = self.physics_matrix(jets, kwargs.get('mask', None))
+            L = self.learned_matrix(jets, kwargs.get('mask', None))
             x = self.physics_component
             out = x * P + (1 - x) * L
+            import ipdb; ipdb.set_trace()
 
             # logging
             if self.monitoring and epoch is not None and iters == 0:
                 self.component_monitor(physics_component=self.physics_component)
                 self.component_monitor.visualize('physics_component')
-                if epoch % 20 == 0:
+                if epoch % 1 == 0:
                     self.physics_matrix_monitor(physics=P)
-                    self.physics_matrix_monitor.visualize('epoch-{}'.format(epoch), n=10)
+                    self.physics_matrix_monitor.visualize('epoch-{}/P'.format(epoch), n=10)
                     self.learned_matrix_monitor(learned=L)
-                    self.learned_matrix_monitor.visualize('epoch-{}'.format(epoch), n=10)
+                    self.learned_matrix_monitor.visualize('epoch-{}/L'.format(epoch), n=10)
 
             return out
         return combined_matrix
@@ -205,7 +206,7 @@ class PhysicsStackNMP(nn.Module):
         mp_layer=None,
         pooling_layer=None,
         **kwargs
-        ):  
+        ):
         super().__init__()
         self.iters = iters
         self.embedding = construct_embedding('simple', features + 1, hidden, act=kwargs.get('act', None))
