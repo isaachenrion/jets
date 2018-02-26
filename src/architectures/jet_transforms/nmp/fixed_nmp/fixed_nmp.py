@@ -129,7 +129,7 @@ class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
             L = self.learned_matrix(jets, kwargs.get('mask', None))
             x = self.physics_component
             out = x * P + (1 - x) * L
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             # logging
             if self.monitoring and epoch is not None and iters == 0:
