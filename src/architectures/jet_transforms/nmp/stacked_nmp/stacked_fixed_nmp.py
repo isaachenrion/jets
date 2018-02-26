@@ -54,8 +54,8 @@ class AbstractStackedFixedNMP(nn.Module):
     def set_monitors(self):
         self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True)
         self.dij_matrix_monitor = BatchMatrixMonitor('dij')
-        self.dij_histogram.initialize(None, os.path.join(logger.plotsdir, 'dij_histogram'))
-        self.dij_matrix_monitor.initialize(None, os.path.join(logger.plotsdir, 'adjacency_matrix'))
+        #self.dij_histogram.initialize(None, os.path.join(logger.plotsdir, 'dij_histogram'))
+        #self.dij_matrix_monitor.initialize(None, os.path.join(logger.plotsdir, 'adjacency_matrix'))
 
     def initialize_monitors(self, logger):
         for m in self.monitors: m.initialize(None, logger.plotsdir)
