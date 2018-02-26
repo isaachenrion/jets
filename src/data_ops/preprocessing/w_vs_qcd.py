@@ -5,7 +5,54 @@ import numpy as np
 from ..Jet import Jet
 from .extract_four_vectors import extract_four_vectors
 
-from ..old.preprocessing import rewrite_content, extract, permute_by_pt
+from ..old.preprocessing import rewrite_content, permute_by_pt
+
+def permute_by_pt(jet, root_id=None):
+    # ensure that the left sub-jet has always a larger pt than the right
+
+    if root_id is None:
+        root_id = jet["root_id"]
+
+    if jet["tree"][root_id][0] != -1:
+        left = jet["tree"][root_id][0]
+        right = jet["tree"][root_id][1]
+
+        pt_left = _pt(jet["content"][left])
+        pt_right = _pt(jet["content"][right])
+
+        if pt_left < pt_right:
+            jet["tree"][root_id][0] = right
+            jet["tree"][root_id][1] = left
+
+        permute_by_pt(jet, left)
+        permute_by_pt(jet, right)
+
+    return jet
+
+def rewrite_content(jet):
+    jet = copy.deepcopy(jet)
+
+    if jet["content"].shape[1] == 5:
+        pflow = jet["content"][:, 4].copy()
+
+    content = jet["content"]
+    tree = jet["tree"]
+
+    def _rec(i):
+        if tree[i, 0] == -1:
+            pass
+        else:
+            _rec(tree[i, 0])
+            _rec(tree[i, 1])
+            c = content[tree[i, 0]] + content[tree[i, 1]]
+            content[i] = c
+
+    _rec(jet["root_id"])
+
+    if jet["content"].shape[1] == 5:
+        jet["content"][:, 4] = pflow
+
+    return jet
 
 def convert_to_jet(x, y):
     x = permute_by_pt(rewrite_content(x))

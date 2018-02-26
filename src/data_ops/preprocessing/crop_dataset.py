@@ -30,10 +30,10 @@ def crop(jets, pileup=False):
     indices = np.searchsorted(edges, pts) - 1
     inv_w = 1. / pdf[indices]
     inv_w /= inv_w.sum()
-    w[y_==0] = inv_w
-    #for i, (iw, jet) in enumerate(zip(inv_w, good_jets)):
-    #    if jet.y == 0:
-    #        w[i] = iw
+    #w[y_==0] = inv_w
+    for i, (iw, jet) in enumerate(zip(inv_w, good_jets)):
+        if jet.y == 0:
+            w[i] = iw
 
     jets_1 = [jet for jet in good_jets if jet.y == 1]
     pdf, edges = np.histogram([j.pt for j in jets_1], density=True, range=[pt_min, pt_max], bins=50)
@@ -41,10 +41,10 @@ def crop(jets, pileup=False):
     indices = np.searchsorted(edges, pts) - 1
     inv_w = 1. / pdf[indices]
     inv_w /= inv_w.sum()
-    w[y_==1] = inv_w
-    #for i, (iw, jet) in enumerate(zip(inv_w, good_jets)):
-    #    if jet.y == 1:
-    #        w[i] = iw
+    #w[y_==1] = inv_w
+    for i, (iw, jet) in enumerate(zip(inv_w, good_jets)):
+        if jet.y == 1:
+            w[i] = iw
 
 
     return good_jets, bad_jets, w
