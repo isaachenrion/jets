@@ -44,17 +44,28 @@ class AbstractStackedFixedNMP(nn.Module):
         self.readout = construct_readout(readout, hidden, hidden)
         self.pool_first = pool_first
 
-        self.set_monitors(kwargs.get('logger', None))
+        logger = kwargs.get('logger', None)
+        self.monitoring = logger is not None
+        if self.monitoring:
+            self.set_monitors()
+            self.initialize_monitors(logger)
+        #self.set_monitors(kwargs.get('logger', None))
 
-    def set_monitors(self, logger):
+    def set_monitors(self):
         self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True)
         self.dij_matrix_monitor = BatchMatrixMonitor('dij')
         self.dij_histogram.initialize(None, os.path.join(logger.plotsdir, 'dij_histogram'))
         self.dij_matrix_monitor.initialize(None, os.path.join(logger.plotsdir, 'adjacency_matrix'))
 
+    def initialize_monitors(self, logger):
+        for m in self.monitors: m.initialize(None, logger.plotsdir)
+
     def logging(self, dij=None, epoch=None, iters_left=None, **kwargs):
         if epoch is not None and epoch % 20 == 0:
-            self.dij_histogram(values=dij.view(-1))
+            nonmask_ends = [int(torch.sum(m,0)[0]) for m in mask.data]
+            dij_hist = [d[:nme, :nme].contiguous().view(-1) for d, nme in zip(dij, nonmask_ends)]
+            dij_hist = torch.cat(dij_hist,0)
+            self.dij_histogram(values=dij_hist)
             if iters_left == 0:
                 self.dij_histogram.visualize('epoch-{}'.format(epoch))
                 #self.dij_histogram.clear()
