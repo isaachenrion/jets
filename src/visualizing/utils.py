@@ -30,17 +30,21 @@ def ensure_numpy_float(one_d_tensor):
     assert isinstance(tensor, np.float32)
     return tensor
 
+def remove_leaf_from_path(path):
+    return '/'.join(path.split('/')[:-1])
+
 def image_and_pickle(fig, name, imgdir, pkldir):
 
 
     img_filename = os.path.join(imgdir, name)
     imgdir = img_filename.split('.')[0]
+    imgdir = remove_leaf_from_path(img_filename)
     if not os.path.exists(imgdir):
         os.makedirs(imgdir)
     plt.savefig(img_filename)
 
     pkl_filename = os.path.join(pkldir, name + '.pkl')
-    pkldir = pkl_filename.split('.')[0]
+    pkldir = remove_leaf_from_path(pkl_filename)
     if not os.path.exists(pkldir):
         os.makedirs(pkldir)
     with open(pkl_filename, 'wb') as f:

@@ -20,8 +20,8 @@ def construct_physics_based_adjacency_matrix(alpha=None, R=None, trainable_physi
         return FixedPhysicsBasedAdjacencyMatrix(alpha=alpha, R=R)
 
 def compute_dij(p, alpha, R):
-    p1 = p.unsqueeze(1)
-    p2 = p.unsqueeze(2)
+    p1 = p.unsqueeze(1) + 1e-10
+    p2 = p.unsqueeze(2) + 1e-10
 
     delta_eta = p1[:,:,:,1] - p2[:,:,:,1]
 
