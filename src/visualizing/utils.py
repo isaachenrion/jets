@@ -37,9 +37,10 @@ def image_and_pickle(fig, name, imgdir, pkldir):
     img_filename = os.path.join(imgdir, name)
     plt.savefig(img_filename)
 
+    pkl_filename = os.path.join(pkldir, name + '.pkl')
+    pkldir = pkl_filename.split('.')[0]
     if not os.path.exists(pkldir):
         os.makedirs(pkldir)
-    pkl_filename = os.path.join(pkldir, name + '.pkl')
     with open(pkl_filename, 'wb') as f:
         pickle.dump(fig, f)
 

@@ -73,10 +73,10 @@ class FixedAdjacencyNMP(nn.Module):
             dij_hist = torch.cat(dij_hist,0)
             self.dij_histogram(values=dij_hist)
             if iters == 0:
-                self.dij_histogram.visualize('epoch-{}'.format(epoch))
+                self.dij_histogram.visualize('epoch-{}/histogram'.format(epoch))
                 #self.dij_histogram.clear()
                 self.dij_matrix_monitor(dij=dij)
-                self.dij_matrix_monitor.visualize('epoch-{}'.format(epoch), n=10)
+                self.dij_matrix_monitor.visualize('epoch-{}/M'.format(epoch), n=10)
 
 
 class PhysicsNMP(FixedAdjacencyNMP):
