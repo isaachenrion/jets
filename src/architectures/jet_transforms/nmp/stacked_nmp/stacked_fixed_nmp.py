@@ -61,13 +61,14 @@ class AbstractStackedFixedNMP(nn.Module):
     def initialize_monitors(self, logger):
         for m in self.monitors: m.initialize(None, logger.plotsdir)
 
-    def logging(self, dij=None, epoch=None, iters_left=None, **kwargs):
+    def logging(self, dij=None, mask=None, epoch=None, iters=None, **kwargs):
         if epoch is not None and epoch % 20 == 0:
+            #import ipdb; ipdb.set_trace()
             nonmask_ends = [int(torch.sum(m,0)[0]) for m in mask.data]
             dij_hist = [d[:nme, :nme].contiguous().view(-1) for d, nme in zip(dij, nonmask_ends)]
             dij_hist = torch.cat(dij_hist,0)
             self.dij_histogram(values=dij_hist)
-            if iters_left == 0:
+            if iters == 0:
                 self.dij_histogram.visualize('epoch-{}'.format(epoch))
                 #self.dij_histogram.clear()
                 self.dij_matrix_monitor(dij=dij)
