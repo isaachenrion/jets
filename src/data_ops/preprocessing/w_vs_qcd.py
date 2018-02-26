@@ -5,7 +5,7 @@ import numpy as np
 from ..Jet import Jet
 from .extract_four_vectors import extract_four_vectors
 
-from ..old.preprocessing import rewrite_content, permute_by_pt
+#from ..old.preprocessing import rewrite_content, permute_by_pt
 
 def permute_by_pt(jet, root_id=None):
     # ensure that the left sub-jet has always a larger pt than the right
