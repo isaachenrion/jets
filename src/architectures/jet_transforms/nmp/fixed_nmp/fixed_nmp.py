@@ -135,7 +135,7 @@ class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
             if self.monitoring and epoch is not None and iters == 0:
                 self.component_monitor(physics_component=self.physics_component)
                 self.component_monitor.visualize('physics_component')
-                if epoch % 1 == 0:
+                if epoch % 20 == 0:
                     self.physics_matrix_monitor(physics=P)
                     self.physics_matrix_monitor.visualize('epoch-{}/P'.format(epoch), n=10)
                     self.learned_matrix_monitor(learned=L)
