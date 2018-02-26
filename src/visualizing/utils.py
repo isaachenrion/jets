@@ -31,10 +31,12 @@ def ensure_numpy_float(one_d_tensor):
     return tensor
 
 def image_and_pickle(fig, name, imgdir, pkldir):
-    if not os.path.exists(imgdir):
-        os.makedirs(imgdir)
+
 
     img_filename = os.path.join(imgdir, name)
+    imgdir = img_filename.split('.')[0]
+    if not os.path.exists(imgdir):
+        os.makedirs(imgdir)
     plt.savefig(img_filename)
 
     pkl_filename = os.path.join(pkldir, name + '.pkl')
