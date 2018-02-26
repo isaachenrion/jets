@@ -10,7 +10,6 @@ from ..old.preprocessing import rewrite_content, extract, permute_by_pt
 def convert_to_jet(x, y):
     x = permute_by_pt(rewrite_content(x))
 
-
     tree_content = x['content']
     tree = x['tree']
     root_id = x['root_id']
