@@ -7,11 +7,13 @@ from .io import load_jets_from_pickle, save_jets_to_pickle
 from .datasets import JetDataset
 from .preprocessing import crop_dataset
 
-def load_jets(data_dir, filename):
+from sklearn.preprocessing import RobustScaler
+
+def load_jets(data_dir, filename, redo=False):
     path_to_preprocessed_dir = os.path.join(data_dir, 'preprocessed')
     path_to_preprocessed = os.path.join(path_to_preprocessed_dir, filename)
 
-    if not os.path.exists(path_to_preprocessed):
+    if not os.path.exists(path_to_preprocessed) or redo:
         if not os.path.exists(path_to_preprocessed_dir):
             os.makedirs(path_to_preprocessed_dir)
 
@@ -25,6 +27,14 @@ def load_jets(data_dir, filename):
             raise ValueError('Unrecognized data_dir!')
 
         jets = preprocess(os.path.join(data_dir, 'raw'), filename)
+
+        new_jets = []
+        tf = RobustScaler().fit(np.vstack([jet.constituents for jet in jets]))
+        for ij, jet in enumerate(jets):
+            jet.constituents = tf.transform(jet.constituents)
+            new_jets.append(jet)
+        jets = new_jets
+
         save_jets_to_pickle(jets, path_to_preprocessed)
         logging.warning("Preprocessed the data and saved it to {}".format(path_to_preprocessed))
     else:
@@ -33,10 +43,10 @@ def load_jets(data_dir, filename):
     return jets
 
 
-def load_train_dataset(data_dir, filename, n_train, n_valid, pileup):
+def load_train_dataset(data_dir, filename, n_train, n_valid, pileup, redo):
     logging.warning("Loading data...")
     filename = "{}-train.pickle".format(filename)
-    jets = load_jets(data_dir, filename)
+    jets = load_jets(data_dir, filename, redo)
     jets = jets[:n_train]
     logging.warning("Splitting into train and validation...")
 
@@ -57,10 +67,10 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, pileup):
 
     return train_dataset, valid_dataset
 
-def load_test_dataset(data_dir, filename, n_test, pileup):
+def load_test_dataset(data_dir, filename, n_test, pileup, redo):
     logging.warning("Loading test data...")
     filename = "{}-test.pickle".format(filename)
-    jets = load_jets(data_dir, filename)
+    jets = load_jets(data_dir, filename, redo)
     jets = jets[:n_test]
 
     dataset = JetDataset(jets)

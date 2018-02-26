@@ -5,7 +5,12 @@ import numpy as np
 from ..Jet import Jet
 from .extract_four_vectors import extract_four_vectors
 
+from ..old.preprocessing import rewrite_content, extract, permute_by_pt
+
 def convert_to_jet(x, y):
+    x = permute_by_pt(rewrite_content(x))
+
+
     tree_content = x['content']
     tree = x['tree']
     root_id = x['root_id']

@@ -27,7 +27,7 @@ def train(args):
     intermediate_dir, data_filename = DATASETS[args.dataset]
     data_dir = os.path.join(args.data_dir, intermediate_dir)
     #X_train, y_train, X_valid, y_valid, w_valid = prepare_train_data(args.data_dir, data_filename, args.n_train, args.n_valid, args.pileup)
-    train_dataset, valid_dataset = load_train_dataset(data_dir, data_filename, args.n_train, args.n_valid, args.pileup)
+    train_dataset, valid_dataset = load_train_dataset(data_dir, data_filename, args.n_train, args.n_valid, args.pileup, args.pp)
 
     if args.model in ['recs', 'recg']:
         DataLoader = TreeJetLoader

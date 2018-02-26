@@ -45,6 +45,7 @@ parser.add_argument("-n", "--n_train", type=int, default=-1)
 parser.add_argument("--n_valid", type=int, default=VALID)
 parser.add_argument("--dataset", type=str, default='wqcd')
 parser.add_argument("--pileup", action='store_true', default=False)
+parser.add_argument("--pp", action='store_true', default=False)
 parser.add_argument("--root_dir", default=MODELS_DIR)
 
 # Dimension and activation args
