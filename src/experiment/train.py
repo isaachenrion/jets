@@ -48,7 +48,7 @@ def train(args):
     #scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
     #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
     #scheduler = lr_scheduler.Step
-    scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[10,20,30,40], gamma=0.5)
+    scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[10,20,30,40,70], gamma=0.5)
 
     def loss(y_pred, y):
         return F.binary_cross_entropy(y_pred.squeeze(1), y)
@@ -86,7 +86,7 @@ def train(args):
                 time=((t1-t_start))
             )
 
-            scheduler.step(valid_loss)
+            #scheduler.step(valid_loss)
             model.train()
             return logdict
 
