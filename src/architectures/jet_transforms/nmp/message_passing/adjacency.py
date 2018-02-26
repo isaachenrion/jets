@@ -24,7 +24,7 @@ class AdjacencyMatrix(nn.Module):
     def compute_adjacency_matrix(self, h, mask):
         pass
 
-    def forward(self, h, mask):
+    def forward(self, h, mask, **kwargs):
         A = self.compute_adjacency_matrix(h, mask)
         if self.symmetric:
             A = 0.5 * (A + torch.transpose(A, 1, 2))
