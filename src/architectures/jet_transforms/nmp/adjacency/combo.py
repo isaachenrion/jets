@@ -15,8 +15,7 @@ class ComboAdjacency(_Adjacency):
             self.adjs.append(SIMPLE_ADJACENCIES[adj](**kwargs))
         #if learned_tradeoff:
         #    self.base_weights = nn.Parameter
-        #else:
-        #    self._weights = [1.0 / len(adj_list) for _ in adj_list]
+        self._weights = [1.0 / len(adj_list) for _ in adj_list]
 
     @property
     def weights(self):

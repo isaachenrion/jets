@@ -24,10 +24,14 @@ def masked_function(fn):
         return fn(matrix) * mask
     return masked
 
+def no_mask_softmax(matrix, mask):
+    return F.softmax(-matrix.transpose(0, -1)).transpose(0, -1)
+
 MATRIX_ACTIVATIONS = {
     'mask': masked_function(lambda x: x),
     'soft': padded_matrix_softmax,
     'sigmoid': masked_function(F.sigmoid),
     'exp': masked_function(lambda x: torch.exp(-x)),
-    'tanh': masked_function(F.tanh)
+    'tanh': masked_function(F.tanh),
+    'no_mask_softmax': no_mask_softmax
 }
