@@ -52,7 +52,7 @@ class Siamese(_Adjacency):
         super().__init__(**kwargs)
         #self.softmax = PaddedMatrixSoftmax()
 
-    def raw_matrix(self, h, mask):
+    def raw_matrix(self, h):
         shp = h.size()
         h_l = h.view(shp[0], shp[1], 1, shp[2])
         h_r = h.view(shp[0], 1, shp[1], shp[2])
