@@ -6,6 +6,7 @@ from .nmp import PhysicsNMP
 from .nmp import EyeNMP
 from .nmp import OnesNMP
 from .nmp import LearnedFixedNMP
+from .nmp import FixedNMP
 from .nmp import PhysicsStackNMP
 from .nmp import PhysicsPlusLearnedNMP
 from .recursive_net import GRNNTransformGated, GRNNTransformSimple
@@ -23,6 +24,7 @@ def construct_transform(key, *args, **kwargs):
         #stack=StackedNMP,
         phy=PhysicsNMP,
         #phystaold=PhysicsStackNMP,
+        dbg=FixedNMP,
         tra=TransformerTransform,
         one=OnesNMP,
         eye=EyeNMP,

@@ -62,9 +62,10 @@ parser.add_argument("-j", "--model", type=str, default="nmp", help="name of the 
 # NMP
 parser.add_argument("-i", "--iters", type=int, default=2)
 parser.add_argument("--mp", type=str, default='van', help='type of message passing layer')
-parser.add_argument("--matrix", type=str, default='dm', help='type of adaptive matrix layer')
+parser.add_argument("--matrix", type=str, default='dm', help='type of matrix layer')
 parser.add_argument("--asym", action='store_true', default=False)
 parser.add_argument("--readout", type=str, default='dtnn', help='type of readout layer')
+parser.add_argument("--m_act", type=str, default='softmax', help='type of nonlinearity for matrices' )
 
 # Stack NMP
 parser.add_argument("--pool_first", action='store_true', default=False)

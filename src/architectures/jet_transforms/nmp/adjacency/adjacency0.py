@@ -16,19 +16,6 @@ def construct_adjacency_matrix_layer(key, *args, **kwargs):
     except ValueError as e:
         raise ValueError('Adjacency matrix layer {}'.format(e))
 
-class AdjacencyMatrix(nn.Module):
-    def __init__(self, symmetric=None, **kwargs):
-        super().__init__()
-        self.symmetric = symmetric
-
-    def compute_adjacency_matrix(self, h, mask):
-        pass
-
-    def forward(self, h, mask, **kwargs):
-        A = self.compute_adjacency_matrix(h, mask)
-        if self.symmetric:
-            A = 0.5 * (A + torch.transpose(A, 1, 2))
-        return A
 
 class SumMatrix(AdjacencyMatrix):
     def __init__(self, hidden=None, **kwargs):

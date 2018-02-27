@@ -9,8 +9,8 @@ from .....architectures.readout import construct_readout
 from .....architectures.embedding import construct_embedding
 from .attention_pooling import construct_pooling_layer
 from ..message_passing import construct_mp_layer
-from ..message_passing import construct_adjacency_matrix_layer
-from ..fixed_nmp.adjacency import construct_physics_based_adjacency_matrix
+#from ..message_passing import construct_adjacency_matrix_layer
+#from ..fixed_nmp.adjacency import construct_physics_based_adjacency_matrix
 
 from .....monitors import BatchMatrixMonitor
 from .....monitors import Histogram
@@ -63,7 +63,6 @@ class AbstractStackedFixedNMP(nn.Module):
 
     def logging(self, dij=None, mask=None, epoch=None, iters=None, **kwargs):
         if epoch is not None and epoch % 20 == 0:
-            #import ipdb; ipdb.set_trace()
             nonmask_ends = [int(torch.sum(m,0)[0]) for m in mask.data]
             dij_hist = [d[:nme, :nme].contiguous().view(-1) for d, nme in zip(dij, nonmask_ends)]
             dij_hist = torch.cat(dij_hist,0)
@@ -80,25 +79,7 @@ class AbstractStackedFixedNMP(nn.Module):
 class StackedFixedNMP(AbstractStackedFixedNMP):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        #self.embedding = construct_embedding('simple', features+1, hidden, act=kwargs.get('act', None))
-        #self.nmps = nn.ModuleList(
-        #                    [nn.ModuleList(
-        #                            [construct_mp_layer('fixed', hidden=hidden,**kwargs) for _ in range(iters)
-        #                            ]
-        #                        )
-        #                    for _ in scales
-        #                    ]
-        #                )
-        #self.attn_pools = nn.ModuleList([construct_pooling_layer(pooling_layer, scales[i], hidden, **kwargs) for i in range(len(scales))])
-        #self.readout = construct_readout(readout, hidden, hidden)
-        #self.pool_first = pool_first
         self.adjs = self.set_adjacency_matrices(**kwargs)
-
-    #def set_monitors(self, logger):
-    #    self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True)
-    #    self.dij_matrix_monitor = BatchMatrixMonitor('dij')
-    #    self.dij_histogram.initialize(None, os.path.join(logger.plotsdir, 'dij_histogram'))
-    #    self.dij_matrix_monitor.initialize(None, os.path.join(logger.plotsdir, 'adjacency_matrix'))
 
     def set_adjacency_matrices(self, scales=None, features=None, hidden=None, symmetric=None,adaptive_matrix=None, **kwargs):
         m1 = construct_adjacency_matrix_layer(

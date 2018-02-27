@@ -5,7 +5,7 @@ from ...architectures import construct_classifier
 def construct_model_kwargs(args):
     model_kwargs = {
         # model dimensions
-        'features': args.features,
+        'features': args.features+1,
         'hidden': args.hidden,
 
         # activation
@@ -22,7 +22,8 @@ def construct_model_kwargs(args):
         'mp_layer':args.mp,
         'symmetric':args.sym,
         'readout':args.readout,
-        'adaptive_matrix':args.matrix,
+        'matrix':args.matrix,
+        'activation':args.m_act,
 
         # Stacked NMP
         'scales': args.scales,

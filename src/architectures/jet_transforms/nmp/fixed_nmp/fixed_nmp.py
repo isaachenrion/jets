@@ -6,17 +6,80 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 
-from .adjacency import construct_physics_based_adjacency_matrix
+#from .adjacency import construct_physics_based_adjacency_matrix
 
 from ..stacked_nmp.attention_pooling import construct_pooling_layer
 from ..message_passing import construct_mp_layer
-from ..message_passing.adjacency import construct_adjacency_matrix_layer
+#from ..message_passing.adjacency import construct_adjacency_matrix_layer
 
+from ..adjacency import construct_adjacency
 from .....architectures.readout import construct_readout
 from .....architectures.embedding import construct_embedding
 from .....monitors import Histogram
 from .....monitors import Collect
 from .....monitors import BatchMatrixMonitor
+
+class FixedNMP(nn.Module):
+    def __init__(self,
+        features=None,
+        hidden=None,
+        iters=None,
+        readout=None,
+        matrix=None,
+        **kwargs
+        ):
+        super().__init__()
+        self.iters = iters
+        self.embedding = construct_embedding('simple', features, hidden, act=kwargs.get('act', None))
+        self.mp_layers = nn.ModuleList([construct_mp_layer('fixed', hidden=hidden,**kwargs) for _ in range(iters)])
+        self.readout = construct_readout(readout, hidden, hidden)
+        #self.adjacency_matrix = self.set_adjacency_matrix(features=features,**kwargs)
+        self.adjacency_matrix = construct_adjacency(matrix=matrix, dim_in=features, hidden=hidden, **kwargs)
+
+        logger = kwargs.get('logger', None)
+        self.monitoring = logger is not None
+        if self.monitoring:
+            self.set_monitors()
+            self.initialize_monitors(logger)
+
+    def set_monitors(self):
+        self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True)
+        self.dij_matrix_monitor = BatchMatrixMonitor('dij')
+        #self.dij_histogram.initialize(None, os.path.join(logger.plotsdir, 'dij_histogram'))
+        #self.dij_matrix_monitor.initialize(None, os.path.join(logger.plotsdir, 'adjacency_matrix'))
+        self.monitors = [self.dij_matrix_monitor, self.dij_histogram]
+
+    def initialize_monitors(self, logger):
+        for m in self.monitors: m.initialize(None, logger.plotsdir)
+
+    def set_adjacency_matrix(self, **kwargs):
+        pass
+
+    def forward(self, jets, mask=None, **kwargs):
+        h = self.embedding(jets)
+        dij = self.adjacency_matrix(jets, mask=mask, **kwargs)
+        for mp in self.mp_layers:
+            h, _ = mp(h=h, mask=mask, dij=dij, **kwargs)
+        out = self.readout(h)
+
+        # logging
+        if self.monitoring:
+            self.logging(dij=dij, mask=mask, **kwargs)
+
+        return out, _
+
+    def logging(self, dij=None, mask=None, epoch=None, iters=None, **kwargs):
+        if epoch is not None and epoch % 20 == 0:
+            #import ipdb; ipdb.set_trace()
+            nonmask_ends = [int(torch.sum(m,0)[0]) for m in mask.data]
+            dij_hist = [d[:nme, :nme].contiguous().view(-1) for d, nme in zip(dij, nonmask_ends)]
+            dij_hist = torch.cat(dij_hist,0)
+            self.dij_histogram(values=dij_hist)
+            if iters == 0:
+                self.dij_histogram.visualize('epoch-{}/histogram'.format(epoch))
+                #self.dij_histogram.clear()
+                self.dij_matrix_monitor(dij=dij)
+                self.dij_matrix_monitor.visualize('epoch-{}/M'.format(epoch), n=10)
 
 class FixedAdjacencyNMP(nn.Module):
     def __init__(self,
@@ -24,6 +87,7 @@ class FixedAdjacencyNMP(nn.Module):
         hidden=None,
         iters=None,
         readout=None,
+        matrix=None,
         **kwargs
         ):
         super().__init__()
@@ -31,7 +95,8 @@ class FixedAdjacencyNMP(nn.Module):
         self.embedding = construct_embedding('simple', features + 1, hidden, act=kwargs.get('act', None))
         self.mp_layers = nn.ModuleList([construct_mp_layer('fixed', hidden=hidden,**kwargs) for _ in range(iters)])
         self.readout = construct_readout(readout, hidden, hidden)
-        self.adjacency_matrix = self.set_adjacency_matrix(features=features,**kwargs)
+        #self.adjacency_matrix = self.set_adjacency_matrix(features=features,**kwargs)
+        self.adjacency_matrix = construct_adjacency(matrix=matrix, features=features, **kwargs)
 
         logger = kwargs.get('logger', None)
         self.monitoring = logger is not None
@@ -83,12 +148,12 @@ class PhysicsNMP(FixedAdjacencyNMP):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def set_adjacency_matrix(self, **kwargs):
-        return construct_physics_based_adjacency_matrix(
-                        alpha=kwargs.pop('alpha', None),
-                        R=kwargs.pop('R', None),
-                        trainable_physics=kwargs.pop('trainable_physics', None)
-                        )
+    #def set_adjacency_matrix(self, **kwargs):
+    #    return construct_physics_based_adjacency_matrix(
+    #                    alpha=kwargs.pop('alpha', None),
+    #                    R=kwargs.pop('R', None),
+    #                    trainable_physics=kwargs.pop('trainable_physics', None)
+    #                    )
 
 class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
     def __init__(self, **kwargs):
@@ -115,21 +180,26 @@ class PhysicsPlusLearnedNMP(FixedAdjacencyNMP):
         self.learned_matrix = construct_adjacency_matrix_layer(
                     kwargs.get('adaptive_matrix', None),
                     hidden=kwargs.get('features', None) + 1,
-                    symmetric=kwargs.get('symmetric', None)
+                    symmetric=kwargs.get('symmetric', None),
+                    m_out=None
                     )
 
         self.physics_matrix = construct_physics_based_adjacency_matrix(
                         alpha=kwargs.pop('alpha', None),
                         R=kwargs.pop('R', None),
-                        trainable_physics=kwargs.pop('trainable_physics', None)
+                        trainable_physics=kwargs.pop('trainable_physics', None),
+                        m_out=None
                         )
 
+        self.m_out = kwargs.pop('m_out')
+
         def combined_matrix(jets, epoch=None, iters=None, **kwargs):
-            P = self.physics_matrix(jets, kwargs.get('mask', None))
-            L = self.learned_matrix(jets, kwargs.get('mask', None))
+            mask = kwargs.get('mask', None)
+            P = self.physics_matrix(jets, mask)
+            L = self.learned_matrix(jets, mask)
             x = self.physics_component
             out = x * P + (1 - x) * L
-            #import ipdb; ipdb.set_trace()
+            out = self.m_act(out, mask=mask)
 
             # logging
             if self.monitoring and epoch is not None and iters == 0:

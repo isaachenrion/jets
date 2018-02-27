@@ -20,8 +20,8 @@ def construct_physics_based_adjacency_matrix(alpha=None, R=None, trainable_physi
         return FixedPhysicsBasedAdjacencyMatrix(alpha=alpha, R=R)
 
 def compute_dij(p, alpha, R):
-    p1 = p.unsqueeze(1) + 1e-10
-    p2 = p.unsqueeze(2) + 1e-10
+    p1 = p.unsqueeze(1) + 1e-1
+    p2 = p.unsqueeze(2)
 
     delta_eta = p1[:,:,:,1] - p2[:,:,:,1]
 
@@ -48,11 +48,11 @@ class _PhysicsBasedAdjacencyMatrix(nn.Module):
 
     def forward(self, p, mask=None, **kwargs):
         dij = compute_dij(p, self.alpha, self.R)
-        #out = torch.exp(-dij)
-        #if mask is None:
-        #    return out
-        #return mask * out
-        return F.softmax(-dij.transpose(0, -1)).transpose(0, -1)
+        out = torch.exp(-dij)
+        if mask is None:
+            return out
+        return mask * out
+        #return F.softmax(-dij.transpose(0, -1)).transpose(0, -1)
 
 class FixedPhysicsBasedAdjacencyMatrix(_PhysicsBasedAdjacencyMatrix):
     def __init__(self, alpha=None, R=None):

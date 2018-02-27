@@ -5,7 +5,7 @@ from torch.autograd import Variable
 
 from .vertex_update import GRUUpdate as Update
 from .message import SimpleMessage as Message
-from .adjacency import construct_adjacency_matrix_layer
+#from .adjacency import construct_adjacency_matrix_layer
 
 from .....misc.abstract_constructor import construct_object
 
