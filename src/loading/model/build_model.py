@@ -25,7 +25,7 @@ def build_model(filename, restart, args, **kwargs):
         logging.warning(out_str)
         settings = {
             "model_kwargs": model_kwargs,
-            "step_size": args.step_size,
+            "lr": args.lr,
             "args": args,
             }
     else:

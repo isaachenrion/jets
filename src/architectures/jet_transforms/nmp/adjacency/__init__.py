@@ -1,11 +1,9 @@
-from .learned import LEARNED_ADJACENCIES
-from .constant import CONSTANT_ADJACENCIES
-from .physics import PHYSICS_ADJACENCIES
-
-ADJACENCIES = {}
-ADJACENCIES.update(LEARNED_ADJACENCIES)
-ADJACENCIES.update(CONSTANT_ADJACENCIES)
-ADJACENCIES.update(PHYSICS_ADJACENCIES)
+from .simple import SIMPLE_ADJACENCIES
+from .combo import ComboAdjacency, LearnedComboAdjacency
 
 def construct_adjacency(matrix, **kwargs):
-    return ADJACENCIES[matrix](**kwargs)
+    if isinstance(matrix, (list,)):
+        if kwargs.get('learned_tradeoff', False):
+            return LearnedComboAdjacency(matrix, **kwargs)
+        return ComboAdjacency(matrix, **kwargs)
+    return SIMPLE_ADJACENCIES[matrix](**kwargs)

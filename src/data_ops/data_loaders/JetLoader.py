@@ -3,7 +3,7 @@ import torch
 from torch.autograd import Variable
 
 from ._DataLoader import _DataLoader
-from ..wrapping import wrap 
+from ..wrapping import wrap
 
 class JetLoader(_DataLoader):
     def __init__(self, dataset, batch_size):
@@ -17,11 +17,18 @@ class JetLoader(_DataLoader):
         return y
 
 class LeafJetLoader(JetLoader):
-    def __init__(self, dataset, batch_size):
+    def __init__(self, dataset, batch_size, dropout=None):
         super().__init__(dataset, batch_size)
+        self.dropout = dropout
 
     def preprocess_x(self, x_list):
         data = [torch.from_numpy(x.constituents) for x in x_list]
+
+        # dropout
+        if self.dropout is not None:
+            dropout_masks = [torch.bernoulli(torch.zeros(x.constituents.shape[0]).fill_(self.dropout)).byte() for x in x_list]
+            for i, dm in enumerate(dropout_masks):
+                data[i] = torch.masked_select(data[i], dm.unsqueeze(1).repeat(1, data[i].shape[1])).view(-1, self.dataset.dim)
 
         seq_lengths = [len(x) for x in data]
         max_seq_length = max(seq_lengths)
@@ -44,7 +51,7 @@ class LeafJetLoader(JetLoader):
         return (padded_data, mask)
 
 class TreeJetLoader(JetLoader):
-    def __init__(self, dataset, batch_size,):
+    def __init__(self, dataset, batch_size,**kwargs):
         super().__init__(dataset, batch_size)
 
     def preprocess_x(self, x_list):

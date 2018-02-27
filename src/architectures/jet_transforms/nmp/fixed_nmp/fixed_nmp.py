@@ -35,7 +35,6 @@ class FixedNMP(nn.Module):
         self.readout = construct_readout(readout, hidden, hidden)
         #self.adjacency_matrix = self.set_adjacency_matrix(features=features,**kwargs)
         self.adjacency_matrix = construct_adjacency(matrix=matrix, dim_in=features, hidden=hidden, **kwargs)
-
         logger = kwargs.get('logger', None)
         self.monitoring = logger is not None
         if self.monitoring:
@@ -56,6 +55,7 @@ class FixedNMP(nn.Module):
         pass
 
     def forward(self, jets, mask=None, **kwargs):
+
         h = self.embedding(jets)
         dij = self.adjacency_matrix(jets, mask=mask, **kwargs)
         for mp in self.mp_layers:

@@ -26,7 +26,7 @@ def masked_function(fn):
 
 MATRIX_ACTIVATIONS = {
     'mask': masked_function(lambda x: x),
-    'pms': padded_matrix_softmax,
+    'soft': padded_matrix_softmax,
     'sigmoid': masked_function(F.sigmoid),
     'exp': masked_function(lambda x: torch.exp(-x)),
     'tanh': masked_function(F.tanh)

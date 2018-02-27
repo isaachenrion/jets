@@ -3,6 +3,7 @@ import pickle
 from ...architectures import construct_classifier
 
 def construct_model_kwargs(args):
+    #import ipdb; ipdb.set_trace()
     model_kwargs = {
         # model dimensions
         'features': args.features+1,
@@ -22,7 +23,7 @@ def construct_model_kwargs(args):
         'mp_layer':args.mp,
         'symmetric':args.sym,
         'readout':args.readout,
-        'matrix':args.matrix,
+        'matrix':args.adj[0] if len(args.adj) == 1 else args.adj,
         'activation':args.m_act,
 
         # Stacked NMP

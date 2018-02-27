@@ -97,6 +97,6 @@ class TrainablePhysicsAdjacency(_PhysicsAdjacency):
         return R
 
 PHYSICS_ADJACENCIES = dict(
-    tp=TrainablePhysicsAdjacency,
-    fp=FixedPhysicsAdjacency
+    tphy=TrainablePhysicsAdjacency,
+    phy=FixedPhysicsAdjacency
 )

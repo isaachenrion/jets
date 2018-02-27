@@ -30,7 +30,7 @@ parser.add_argument("-b", "--batch_size", type=int, default=BATCH_SIZE)
 parser.add_argument("--experiment_time", type=int, default=1000000)
 
 # Optimization args
-parser.add_argument("-a", "--step_size", type=float, default=STEP_SIZE)
+parser.add_argument("--lr", type=float, default=STEP_SIZE)
 parser.add_argument("--decay", type=float, default=DECAY)
 parser.add_argument("--clip", type=float, default=None)
 parser.add_argument("--reg", type=float, default=L2_REGULARIZATION)
@@ -44,6 +44,7 @@ parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_train", type=int, default=-1)
 parser.add_argument("--n_valid", type=int, default=VALID)
 parser.add_argument("--dataset", type=str, default='w')
+parser.add_argument("--dropout", type=float, default=1)
 parser.add_argument("--pileup", action='store_true', default=False)
 parser.add_argument("--pp", action='store_true', default=False)
 parser.add_argument("--root_dir", default=MODELS_DIR)
@@ -62,10 +63,10 @@ parser.add_argument("-j", "--model", type=str, default="nmp", help="name of the 
 # NMP
 parser.add_argument("-i", "--iters", type=int, default=2)
 parser.add_argument("--mp", type=str, default='van', help='type of message passing layer')
-parser.add_argument("--matrix", type=str, default='dm', help='type of matrix layer')
+parser.add_argument("-a","--adj", type=str, nargs='+', default='dm', help='type of matrix layer')
 parser.add_argument("--asym", action='store_true', default=False)
 parser.add_argument("--readout", type=str, default='dtnn', help='type of readout layer')
-parser.add_argument("--m_act", type=str, default='softmax', help='type of nonlinearity for matrices' )
+parser.add_argument("--m_act", type=str, default='soft', help='type of nonlinearity for matrices' )
 
 # Stack NMP
 parser.add_argument("--pool_first", action='store_true', default=False)
@@ -86,7 +87,6 @@ parser.add_argument("--n_layers", type=int, default=3)
 parser.add_argument("--n_heads", type=int, default=8)
 parser.add_argument("--dq", type=int, default=32)
 parser.add_argument("--dv", type=int, default=32)
-parser.add_argument("--dropout", action='store_true', default=False)
 
 args = parser.parse_args()
 args = reset_unused_args(args)

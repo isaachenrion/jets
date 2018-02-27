@@ -33,8 +33,8 @@ def train(args):
         DataLoader = TreeJetLoader
     else:
         DataLoader = LeafJetLoader
-    train_data_loader = DataLoader(train_dataset, batch_size = args.batch_size)
-    valid_data_loader = DataLoader(valid_dataset, batch_size = args.batch_size)
+    train_data_loader = DataLoader(train_dataset, batch_size = args.batch_size, dropout=args.dropout)
+    valid_data_loader = DataLoader(valid_dataset, batch_size = args.batch_size, dropout=args.dropout)
 
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
@@ -44,7 +44,7 @@ def train(args):
     ''' OPTIMIZER AND LOSS '''
     '''----------------------------------------------------------------------- '''
     logging.info("Building optimizer...")
-    optimizer = Adam(model.parameters(), lr=settings['step_size'], weight_decay=args.reg)
+    optimizer = Adam(model.parameters(), lr=settings['lr'], weight_decay=args.reg)
     scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
     #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
     #scheduler = lr_scheduler.Step
@@ -100,7 +100,7 @@ def train(args):
 
     for i in range(args.epochs):
         logging.info("epoch = %d" % i)
-        logging.info("step_size = %.8f" % settings['step_size'])
+        logging.info("lr = %.8f" % settings['lr'])
         t0 = time.time()
         for j, (x, y) in enumerate(train_data_loader):
             iteration += 1
@@ -128,7 +128,7 @@ def train(args):
 
         #scheduler.step(logdict['valid_loss'])
         scheduler.step()
-        #settings['step_size'] = settings['step_size'] * (args.decay) ** (i + 1)
+        #settings['lr'] = settings['lr'] * (args.decay) ** (i + 1)
 
         if t1 - t_start > args.experiment_time - 60:
             break
