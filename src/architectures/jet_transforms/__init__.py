@@ -1,14 +1,14 @@
-from .nmp import LearnedVariableNMP
-from .nmp import StackedNMP
-from .nmp import StackedFixedNMP
-from .nmp import PhysicsStackedFixedNMP
-from .nmp import PhysicsNMP
-from .nmp import EyeNMP
-from .nmp import OnesNMP
-from .nmp import LearnedFixedNMP
+#from .nmp import LearnedVariableNMP
+#from .nmp import StackedNMP
+#from .nmp import StackedFixedNMP
+#from .nmp import PhysicsStackedFixedNMP
+#from .nmp import PhysicsNMP
+#from .nmp import EyeNMP
+#from .nmp import OnesNMP
+#from .nmp import LearnedFixedNMP
 from .nmp import FixedNMP
-from .nmp import PhysicsStackNMP
-from .nmp import PhysicsPlusLearnedNMP
+#from .nmp import PhysicsStackNMP
+#from .nmp import PhysicsPlusLearnedNMP
 from .recursive_net import GRNNTransformGated, GRNNTransformSimple
 from .relation_net import RelNNTransformConnected
 from .transformer import TransformerTransform
@@ -20,18 +20,18 @@ def construct_transform(key, *args, **kwargs):
         rel=RelNNTransformConnected,
         recs=GRNNTransformSimple,
         recg=GRNNTransformGated,
-        nmp=LearnedVariableNMP,
+        #nmp=LearnedVariableNMP,
         #stack=StackedNMP,
-        phy=PhysicsNMP,
+        #phy=PhysicsNMP,
         #phystaold=PhysicsStackNMP,
         dbg=FixedNMP,
         tra=TransformerTransform,
-        one=OnesNMP,
-        eye=EyeNMP,
-        lf=LearnedFixedNMP,
-        plf=PhysicsPlusLearnedNMP,
-        sta=StackedFixedNMP,
-        physta=PhysicsStackedFixedNMP
+        #one=OnesNMP,
+        #eye=EyeNMP,
+        #lf=LearnedFixedNMP,
+        #plf=PhysicsPlusLearnedNMP,
+        #sta=StackedFixedNMP,
+        #physta=PhysicsStackedFixedNMP
     )
     try:
         return construct_object(key, dictionary, *args, **kwargs)
