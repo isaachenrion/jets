@@ -37,6 +37,8 @@ class ComboAdjacency(_Adjacency):
     def forward(self, h, mask, **kwargs):
         # raw matrix
         combo = Variable(torch.zeros(h.size()[0], h.size()[1], h.size()[1]))
+        if torch.cuda.is_available():
+            combo = combo.cuda()
         for adj, weight in zip(self.adjs, self.weights):
             M = adj(h, mask, **kwargs)
             combo += M * weight
