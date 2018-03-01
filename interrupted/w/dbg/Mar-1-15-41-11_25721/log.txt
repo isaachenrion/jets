@@ -1,0 +1,130 @@
+INTERRUPTED on Mar-1 at 15:41:20
+2018-03-01 15:41:11,157 running on 172-16-44-93.DYNAPOOL.NYU.EDU
+2018-03-01 15:41:11,157 running/w/dbg/Mar-1-15-41-11_25721/
+2018-03-01 15:41:11,158 	R = 1
+2018-03-01 15:41:11,158 	act = relu
+2018-03-01 15:41:11,158 	adj = ['phy', 'dm', 'eye']
+2018-03-01 15:41:11,159 	alpha = 1
+2018-03-01 15:41:11,159 	asym = False
+2018-03-01 15:41:11,159 	batch_size = 5
+2018-03-01 15:41:11,159 	clip = None
+2018-03-01 15:41:11,159 	cmd_line_args = ['train.py', '-a', 'phy', 'dm', 'eye', '--learned_tradeoff', '--debug']
+2018-03-01 15:41:11,159 	data_dir = data
+2018-03-01 15:41:11,159 	dataset = w
+2018-03-01 15:41:11,159 	debug = True
+2018-03-01 15:41:11,159 	decay = 1
+2018-03-01 15:41:11,159 	dq = 32
+2018-03-01 15:41:11,159 	dropout = 1
+2018-03-01 15:41:11,159 	dv = 32
+2018-03-01 15:41:11,159 	email = None
+2018-03-01 15:41:11,160 	epochs = 3
+2018-03-01 15:41:11,160 	experiment_time = 3600000000
+2018-03-01 15:41:11,160 	features = 7
+2018-03-01 15:41:11,160 	gpu = 
+2018-03-01 15:41:11,160 	hidden = 7
+2018-03-01 15:41:11,160 	host = 172-16-44-93.DYNAPOOL.NYU.EDU
+2018-03-01 15:41:11,160 	iters = 2
+2018-03-01 15:41:11,160 	learned_tradeoff = True
+2018-03-01 15:41:11,160 	lf = 1
+2018-03-01 15:41:11,160 	load = None
+2018-03-01 15:41:11,160 	lr = 0.0003
+2018-03-01 15:41:11,160 	m_act = soft
+2018-03-01 15:41:11,160 	model = dbg
+2018-03-01 15:41:11,160 	models_dir = models
+2018-03-01 15:41:11,161 	mp = van
+2018-03-01 15:41:11,161 	n_heads = 8
+2018-03-01 15:41:11,161 	n_layers = 3
+2018-03-01 15:41:11,161 	n_train = 1000
+2018-03-01 15:41:11,161 	n_valid = 200
+2018-03-01 15:41:11,161 	no_email = True
+2018-03-01 15:41:11,161 	physics_component = 0.0
+2018-03-01 15:41:11,161 	pid = 25721
+2018-03-01 15:41:11,161 	pileup = False
+2018-03-01 15:41:11,161 	pool = attn
+2018-03-01 15:41:11,161 	pool_first = False
+2018-03-01 15:41:11,161 	pp = False
+2018-03-01 15:41:11,161 	predict = simple
+2018-03-01 15:41:11,161 	readout = dtnn
+2018-03-01 15:41:11,162 	reg = 0.0
+2018-03-01 15:41:11,162 	restart = False
+2018-03-01 15:41:11,162 	root_dir = models
+2018-03-01 15:41:11,162 	scales = None
+2018-03-01 15:41:11,162 	seed = 1
+2018-03-01 15:41:11,162 	silent = False
+2018-03-01 15:41:11,162 	slurm = False
+2018-03-01 15:41:11,162 	slurm_array_job_id = 0
+2018-03-01 15:41:11,162 	slurm_array_task_id = 0
+2018-03-01 15:41:11,162 	sym = True
+2018-03-01 15:41:11,163 	train = True
+2018-03-01 15:41:11,163 	trainable_physics = False
+2018-03-01 15:41:11,163 	verbose = True
+2018-03-01 15:41:11,163 	visualizing = False
+2018-03-01 15:41:11,163 	PID = 25721
+2018-03-01 15:41:11,163 	Not running on GPU
+2018-03-01 15:41:11,163 Loading data...
+2018-03-01 15:41:13,537 Data loaded and already preprocessed
+2018-03-01 15:41:13,921 Splitting into train and validation...
+2018-03-01 15:41:13,922 	final train size = 925
+2018-03-01 15:41:13,922 	final valid size = 75
+2018-03-01 15:41:13,922 Initializing model...
+2018-03-01 15:41:13,924 LeafJetClassifier (
+  (transform): FixedNMP (
+    (embedding): Simple (
+      (fc): Linear (8 -> 7)
+      (activation): ReLU ()
+    )
+    (mp_layers): ModuleList (
+      (0): MPFixed (
+        (vertex_update): GRUUpdate (
+          (gru): AnyBatchGRUCell (
+            (linear_ih): Linear (7 -> 21)
+            (linear_hh): Linear (7 -> 21)
+          )
+        )
+        (message): SimpleMessage (
+          (embedding): Simple (
+            (fc): Linear (7 -> 7)
+            (activation): ReLU ()
+          )
+        )
+      )
+      (1): MPFixed (
+        (vertex_update): GRUUpdate (
+          (gru): AnyBatchGRUCell (
+            (linear_ih): Linear (7 -> 21)
+            (linear_hh): Linear (7 -> 21)
+          )
+        )
+        (message): SimpleMessage (
+          (embedding): Simple (
+            (fc): Linear (7 -> 7)
+            (activation): ReLU ()
+          )
+        )
+      )
+    )
+    (readout): DTNNReadout (
+      (fc1): Linear (7 -> 7)
+      (fc2): Linear (7 -> 7)
+    )
+    (adjacency_matrix): LearnedComboAdjacency (
+      (adjs): ModuleList (
+        (0): FixedPhysicsAdjacency (
+        )
+        (1): DistMult (
+        )
+        (2): Eye (
+        )
+      )
+    )
+  )
+  (predictor): ClassificationReadout (
+    (fc): Linear (7 -> 1)
+  )
+)
+2018-03-01 15:41:13,925 Number of parameters: 1034
+2018-03-01 15:41:13,925 Building optimizer...
+2018-03-01 15:41:13,926 Training...
+2018-03-01 15:41:13,926 epoch = 0
+2018-03-01 15:41:13,926 lr = 0.00030000
+2018-03-01 15:41:20,831 INTERRUPTED on Mar-1 at 15:41:20

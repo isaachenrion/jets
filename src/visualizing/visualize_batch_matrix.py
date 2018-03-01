@@ -58,7 +58,8 @@ def visualize_batch_matrix(tensor, plotsdir, path_to_visualizations):
         visualize_matrix(matrix, prefix=os.path.join(plotsdir, path_to_visualizations, str(i)))
 
 def visualize_matrix(matrix, prefix, cmin=0., cmax=None, log=False, clabel=r'$A_{ij}$'):
-    plt.figure(figsize=(6,5))
+    #plt.figure(figsize=(6,5))
+    fig, ax = plt.subplots()
 
     if log:
         plt.matshow(unpad(matrix), cmap='viridis_r', norm=LogNorm(), origin='lower', fignum=False)
@@ -70,6 +71,7 @@ def visualize_matrix(matrix, prefix, cmin=0., cmax=None, log=False, clabel=r'$A_
     cbar.set_label(clabel)
 
     plt.savefig(prefix + ".pdf", dpi=300)
+    plt.close(fig)
 
     #if i == len(AA)-1:
     #    plt.show()

@@ -3,12 +3,12 @@ import os
 ''' CONSTANTS '''
 '''----------------------------------------------------------------------- '''
 MODELS_DIR = 'models'
-RUNNING_MODELS_DIR = os.path.join(MODELS_DIR,'running')
-FINISHED_MODELS_DIR = os.path.join(MODELS_DIR,'finished')
-DEBUG_MODELS_DIR = os.path.join(MODELS_DIR,'debugging')
-INTERRUPTED_MODELS_DIR = os.path.join(MODELS_DIR,'interrupted')
-KILLED_MODELS_DIR = os.path.join(MODELS_DIR,'killed')
-ARCHIVED_MODELS_DIR = os.path.join(MODELS_DIR,'archive')
+RUNNING_MODELS_DIR = 'running'
+FINISHED_MODELS_DIR = 'finished'
+DEBUG_MODELS_DIR = 'debugging'
+INTERRUPTED_MODELS_DIR = 'interrupted'
+KILLED_MODELS_DIR = 'killed'
+ARCHIVED_MODELS_DIR = 'archive'
 ALL_MODEL_DIRS = [
     RUNNING_MODELS_DIR,
     FINISHED_MODELS_DIR,

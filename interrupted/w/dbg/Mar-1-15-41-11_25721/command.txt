@@ -1,0 +1,3 @@
+-a phy dm eye
+--learned_tradeoff
+--debug

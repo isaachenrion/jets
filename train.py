@@ -19,6 +19,10 @@ parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("--visualizing", action='store_true', default=False)
 parser.add_argument("--no_email", action='store_true', default=False)
 
+# Directoery args
+parser.add_argument("--data_dir", type=str, default=DATA_DIR)
+parser.add_argument("--models_dir", type=str, default=MODELS_DIR)
+
 # Slurm args
 parser.add_argument("--slurm", action='store_true', default=False)
 parser.add_argument("--slurm_array_job_id", default=0)
@@ -44,7 +48,6 @@ parser.add_argument("--seed", help="Random seed used in torch and numpy", type=i
 parser.add_argument("-g", "--gpu", type=str, default="")
 
 # Data args
-parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_train", type=int, default=-1)
 parser.add_argument("--n_valid", type=int, default=VALID)
 parser.add_argument("--dataset", type=str, default='w')

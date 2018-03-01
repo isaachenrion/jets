@@ -35,6 +35,7 @@ class ExperimentHandler:
             silent=None,
             verbose=None,
             cmd_line_args=None,
+            models_dir=None,
             **kwargs
             ):
 
@@ -46,6 +47,7 @@ class ExperimentHandler:
         passed_args.pop('self')
         passed_args.update(kwargs)
 
+        self.models_dir = models_dir
         self.debug = debug
         self.slurm = slurm
         self.slurm_array_task_id = slurm_array_task_id
@@ -102,7 +104,8 @@ class ExperimentHandler:
 
 
     def create_all_model_dirs(self):
-        for model_dir in ALL_MODEL_DIRS:
+        for intermediate_dir in ALL_MODEL_DIRS:
+            model_dir = os.path.join(self.models_dir, intermediate_dir)
             if not os.path.isdir(model_dir):
                 os.makedirs(model_dir)
 
@@ -190,7 +193,10 @@ class ExperimentHandler:
     def record_settings(self, passed_args):
         with open(os.path.join(self.root_dir, self.intermediate_dir, 'command.txt'), 'w') as f:
             #import ipdb; ipdb.set_trace()
-            f.write(' '.join(self.cmd_line_args))
+            out_str = (' '.join(self.cmd_line_args))
+            out_strs = out_str.split(' -')
+            for s in out_strs[1:]:
+                f.write('-{}\n'.format(s))
 
         for k, v in sorted(passed_args.items()): logging.warning('\t{} = {}'.format(k, v))
 
