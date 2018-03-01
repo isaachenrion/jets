@@ -84,7 +84,8 @@ class ExperimentHandler:
         self.gpu = gpu
 
     def setup_model_directory(self, dataset, model):
-        self.root_dir = RUNNING_MODELS_DIR
+        self.current_dir = RUNNING_MODELS_DIR
+        self.root_dir = os.path.join(self.models_dir, self.current_dir)
         dt = datetime.datetime.now()
         self.start_dt = dt
 
@@ -133,7 +134,8 @@ class ExperimentHandler:
         self.signal_handler = SignalHandler(
                                 emailer=self.emailer,
                                 logfile=self.logfile,
-                                root_dir=self.root_dir,
+                                current_dir=self.current_dir,
+                                models_dir=self.models_dir,
                                 intermediate_dir=self.intermediate_dir,
                                 leaf_dir=self.leaf_dir,
                                 need_input=True,
