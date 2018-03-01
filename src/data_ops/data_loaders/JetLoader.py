@@ -26,8 +26,11 @@ class LeafJetLoader(JetLoader):
 
         # dropout
         if self.dropout is not None:
-            dropout_masks = [torch.bernoulli(torch.zeros(x.constituents.shape[0]).fill_(self.dropout)).byte() for x in x_list]
-            for i, dm in enumerate(dropout_masks):
+            #dropout_masks = [torch.bernoulli(torch.zeros(x.constituents.shape[0]).fill_(self.dropout)).byte() for x in x_list]
+            for i, x in enumerate(x_list):
+                dm = torch.bernoulli(torch.zeros(x.constituents.shape[0]).fill_(self.dropout)).byte()
+                while dm.sum() == 0:
+                    dm = torch.bernoulli(torch.zeros(x.constituents.shape[0]).fill_(self.dropout)).byte()
                 data[i] = torch.masked_select(data[i], dm.unsqueeze(1).repeat(1, data[i].shape[1])).view(-1, self.dataset.dim)
 
         seq_lengths = [len(x) for x in data]
