@@ -45,10 +45,10 @@ def train(args):
     '''----------------------------------------------------------------------- '''
     logging.info("Building optimizer...")
     optimizer = Adam(model.parameters(), lr=settings['lr'], weight_decay=args.reg)
-    scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
+    #scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
     #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
     #scheduler = lr_scheduler.Step
-    #scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[10,20,30,40,70], gamma=0.5)
+    scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[10,20,30,40,70], gamma=0.5)
 
     def loss(y_pred, y):
         return F.binary_cross_entropy(y_pred.squeeze(1), y)
