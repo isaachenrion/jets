@@ -189,7 +189,7 @@ class ExperimentHandler:
 
     def record_settings(self, passed_args):
         with open(os.path.join(self.root_dir, self.intermediate_dir, 'command.txt'), 'w') as f:
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             f.write(' '.join(self.cmd_line_args))
 
         for k, v in sorted(passed_args.items()): logging.warning('\t{} = {}'.format(k, v))
