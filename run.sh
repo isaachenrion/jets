@@ -1,5 +1,6 @@
 PYTHONARGS="${@:2}"
 
+
 read SRCDIR DATADIR GPU EXPT_TIME < <(bash misc/paths.sh)
 
 PYTHONARGS="$PYTHONARGS --data_dir $DATADIR --experiment_time $EXPT_TIME"

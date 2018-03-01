@@ -1,4 +1,6 @@
 import argparse
+import sys
+
 from src.experiment import train
 from src.experiment import reset_unused_args
 from src.misc.constants import *
@@ -58,10 +60,10 @@ parser.add_argument("--act", type=str, default='relu')
 parser.add_argument("--predict", type=str, default='simple', help='type of prediction layer')
 
 # Transform
-parser.add_argument("-j", "--model", type=str, default="nmp", help="name of the model you want to train - look in constants.py for the model list")
+parser.add_argument("-j", "--model", type=str, default="dbg", help="name of the model you want to train - look in constants.py for the model list")
 
 # NMP
-parser.add_argument("-i", "--iters", type=int, default=2)
+parser.add_argument("-i", "--iters", type=int, default=10)
 parser.add_argument("--mp", type=str, default='van', help='type of message passing layer')
 parser.add_argument("-a","--adj", type=str, nargs='+', default='dm', help='type of matrix layer')
 parser.add_argument("--asym", action='store_true', default=False)
@@ -92,6 +94,7 @@ parser.add_argument("--dv", type=int, default=32)
 args = parser.parse_args()
 args = reset_unused_args(args)
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+args.cmd_line_args = sys.argv
 
 if __name__ == "__main__":
     train(args)

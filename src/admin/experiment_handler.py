@@ -34,6 +34,7 @@ class ExperimentHandler:
             visualizing=None,
             silent=None,
             verbose=None,
+            cmd_line_args=None,
             **kwargs
             ):
 
@@ -49,6 +50,7 @@ class ExperimentHandler:
         self.slurm = slurm
         self.slurm_array_task_id = slurm_array_task_id
         self.slurm_array_job_id = slurm_array_job_id
+        self.cmd_line_args = cmd_line_args
         self.pid = pid
         self.host = host
         self.train = train
@@ -186,8 +188,10 @@ class ExperimentHandler:
         self.saver = saver
 
     def record_settings(self, passed_args):
-        ''' RECORD SETTINGS '''
-        '''----------------------------------------------------------------------- '''
+        with open(os.path.join(self.root_dir, self.intermediate_dir, 'command.txt'), 'w') as f:
+            import ipdb; ipdb.set_trace()
+            f.write(' '.join(self.cmd_line_args))
+
         for k, v in sorted(passed_args.items()): logging.warning('\t{} = {}'.format(k, v))
 
         logging.warning("\tPID = {}".format(self.pid))
