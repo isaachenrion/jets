@@ -254,11 +254,11 @@ class EvaluationExperimentHandler(ExperimentHandler):
         roc_auc = ROCAUC()
         inv_fpr = InvFPR()
         roc_curve = ROCCurve()
-        model_counter = Regurgitate('model', visualizing=False)
+        #model_counter = Regurgitate('model', visualizing=False)
         logtimer=Collect('logtime', fn='mean')
         prediction_histogram = EachClassHistogram([0,1], 'yy', 'yy_pred', append=True)
         monitors = [
-            model_counter,
+            #model_counter,
             roc_auc,
             inv_fpr,
             roc_curve,
@@ -273,7 +273,8 @@ class EvaluationExperimentHandler(ExperimentHandler):
 
         if not self.latex:
             out_str = "\tModel = {}\t1/FPR @ TPR = 0.5={:.4f}\troc_auc={:.4f}".format(
-                    kwargs['model'],
+                    0,
+                    #kwargs['model'],
                     self.stats_logger.monitors['inv_fpr'].value if kwargs.get('compute_monitors', True) else kwargs['inv_fpr'],
                     self.stats_logger.monitors['roc_auc'].value if kwargs.get('compute_monitors', True) else kwargs['roc_auc']
                     )

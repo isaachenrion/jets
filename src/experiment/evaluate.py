@@ -111,7 +111,9 @@ def evaluate(args):
                 else:
                     with open(model_test_file, "rb") as fd:
                         roc, fpr, tpr, inv_fpr = pickle.load(fd)
-                    logdict = {'compute_monitors':False,'roc_auc': roc, 'inv_fpr':inv_fpr, 'model':filename.split('/')[-1]}
+                    logdict = {'compute_monitors':False,'roc_auc': roc, 'inv_fpr':inv_fpr,
+                    #model':filename.split('/')[-1]
+                    }
                     eh.log(**logdict)
                 rocs.append(roc)
                 fprs.append(fpr)
@@ -142,7 +144,7 @@ def evaluate(args):
 
         logging.info('Building ROCs for models trained on {}'.format(data_filename))
         #X_test, y_test, w_test = load_dataset(args.data_dir, "{}-train.pickle".format(dataset), args.n_test, args.pileup)
-        dataset = load_test_dataset(data_dir, data_filename, args.n_test, args.pileup)
+        dataset = load_test_dataset(data_dir, data_filename, args.n_test, args.pileup, args.pp)
         if '/rec' in args.model:
             DataLoader = TreeJetLoader
         else:

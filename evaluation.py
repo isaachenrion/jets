@@ -1,3 +1,4 @@
+import sys
 import argparse
 from src.experiment import evaluate
 from src.misc.constants import *
@@ -14,6 +15,7 @@ parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("-n", "--n_test", type=int, default=-1)
 parser.add_argument("--dataset", type=str, default='test')
 parser.add_argument("-p", "--pileup", action='store_true', default=False)
+parser.add_argument("--pp", action='store_true', default=False)
 
 # Slurm args
 parser.add_argument("--slurm", action='store_true', default=False)
@@ -50,6 +52,7 @@ args = parser.parse_args()
 args.train = False
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 args.silent = not args.verbose
+args.cmd_line_args = sys.argv
 
 if args.debug:
     args.n_test = 1000
