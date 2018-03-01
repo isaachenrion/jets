@@ -2,6 +2,7 @@ import matplotlib as mpl
 mpl.use('Agg')
 import argparse
 import sys
+import cProfile
 
 from src.experiment import train
 from src.experiment import reset_unused_args
@@ -12,6 +13,7 @@ from src.misc.constants import *
 parser = argparse.ArgumentParser(description='Jets')
 # Debugging
 parser.add_argument("-d", "--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
+parser.add_argument("--profile", action='store_true', default=False)
 
 # Admin args
 parser.add_argument("-s", "--silent", action='store_true', default=False)
@@ -102,4 +104,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 args.cmd_line_args = sys.argv
 
 if __name__ == "__main__":
-    train(args)
+    if args.profile:
+        cProfile.run('train(args)')
+    else:
+        train(args)

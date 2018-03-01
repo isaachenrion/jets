@@ -1,6 +1,5 @@
 import logging
 import time
-
 import torch
 from torch.optim import Adam, lr_scheduler
 import torch.nn.functional as F
@@ -48,7 +47,7 @@ def train(args):
     #scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.decay)
     #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
     #scheduler = lr_scheduler.Step
-    scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[5,10,20,30,40,70], gamma=0.5)
+    scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[5,7,10,20,30,40,70], gamma=0.5)
 
     def loss(y_pred, y):
         return F.binary_cross_entropy(y_pred.squeeze(1), y)
@@ -100,7 +99,7 @@ def train(args):
 
     for i in range(args.epochs):
         logging.info("epoch = %d" % i)
-        logging.info("lr = %.8f" % settings['lr'])
+        logging.info("lr = %.8f" % scheduler.get_lr()[0])
         t0 = time.time()
         for j, (x, y) in enumerate(train_data_loader):
             iteration += 1
