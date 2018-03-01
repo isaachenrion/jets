@@ -6,9 +6,15 @@ from torch.autograd import Variable
 from .simple._adjacency import _Adjacency
 from .simple import SIMPLE_ADJACENCIES
 
+from src.monitors import Collect
+
 class ComboAdjacency(_Adjacency):
-    def __init__(self, adj_list, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(name='combo',**kwargs)
+
+    def initialize(self, adj_list=None, **kwargs):
+        super().initialize(**kwargs)
+        kwargs.pop('name')
         self.adjs = nn.ModuleList()
         #self.n_adjs = len(self.adjs)
         for adj in adj_list:
@@ -21,14 +27,43 @@ class ComboAdjacency(_Adjacency):
     def weights(self):
         return self._weights
 
-    def raw_matrix(self, h):
-        combo = [adj.raw_matrix(h) * weight for adj, weight in zip(self.adjs, self.weights)]
-        return torch.sum(torch.stack(combo, -1), -1)
+    def set_monitors(self):
+        super().set_monitors()
+        self.component_monitors = [
+            Collect('component', fn='last') for adj in self.adjs
+        ]
+        self.monitors.extend(self.component_monitors)
+
+    def forward(self, h, mask, **kwargs):
+        # raw matrix
+        combo = Variable(torch.zeros(h.size()[0], h.size()[1], h.size()[1]))
+        for adj, weight in zip(self.adjs, self.weights):
+            M = adj(h, mask, **kwargs)
+            combo += M * weight
+
+        #if self.symmetric:
+        #    M = 0.5 * (M + M.transpose(1, 2))
+
+        if self.activation is not None:
+            M = self.activation(M, mask)
+
+        if self.monitoring:
+            self.logging(dij=combo, mask=mask, **kwargs)
+        return combo
+
+    def logging(self, **kwargs):
+        super().logging(**kwargs)
+        if kwargs.get('epoch', None) is not None and kwargs.get('iters', None) == 0:
+            for i, (cm, adj) in enumerate(zip(self.component_monitors, self.adjs)):
+                w = self.weights[i]
+                cm(component=w)
+                cm.visualize(adj.name)
 
 class LearnedComboAdjacency(ComboAdjacency):
-    def __init__(self, adj_list, **kwargs):
-        super().__init__(adj_list, **kwargs)
+    def __init__(self, adj_list=None, **kwargs):
+        super().__init__(adj_list=adj_list, **kwargs)
         self._weights = nn.Parameter(torch.zeros(len(self.adjs)))
+        #import ipdb; ipdb.set_trace()
 
     @property
     def weights(self):

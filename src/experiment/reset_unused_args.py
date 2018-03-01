@@ -36,6 +36,7 @@ def reset_unused_args(args):
         args.epochs = 3
         args.n_train = 1000
         args.seed = 1
+        args.lf = 1
 
 
     if args.n_train <= 5 * args.n_valid and args.n_train > 0:

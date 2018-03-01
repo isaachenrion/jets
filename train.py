@@ -67,6 +67,7 @@ parser.add_argument("-a","--adj", type=str, nargs='+', default='dm', help='type 
 parser.add_argument("--asym", action='store_true', default=False)
 parser.add_argument("--readout", type=str, default='dtnn', help='type of readout layer')
 parser.add_argument("--m_act", type=str, default='soft', help='type of nonlinearity for matrices' )
+parser.add_argument("--lf", type=int, default=20)
 
 # Stack NMP
 parser.add_argument("--pool_first", action='store_true', default=False)
@@ -76,7 +77,7 @@ parser.add_argument("--pool", type=str, default='attn', help='type of pooling la
 # Physics NMP
 parser.add_argument("-t", "--trainable_physics", action='store_true', default=False)
 parser.add_argument("--alpha", type=float, default=1)
-parser.add_argument("-R", type=float, default=1)
+parser.add_argument("-R", type=float, default=.1)
 
 # Physics plus learned NMP
 parser.add_argument( "--physics_component", type=float, default=0.)

@@ -134,7 +134,7 @@ class Histogram(Monitor):
         if plotname is None:
             plotname = self.name + str(self.visualize_count)
 
-        image_and_pickle(fig, plotname, self.plotsdir, os.path.join(self.plotsdir, 'pkl'))
+        image_and_pickle(fig, os.path.join(plotname, 'histogram'), self.plotsdir, os.path.join(self.plotsdir, 'pkl'))
         plt.close(fig)
 
         #self.visualize_count += 1

@@ -9,6 +9,9 @@ def construct_model_kwargs(args):
         'features': args.features+1,
         'hidden': args.hidden,
 
+        # logging
+        'logging_frequency': args.lf,
+
         # activation
         'act': args.act,
 

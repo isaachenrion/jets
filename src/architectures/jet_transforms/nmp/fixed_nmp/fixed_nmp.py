@@ -63,8 +63,8 @@ class FixedNMP(nn.Module):
         out = self.readout(h)
 
         # logging
-        if self.monitoring:
-            self.logging(dij=dij, mask=mask, **kwargs)
+        #if self.monitoring:
+        #    self.logging(dij=dij, mask=mask, **kwargs)
 
         return out, _
 

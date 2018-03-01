@@ -14,9 +14,10 @@ def visualize_batch_matrix(tensor, plotsdir, path_to_visualizations):
     '''
     #import ipdb; ipdb.set_trace()
     tensor = ensure_numpy_array(tensor)
-    if tensor.max() > 1.0:
-        tensor -= tensor.min()
-        tensor /= np.abs(tensor.max())
+    #if tensor.max() > 1.0:
+    #tensor -= tensor.min()
+    #tensor /= np.abs(tensor.max())
+
     assert tensor.max() <= 1.0
     assert tensor.min() >= 0.0
 
