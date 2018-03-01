@@ -8,28 +8,19 @@ import logging
 from .utils import ensure_numpy_array
 
 def visualize_batch_matrix(tensor, plotsdir, path_to_visualizations):
-    '''
-    Input: B x N x M tensor with values in [0, 1]
-    Saves B grayscale images to the savedir
-    '''
-    #import ipdb; ipdb.set_trace()
-    tensor = ensure_numpy_array(tensor)
-    #if tensor.max() > 1.0:
-    #tensor -= tensor.min()
-    #tensor /= np.abs(tensor.max())
+    plt.figure(figsize=(6,5))
 
-    assert tensor.max() <= 1.0
-    assert tensor.min() >= 0.0
+    if log:
+        plt.matshow(unpad(A), cmap='viridis', norm=LogNorm(), origin='lower', fignum=False)
+        plt.gca().xaxis.set_ticks_position('bottom')
+    else:
+        plt.imshow(unpad(A), cmap='viridis', origin='lower', vmin=cmin, vmax=cmax)
 
-    tensor = 1 - tensor
+    cbar = plt.colorbar()
+    cbar.set_label(clabel)
 
-    cm_hot = mpl.cm.get_cmap('hot')
-    tensor = cm_hot(tensor)
-    tensor = np.uint8(tensor * 255)
-
-    savedir = os.path.join(plotsdir, path_to_visualizations)
-    if not os.path.exists(savedir):
-        os.makedirs(savedir)
-    for i, t in enumerate(tensor):
-        im = Image.fromarray(t)
-        im.save("{}/{}.tiff".format(savedir, i+1))
+    plt.savefig(prefix + str(i) + ".pdf", dpi=300)
+    if i == len(AA)-1:
+        plt.show()
+    else:
+        plt.close()

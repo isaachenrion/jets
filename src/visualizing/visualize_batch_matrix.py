@@ -1,7 +1,8 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-mpl.use('Agg')
+
+plt.rcParams["figure.figsize"] = (6, 6)
 from PIL import Image
 import torch
 import os
@@ -69,6 +70,7 @@ def visualize_matrix(matrix, prefix, cmin=0., cmax=None, log=False, clabel=r'$A_
     cbar.set_label(clabel)
 
     plt.savefig(prefix + ".pdf", dpi=300)
+
     #if i == len(AA)-1:
     #    plt.show()
     #else:
