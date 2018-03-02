@@ -49,7 +49,8 @@ def train(args):
     #total_decay_factor = 100
     #decay = (1.0 / total_decay_factor) ** (1.0 / args.epochs)
     #scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=decay)
-    scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[4,7,15,20,25,30,35,40,45,50], gamma=0.5)
+    #scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[4,7,15,20,25,30,35,40,45,50], gamma=0.5)
+    scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[4,8,12,16,20,24,28,32,36,40,44,48,52], gamma=0.5)
 
     def loss(y_pred, y):
         return F.binary_cross_entropy(y_pred.squeeze(1), y)

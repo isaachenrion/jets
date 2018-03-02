@@ -9,7 +9,7 @@ from .....architectures.readout import construct_readout
 from .....architectures.embedding import construct_embedding
 from .attention_pooling import construct_pooling_layer
 from ..message_passing import construct_mp_layer
-#from ..message_passing import construct_adjacency_matrix_layer
+from ..adjacency import construct_adjacency
 #from ..fixed_nmp.adjacency import construct_physics_based_adjacency_matrix
 
 from .....monitors import BatchMatrixMonitor
@@ -44,34 +44,6 @@ class AbstractStackedFixedNMP(nn.Module):
         self.readout = construct_readout(readout, hidden, hidden)
         self.pool_first = pool_first
 
-        logger = kwargs.get('logger', None)
-        self.monitoring = logger is not None
-        if self.monitoring:
-            self.set_monitors()
-            self.initialize_monitors(logger)
-        #self.set_monitors(kwargs.get('logger', None))
-
-    def set_monitors(self):
-        self.dij_histogram = Histogram('dij', n_bins=10, rootname='dij', append=True)
-        self.dij_matrix_monitor = BatchMatrixMonitor('dij')
-        self.monitors = [self.dij_histogram, self.dij_matrix_monitor]
-        #self.dij_histogram.initialize(None, os.path.join(logger.plotsdir, 'dij_histogram'))
-        #self.dij_matrix_monitor.initialize(None, os.path.join(logger.plotsdir, 'adjacency_matrix'))
-
-    def initialize_monitors(self, logger):
-        for m in self.monitors: m.initialize(None, logger.plotsdir)
-
-    def logging(self, dij=None, mask=None, epoch=None, iters=None, **kwargs):
-        if epoch is not None and epoch % 20 == 0:
-            nonmask_ends = [int(torch.sum(m,0)[0]) for m in mask.data]
-            dij_hist = [d[:nme, :nme].contiguous().view(-1) for d, nme in zip(dij, nonmask_ends)]
-            dij_hist = torch.cat(dij_hist,0)
-            self.dij_histogram(values=dij_hist)
-            if iters == 0:
-                self.dij_histogram.visualize('epoch-{}'.format(epoch))
-                #self.dij_histogram.clear()
-                self.dij_matrix_monitor(dij=dij)
-                self.dij_matrix_monitor.visualize('epoch-{}'.format(epoch), n=10)
 
     def forward(self, *args, **kwargs):
         raise NotImplementedError
@@ -81,16 +53,16 @@ class StackedFixedNMP(AbstractStackedFixedNMP):
         super().__init__(*args, **kwargs)
         self.adjs = self.set_adjacency_matrices(**kwargs)
 
-    def set_adjacency_matrices(self, scales=None, features=None, hidden=None, symmetric=None,adaptive_matrix=None, **kwargs):
-        m1 = construct_adjacency_matrix_layer(
-                    key=adaptive_matrix,
-                    hidden=features+1,
-                    symmetric=symmetric
+    def set_adjacency_matrices(self, scales=None, features=None, hidden=None,matrix=None, **kwargs):
+        m1 = construct_adjacency(
+                    matrix=matrix,
+                    dim_in=features,
+                    **kwargs
                     )
-        matrices = [construct_adjacency_matrix_layer(
-                    key=adaptive_matrix,
-                    hidden=hidden,
-                    symmetric=symmetric
+        matrices = [construct_adjacency(
+                    matrix=matrix,
+                    dim_in=hidden,
+                    **kwargs
                     )
                     for _ in range(len(scales) - 1)]
         return nn.ModuleList([m1] + matrices)

@@ -1,11 +1,17 @@
 import os
 import pickle
 import numpy as np
-
 from ..Jet import Jet
 from .extract_four_vectors import extract_four_vectors
 
 #from ..old.preprocessing import rewrite_content, permute_by_pt
+
+def _pt(v):
+    pz = v[2]
+    p = (v[0:3] ** 2).sum() ** 0.5
+    eta = 0.5 * (np.log(p + pz) - np.log(p - pz))
+    pt = p / np.cosh(eta)
+    return pt
 
 def permute_by_pt(jet, root_id=None):
     # ensure that the left sub-jet has always a larger pt than the right
@@ -30,7 +36,7 @@ def permute_by_pt(jet, root_id=None):
     return jet
 
 def rewrite_content(jet):
-    jet = copy.deepcopy(jet)
+    #jet = copy.deepcopy(jet)
 
     if jet["content"].shape[1] == 5:
         pflow = jet["content"][:, 4].copy()
@@ -66,8 +72,9 @@ def convert_to_jet(x, y):
     mass = x['mass']
 
     outers = [node for node in range(len(x['content'])) if x['tree'][node,0] == -1]
-    constituents = extract_four_vectors(np.stack([tree_content[i] for i in outers], 0))
-
+    tree_content = extract_four_vectors(tree_content)
+    constituents = np.stack([tree_content[i] for i in outers], 0)
+    #constituents = extract_four_vectors(np.stack([tree_content[i] for i in outers], 0))
     progenitor = 'w' if y == 1 else 'qcd'
 
     jet = Jet(

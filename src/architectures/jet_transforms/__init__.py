@@ -1,6 +1,6 @@
 #from .nmp import LearnedVariableNMP
 #from .nmp import StackedNMP
-#from .nmp import StackedFixedNMP
+from .nmp import StackedFixedNMP
 #from .nmp import PhysicsStackedFixedNMP
 #from .nmp import PhysicsNMP
 #from .nmp import EyeNMP
@@ -30,7 +30,7 @@ def construct_transform(key, *args, **kwargs):
         #eye=EyeNMP,
         #lf=LearnedFixedNMP,
         #plf=PhysicsPlusLearnedNMP,
-        #sta=StackedFixedNMP,
+        sta=StackedFixedNMP,
         #physta=PhysicsStackedFixedNMP
     )
     try:
