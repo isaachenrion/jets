@@ -10,7 +10,7 @@ from src.monitors import Collect
 
 class ComboAdjacency(_Adjacency):
     def __init__(self, **kwargs):
-        super().__init__(name='combo',**kwargs)
+        super().__init__(name='combo'+kwargs.get('index', ''),**kwargs)
 
     def initialize(self, adj_list=None, **kwargs):
         super().initialize(**kwargs)

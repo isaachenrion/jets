@@ -35,7 +35,6 @@ class _Adjacency(nn.Module):
         pass
 
     def forward(self, h, mask, **kwargs):
-        #import ipdb; ipdb.set_trace()
         M = self.raw_matrix(h)
 
         if self.symmetric:
@@ -43,7 +42,7 @@ class _Adjacency(nn.Module):
 
         if self.activation is not None:
             M = self.activation(M, mask)
-        
+
         if self.monitoring:
             self.logging(dij=M, mask=mask, **kwargs)
 
@@ -51,12 +50,17 @@ class _Adjacency(nn.Module):
 
 
     def logging(self, dij=None, mask=None, epoch=None, iters=None, **kwargs):
+
+        #import ipdb; ipdb.set_trace()
         if epoch is not None and epoch % self.logging_frequency == 0:
             #print(self.name)
             #import ipdb; ipdb.set_trace()
-            nonmask_ends = [int(torch.sum(m,0)[0]) for m in mask.data]
-            dij_hist = [d[:nme, :nme].contiguous().view(-1) for d, nme in zip(dij, nonmask_ends)]
-            dij_hist = torch.cat(dij_hist,0)
+            if mask is not None:
+                nonmask_ends = [int(torch.sum(m,0)[0]) for m in mask.data]
+                dij_hist = [d[:nme, :nme].contiguous().view(-1) for d, nme in zip(dij, nonmask_ends)]
+                dij_hist = torch.cat(dij_hist,0)
+            else:
+                dij_hist = dij.contiguous().view(-1)
             self.dij_histogram(values=dij_hist)
             if iters == 0:
                 self.dij_histogram.visualize('epoch-{}/{}'.format(epoch, self.name))

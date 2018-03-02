@@ -51,6 +51,7 @@ class LeafJetClassifier(JetClassifier):
     def forward(self, x, **kwargs):
 
         jets, mask = x
+        
         #jets, mask = batch_leaves(jets)
         h, _ = self.transform(jets, mask, **kwargs)
         outputs = self.predictor(h)

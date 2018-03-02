@@ -21,8 +21,9 @@ from src.architectures.embedding import Simple
 
 
 class Sum(_Adjacency):
-    def __init__(self, dim_in, **kwargs):
-        super().__init__(name='sum',**kwargs)
+    def __init__(self, dim_in, index='',**kwargs):
+        name='sum'+index
+        super().__init__(name=name,**kwargs)
         #self.softmax = PaddedMatrixSoftmax()
         self.edge_embedding = nn.Linear(dim_in, 1)
         if kwargs['wn']:
@@ -37,8 +38,9 @@ class Sum(_Adjacency):
 
 
 class DistMult(_Adjacency):
-    def __init__(self, dim_in, **kwargs):
-        super().__init__(name='dm',**kwargs)
+    def __init__(self, dim_in, index='', **kwargs):
+        name='dm'+index
+        super().__init__(name=name,**kwargs)
         #self.softmax = PaddedMatrixSoftmax()
         #import ipdb; ipdb.set_trace()
         #self.embedding = Simple(dim_in, dim_in, act='tanh')
@@ -60,8 +62,9 @@ class DistMult(_Adjacency):
 
 
 class Siamese(_Adjacency):
-    def __init__(self, dim_in, **kwargs):
-        super().__init__(name='siam',**kwargs)
+    def __init__(self, dim_in, index='',**kwargs):
+        name='siam'+index
+        super().__init__(name=name,**kwargs)
         #self.softmax = PaddedMatrixSoftmax()
 
     def raw_matrix(self, h):

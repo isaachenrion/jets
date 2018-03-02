@@ -4,10 +4,11 @@ from ._adjacency import _Adjacency
 
 
 class Ones(_Adjacency):
-    def __init__(self, **kwargs):
+    def __init__(self,index='', **kwargs):
         kwargs.pop('symmetric', None)
         kwargs.pop('activation', None)
-        super().__init__(symmetric=False, activation='mask',name='one', **kwargs)
+        name='one'+index
+        super().__init__(symmetric=False, activation='mask',name=name, **kwargs)
 
     def raw_matrix(self, vertices):
         bs, sz, _ = vertices.size()
@@ -21,10 +22,11 @@ class Ones(_Adjacency):
         #return mask * matrix
 
 class Eye(_Adjacency):
-    def __init__(self, **kwargs):
+    def __init__(self, index='',**kwargs):
         kwargs.pop('symmetric', None)
         kwargs.pop('activation', None)
-        super().__init__(symmetric=False, activation='mask',name='eye', **kwargs)
+        name='eye'+index
+        super().__init__(symmetric=False, activation='mask',name=name, **kwargs)
 
     def raw_matrix(self, vertices):
         bs, sz, _ = vertices.size()

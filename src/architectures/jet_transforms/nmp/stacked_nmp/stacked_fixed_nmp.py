@@ -31,7 +31,7 @@ class AbstractStackedFixedNMP(nn.Module):
         ):
 
         super().__init__()
-        self.embedding = construct_embedding('simple', features+1, hidden, act=kwargs.get('act', None))
+        self.embedding = construct_embedding('simple', features, hidden, act=kwargs.get('act', None))
         self.nmps = nn.ModuleList(
                             [nn.ModuleList(
                                     [construct_mp_layer('fixed', hidden=hidden,**kwargs) for _ in range(iters)
@@ -57,14 +57,17 @@ class StackedFixedNMP(AbstractStackedFixedNMP):
         m1 = construct_adjacency(
                     matrix=matrix,
                     dim_in=features,
+                    index=str(1),
                     **kwargs
                     )
+        #import ipdb; ipdb.set_trace()
         matrices = [construct_adjacency(
                     matrix=matrix,
                     dim_in=hidden,
+                    index=str(i+2),
                     **kwargs
                     )
-                    for _ in range(len(scales) - 1)]
+                    for i in range(len(scales) - 1)]
         return nn.ModuleList([m1] + matrices)
 
     def forward(self, jets, mask=None, **kwargs):
@@ -73,9 +76,9 @@ class StackedFixedNMP(AbstractStackedFixedNMP):
         for i, (nmp, pool, adj) in enumerate(zip(self.nmps, self.attn_pools, self.adjs)):
             if i > 0:
                 #mask = None
-                dij = adj(h, mask=None)
+                dij = adj(h, mask=None, **kwargs)
             else:
-                dij = adj(jets, mask=mask)
+                dij = adj(jets, mask=mask, **kwargs)
 
             if self.pool_first:
                 h, attns = pool(h, **kwargs)
@@ -84,12 +87,9 @@ class StackedFixedNMP(AbstractStackedFixedNMP):
             for mp in nmp:
                 h, _ = mp(h=h, mask=mask, dij=dij)
 
-            # logging
-            self.logging(dij=dij, mask=mask,**kwargs)
-
             if not self.pool_first:
                 h, attns = pool(h, **kwargs)
-
+            
         out = self.readout(h)
         return out, _
 

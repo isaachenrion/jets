@@ -51,8 +51,9 @@ class _PhysicsAdjacency(_Adjacency):
 
 
 class FixedPhysicsAdjacency(_PhysicsAdjacency):
-    def __init__(self, alpha=None, R=None,**kwargs):
-        super().__init__(name='phy', **kwargs)
+    def __init__(self, alpha=None, R=None,index='',**kwargs):
+        name='phy'+index
+        super().__init__(name=name, **kwargs)
         self._alpha = Variable(torch.FloatTensor([alpha]))
         self._R = Variable(torch.FloatTensor([R]))
         if torch.cuda.is_available():
@@ -69,8 +70,9 @@ class FixedPhysicsAdjacency(_PhysicsAdjacency):
 
 
 class TrainablePhysicsAdjacency(_PhysicsAdjacency):
-    def __init__(self, alpha_init=0, R_init=0,**kwargs):
-        super().__init__(name='tphy', **kwargs)
+    def __init__(self, alpha_init=0, R_init=0,index='',**kwargs):
+        name='tphy'+index
+        super().__init__(name=name, **kwargs)
         base_alpha_init = 0
         base_R_init = 0
 
