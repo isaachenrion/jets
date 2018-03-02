@@ -33,21 +33,44 @@
 
 RES=$1
 MODELS_DIR=$2
-MODEL_RUNDIR=$(find $MODELS_DIR/running -depth -name $RES)
+RUNNING='running'
+FINISHED='finished'
 
-COMMAND_FILE="$MODEL_RUNDIR/command.txt"
-NEW_COMMAND_FILE=$(echo $COMMAND_FILE | sed -e 's/\//-/g')
-mv $COMMAND_FILE $NEW_COMMAND_FILE
+MODEL_RUNDIR=$(find $MODELS_DIR/$RUNNING -depth -name $RES)
+
+str=$MODEL_RUNDIR
+delimiter=$RUNNING
+s=$str$delimiter
+array=();
+while [[ $s ]]; do
+    array+=( "${s%%"$delimiter"*}" );
+    s=${s#*"$delimiter"};
+done;
+
+ROOT_DIR=$array[0]
+LEAF_DIR=$array[1]
+
+COMMAND_FILE="$ROOT_DIR/$RUNNING/$LEAF_DIR/command.txt"
+MODEL_OUTDIR="$ROOT_DIR/$FINISHED/$LEAF_DIR"
 
 echo $COMMAND_FILE
-echo $NEW_COMMAND_FILE
+echo $MODEL_RUNDIR
+echo $MODEL_OUTDIR
+
+mv $COMMAND_FILE $MODEL_OUTDIR
+
+#sed -e "s/^$RUNNING//"
+#COMMAND_FILE="$MODEL_RUNDIR/command.txt"
+#NEW_COMMAND_FILE=$(echo $COMMAND_FILE | sed -e 's/\//-/g')
+#mv $COMMAND_FILE $NEW_COMMAND_FILE
+#echo $COMMAND_FILE
+#echo $NEW_COMMAND_FILE
 
 rm -rf $MODEL_RUNDIR
 
-MODEL_OUTDIR=$(find $MODELS_DIR -depth -name $RES)
-mv $NEW_COMMAND_FILE $MODEL_OUTDIR
-echo $MODEL_RUNDIR
-echo $MODEL_OUTDIR
+#MODEL_OUTDIR=$(find $MODELS_DIR -depth -name $RES)
+#mv $NEW_COMMAND_FILE $MODEL_OUTDIR
+#echo $MODEL_OUTDIR
 
 PYTHONARGS="-j $MODEL_OUTDIR -e"
 
