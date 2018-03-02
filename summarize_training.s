@@ -39,6 +39,9 @@ COMMAND_FILE="$MODEL_RUNDIR/command.txt"
 NEW_COMMAND_FILE=$(echo $COMMAND_FILE | sed -e 's/\//-/g')
 mv $COMMAND_FILE $NEW_COMMAND_FILE
 
+echo $COMMAND_FILE
+echo $NEW_COMMAND_FILE
+
 rm -rf $MODEL_RUNDIR
 
 MODEL_OUTDIR=$(find $MODELS_DIR -depth -name $RES)
