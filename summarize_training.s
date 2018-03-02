@@ -47,8 +47,8 @@ while [[ $s ]]; do
     s=${s#*"$delimiter"};
 done;
 
-ROOT_DIR=$array[0]
-LEAF_DIR=$array[1]
+ROOT_DIR=${array[0]}
+LEAF_DIR=${array[1]}
 
 COMMAND_FILE="$ROOT_DIR/$RUNNING/$LEAF_DIR/command.txt"
 MODEL_OUTDIR="$ROOT_DIR/$FINISHED/$LEAF_DIR"
