@@ -8,4 +8,4 @@ RES=$(sbatch --time=$EXPT_TIME:00:00 --parsable --array=1-$1 --gres=$GPU train.s
 echo $RES
 
 
-sbatch --dependency=afterok:${RES} summarize_training.s $RES
+sbatch --dependency=afterok:${RES} summarize_training.s $RES $MODELS_DIR

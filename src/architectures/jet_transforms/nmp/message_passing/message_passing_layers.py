@@ -26,7 +26,7 @@ class MessagePassingLayer(nn.Module):
         super().__init__()
         self.activation = F.tanh
         self.vertex_update = Update(hidden, hidden)
-        
+
         message_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
         self.message = Message(hidden, hidden, 0, **message_kwargs)
 

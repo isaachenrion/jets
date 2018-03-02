@@ -32,10 +32,17 @@
 #SBATCH --mail-user=henrion@nyu.edu
 
 RES=$1
+MODELS_DIR=$2
+MODEL_RUNDIR=$(find $MODELS_DIR/running -depth -name $RES)
 
-MODEL_RUNDIR=$(find models/running -depth -name $RES)
+COMMAND_FILE="$MODEL_RUNDIR/command.txt"
+NEW_COMMAND_FILE=$(echo $COMMAND_FILE | sed -e 's/\//-/g')
+mv $COMMAND_FILE $NEW_COMMAND_FILE
+
 rm -rf $MODEL_RUNDIR
-MODEL_OUTDIR=$(find models -depth -name $RES)
+
+MODEL_OUTDIR=$(find $MODELS_DIR -depth -name $RES)
+mv $NEW_COMMAND_FILE $MODEL_OUTDIR
 echo $MODEL_RUNDIR
 echo $MODEL_OUTDIR
 
