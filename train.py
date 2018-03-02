@@ -77,6 +77,7 @@ parser.add_argument("--asym", action='store_true', default=False)
 parser.add_argument("--readout", type=str, default='dtnn', help='type of readout layer')
 parser.add_argument("--m_act", type=str, default='soft', help='type of nonlinearity for matrices' )
 parser.add_argument("--lf", type=int, default=20)
+parser.add_argument("--wn", action='store_true')
 
 # Stack NMP
 parser.add_argument("--pool_first", action='store_true', default=False)

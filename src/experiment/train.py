@@ -46,10 +46,10 @@ def train(args):
     optimizer = Adam(model.parameters(), lr=settings['lr'], weight_decay=args.reg)
     #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
     #scheduler = lr_scheduler.Step
-    total_decay_factor = 100
-    decay = (1.0 / total_decay_factor) ** (1.0 / args.epochs)
-    scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=decay)
-    #scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[5,7,10,20,30,40,70], gamma=0.5)
+    #total_decay_factor = 100
+    #decay = (1.0 / total_decay_factor) ** (1.0 / args.epochs)
+    #scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=decay)
+    scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[4,7,10,20,30,40,70], gamma=0.5)
 
     def loss(y_pred, y):
         return F.binary_cross_entropy(y_pred.squeeze(1), y)

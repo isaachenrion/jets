@@ -44,9 +44,9 @@ class DTNNMessage(Message):
         return message
 
 class SimpleMessage(Message):
-    def __init__(self,*args, act=None):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args)
-        self.embedding = construct_embedding('simple', self.vertex_dim, self.message_dim, act=act)
+        self.embedding = construct_embedding('simple', self.vertex_dim, self.message_dim, **kwargs)
 
     def _forward_without_edge(self, vertices):
         message = self.embedding(vertices)
@@ -105,16 +105,3 @@ class Constant(Message):
     def _forward_with_edge(self, vertices, edges):
         message = torch.cat([edges, vertices], -1)
         return message
-
-
-def make_message(message_config):
-    if message_config.function == 'fully_connected':
-        return FullyConnectedMessage(message_config.config)
-    elif message_config.function == 'dtnn':
-        return DTNNMessage(message_config.config)
-    elif message_config.function == 'constant':
-        return Constant(message_config.config)
-    elif message_config.function == 'edge_message':
-        return EdgeMatrixMessage(message_config.config)
-    else:
-        raise ValueError("Unsupported message function! ({})".format(message_config.function))

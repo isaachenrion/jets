@@ -28,6 +28,7 @@ def construct_model_kwargs(args):
         'readout':args.readout,
         'matrix':args.adj[0] if len(args.adj) == 1 else args.adj,
         'activation':args.m_act,
+        'wn': args.wn,
 
         # Stacked NMP
         'scales': args.scales,

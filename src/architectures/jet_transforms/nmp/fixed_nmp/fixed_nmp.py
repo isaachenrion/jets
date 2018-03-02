@@ -30,8 +30,12 @@ class FixedNMP(nn.Module):
         ):
         super().__init__()
         self.iters = iters
-        self.embedding = construct_embedding('simple', features, hidden, act=kwargs.get('act', None))
-        self.mp_layers = nn.ModuleList([construct_mp_layer('fixed', hidden=hidden,**kwargs) for _ in range(iters)])
+
+        emb_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
+        self.embedding = construct_embedding('simple', features, hidden, **emb_kwargs)
+
+        mp_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
+        self.mp_layers = nn.ModuleList([construct_mp_layer('fixed', hidden=hidden,**mp_kwargs) for _ in range(iters)])
         self.readout = construct_readout(readout, hidden, hidden)
         #self.adjacency_matrix = self.set_adjacency_matrix(features=features,**kwargs)
         self.adjacency_matrix = construct_adjacency(matrix=matrix, dim_in=features, hidden=hidden, **kwargs)

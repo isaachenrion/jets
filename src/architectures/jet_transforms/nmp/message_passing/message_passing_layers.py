@@ -13,7 +13,7 @@ def construct_mp_layer(key, *args, **kwargs):
     dictionary = dict(
         van=MPAdaptive,
         set=MPSet2Set,
-        id=MPIdentity,
+        #id=MPIdentity,
         fixed=MPFixed,
     )
     try:
@@ -26,8 +26,9 @@ class MessagePassingLayer(nn.Module):
         super().__init__()
         self.activation = F.tanh
         self.vertex_update = Update(hidden, hidden)
-        self.message = Message(hidden, hidden, 0, act=kwargs.get('act', None))
-        self.physics_based = False
+        
+        message_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
+        self.message = Message(hidden, hidden, 0, **message_kwargs)
 
     def get_adjacency_matrix(self, **kwargs):
         pass
@@ -38,18 +39,6 @@ class MessagePassingLayer(nn.Module):
         h = self.vertex_update(h, message)
         return h, A
 
-
-class MPIdentity(MessagePassingLayer):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def get_adjacency_matrix(self, h=None, mask=None, **kwargs):
-        A = Variable(torch.eye(h.size()[1]).unsqueeze(0).repeat(h.size()[0], 1, 1))
-        if torch.cuda.is_available(): A = A.cuda()
-        if mask is None:
-            return A
-        else:
-            return A * mask
 
 class MPAdaptive(MessagePassingLayer):
     def __init__(self, hidden=None, adaptive_matrix=None, symmetric=False, **kwargs):

@@ -34,7 +34,7 @@ DATASETS = {
 }
 
 ''' argparse args '''
-STEP_SIZE=0.0003
+STEP_SIZE=0.001
 DECAY=1
 L2_REGULARIZATION=0.0
 

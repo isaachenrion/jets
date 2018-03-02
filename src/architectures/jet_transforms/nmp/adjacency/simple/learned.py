@@ -25,6 +25,8 @@ class Sum(_Adjacency):
         super().__init__(name='sum',**kwargs)
         #self.softmax = PaddedMatrixSoftmax()
         self.edge_embedding = nn.Linear(dim_in, 1)
+        if kwargs['wn']:
+            self.edge_embedding = nn.utils.weight_norm(self.edge_embedding, name='weight')
 
     def raw_matrix(self, h):
         shp = h.size()
@@ -42,6 +44,8 @@ class DistMult(_Adjacency):
         #self.embedding = Simple(dim_in, dim_in, act='tanh')
         self.matrix = nn.Parameter(torch.zeros(dim_in,dim_in))
         nn.init.xavier_uniform(self.matrix)
+        if kwargs['wn']:
+            self = nn.utils.weight_norm(self, name='matrix')
 
     def raw_matrix(self, vertices):
         #h = self.embedding(vertices)

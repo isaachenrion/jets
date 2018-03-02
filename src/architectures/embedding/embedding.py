@@ -16,9 +16,11 @@ class Embedding(nn.Module):
         pass
 
 class Simple(Embedding):
-    def __init__(self, features, hidden, act=None):
+    def __init__(self, features, hidden, act=None, wn=False):
         super().__init__(features, hidden)
         self.fc = nn.Linear(features, hidden)
+        if wn:
+            self.fc = nn.utils.weight_norm(self.fc, name='weight')
         if act == 'tanh':
             self.activation = nn.Tanh()
         elif act == 'relu':
