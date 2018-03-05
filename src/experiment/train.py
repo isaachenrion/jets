@@ -42,6 +42,7 @@ def train(args):
 
     ''' OPTIMIZER AND LOSS '''
     '''----------------------------------------------------------------------- '''
+    logging.info('***********')
     logging.info("Building optimizer...")
     optimizer = Adam(model.parameters(), lr=settings['lr'], weight_decay=args.reg)
     #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
@@ -50,7 +51,25 @@ def train(args):
     #decay = (1.0 / total_decay_factor) ** (1.0 / args.epochs)
     #scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=decay)
     #scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[4,7,15,20,25,30,35,40,45,50], gamma=0.5)
-    scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[4,8,12,16,20,24,28,32,36,40,44,48,52], gamma=0.5)
+    #scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[4,8,12,16,20,24,28,32,36,40,44,48,52], gamma=0.5)
+
+    #scheduler_name, sched_kwargs = 'multi', dict(milestones=[4,8,12,16,20,24,28,32,36,40,44,48,52], gamma=0.5)
+    #scheduler_name, sched_kwargs = 'multi', dict(milestones=[4,7,15,20,25,30,35,40,45,50], gamma=0.5)
+    #scheduler_name, sched_kwargs = 'multi', dict(milestones=[15,30,45], gamma=0.2)
+    scheduler_name, sched_kwargs = 'exp', dict(gamma=0.92)
+    #scheduler_name, sched_kwargs = 'exp', dict(gamma=1.0)
+    logging.info('***********')
+    logging.info('Scheduler is {}'.format(scheduler_name))
+    for k, v in sched_kwargs.items(): logging.info('{}: {}'.format(k, v))
+    logging.info('***********')
+    schedulers = dict(
+        multi=lr_scheduler.MultiStepLR,
+        exp=lr_scheduler.ExponentialLR
+    )
+
+    Scheduler = schedulers[scheduler_name]
+
+    scheduler = Scheduler(optimizer, **sched_kwargs)
 
     def loss(y_pred, y):
         return F.binary_cross_entropy(y_pred.squeeze(1), y)
@@ -128,9 +147,7 @@ def train(args):
         t1 = time.time()
         logging.info("Epoch took {} seconds".format(t1-t0))
 
-        #scheduler.step(logdict['valid_loss'])
         scheduler.step()
-        #settings['lr'] = settings['lr'] * (args.decay) ** (i + 1)
 
         if t1 - t_start > args.experiment_time - 60:
             break
