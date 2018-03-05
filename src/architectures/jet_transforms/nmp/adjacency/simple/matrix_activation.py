@@ -22,6 +22,8 @@ def padded_matrix_softmax(matrix, mask):
 
 def masked_function(fn):
     def masked(matrix, mask):
+        if mask is None:
+            return fn(matrix)
         return fn(matrix) * mask
     return masked
 

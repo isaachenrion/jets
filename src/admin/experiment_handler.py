@@ -220,7 +220,7 @@ class ExperimentHandler:
                 kwargs['valid_loss'],
                 self.stats_logger.monitors['roc_auc'].value)
 
-        out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest roc_auc: {:.5f}".format(self.stats_logger.monitors['inv_fpr'].value, self.stats_logger.monitors['best_roc_auc'].value)
+        out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.5f}".format(self.stats_logger.monitors['inv_fpr'].value, self.stats_logger.monitors['best_inv_fpr'].value)
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)
 
