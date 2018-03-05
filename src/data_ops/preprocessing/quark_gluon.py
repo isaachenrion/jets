@@ -6,7 +6,9 @@ import pickle
 import numpy as np
 from ..Jet import Jet
 from .extract_four_vectors import extract_four_vectors
+from ..io import save_jets_to_pickle
 
+from sklearn.preprocessing import RobustScaler
 
 def process_textfile(contents):
     jet_contents = []
@@ -69,23 +71,6 @@ def convert_to_jet(entry, progenitor, y, env):
     return jet
 
 
-def preprocess(raw_data_dir, filename):
-    filename = filename.split('-')[0]
-    quark_filename = os.path.join(raw_data_dir, 'quark_' + filename + '.txt')
-    gluon_filename = os.path.join(raw_data_dir, 'gluon_' + filename + '.txt')
-
-    quark_jets = make_jets_from_textfile(quark_filename)
-    gluon_jets = make_jets_from_textfile(gluon_filename)
-    jets = quark_jets + gluon_jets
-    #import ipdb; ipdb.set_trace()
-
-    perm = np.random.permutation(len(jets))
-    jets = [jets[i] for i in perm]
-    #for j in jets:
-    #    print(j.progenitor)
-    #import ipdb; ipdb.set_trace()
-
-    return jets
 
 
 def make_jets_from_textfile(filename):
@@ -117,3 +102,44 @@ def make_jets_from_textfile(filename):
 
 
     return jets
+
+def preprocess(raw_data_dir, preprocessed_dir, filename):
+    #raw_data_dir = os.path.join(data_dir, 'raw')
+    #preprocessed_dir = os.path.join(data_dir, 'preprocessed')
+
+    env_type = filename.split('-')[0]
+    quark_filename = os.path.join(raw_data_dir, 'quark_' + env_type + '.txt')
+    gluon_filename = os.path.join(raw_data_dir, 'gluon_' + env_type + '.txt')
+
+    quark_jets = make_jets_from_textfile(quark_filename)
+    gluon_jets = make_jets_from_textfile(gluon_filename)
+    jets = quark_jets + gluon_jets
+    #import ipdb; ipdb.set_trace()
+
+    perm = np.random.permutation(len(jets))
+    jets = [jets[i] for i in perm]
+
+    # split into train and test
+    test_fraction = 0.1
+    n_test = int(len(jets) * test_fraction)
+    test_jets = jets[:n_test]
+    train_jets = jets[n_test:]
+
+    tf = RobustScaler().fit(np.vstack([jet.constituents for jet in train_jets]))
+
+    new_test_jets, new_train_jets = [], []
+    for i, jet in enumerate(jets):
+        jet.constituents = tf.transform(jet.constituents)
+        if i < n_test:
+            new_test_jets.append(jet)
+        else:
+            new_train_jets.append(jet)
+
+    save_jets_to_pickle(new_train_jets, os.path.join(preprocessed_dir, env_type + '-train.pickle'))
+    save_jets_to_pickle(new_test_jets, os.path.join(preprocessed_dir, env_type + '-test.pickle'))
+
+    #for j in jets:
+    #    print(j.progenitor)
+    #import ipdb; ipdb.set_trace()
+
+    return None

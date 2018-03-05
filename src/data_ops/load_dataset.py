@@ -7,15 +7,17 @@ from .io import load_jets_from_pickle, save_jets_to_pickle
 from .datasets import JetDataset
 from .preprocessing import crop_dataset
 
-from sklearn.preprocessing import RobustScaler
 
 def load_jets(data_dir, filename, redo=False):
-    path_to_preprocessed_dir = os.path.join(data_dir, 'preprocessed')
-    path_to_preprocessed = os.path.join(path_to_preprocessed_dir, filename)
+    #preprocessed_dir = os.path.join(data_dir, 'preprocessed')
+
+    raw_data_dir = os.path.join(data_dir, 'raw')
+    preprocessed_dir = os.path.join(data_dir, 'preprocessed')
+    path_to_preprocessed = os.path.join(preprocessed_dir, filename)
 
     if not os.path.exists(path_to_preprocessed) or redo:
-        if not os.path.exists(path_to_preprocessed_dir):
-            os.makedirs(path_to_preprocessed_dir)
+        if not os.path.exists(preprocessed_dir):
+            os.makedirs(preprocessed_dir)
 
         logging.warning("Preprocessing...")
 
@@ -26,20 +28,13 @@ def load_jets(data_dir, filename, redo=False):
         else:
             raise ValueError('Unrecognized data_dir!')
 
-        jets = preprocess(os.path.join(data_dir, 'raw'), filename)
+        preprocess(raw_data_dir, preprocessed_dir, filename)
 
-        new_jets = []
-        tf = RobustScaler().fit(np.vstack([jet.constituents for jet in jets]))
-        for ij, jet in enumerate(jets):
-            jet.constituents = tf.transform(jet.constituents)
-            new_jets.append(jet)
-        jets = new_jets
-
-        save_jets_to_pickle(jets, path_to_preprocessed)
         logging.warning("Preprocessed the data and saved it to {}".format(path_to_preprocessed))
     else:
-        jets = load_jets_from_pickle(path_to_preprocessed)
         logging.warning("Data loaded and already preprocessed")
+
+    jets = load_jets_from_pickle(path_to_preprocessed)
     return jets
 
 
