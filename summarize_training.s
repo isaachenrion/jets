@@ -33,6 +33,8 @@
 
 RES=$1
 MODELS_DIR=$2
+END_DIR=$3
+
 RUNNING='running'
 FINISHED='finished'
 
@@ -66,6 +68,9 @@ PYTHONARGS="-j $MODEL_OUTDIR -e"
 read SRCDIR _DATADIR _GPU _QOS < <(bash misc/paths.sh)
 
 cd $SRCDIR
-source activate jets
+#source activate jets
 
 python $SRCDIR/summary.py $PYTHONARGS
+
+# move to scratch
+mv $MODEL_OUTDIR $END_DIR
