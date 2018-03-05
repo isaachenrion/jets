@@ -10,10 +10,10 @@ def get_scalars_csv_filename(model_dir):
 def summarize_training(jobsdir, email=False, many_jobs=False):
     if many_jobs:
         for jobdir in os.listdir(jobsdir):
-            summarize_one_job_training(jobdir, email)
+            summarize_one_job_training(os.path.join(jobsdir, jobdir), email)
     else:
         summarize_one_job_training(jobsdir, email)
-        
+
 def summarize_one_job_training(jobdir, email=False):
     csv_filenames = []
     for run in os.listdir(jobdir):
