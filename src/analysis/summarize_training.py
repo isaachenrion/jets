@@ -7,14 +7,14 @@ from ..admin.emailer import get_emailer
 def get_scalars_csv_filename(model_dir):
     return os.path.join(model_dir, 'stats', 'scalars.csv')
 
-def summarize_training(jobsdir, email=False, many_jobs=False):
+def summarize_training(jobsdir, email=False, many_jobs=False, verbose=False):
     if many_jobs:
         for jobdir in os.listdir(jobsdir):
-            summarize_one_job_training(os.path.join(jobsdir, jobdir), email)
+            summarize_one_job_training(os.path.join(jobsdir, jobdir), email, verbose)
     else:
-        summarize_one_job_training(jobsdir, email)
+        summarize_one_job_training(jobsdir, email, verbose)
 
-def summarize_one_job_training(jobdir, email=False):
+def summarize_one_job_training(jobdir, email=False, verbose=False):
     csv_filenames = []
     for run in os.listdir(jobdir):
         csv_filename = os.path.join(jobdir, get_scalars_csv_filename(run))
@@ -70,7 +70,10 @@ def summarize_one_job_training(jobdir, email=False):
         f.write(out_str)
 
     # send email
+    if verbose:
+        print(out_str)
     if email:
-        print('Emailing')
         emailer = get_emailer()
         emailer.send_msg(out_str, '{}: training stats'.format(jobdir), [statsfile])
+        if verbose:
+            print('Emailed: {}'.format(jobdir))
