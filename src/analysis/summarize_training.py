@@ -7,7 +7,14 @@ from ..admin.emailer import get_emailer
 def get_scalars_csv_filename(model_dir):
     return os.path.join(model_dir, 'stats', 'scalars.csv')
 
-def summarize_training(jobdir, email=False):
+def summarize_training(jobsdir, email=False, many_jobs=False):
+    if many_jobs:
+        for jobdir in os.listdir(jobsdir):
+            summarize_one_job_training(jobdir, email)
+    else:
+        summarize_one_job_training(jobsdir, email)
+        
+def summarize_one_job_training(jobdir, email=False):
     csv_filenames = []
     for run in os.listdir(jobdir):
         csv_filename = os.path.join(jobdir, get_scalars_csv_filename(run))
