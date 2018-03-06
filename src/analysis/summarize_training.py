@@ -64,6 +64,8 @@ def summarize_one_job_training(jobdir, email=False, verbose=False):
                 except (ValueError, TypeError):
                     out_str += '{}\n'.format(s)
 
+    headline = aggregate_stats_dict['best_inv_fpr'][0]
+
     # pretty print to results file
     statsfile = os.path.join(jobdir, 'stats.txt')
     with open(statsfile, 'w') as f:
@@ -74,6 +76,6 @@ def summarize_one_job_training(jobdir, email=False, verbose=False):
         print(out_str)
     if email:
         emailer = get_emailer()
-        emailer.send_msg(out_str, '{}: training stats'.format(jobdir), [statsfile])
+        emailer.send_msg(out_str, '{:.2f} ({}: training stats)'.format(headline, jobdir.split('/')[-1]), [statsfile])
         if verbose:
             print('Emailed: {}'.format(jobdir))

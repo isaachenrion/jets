@@ -230,9 +230,7 @@ class ExperimentHandler:
     def finished(self):
         self.stats_logger.complete_logging()
         self.signal_handler.completed()
-        #if not self.slurm:
-        #    os.rmdir(os.path.join(self.root_dir, self.intermediate_dir))
-
+        
     def initial_email(self):
         text = ['JOB STARTED', self.exp_dir, self.host.split('.')[0], str(self.pid)]
         if self.emailer is not None:
