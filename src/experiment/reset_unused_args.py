@@ -24,6 +24,7 @@ def reset_unused_args(args):
     #        #args.alpha = None
     #        args.R = None
     #    #args.alpha = None
+    args.learned_tradeoff = not args.equal_weight
 
     args.experiment_time *= (60 * 60)
 
