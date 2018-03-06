@@ -41,7 +41,7 @@ def construct_model_kwargs(args):
         'trainable_physics':args.trainable_physics,
 
         # Physics plus learned NMP
-        'physics_component':args.physics_component,
+        #'physics_component':args.physics_component,
         'learned_tradeoff':args.learned_tradeoff,
 
         # Transformer
