@@ -35,10 +35,13 @@ class _Adjacency(nn.Module):
         pass
 
     def forward(self, h, mask, **kwargs):
+        #import ipdb; ipdb.set_trace()
         M = self.raw_matrix(h)
+
 
         if self.activation is not None:
             M = self.activation(M, mask)
+
 
         if self.symmetric:
             M = 0.5 * (M + M.transpose(1, 2))

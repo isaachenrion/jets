@@ -72,11 +72,15 @@ class StackedFixedNMP(AbstractStackedFixedNMP):
 
     def forward(self, jets, mask=None, **kwargs):
         h = self.embedding(jets)
+        attns = None
+        #import ipdb; ipdb.set_trace()
 
         for i, (nmp, pool, adj) in enumerate(zip(self.nmps, self.attn_pools, self.adjs)):
             if i > 0:
                 #mask = None
-                dij = adj(h, mask=None, **kwargs)
+                dij = torch.bmm(attns, dij)
+                dij = torch.bmm(dij, attns.transpose(1,2))
+                #dij = adj(h, mask=None, **kwargs)
             else:
                 dij = adj(jets, mask=mask, **kwargs)
 
@@ -89,7 +93,7 @@ class StackedFixedNMP(AbstractStackedFixedNMP):
 
             if not self.pool_first:
                 h, attns = pool(h, **kwargs)
-            
+
         out = self.readout(h)
         return out, _
 

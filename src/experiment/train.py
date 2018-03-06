@@ -131,6 +131,9 @@ def train(args):
             y_pred = model(x, logger=eh.stats_logger, epoch=i, iters=j, iters_left=n_batches-j-1)
             l = loss(y_pred, y)
             l.backward()
+            #for w in model.parameters():
+            #    print(w.grad)
+            #import ipdb; ipdb.set_trace()
             train_losses.append(unwrap(l))
             if args.clip is not None:
                 torch.nn.utils.clip_grad_norm(model.parameters(), args.clip)
