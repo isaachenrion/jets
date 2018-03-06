@@ -108,7 +108,10 @@ class ExperimentHandler:
         for intermediate_dir in ALL_MODEL_DIRS:
             model_dir = os.path.join(self.models_dir, intermediate_dir)
             if not os.path.isdir(model_dir):
-                os.makedirs(model_dir)
+                try:
+                    os.makedirs(model_dir)
+                except FileExistsError:
+                    pass
 
     def setup_logging(self, silent, verbose):
         ''' SET UP LOGGING '''
@@ -230,7 +233,7 @@ class ExperimentHandler:
     def finished(self):
         self.stats_logger.complete_logging()
         self.signal_handler.completed()
-        
+
     def initial_email(self):
         text = ['JOB STARTED', self.exp_dir, self.host.split('.')[0], str(self.pid)]
         if self.emailer is not None:
