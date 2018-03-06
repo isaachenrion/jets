@@ -6,7 +6,7 @@ def construct_model_kwargs(args):
     #import ipdb; ipdb.set_trace()
     model_kwargs = {
         # model dimensions
-        'features': args.features+1,
+        'features': args.features+1 if args.model == 'nmp' else args.features,
         'hidden': args.hidden,
 
         # logging

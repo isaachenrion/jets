@@ -55,8 +55,8 @@ def train(args):
 
     #scheduler_name, sched_kwargs = 'multi', dict(milestones=[4,8,12,16,20,24,28,32,36,40,44,48,52], gamma=args.decay)
     #scheduler_name, sched_kwargs = 'multi', dict(milestones=[4,7,15,20,25,30,35,40,45,50], gamma=args.decay)
-    #scheduler_name, sched_kwargs = 'multi', dict(milestones=[15,30,45], gamma=args.decay)
-    scheduler_name, sched_kwargs = 'exp', dict(gamma=args.decay)
+    scheduler_name, sched_kwargs = 'multi', dict(milestones=[10,20,30,40,50,60,70,80,90], gamma=args.decay)
+    #scheduler_name, sched_kwargs = 'exp', dict(gamma=args.decay)
     #scheduler_name, sched_kwargs = 'exp', dict(gamma=1.0)
     logging.info('***********')
     logging.info('Scheduler is {}'.format(scheduler_name))

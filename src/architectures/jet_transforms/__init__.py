@@ -15,7 +15,7 @@ from .transformer import TransformerTransform
 
 from ...misc.abstract_constructor import construct_object
 
-def construct_transform(key, *args, **kwargs):
+def construct_transform(key, **kwargs):
     dictionary = dict(
         rel=RelNNTransformConnected,
         recs=GRNNTransformSimple,
@@ -24,7 +24,7 @@ def construct_transform(key, *args, **kwargs):
         #stack=StackedNMP,
         #phy=PhysicsNMP,
         #phystaold=PhysicsStackNMP,
-        dbg=FixedNMP,
+        nmp=FixedNMP,
         tra=TransformerTransform,
         #one=OnesNMP,
         #eye=EyeNMP,
@@ -33,7 +33,11 @@ def construct_transform(key, *args, **kwargs):
         sta=StackedFixedNMP,
         #physta=PhysicsStackedFixedNMP
     )
+    if kwargs['scales'] is not None:
+        assert key == 'nmp'
+        key = 'sta'
     try:
-        return construct_object(key, dictionary, *args, **kwargs)
+        #return construct_object(key, dictionary, *args, **kwargs)
+        return dictionary[key](**kwargs)
     except ValueError as e:
         raise ValueError('Jet transform layer {}'.format(e))
