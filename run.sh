@@ -3,8 +3,8 @@ N_JOBS=${ARGS[0]}
 PYTHONARGS="${ARGS:2}"
 #echo $1
 
-echo $N_JOBS
-echo $PYTHONARGS
+#echo $N_JOBS
+#echo $PYTHONARGS
 
 
 read SRCDIR DATA_DIR MODELS_DIR GPU EXPT_TIME END_DIR < <(bash misc/paths.sh)
