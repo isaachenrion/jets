@@ -8,5 +8,5 @@ done
 
 for cmd in ${commands[@]}
 do
-    bash run.sh "$cmd"
+    bash run.sh $cmd
 done
