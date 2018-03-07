@@ -1,7 +1,8 @@
 ARGS=$@
 N_JOBS=${ARGS[1]}
 PYTHONARGS="${ARGS:2}"
-#echo $1
+echo $1
+
 echo $N_JOBS
 echo $PYTHONARGS
 
