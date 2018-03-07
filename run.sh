@@ -1,3 +1,4 @@
+echo $@
 PYTHONARGS="${@:2}"
 echo $PYTHONARGS
 
