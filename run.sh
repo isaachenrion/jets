@@ -1,4 +1,4 @@
-ARGS=$@
+ARGS=$1
 N_JOBS=${ARGS[1]}
 PYTHONARGS="${ARGS:2}"
 echo $1
