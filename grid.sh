@@ -1,4 +1,4 @@
-commands="$(python _grid.py $@)"
+commands="$(python _grid.py "$@")"
 IFS=$'\n'
 commands=($commands)
 for cmd in ${commands[@]}
