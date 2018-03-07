@@ -1,4 +1,5 @@
 PYTHONARGS="${@:2}"
+echo $PYTHONARGS
 
 
 read SRCDIR DATA_DIR MODELS_DIR GPU EXPT_TIME END_DIR < <(bash misc/paths.sh)
