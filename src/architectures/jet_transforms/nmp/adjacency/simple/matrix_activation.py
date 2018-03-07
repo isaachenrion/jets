@@ -13,7 +13,8 @@ def padded_matrix_softmax(matrix, mask):
             matrix, and the padded values have been assigned probability 0.
     '''
     #
-    S = F.softmax(matrix.transpose(0, -1)).transpose(0, -1)
+    #S = F.softmax(matrix.transpose(0, -1)).transpose(0, -1)
+    S = F.softmax(matrix, dim=3)
     if mask is not None:
         S = S * mask
         Z = S.sum(2, keepdim=True) + 1e-10
