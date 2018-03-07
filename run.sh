@@ -1,6 +1,7 @@
 ARGS=$@
 N_JOBS=$1
 PYTHONARGS="${ARGS:2}"
+echo $1
 echo $PYTHONARGS
 
 
