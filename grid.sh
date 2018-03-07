@@ -3,7 +3,8 @@ IFS=$'\n'
 commands=($commands)
 for cmd in ${commands[@]}
 do
-    echo "$cmd"
+    #echo "$cmd"
+    echo ""
 done
 
 for cmd in ${commands[@]}
