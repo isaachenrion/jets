@@ -21,6 +21,7 @@ def summarize_one_job_training(jobdir, email=False, verbose=False):
         if os.path.isdir(os.path.join(jobdir, run)):
             csv_filenames.append(csv_filename)
 
+
     # collect final lines of training stats
     for i, csv_filename in enumerate(csv_filenames):
         with open(csv_filename, 'r', newline='') as f:
@@ -49,6 +50,11 @@ def summarize_one_job_training(jobdir, email=False, verbose=False):
 
     # make out string
     out_str = ''
+    with open(os.path.join(jobdir, 'command.txt'), 'r') as f:
+        command_str = f.read()
+
+    out_str += command_str
+
     for name in sorted(headers):
         (mean, std) = aggregate_stats_dict[name]
         if mean is not None:
@@ -63,7 +69,7 @@ def summarize_one_job_training(jobdir, email=False, verbose=False):
                     out_str += '{:.5f}\n'.format(s)
                 except (ValueError, TypeError):
                     out_str += '{}\n'.format(s)
-
+    
     headline = aggregate_stats_dict['best_inv_fpr'][0]
 
     # pretty print to results file
