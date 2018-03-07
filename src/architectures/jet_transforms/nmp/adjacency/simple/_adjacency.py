@@ -38,13 +38,13 @@ class _Adjacency(nn.Module):
         #import ipdb; ipdb.set_trace()
         M = self.raw_matrix(h)
 
+        if self.symmetric:
+            M = 0.5 * (M + M.transpose(1, 2))
+
 
         if self.activation is not None:
             M = self.activation(M, mask)
 
-
-        if self.symmetric:
-            M = 0.5 * (M + M.transpose(1, 2))
 
         if self.monitoring:
             self.logging(dij=M, mask=mask, **kwargs)
