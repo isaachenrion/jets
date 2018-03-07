@@ -14,7 +14,7 @@ def padded_matrix_softmax(matrix, mask):
     '''
     #
     #S = F.softmax(matrix.transpose(0, -1)).transpose(0, -1)
-    S = F.softmax(matrix, dim=3)
+    S = F.softmax(matrix, dim=2)
     if mask is not None:
         S = S * mask
         Z = S.sum(2, keepdim=True) + 1e-10
