@@ -95,7 +95,7 @@ class StackedFixedNMP(AbstractStackedFixedNMP):
 
             #dij = adj(h, mask=mask)
             for mp in nmp:
-                h, _ = mp(h=h, mask=mask, dij=dij)
+                h = mp(h=h, mask=mask, dij=dij)
 
             if not self.pool_first:
                 h, attns = pool(h, **kwargs)

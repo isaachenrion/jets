@@ -54,7 +54,7 @@ class FixedNMP(nn.Module):
         h = self.embedding(jets)
         dij = self.adjacency_matrix(jets, mask=mask, **kwargs)
         for mp in self.mp_layers:
-            h, _ = mp(h=h, mask=mask, dij=dij, **kwargs)
+            h = mp(h=h, mask=mask, dij=dij, **kwargs)
         out = self.readout(h)
 
         return out
