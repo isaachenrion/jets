@@ -3,23 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from ._adjacency import _Adjacency
 
-from src.architectures.embedding import Simple
-#from .....misc.abstract_constructor import construct_object
-
-
-#def construct_adjacency_matrix_layer(key, *args, **kwargs):
-
-    #dictionary = dict(
-    #    sum=Sum,
-    #    dm=DistMult,
-    #    siam=Siamese,
-    #)
-    #try:
-    #    return construct_object(key, dictionary, *args, **kwargs)
-    #except ValueError as e:
-    #    raise ValueError('Adjacency matrix layer {}'.format(e))
-
-
 class Sum(_Adjacency):
     def __init__(self, dim_in, index='',**kwargs):
         name='sum'+index
@@ -41,9 +24,6 @@ class DistMult(_Adjacency):
     def __init__(self, dim_in, index='', **kwargs):
         name='dm'+index
         super().__init__(name=name,**kwargs)
-        #self.softmax = PaddedMatrixSoftmax()
-        #import ipdb; ipdb.set_trace()
-        #self.embedding = Simple(dim_in, dim_in, act='tanh')
         self.matrix = nn.Parameter(torch.zeros(dim_in,dim_in))
         nn.init.xavier_uniform(self.matrix)
         if kwargs['wn']:

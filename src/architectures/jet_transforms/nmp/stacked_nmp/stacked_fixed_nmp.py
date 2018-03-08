@@ -5,10 +5,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-from .....architectures.readout import construct_readout
-from .....architectures.embedding import construct_embedding
-from .attention_pooling import construct_pooling_layer
-from ..message_passing import construct_mp_layer
+from .....architectures.readout import READOUTS
+from .....architectures.embedding import EMBEDDINGS
+from .attention_pooling import POOLING_LAYERS
+from ..message_passing import MP_LAYERS
 from ..adjacency import construct_adjacency
 #from ..fixed_nmp.adjacency import construct_physics_based_adjacency_matrix
 
@@ -31,17 +31,23 @@ class AbstractStackedFixedNMP(nn.Module):
         ):
 
         super().__init__()
-        self.embedding = construct_embedding('simple', features, hidden, act=kwargs.get('act', None))
+        self.embedding = EMBEDDINGS['simple'](features, hidden, act=kwargs.get('act', None))
+
+        MPLayer = MP_LAYERS[mp_layer]
         self.nmps = nn.ModuleList(
                             [nn.ModuleList(
-                                    [construct_mp_layer(mp_layer, hidden=hidden,**kwargs) for _ in range(iters)
+                                    [MPLayer(hidden=hidden,**kwargs) for _ in range(iters)
                                     ]
                                 )
                             for _ in scales
                             ]
                         )
-        self.attn_pools = nn.ModuleList([construct_pooling_layer(pooling_layer, scales[i], hidden, **kwargs) for i in range(len(scales))])
-        self.readout = construct_readout(readout, hidden, hidden)
+        Pool = POOLING_LAYERS[pooling_layer]
+        self.attn_pools = nn.ModuleList([Pool(scales[i], hidden, **kwargs) for i in range(len(scales))])
+
+        Readout = READOUTS[readout]
+        self.readout = Readout(hidden, hidden)
+
         self.pool_first = pool_first
 
 

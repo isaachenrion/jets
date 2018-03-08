@@ -4,27 +4,16 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .....architectures.readout import construct_readout
+from .....architectures.readout import READOUTS
 from .....architectures.utils import Attention
-from .....misc.abstract_constructor import construct_object
 from .....monitors import BatchMatrixMonitor
 #from .....visualizing import visualize_batch_matrix
-
-def construct_pooling_layer(key, *args, **kwargs):
-    dictionary = dict(
-        recattn=RecurrentAttentionPooling,
-        attn=AttentionPooling,
-    )
-    try:
-        return construct_object(key, dictionary, *args, **kwargs)
-    except ValueError as e:
-        raise ValueError('Pooling layer {}'.format(e))
 
 class RecurrentAttentionPooling(nn.Module):
     def __init__(self, nodes_out, hidden):
         super().__init__()
         self.nodes_out = nodes_out
-        self.readout = construct_readout('simple', hidden, hidden)
+        self.readout = READOUTS['mult'](hidden, hidden)
         self.attn = Attention()
         self.recurrent_cell = nn.GRUCell(hidden, hidden)
 
@@ -45,7 +34,7 @@ class AttentionPooling(nn.Module):
     def __init__(self, nodes_out, hidden, **kwargs):
         super().__init__()
         self.nodes_out = nodes_out
-        self.readout = construct_readout('mult', hidden, hidden, nodes_out)
+        self.readout = READOUTS['mult'](hidden, hidden, nodes_out)
         self.attn = Attention()
         #self.recurrent_cell = nn.GRUCell(hidden, hidden)
         self.set_monitors(kwargs.get('logger', None))
@@ -75,3 +64,8 @@ class AttentionPooling(nn.Module):
             if iters_left == 0:
                 self.monitor(attn=attn)
                 self.monitor.visualize('epoch-{}'.format(epoch), n=10)
+
+POOLING_LAYERS = dict(
+    attn=AttentionPooling,
+    rec=RecurrentAttentionPooling
+)

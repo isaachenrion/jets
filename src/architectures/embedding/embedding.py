@@ -12,10 +12,17 @@ class Embedding(nn.Module):
         self.features = features
         self.hidden = hidden
 
-    def forward(self, vertices):
+    def forward(self, x):
         pass
 
-class Simple(Embedding):
+class Constant(Embedding):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def forward(self, x):
+        return x
+
+class OneLayer(Embedding):
     def __init__(self, features, hidden, act=None, wn=False):
         super().__init__(features, hidden)
         self.fc = nn.Linear(features, hidden)
@@ -34,5 +41,20 @@ class Simple(Embedding):
         else:
             raise ValueError('Activation {} not found'.format(act))
 
-    def forward(self, vertices):
-        return self.activation(self.fc(vertices))
+    def forward(self, x):
+        return self.activation(self.fc(x))
+
+class TwoLayer(Embedding):
+    def __init__(self, features, hidden, act=None, wn=False):
+        super().__init__(features, hidden)
+        self.e1 = Simple(features, hidden, act, wn)
+        self.e2 = Simple(hidden, hidden, act, wn)
+
+    def forward(self, x):
+        return self.e1(self.e2(x))
+
+EMBEDDINGS = dict(
+    one=OneLayer,
+    two=TwoLayer,
+    const=Constant
+)

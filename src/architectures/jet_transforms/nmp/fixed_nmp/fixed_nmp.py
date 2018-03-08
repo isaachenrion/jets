@@ -8,13 +8,15 @@ from torch.autograd import Variable
 
 #from .adjacency import construct_physics_based_adjacency_matrix
 
-from ..stacked_nmp.attention_pooling import construct_pooling_layer
-from ..message_passing import construct_mp_layer
+
+#from ..stacked_nmp.attention_pooling import construct_pooling_layer
+from ..message_passing import MP_LAYERS
 #from ..message_passing.adjacency import construct_adjacency_matrix_layer
 
 from ..adjacency import construct_adjacency
-from .....architectures.readout import construct_readout
-from .....architectures.embedding import construct_embedding
+from .....architectures.readout import READOUTS
+from .....architectures.embedding import EMBEDDINGS
+
 from .....monitors import Histogram
 from .....monitors import Collect
 from .....monitors import BatchMatrixMonitor
@@ -26,6 +28,7 @@ class FixedNMP(nn.Module):
         iters=None,
         readout=None,
         matrix=None,
+        emb_init=None,
         mp_layer='simple',
         **kwargs
         ):
@@ -35,12 +38,15 @@ class FixedNMP(nn.Module):
         self.iters = iters
 
         emb_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
-        self.embedding = construct_embedding('simple', features, hidden, **emb_kwargs)
+        self.embedding = EMBEDDINGS[emb_init](features, hidden, **emb_kwargs)
 
-        mp_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
-        self.mp_layers = nn.ModuleList([construct_mp_layer(mp_layer, hidden=hidden,**mp_kwargs) for _ in range(iters)])
+        mp_kwargs = {x: kwargs[x] for x in ['act', 'wn', 'update', 'message']}
+        MPLayer = MP_LAYERS[mp_layer]
+        self.mp_layers = nn.ModuleList([MPLayer(hidden=hidden,**mp_kwargs) for _ in range(iters)])
 
-        self.readout = construct_readout(readout, hidden, hidden)
+        Readout = READOUTS[readout]
+        self.readout = Readout(hidden, hidden)
+
         self.adjacency_matrix = construct_adjacency(matrix=matrix, dim_in=features, **kwargs)
 
     def forward(self, jets, mask=None, **kwargs):

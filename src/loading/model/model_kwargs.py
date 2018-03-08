@@ -23,6 +23,9 @@ def construct_model_kwargs(args):
 
         # NMP
         'iters': args.iters,
+        'update': args.update,
+        'message': args.message,
+        'emb_init':args.emb_init,
         'mp_layer':args.mp,
         'symmetric':args.sym,
         'readout':args.readout,

@@ -1,4 +1,4 @@
-from .message_passing_layers import construct_mp_layer
+from .message_passing_layers import MP_LAYERS
 #from .adjacency import construct_adjacency_matrix_layer
 
 '''
