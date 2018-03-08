@@ -7,7 +7,7 @@ from ...misc.abstract_constructor import construct_object
 
 def construct_transform(key, **kwargs):
     dictionary = dict(
-        rel=RelNNTransformConnected,
+        #rel=RelNNTransformConnected,
         recs=GRNNTransformSimple,
         recg=GRNNTransformGated,
         nmp=FixedNMP,
