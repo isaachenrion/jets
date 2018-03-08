@@ -23,10 +23,10 @@ class AbstractStackedFixedNMP(nn.Module):
         features=None,
         hidden=None,
         iters=None,
-        mp_layer=None,
         readout=None,
         pooling_layer=None,
         pool_first=False,
+        mp_layer='simple',
         **kwargs
         ):
 
@@ -34,7 +34,7 @@ class AbstractStackedFixedNMP(nn.Module):
         self.embedding = construct_embedding('simple', features, hidden, act=kwargs.get('act', None))
         self.nmps = nn.ModuleList(
                             [nn.ModuleList(
-                                    [construct_mp_layer('fixed', hidden=hidden,**kwargs) for _ in range(iters)
+                                    [construct_mp_layer(mp_layer, hidden=hidden,**kwargs) for _ in range(iters)
                                     ]
                                 )
                             for _ in scales
