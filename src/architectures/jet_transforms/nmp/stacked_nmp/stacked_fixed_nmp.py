@@ -101,4 +101,4 @@ class StackedFixedNMP(AbstractStackedFixedNMP):
                 h, attns = pool(h, **kwargs)
 
         out = self.readout(h)
-        return out, _
+        return out

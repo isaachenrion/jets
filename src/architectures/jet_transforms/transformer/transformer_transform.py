@@ -26,4 +26,4 @@ class TransformerTransform(nn.Module):
         h = self.embedding(jets)
         h = self.transformer(h)
         out = self.readout(h)
-        return out, None
+        return out

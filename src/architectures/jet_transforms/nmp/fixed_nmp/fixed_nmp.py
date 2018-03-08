@@ -57,4 +57,4 @@ class FixedNMP(nn.Module):
             h, _ = mp(h=h, mask=mask, dij=dij, **kwargs)
         out = self.readout(h)
 
-        return out, _
+        return out

@@ -30,15 +30,9 @@ class DistMult(_Adjacency):
             self = nn.utils.weight_norm(self, name='matrix')
 
     def raw_matrix(self, vertices):
-        #h = self.embedding(vertices)
         h = vertices
         A = torch.matmul(h, torch.matmul(self.matrix, h.transpose(1,2)))
-        #import ipdb; ipdb.set_trace()
         return A
-        #A = F.sigmoid(A)
-        #if mask is None:
-        #    return A
-        #return mask * A
 
 
 class Siamese(_Adjacency):
