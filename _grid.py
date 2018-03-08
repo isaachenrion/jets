@@ -4,18 +4,19 @@ def generate_all_commands(command):
     # split into list of args
     arg_strs = command.split(' -')
     for i, s in enumerate(arg_strs):
-        if '-' == s[0] and '-' != s[1]:
-            new_s = '-'+s
-        else:
-            new_s = s
+        new_s = '-'+s
         arg_strs[i] = new_s
-        #print(new_s)
+
+    # the number of jobs. remove the dash
+    arg_strs[0] = arg_strs[0][1:]
 
     # split into name/value pairs
     args_dict = {}
     for i, s in enumerate(arg_strs):
         try:
-            name, value = s.split(' ')
+            # handle possible whitespace between comma-separated params
+            s_split = s.split(' ')
+            name, value = s_split[0], ''.join(s_split[1:])
         except ValueError:
             name, value = s, ''
         args_dict[name] = value
@@ -26,6 +27,7 @@ def generate_all_commands(command):
     for name, value in args_dict.items():
         if ',' in value:
             multi_args_dict[name] = value.split(',')
+            #print(value)
         else:
             single_args.append(name + ' ' + value)
 

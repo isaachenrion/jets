@@ -69,4 +69,4 @@ class LearnedComboAdjacency(ComboAdjacency):
 
     @property
     def weights(self):
-        return F.softmax(self._weights)
+        return F.softmax(self._weights, dim=0)

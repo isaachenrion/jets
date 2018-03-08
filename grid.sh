@@ -4,5 +4,5 @@ commands=($commands)
 for cmd in ${commands[@]}
 do
     echo $cmd
-    bash run.sh $cmd
+    #bash run.sh $cmd
 done
