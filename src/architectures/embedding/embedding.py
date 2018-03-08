@@ -47,8 +47,8 @@ class OneLayer(Embedding):
 class TwoLayer(Embedding):
     def __init__(self, features, hidden, act=None, wn=False):
         super().__init__(features, hidden)
-        self.e1 = Simple(features, hidden, act, wn)
-        self.e2 = Simple(hidden, hidden, act, wn)
+        self.e1 = OneLayer(features, hidden, act, wn)
+        self.e2 = OneLayer(hidden, hidden, act, wn)
 
     def forward(self, x):
         return self.e1(self.e2(x))
