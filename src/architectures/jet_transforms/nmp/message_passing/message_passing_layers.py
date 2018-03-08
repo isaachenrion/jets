@@ -14,7 +14,8 @@ def construct_mp_layer(key, *args, **kwargs):
         van=MPAdaptive,
         set=MPSet2Set,
         #id=MPIdentity,
-        fixed=MPFixed,
+        simple=MPSimple,
+        attn=GraphAttentionalLayer,
     )
     try:
         return construct_object(key, dictionary, *args, **kwargs)
@@ -22,6 +23,24 @@ def construct_mp_layer(key, *args, **kwargs):
         raise ValueError('Message passing layer {}'.format(e))
 
 class MessagePassingLayer(nn.Module):
+    def __init__(self, hidden=None, **kwargs):
+        super().__init__()
+        self.activation = F.tanh
+        self.vertex_update = Update(hidden, hidden)
+
+        message_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
+        self.message = Message(hidden, hidden, 0, **message_kwargs)
+
+    def get_adjacency_matrix(self, **kwargs):
+        pass
+
+    def forward(self, h=None, **kwargs):
+        A = self.get_adjacency_matrix(h=h, **kwargs)
+        message = self.activation(torch.matmul(A, self.message(h)))
+        h = self.vertex_update(h, message)
+        return h, A
+
+class GraphAttentionalLayer(nn.Module):
     def __init__(self, hidden=None, **kwargs):
         super().__init__()
         self.activation = F.tanh
@@ -48,7 +67,7 @@ class MPAdaptive(MessagePassingLayer):
     def get_adjacency_matrix(self, h=None, mask=None, **kwargs):
         return self.adjacency_matrix(h, mask)
 
-class MPFixed(MessagePassingLayer):
+class MPSimple(MessagePassingLayer):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
