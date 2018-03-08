@@ -16,7 +16,7 @@ def generate_all_commands(command):
         try:
             # handle possible whitespace between comma-separated params
             s_split = s.split(' ')
-            name, value = s_split[0], ''.join(s_split[1:])
+            name, value = s_split[0], ' '.join(s_split[1:])
         except ValueError:
             name, value = s, ''
         args_dict[name] = value
