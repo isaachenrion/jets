@@ -56,7 +56,7 @@ def train(args):
     #scheduler_name, sched_kwargs = 'multi', dict(milestones=[4,8,12,16,20,24,28,32,36,40,44,48,52], gamma=args.decay)
     #scheduler_name, sched_kwargs = 'multi', dict(milestones=[4,7,15,20,25,30,35,40,45,50], gamma=args.decay)
     scheduler_name = args.scheduler
-    if scheduler == 'none':
+    if scheduler_name == 'none':
         Scheduler = lr_scheduler.ExponentialLR
         sched_kwargs = dict(gamma=1)
     elif scheduler_name == 'm1':
