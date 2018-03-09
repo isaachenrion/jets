@@ -7,7 +7,7 @@ class Embedding(nn.Module):
     Abstract base class for any module that embeds a collection of N vertices into
     N hidden states
     '''
-    def __init__(self, features, hidden):
+    def __init__(self, features, hidden, **kwargs):
         super().__init__()
         self.features = features
         self.hidden = hidden
