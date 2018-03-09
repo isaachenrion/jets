@@ -5,15 +5,17 @@ from torch.autograd import Variable
 
 from .vertex_update import VERTEX_UPDATES
 from src.architectures.embedding import EMBEDDINGS
+from src.architectures.embedding import ACTIVATIONS
 
 class MessagePassingLayer(nn.Module):
-    def __init__(self, hidden=None, update=None, message=None, **kwargs):
+    def __init__(self, hidden=None, update=None, message=None, act=None, **kwargs):
         super().__init__()
-        self.activation = F.tanh
+        self.activation = ACTIVATIONS[act]()
+        #self.activation = F.tanh
         self.vertex_update = VERTEX_UPDATES[update](hidden, hidden)
 
-        message_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
-        self.message = EMBEDDINGS['n'](dim_in=hidden, dim_out=hidden, n_layers=int(message), **message_kwargs)
+        message_kwargs = {x: kwargs[x] for x in ['wn']}
+        self.message = EMBEDDINGS['n'](dim_in=hidden, dim_out=hidden, n_layers=int(message), act=act, **message_kwargs)
 
     def get_adjacency_matrix(self, **kwargs):
         pass
@@ -25,12 +27,12 @@ class MessagePassingLayer(nn.Module):
         return h
 
 class GraphAttentionalLayer(nn.Module):
-    def __init__(self, hidden=None, **kwargs):
+    def __init__(self, hidden=None, act=None, **kwargs):
         super().__init__()
         self.W = nn.Linear(hidden, hidden, bias=False)
         self.a = nn.Parameter(torch.zeros(1, 1,1, 2 * hidden))
         nn.init.xavier_normal(self.a)
-        self.activation = nn.LeakyReLU(negative_slope=0.2)
+        self.activation = ACTIVATIONS[act]()
 
     def forward(self, h=None, **kwargs):
         h = self.W(h)

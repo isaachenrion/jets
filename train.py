@@ -62,7 +62,7 @@ parser.add_argument("--root_dir", default=MODELS_DIR)
 # Dimension and activation args
 parser.add_argument("--features", type=int, default=FEATURES)
 parser.add_argument("--hidden", type=int, default=HIDDEN)
-parser.add_argument("--act", type=str, default='relu')
+parser.add_argument("--act", type=str, default='leakyrelu')
 
 # Classifier
 parser.add_argument("--predict", type=str, default='simple', help='type of prediction layer')

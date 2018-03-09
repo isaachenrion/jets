@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from .activations import ACTIVATIONS
+
 class Embedding(nn.Module):
     '''
     Abstract base class for any module that embeds a collection of N vertices into
@@ -28,18 +30,7 @@ class OneLayer(Embedding):
         self.fc = nn.Linear(features, hidden)
         if wn:
             self.fc = nn.utils.weight_norm(self.fc, name='weight')
-        if act == 'tanh':
-            self.activation = nn.Tanh()
-        elif act == 'relu':
-            self.activation = nn.ReLU()
-        elif act == 'sigmoid':
-            self.activation = nn.Sigmoid()
-        elif act == 'hardtanh':
-            self.activation = nn.HardTanh()
-        elif act is None:
-            self.activation = lambda x: x
-        else:
-            raise ValueError('Activation {} not found'.format(act))
+        self.activation = ACTIVATIONS[act]()
 
     def forward(self, x):
         return self.activation(self.fc(x))
@@ -56,24 +47,7 @@ class TwoLayer(Embedding):
 class NLayer(nn.Module):
     def __init__(self, dim_in=None, dim_out=None, n_layers=None, dim_hidden=None, act=None, wn=False, **kwargs):
         super().__init__()
-        if act == 'tanh':
-            self.activation = nn.Tanh()
-        elif act == 'relu':
-            self.activation = nn.ReLU()
-        elif act == 'sigmoid':
-            self.activation = nn.Sigmoid()
-        elif act == 'hardtanh':
-            self.activation = nn.HardTanh()
-        elif act == 'leakyrelu':
-            self.activation = nn.LeakyReLU()
-        elif act == 'elu':
-            self.activation = nn.ELU()
-        elif act == 'selu':
-            self.activation = nn.SELU()
-        elif act is None:
-            self.activation = lambda x: x
-        else:
-            raise ValueError('Activation {} not found'.format(act))
+        self.activation = ACTIVATIONS[act]()
 
         if dim_hidden is None:
             dim_hidden = dim_out
