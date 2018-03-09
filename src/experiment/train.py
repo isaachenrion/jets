@@ -56,7 +56,10 @@ def train(args):
     #scheduler_name, sched_kwargs = 'multi', dict(milestones=[4,8,12,16,20,24,28,32,36,40,44,48,52], gamma=args.decay)
     #scheduler_name, sched_kwargs = 'multi', dict(milestones=[4,7,15,20,25,30,35,40,45,50], gamma=args.decay)
     scheduler_name = args.scheduler
-    if scheduler_name == 'm1':
+    if scheduler == 'none':
+        Scheduler = lr_scheduler.ExponentialLR
+        sched_kwargs = dict(gamma=1)
+    elif scheduler_name == 'm1':
         Scheduler = lr_scheduler.MultiStepLR
         sched_kwargs = dict(milestones=[5,10,15,20,30,40,50,60,70,80,90], gamma=args.decay)
     elif scheduler_name == 'm2':
@@ -68,6 +71,8 @@ def train(args):
     elif scheduler_name == 'exp':
         Scheduler = lr_scheduler.ExponentialLR
         sched_kwargs = dict(gamma=args.decay)
+    else:
+        raise ValueError("bad scheduler name: {}".format(scheduler_name))
 
     #scheduler_name, sched_kwargs = 'exp', dict(gamma=args.decay)
     #scheduler_name, sched_kwargs = 'exp', dict(gamma=1.0)
@@ -75,12 +80,6 @@ def train(args):
     logging.info('Scheduler is {}'.format(scheduler_name))
     for k, v in sched_kwargs.items(): logging.info('{}: {}'.format(k, v))
     logging.info('***********')
-    #schedulers = dict(
-    #    multi=lr_scheduler.MultiStepLR,
-    #    exp=lr_scheduler.ExponentialLR
-    #)
-
-    #Scheduler = schedulers[scheduler_name]
 
     scheduler = Scheduler(optimizer, **sched_kwargs)
 
