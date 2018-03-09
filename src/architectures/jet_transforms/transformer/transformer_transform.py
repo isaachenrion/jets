@@ -14,11 +14,15 @@ class TransformerTransform(nn.Module):
         n_heads=None,
         n_layers=None,
         readout=None,
+        emb_init=None,
         **kwargs
         ):
         super().__init__()
+        
+        emb_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
+        self.embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, n_layers=int(emb_init), **emb_kwargs)
 
-        self.embedding = EMBEDDINGS['simple'](features + 1, hidden, act='relu')
+        #self.embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, **emb_kwargs)
         self.readout = READOUTS[readout](hidden, hidden)
         self.transformer = Transformer(hidden, n_heads, n_layers, **kwargs)
 

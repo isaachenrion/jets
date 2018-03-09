@@ -10,7 +10,6 @@ from .....architectures.embedding import EMBEDDINGS
 from .attention_pooling import POOLING_LAYERS
 from ..message_passing import MP_LAYERS
 from ..adjacency import construct_adjacency
-#from ..fixed_nmp.adjacency import construct_physics_based_adjacency_matrix
 
 from .....monitors import BatchMatrixMonitor
 from .....monitors import Histogram
@@ -26,22 +25,28 @@ class AbstractStackedFixedNMP(nn.Module):
         readout=None,
         pooling_layer=None,
         pool_first=False,
-        mp_layer='simple',
+        mp_layer=None,
+        emb_init=None,
         **kwargs
         ):
 
         super().__init__()
-        self.embedding = EMBEDDINGS['simple'](features, hidden, act=kwargs.get('act', None))
+        emb_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
+        self.embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, n_layers=int(emb_init), **emb_kwargs)
 
+        #self.embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, act=kwargs.get('act', None))
+
+        mp_kwargs = {x: kwargs[x] for x in ['act', 'wn', 'update', 'message']}
         MPLayer = MP_LAYERS[mp_layer]
         self.nmps = nn.ModuleList(
                             [nn.ModuleList(
-                                    [MPLayer(hidden=hidden,**kwargs) for _ in range(iters)
+                                    [MPLayer(hidden=hidden,**mp_kwargs) for _ in range(iters)
                                     ]
                                 )
                             for _ in scales
                             ]
                         )
+
         Pool = POOLING_LAYERS[pooling_layer]
         self.attn_pools = nn.ModuleList([Pool(scales[i], hidden, **kwargs) for i in range(len(scales))])
 
@@ -66,7 +71,7 @@ class StackedFixedNMP(AbstractStackedFixedNMP):
                     index=str(1),
                     **kwargs
                     )
-        #import ipdb; ipdb.set_trace()
+
         matrices = [construct_adjacency(
                     matrix=matrix,
                     dim_in=hidden,

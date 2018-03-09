@@ -21,7 +21,7 @@ parser.add_argument("-v", "--verbose", action='store_true', default=False)
 parser.add_argument("--visualizing", action='store_true', default=False)
 parser.add_argument("--no_email", action='store_true', default=False)
 
-# Directoery args
+# Directory args
 parser.add_argument("--data_dir", type=str, default=DATA_DIR)
 parser.add_argument("--models_dir", type=str, default=MODELS_DIR)
 
@@ -38,6 +38,7 @@ parser.add_argument("-r", "--restart", help="restart a loaded model from where i
 parser.add_argument("-e", "--epochs", type=int, default=EPOCHS)
 parser.add_argument("-b", "--batch_size", type=int, default=BATCH_SIZE)
 parser.add_argument("--experiment_time", type=int, default=1000000)
+parser.add_argument("--scheduler", type=str, default=None)
 
 # Optimization args
 parser.add_argument("--lr", type=float, default=STEP_SIZE)
@@ -73,8 +74,8 @@ parser.add_argument("-m", "--model", type=str, default="nmp", help="name of the 
 parser.add_argument("-i", "--iters", type=int, default=10)
 parser.add_argument("--mp", type=str, default='simple', help='type of message passing layer')
 parser.add_argument("-u", "--update", type=str, default='gru', help='type of vertex update')
-parser.add_argument("--message", type=str, default='one', help='type of message')
-parser.add_argument("--emb_init", type=str, default='one', help='type of message')
+parser.add_argument("--message", type=str, default='1', help='type of message')
+parser.add_argument("--emb_init", type=str, default='1', help='type of message')
 parser.add_argument("-a","--adj", type=str, nargs='+', default='dm', help='type of matrix layer')
 parser.add_argument("--asym", action='store_true', default=False)
 parser.add_argument("--readout", type=str, default='dtnn', help='type of readout layer')
