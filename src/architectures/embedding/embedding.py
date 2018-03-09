@@ -64,8 +64,17 @@ class NLayer(nn.Module):
             self.activation = nn.Sigmoid()
         elif act == 'hardtanh':
             self.activation = nn.HardTanh()
+        elif act == 'leakyrelu':
+            self.activation = nn.LeakyReLU()
+        elif act == 'elu':
+            self.activation = nn.ELU()
+        elif act == 'selu':
+            self.activation = nn.SELU()
         elif act is None:
             self.activation = lambda x: x
+        else:
+            raise ValueError('Activation {} not found'.format(act))
+
         if dim_hidden is None:
             dim_hidden = dim_out
         dims = [dim_in] + [dim_hidden] * (n_layers-1) + [dim_out]
