@@ -29,7 +29,7 @@ class FixedNMP(nn.Module):
         readout=None,
         matrix=None,
         emb_init=None,
-        mp_layer='simple',
+        mp_layer=None,
         **kwargs
         ):
 
@@ -38,7 +38,7 @@ class FixedNMP(nn.Module):
         self.iters = iters
 
         emb_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
-        self.embedding = EMBEDDINGS[emb_init](features, hidden, **emb_kwargs)
+        self.embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, n_layers=int(emb_init), **emb_kwargs)
 
         mp_kwargs = {x: kwargs[x] for x in ['act', 'wn', 'update', 'message']}
         MPLayer = MP_LAYERS[mp_layer]

@@ -13,7 +13,7 @@ class MessagePassingLayer(nn.Module):
         self.vertex_update = VERTEX_UPDATES[update](hidden, hidden)
 
         message_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
-        self.message = EMBEDDINGS[message](hidden, hidden, **message_kwargs)
+        self.message = EMBEDDINGS['n'](dim_in=hidden, dim_out=hidden, n_layers=int(message), **message_kwargs)
 
     def get_adjacency_matrix(self, **kwargs):
         pass

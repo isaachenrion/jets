@@ -50,7 +50,6 @@ class Overwrite(VertexUpdate):
     def _forward_with_vertex_state(self, h, message, s):
         return message
 
-
     def _forward_without_vertex_state(self, h, message):
         return message
 
