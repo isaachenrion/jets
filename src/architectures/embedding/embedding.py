@@ -23,7 +23,7 @@ class Constant(Embedding):
         return x
 
 class OneLayer(Embedding):
-    def __init__(self, features, hidden, act=None, wn=False):
+    def __init__(self, features, hidden, act=None, wn=False, **kwargs):
         super().__init__(features, hidden)
         self.fc = nn.Linear(features, hidden)
         if wn:
@@ -45,7 +45,7 @@ class OneLayer(Embedding):
         return self.activation(self.fc(x))
 
 class TwoLayer(Embedding):
-    def __init__(self, features, hidden, act=None, wn=False):
+    def __init__(self, features, hidden, act=None, wn=False, **kwargs):
         super().__init__(features, hidden)
         self.e1 = OneLayer(features, hidden, act, wn)
         self.e2 = OneLayer(hidden, hidden, act, wn)
