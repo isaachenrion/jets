@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from src.architectures.embedding import EMBEDDINGS
 from ._adjacency import _Adjacency
 
 class Sum(_Adjacency):
@@ -35,6 +36,25 @@ class DistMult(_Adjacency):
         return A
 
 
+class Attentional(_Adjacency):
+    def __init__(self, dim_in, dim_out=None, index='', **kwargs):
+        name='attn'+index
+        super().__init__(name=name,**kwargs)
+        if dim_out is None: dim_out = dim_in
+        self.embedding = EMBEDDINGS['n'](dim_in=dim_in, dim_out=dim_out, n_layers=2, act='leakyrelu')
+        self.a = nn.Parameter(torch.zeros(1, 1,1, 2 * dim_out))
+        nn.init.xavier_normal(self.a)
+
+    def forward(self, h=None, **kwargs):
+        h = self.embedding(h)
+        shp = h.size()
+        h_i = h.view(shp[0], shp[1], 1, shp[2]).repeat(1, 1, shp[1], 1)
+        h_j = h.view(shp[0], 1, shp[1], shp[2]).repeat(1, shp[1], 1, 1)
+        h_cat = torch.cat([h_i,h_j], 3)
+        e_ij = torch.sum(h_cat * self.a, 3)
+
+        return e_ij
+
 class Siamese(_Adjacency):
     def __init__(self, dim_in, index='',**kwargs):
         name='siam'+index
@@ -55,5 +75,6 @@ class Siamese(_Adjacency):
 LEARNED_ADJACENCIES = dict(
     sum=Sum,
     dm=DistMult,
-    siam=Siamese
+    siam=Siamese,
+    attn=Attentional
 )

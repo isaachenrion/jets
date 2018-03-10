@@ -28,13 +28,8 @@ class LeafJetLoader(JetLoader):
         else:
             data = [torch.from_numpy(x.constituents) for x in x_list]
 
-        #    #for i, x in enumerate(x_list):
-        #    x_list = [x[np.random.permutation(x.shape[0])] for x in x_list]
-
-
         # dropout
         if self.dropout is not None:
-            #dropout_masks = [torch.bernoulli(torch.zeros(x.constituents.shape[0]).fill_(self.dropout)).byte() for x in x_list]
             for i, x in enumerate(x_list):
                 dm = torch.bernoulli(torch.zeros(x.constituents.shape[0]).fill_(self.dropout)).byte()
                 while dm.sum() == 0:

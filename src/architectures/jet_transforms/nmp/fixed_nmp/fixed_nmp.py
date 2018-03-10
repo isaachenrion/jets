@@ -47,7 +47,7 @@ class FixedNMP(nn.Module):
         Readout = READOUTS[readout]
         self.readout = Readout(hidden, hidden)
 
-        self.adjacency_matrix = construct_adjacency(matrix=matrix, dim_in=features, **kwargs)
+        self.adjacency_matrix = construct_adjacency(matrix=matrix, dim_in=features, dim_out=hidden, **kwargs)
 
     def forward(self, jets, mask=None, **kwargs):
 
