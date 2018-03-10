@@ -38,13 +38,13 @@ parser.add_argument("-r", "--restart", help="restart a loaded model from where i
 parser.add_argument("-e", "--epochs", type=int, default=EPOCHS)
 parser.add_argument("-b", "--batch_size", type=int, default=BATCH_SIZE)
 parser.add_argument("--experiment_time", type=int, default=1000000)
-parser.add_argument("--scheduler", type=str, default='none')
 
 # Optimization args
 parser.add_argument("--lr", type=float, default=STEP_SIZE)
 parser.add_argument("--decay", type=float, default=DECAY)
 parser.add_argument("--clip", type=float, default=None)
 parser.add_argument("--reg", type=float, default=L2_REGULARIZATION)
+parser.add_argument("--scheduler", type=str, default='m2')
 
 # computing args
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)
@@ -74,7 +74,7 @@ parser.add_argument("-m", "--model", type=str, default="nmp", help="name of the 
 parser.add_argument("-i", "--iters", type=int, default=10)
 parser.add_argument("--mp", type=str, default='simple', help='type of message passing layer')
 parser.add_argument("-u", "--update", type=str, default='gru', help='type of vertex update')
-parser.add_argument("--message", type=str, default='1', help='type of message')
+parser.add_argument("--message", type=str, default='2', help='type of message')
 parser.add_argument("--emb_init", type=str, default='1', help='type of message')
 parser.add_argument("-a","--adj", type=str, nargs='+', default='dm', help='type of matrix layer')
 parser.add_argument("--asym", action='store_true', default=False)
