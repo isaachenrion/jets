@@ -58,6 +58,7 @@ parser.add_argument("--dropout", type=float, default=1)
 parser.add_argument("--pileup", action='store_true', default=False)
 parser.add_argument("--pp", action='store_true', default=False)
 parser.add_argument("--root_dir", default=MODELS_DIR)
+parser.add_argument("--permute_particles", action='store_true')
 
 # Dimension and activation args
 parser.add_argument("--features", type=int, default=FEATURES)

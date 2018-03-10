@@ -17,12 +17,20 @@ class JetLoader(_DataLoader):
         return y
 
 class LeafJetLoader(JetLoader):
-    def __init__(self, dataset, batch_size, dropout=None):
+    def __init__(self, dataset, batch_size, dropout=None, permute_particles=False):
         super().__init__(dataset, batch_size)
         self.dropout = dropout
+        self.permute_particles = permute_particles
 
     def preprocess_x(self, x_list):
-        data = [torch.from_numpy(x.constituents) for x in x_list]
+        if self.permute_particles:
+            data = [torch.from_numpy(np.random.permutation(x.constituents)) for x in x_list]
+        else:
+            data = [torch.from_numpy(x.constituents) for x in x_list]
+
+        #    #for i, x in enumerate(x_list):
+        #    x_list = [x[np.random.permutation(x.shape[0])] for x in x_list]
+
 
         # dropout
         if self.dropout is not None:

@@ -32,8 +32,8 @@ def train(args):
         DataLoader = TreeJetLoader
     else:
         DataLoader = LeafJetLoader
-    train_data_loader = DataLoader(train_dataset, batch_size = args.batch_size, dropout=args.dropout)
-    valid_data_loader = DataLoader(valid_dataset, batch_size = args.batch_size, dropout=args.dropout)
+    train_data_loader = DataLoader(train_dataset, batch_size = args.batch_size, dropout=args.dropout, permute_particles=args.permute_particles)
+    valid_data_loader = DataLoader(valid_dataset, batch_size = args.batch_size, dropout=args.dropout, permute_particles=args.permute_particles)
 
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
