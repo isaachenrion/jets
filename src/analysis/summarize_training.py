@@ -50,10 +50,14 @@ def summarize_one_job_training(jobdir, email=False, verbose=False):
 
     # make out string
     out_str = ''
-    with open(os.path.join(jobdir, 'command.txt'), 'r') as f:
-        command_str = f.read()
+    try:
+        with open(os.path.join(jobdir, 'command.txt'), 'r') as f:
+            command_str = f.read()
 
+    except FileNotFoundError:
+        command_str = "Command not found"
     out_str += command_str
+
 
     for name in sorted(headers):
         (mean, std) = aggregate_stats_dict[name]
@@ -69,7 +73,7 @@ def summarize_one_job_training(jobdir, email=False, verbose=False):
                     out_str += '{:.5f}\n'.format(s)
                 except (ValueError, TypeError):
                     out_str += '{}\n'.format(s)
-    
+
     headline = aggregate_stats_dict['best_inv_fpr'][0]
 
     # pretty print to results file
