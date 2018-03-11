@@ -35,15 +35,15 @@ parser.add_argument("-l", "--load", help="model directory from which we load a s
 parser.add_argument("-r", "--restart", help="restart a loaded model from where it left off", action='store_true', default=False)
 
 # Training args
-parser.add_argument("-e", "--epochs", type=int, default=EPOCHS)
-parser.add_argument("-b", "--batch_size", type=int, default=BATCH_SIZE)
+parser.add_argument("-e", "--epochs", type=int, default=50)
+parser.add_argument("-b", "--batch_size", type=int, default=100)
 parser.add_argument("--experiment_time", type=int, default=1000000)
 
 # Optimization args
-parser.add_argument("--lr", type=float, default=STEP_SIZE)
-parser.add_argument("--decay", type=float, default=DECAY)
+parser.add_argument("--lr", type=float, default=.0005)
+parser.add_argument("--decay", type=float, default=.5)
 parser.add_argument("--clip", type=float, default=None)
-parser.add_argument("--reg", type=float, default=L2_REGULARIZATION)
+parser.add_argument("--reg", type=float, default=.00001)
 parser.add_argument("--scheduler", type=str, default='m2')
 
 # computing args
@@ -52,7 +52,7 @@ parser.add_argument("-g", "--gpu", type=str, default="")
 
 # Data args
 parser.add_argument("-n", "--n_train", type=int, default=-1)
-parser.add_argument("--n_valid", type=int, default=VALID)
+parser.add_argument("--n_valid", type=int, default=27000)
 parser.add_argument("--dataset", type=str, default='w')
 parser.add_argument("--dropout", type=float, default=.99)
 parser.add_argument("--pileup", action='store_true', default=False)
@@ -61,8 +61,8 @@ parser.add_argument("--root_dir", default=MODELS_DIR)
 parser.add_argument("--permute_particles", action='store_true')
 
 # Dimension and activation args
-parser.add_argument("--features", type=int, default=FEATURES)
-parser.add_argument("--hidden", type=int, default=HIDDEN)
+parser.add_argument("--features", type=int, default=7)
+parser.add_argument("--hidden", type=int, default=64)
 parser.add_argument("--act", type=str, default='leakyrelu')
 
 # Classifier
