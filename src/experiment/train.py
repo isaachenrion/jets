@@ -71,7 +71,7 @@ def train(args):
     elif scheduler_name == 'trap':
         Scheduler = schedulers.Piecewise
         i = 1 if args.debug else 10
-        sched_kwargs = dict(milestones=[i, args.epochs-i, args.epochs], lrs=[.2, .4, 0.0])
+        sched_kwargs = dict(milestones=[i, args.epochs-i, args.epochs], lrs=[args.lr, args.lr, 0.0])
         args.lr=0.
     elif scheduler_name == 'line':
         Scheduler = schedulers.Linear
