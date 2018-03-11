@@ -12,8 +12,10 @@ from ..data_ops.data_loaders import LeafJetLoader
 from ..data_ops.data_loaders import TreeJetLoader
 
 from ..misc.constants import *
+import src.misc.schedulers as schedulers
 from ..admin import ExperimentHandler
 
+from ..monitors.meta import Collect
 from ..loading.model import build_model
 
 def train(args):
@@ -45,16 +47,7 @@ def train(args):
     logging.info('***********')
     logging.info("Building optimizer...")
     optimizer = Adam(model.parameters(), lr=settings['lr'], weight_decay=args.reg)
-    #scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5)
-    #scheduler = lr_scheduler.Step
-    #total_decay_factor = 100
-    #decay = (1.0 / total_decay_factor) ** (1.0 / args.epochs)
-    #scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=decay)
-    #scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[4,7,15,20,25,30,35,40,45,50], gamma=0.5)
-    #scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[4,8,12,16,20,24,28,32,36,40,44,48,52], gamma=0.5)
 
-    #scheduler_name, sched_kwargs = 'multi', dict(milestones=[4,8,12,16,20,24,28,32,36,40,44,48,52], gamma=args.decay)
-    #scheduler_name, sched_kwargs = 'multi', dict(milestones=[4,7,15,20,25,30,35,40,45,50], gamma=args.decay)
     scheduler_name = args.scheduler
     if scheduler_name == 'none':
         Scheduler = lr_scheduler.ExponentialLR
@@ -71,11 +64,26 @@ def train(args):
     elif scheduler_name == 'exp':
         Scheduler = lr_scheduler.ExponentialLR
         sched_kwargs = dict(gamma=args.decay)
+    elif scheduler_name == 'cos':
+        Scheduler = lr_scheduler.CosineAnnealingLR
+        sched_kwargs = dict(eta_min=args.lr, T_max=args.epochs / 10)
+        args.lr=0.
+    elif scheduler_name == 'trap':
+        Scheduler = schedulers.Piecewise
+        i = 1 if args.debug else 10
+        sched_kwargs = dict(milestones=[i, args.epochs-i, args.epochs], lrs=[.2, .4, 0.0])
+        args.lr=0.
+    elif scheduler_name == 'line':
+        Scheduler = schedulers.Linear
+        #i = 1 if args.debug else 10
+        sched_kwargs = dict(end_lr=0., endpoint=args.epochs)
+        #args.lr=0.
+
     else:
         raise ValueError("bad scheduler name: {}".format(scheduler_name))
+    lr_monitor = Collect('lr', fn='last')
+    lr_monitor.initialize(None, eh.stats_logger.plotsdir)
 
-    #scheduler_name, sched_kwargs = 'exp', dict(gamma=args.decay)
-    #scheduler_name, sched_kwargs = 'exp', dict(gamma=1.0)
     logging.info('***********')
     logging.info('Scheduler is {}'.format(scheduler_name))
     for k, v in sched_kwargs.items(): logging.info('{}: {}'.format(k, v))
@@ -133,7 +141,9 @@ def train(args):
 
     for i in range(args.epochs):
         logging.info("epoch = %d" % i)
-        logging.info("lr = %.8f" % scheduler.get_lr()[0])
+        lr = scheduler.get_lr()[0]
+        logging.info("lr = %.8f" % lr)
+        lr_monitor(lr=lr)
         t0 = time.time()
         for j, (x, y) in enumerate(train_data_loader):
             iteration += 1
@@ -158,11 +168,13 @@ def train(args):
                 logdict = callback(i, model, train_loss)
                 eh.log(**logdict)
                 train_losses = []
+                lr_monitor.visualize('lr')
 
         t1 = time.time()
         logging.info("Epoch took {} seconds".format(t1-t0))
 
         scheduler.step()
+
 
         if t1 - t_start > args.experiment_time - 60:
             break
