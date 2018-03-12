@@ -90,6 +90,8 @@ class TreeJetLoader(JetLoader):
 
         jet_children = np.vstack(jet_children)
         jet_contents = torch.cat([Variable(torch.from_numpy(jet.tree_content).float()) for jet in jets], 0)
+        if torch.cuda.is_available():
+            jet_contents = jet_contents.cuda()
         #import ipdb; ipdb.set_trace()
         n_nodes = offset
 

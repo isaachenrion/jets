@@ -34,7 +34,7 @@ def reset_unused_args(args):
         args.hidden = 7
         args.batch_size = 5
         args.verbose = True
-        args.epochs = 3
+        args.epochs = 10
         args.n_train = 1000
         args.seed = 1
         args.lf = 1

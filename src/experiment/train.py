@@ -46,7 +46,6 @@ def train(args):
     '''----------------------------------------------------------------------- '''
     logging.info('***********')
     logging.info("Building optimizer...")
-    optimizer = Adam(model.parameters(), lr=settings['lr'], weight_decay=args.reg)
 
     scheduler_name = args.scheduler
     if scheduler_name == 'none':
@@ -65,14 +64,21 @@ def train(args):
         Scheduler = lr_scheduler.ExponentialLR
         sched_kwargs = dict(gamma=args.decay)
     elif scheduler_name == 'cos':
-        Scheduler = lr_scheduler.CosineAnnealingLR
-        sched_kwargs = dict(eta_min=args.lr, T_max=args.epochs / 10)
-        args.lr=0.
+        Scheduler = schedulers.CosineAnnealingLR
+        T_max = 3 if args.debug else args.epochs // 10
+        sched_kwargs = dict(eta_min=args.lr, T_max=T_max)
+        settings['lr']=0.
     elif scheduler_name == 'trap':
         Scheduler = schedulers.Piecewise
         i = 1 if args.debug else 10
         sched_kwargs = dict(milestones=[i, args.epochs-i, args.epochs], lrs=[args.lr, args.lr, 0.0])
-        args.lr=0.
+        settings['lr']=0.
+    elif scheduler_name == 'osc':
+        Scheduler = schedulers.Piecewise
+        i = 1 if args.debug else 10
+        m = 10
+        sched_kwargs = dict(milestones=[i * args.epochs // m for i in range(1, m+1)], lrs=[args.lr,0.0] * int(m//2))
+        settings['lr']=0.
     elif scheduler_name == 'line':
         Scheduler = schedulers.Linear
         #i = 1 if args.debug else 10
@@ -88,6 +94,8 @@ def train(args):
     logging.info('Scheduler is {}'.format(scheduler_name))
     for k, v in sched_kwargs.items(): logging.info('{}: {}'.format(k, v))
     logging.info('***********')
+
+    optimizer = Adam(model.parameters(), lr=settings['lr'], weight_decay=args.reg)
 
     scheduler = Scheduler(optimizer, **sched_kwargs)
 
