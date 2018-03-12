@@ -47,7 +47,7 @@ def train(args):
     logging.info('***********')
     logging.info("Building optimizer...")
 
-    scheduler_name = args.scheduler
+    scheduler_name = args.sched
     if scheduler_name == 'none':
         Scheduler = lr_scheduler.ExponentialLR
         sched_kwargs = dict(gamma=1)
@@ -65,21 +65,21 @@ def train(args):
         sched_kwargs = dict(gamma=args.decay)
     elif scheduler_name == 'cos':
         Scheduler = schedulers.CosineAnnealingLR
-        T_max = 3 if args.debug else args.epochs // 10
+        T_max = 3 if args.debug else args.period / 2
         sched_kwargs = dict(eta_min=args.lr, T_max=T_max)
         settings['lr']=0.
     elif scheduler_name == 'trap':
         Scheduler = schedulers.Piecewise
-        i = 1 if args.debug else 10
+        i = 1 if args.debug else args.period
         sched_kwargs = dict(milestones=[i, args.epochs-i, args.epochs], lrs=[args.lr, args.lr, 0.0])
         settings['lr']=0.
-    elif scheduler_name == 'osc':
+    elif scheduler_name == 'lin-osc':
         Scheduler = schedulers.Piecewise
-        i = 1 if args.debug else 10
-        m = 10
+        #i = 1 if args.debug else 10
+        m = args.period // 2
         sched_kwargs = dict(milestones=[i * args.epochs // m for i in range(1, m+1)], lrs=[args.lr,0.0] * int(m//2))
         settings['lr']=0.
-    elif scheduler_name == 'line':
+    elif scheduler_name == 'lin':
         Scheduler = schedulers.Linear
         #i = 1 if args.debug else 10
         sched_kwargs = dict(end_lr=0., endpoint=args.epochs)

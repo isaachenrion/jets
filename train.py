@@ -44,7 +44,8 @@ parser.add_argument("--lr", type=float, default=.0005)
 parser.add_argument("--decay", type=float, default=.5)
 parser.add_argument("--clip", type=float, default=None)
 parser.add_argument("--reg", type=float, default=.00001)
-parser.add_argument("--scheduler", type=str, default='m2')
+parser.add_argument("--sched", type=str, default='m2')
+parser.add_argument("--period", type=int, default=5)
 
 # computing args
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)

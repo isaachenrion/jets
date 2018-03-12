@@ -1,4 +1,5 @@
 import torch
+import math
 from torch.optim.lr_scheduler import _LRScheduler, LambdaLR
 
 class Piecewise(_LRScheduler):
@@ -86,6 +87,7 @@ class CosineAnnealingLR(_LRScheduler):
         self.T_max = T_max
         self.eta_min = eta_min
         super(CosineAnnealingLR, self).__init__(optimizer, last_epoch)
+        self.step()
 
     def get_lr(self):
         return [self.eta_min + (base_lr - self.eta_min) *
