@@ -84,7 +84,7 @@ def train(args):
         #i = 1 if args.debug else 10
         m = args.period
         n_waves = args.epochs // args.period
-        lr_lists = [[args.lr * 2 ** (-i),args.lr_min] for i in range(int(n_waves//2))]
+        lr_lists = [[args.lr * args.decay ** (i),args.lr_min] for i in range(int(n_waves//2))]
         sched_kwargs = dict(milestones=[i * m for i in range(1, n_waves+1)], lrs=[args.lr_min] + [x for l in lr_lists for x in l] )
         settings['lr']=args.lr_min
     elif scheduler_name == 'lin':
