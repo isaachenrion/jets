@@ -71,18 +71,26 @@ def train(args):
     elif scheduler_name == 'trap':
         Scheduler = schedulers.Piecewise
         i = 1 if args.debug else args.period
-        sched_kwargs = dict(milestones=[i, args.epochs-i, args.epochs], lrs=[args.lr, args.lr, 0.0])
-        settings['lr']=0.
+        sched_kwargs = dict(milestones=[i, args.epochs-i, args.epochs], lrs=[args.lr, args.lr, args.lr_min])
+        settings['lr']=args.lr_min
     elif scheduler_name == 'lin-osc':
         Scheduler = schedulers.Piecewise
         #i = 1 if args.debug else 10
-        m = args.period // 2
-        sched_kwargs = dict(milestones=[i * args.epochs // m for i in range(1, m+1)], lrs=[args.lr,0.0] * int(m//2))
-        settings['lr']=0.
+        m = args.period
+        sched_kwargs = dict(milestones=[i * m for i in range(1, m+1)], lrs=[args.lr_min] + [args.lr,args.lr_min] * int(m//2))
+        settings['lr']=args.lr_min
+    elif scheduler_name == 'damp':
+        Scheduler = schedulers.Piecewise
+        #i = 1 if args.debug else 10
+        m = args.period
+        n_waves = args.epochs // args.period
+        lr_lists = [[args.lr * 2 ** (-i),args.lr_min] for i in range(int(n_waves//2))]
+        sched_kwargs = dict(milestones=[i * m for i in range(1, n_waves+1)], lrs=[args.lr_min] + [x for l in lr_lists for x in l] )
+        settings['lr']=args.lr_min
     elif scheduler_name == 'lin':
         Scheduler = schedulers.Linear
         #i = 1 if args.debug else 10
-        sched_kwargs = dict(end_lr=0., endpoint=args.epochs)
+        sched_kwargs = dict(start_lr=args.lr, end_lr=args.lr_min, interval_length=args.epochs)
         #args.lr=0.
 
     else:

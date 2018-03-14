@@ -41,11 +41,12 @@ parser.add_argument("--experiment_time", type=int, default=1000000)
 
 # Optimization args
 parser.add_argument("--lr", type=float, default=.0005)
+parser.add_argument("--lr_min", type=float, default=.0000005)
 parser.add_argument("--decay", type=float, default=.5)
 parser.add_argument("--clip", type=float, default=None)
 parser.add_argument("--reg", type=float, default=.00001)
 parser.add_argument("--sched", type=str, default='m2')
-parser.add_argument("--period", type=int, default=5)
+parser.add_argument("--period", type=int, default=10)
 
 # computing args
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)

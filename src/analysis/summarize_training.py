@@ -86,6 +86,6 @@ def summarize_one_job_training(jobdir, email=False, verbose=False):
         print(out_str)
     if email:
         emailer = get_emailer()
-        emailer.send_msg(out_str, '{:.2f} ({}: training stats)'.format(headline, jobdir.split('/')[-1]), [statsfile])
+        emailer.send_msg(out_str, '{:.2f} ({}: training stats)'.format(headline, jobdir.split('/')[-1]), [])
         if verbose:
             print('Emailed: {}'.format(jobdir))
