@@ -140,8 +140,6 @@ model.add_argument("--dv", type=int, default=32)
 
 args = parser.parse_args()
 
-#args = reset_unused_args(args)
-
 
 arg_groups={}
 
@@ -153,7 +151,6 @@ os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 arg_groups['admin_args'].cmd_line_args = (' '.join(sys.argv))
 
 if __name__ == "__main__":
-    #import ipdb; ipdb.set_trace()
     if args.profile:
         cProfile.run('train(args)')
     else:

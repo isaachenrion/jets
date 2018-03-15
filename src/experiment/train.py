@@ -1,6 +1,6 @@
 import logging
 import time
-from memory_profiler import profile
+from memory_profiler import profile, memory_usage
 
 import torch
 import torch.optim
@@ -34,6 +34,7 @@ def train(
     loading_args=None,
     **kwargs
     ):
+
     #args = arg_groups[]
     t_start = time.time()
 
@@ -131,7 +132,7 @@ def train(
         lr = scheduler.get_lr()[0]
         logging.info("lr = %.8f" % lr)
         t0 = time.time()
-        
+
         for j, (x, y) in enumerate(train_data_loader):
             iteration += 1
 
@@ -140,9 +141,7 @@ def train(
             y_pred = model(x, logger=eh.stats_logger, epoch=i, iters=j, iters_left=n_batches-j-1)
             l = loss(y_pred, y)
             l.backward()
-            #for w in model.parameters():
-            #    print(w.grad)
-            #import ipdb; ipdb.set_trace()
+            
             train_losses.append(unwrap(l))
             if optim_args.clip is not None:
                 torch.nn.utils.clip_grad_norm(model.parameters(), optim_args.clip)

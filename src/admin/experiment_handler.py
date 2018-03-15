@@ -38,19 +38,15 @@ class ExperimentHandler:
             models_dir=None,
             **kwargs
             ):
-        #import ipdb; ipdb.set_trace()
 
         pid = os.getpid()
         host = socket.gethostname()
 
 
         passed_args = dict(**locals())
-
-        #import ipdb; ipdb.set_trace()
         kwargs = passed_args.pop('kwargs', None)
         passed_args.pop('self')
         passed_args.update(kwargs)
-        #import ipdb; ipdb.set_trace()
 
         self.models_dir = models_dir
         self.debug = debug
