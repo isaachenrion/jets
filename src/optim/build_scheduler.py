@@ -1,7 +1,7 @@
 import logging
 import torch
 from torch.optim import lr_scheduler
-from .schedulers import *
+from .schedulers import Piecewise, Linear, CosineAnnealingLR
 
 def build_scheduler(optimizer, sched=None, decay=None, lr_min=None, period=None, epochs=None, **kwargs):
     scheduler_name = sched
@@ -21,23 +21,23 @@ def build_scheduler(optimizer, sched=None, decay=None, lr_min=None, period=None,
         Scheduler = lr_scheduler.ExponentialLR
         sched_kwargs = dict(gamma=decay)
     elif scheduler_name == 'cos':
-        Scheduler = schedulers.CosineAnnealingLR
+        Scheduler = CosineAnnealingLR
         T_max = 3 if debug else period / 2
         sched_kwargs = dict(eta_min=lr, T_max=T_max)
         #settings['lr']=0.
     elif scheduler_name == 'trap':
-        Scheduler = schedulers.Piecewise
+        Scheduler = Piecewise
         i = 1 if debug else period
         sched_kwargs = dict(milestones=[i, epochs-i, epochs], lrs=[lr_min, lr, lr, lr_min])
         #settings['lr']=lr_min
     elif scheduler_name == 'lin-osc':
-        Scheduler = schedulers.Piecewise
+        Scheduler = Piecewise
         #i = 1 if debug else 10
         m = period
         sched_kwargs = dict(milestones=[i * m for i in range(1, m+1)], lrs=[lr_min] + [lr,lr_min] * int(m//2))
         #settings['lr']=lr_min
     elif scheduler_name == 'damp':
-        Scheduler = schedulers.Piecewise
+        Scheduler = Piecewise
         #i = 1 if debug else 10
         m = period
         n_waves = epochs // period
@@ -45,7 +45,7 @@ def build_scheduler(optimizer, sched=None, decay=None, lr_min=None, period=None,
         sched_kwargs = dict(milestones=[i * m for i in range(1, n_waves+1)], lrs=[lr_min] + [x for l in lr_lists for x in l] )
         #settings['lr']=lr_min
     elif scheduler_name == 'lin':
-        Scheduler = schedulers.Linear
+        Scheduler = Linear
         #i = 1 if debug else 10
         sched_kwargs = dict(start_lr=lr, end_lr=lr_min, interval_length=epochs)
         #lr=0.
