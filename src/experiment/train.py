@@ -1,5 +1,7 @@
 import logging
 import time
+from memory_profiler import profile
+
 import torch
 import torch.optim
 from torch.optim import lr_scheduler
@@ -21,6 +23,7 @@ from ..admin import ExperimentHandler
 from ..monitors.meta import Collect
 from ..loading.model import build_model
 
+@profile
 def train(
     admin_args=None,
     model_args=None,
@@ -128,6 +131,7 @@ def train(
         lr = scheduler.get_lr()[0]
         logging.info("lr = %.8f" % lr)
         t0 = time.time()
+        
         for j, (x, y) in enumerate(train_data_loader):
             iteration += 1
 

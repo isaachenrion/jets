@@ -38,14 +38,19 @@ class ExperimentHandler:
             models_dir=None,
             **kwargs
             ):
+        #import ipdb; ipdb.set_trace()
 
         pid = os.getpid()
         host = socket.gethostname()
 
-        passed_args = locals()
+
+        passed_args = dict(**locals())
+
+        #import ipdb; ipdb.set_trace()
         kwargs = passed_args.pop('kwargs', None)
         passed_args.pop('self')
         passed_args.update(kwargs)
+        import ipdb; ipdb.set_trace()
 
         self.models_dir = models_dir
         self.debug = debug
@@ -222,7 +227,7 @@ class ExperimentHandler:
         if np.isnan(self.stats_logger.monitors['inv_fpr'].value):
             logging.warning("NaN in 1/FPR\n")
 
-        out_str = "{:5f}\t~loss(train)={:.4f}\tloss(valid)={:.4f}\troc_auc(valid)={:.4f}".format(
+        out_str = "{:5}\t~loss(train)={:.4f}\tloss(valid)={:.4f}\troc_auc(valid)={:.4f}".format(
                 self.stats_logger.monitors['iteration'].value,
                 self.stats_logger.monitors['train_loss'].value,
                 self.stats_logger.monitors['valid_loss'].value,
