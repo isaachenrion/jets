@@ -71,7 +71,7 @@ def train(args):
     elif scheduler_name == 'trap':
         Scheduler = schedulers.Piecewise
         i = 1 if args.debug else args.period
-        sched_kwargs = dict(milestones=[i, args.epochs-i, args.epochs], lrs=[args.lr, args.lr, args.lr_min])
+        sched_kwargs = dict(milestones=[i, args.epochs-i, args.epochs], lrs=[args.lr_min, args.lr, args.lr, args.lr_min])
         settings['lr']=args.lr_min
     elif scheduler_name == 'lin-osc':
         Scheduler = schedulers.Piecewise

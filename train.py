@@ -48,6 +48,7 @@ parser.add_argument("--reg", type=float, default=.00001)
 parser.add_argument("--sched", type=str, default='m2')
 parser.add_argument("--period", type=int, default=10)
 # computing args
+
 parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)
 parser.add_argument("-g", "--gpu", type=str, default="")
 
