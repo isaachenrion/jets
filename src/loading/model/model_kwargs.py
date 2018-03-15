@@ -27,7 +27,7 @@ def construct_model_kwargs(args):
         'message': args.message,
         'emb_init':args.emb_init,
         'mp_layer':args.mp,
-        'symmetric':args.sym,
+        'symmetric':not args.asym,
         'readout':args.readout,
         'matrix':args.adj[0] if len(args.adj) == 1 else args.adj,
         'activation':args.m_act,
@@ -45,14 +45,14 @@ def construct_model_kwargs(args):
 
         # Physics plus learned NMP
         #'physics_component':args.physics_component,
-        'learned_tradeoff':args.learned_tradeoff,
+        'learned_tradeoff':not args.equal_weight,
 
         # Transformer
         'n_heads':args.n_heads,
         'n_layers':args.n_layers,
         'dq':args.dq,
         'dv':args.dv,
-        'dropout':args.dropout
+        'dropout':args.model_dropout
     }
     return model_kwargs
 

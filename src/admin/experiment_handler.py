@@ -157,39 +157,45 @@ class ExperimentHandler:
         best_inv_fpr = Best(inv_fpr)
         #inv_fpr_at_best_roc_auc = LogOnImprovement(inv_fpr, best_roc_auc)
         roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
-        epoch_counter = Regurgitate('epoch', visualizing=False)
-        batch_counter = Regurgitate('iteration', visualizing=False)
-        valid_loss = Regurgitate('valid_loss', visualizing=True)
-        train_loss = Regurgitate('train_loss', visualizing=True)
-        #prediction_histogram = EachClassHistogram([0,1], 'yy', 'yy_pred', append=False)
-        #logtimer = Regurgitate('logtime')
-        logtimer=Collect('logtime', fn='last', visualizing=False)
-        epoch_timer=Hours()
-        cumulative_timer=Collect('time', fn='sum', visualizing=False)
-        eta=ETA(self.start_dt, epochs)
 
-        model_file = os.path.join(self.exp_dir, 'model_state_dict.pt')
-        settings_file = os.path.join(self.exp_dir, 'settings.pickle')
-        saver = Saver(best_inv_fpr, model_file, settings_file, visualizing=False)
-
-        monitors = [
-            epoch_counter,
-            batch_counter,
+        metric_monitors = [
             roc_auc,
             inv_fpr,
             #best_roc_auc,
             best_inv_fpr,
             roc_auc_at_best_inv_fpr,
             #inv_fpr_at_best_roc_auc,
-            valid_loss,
-            train_loss,
-            saver,
-            #prediction_histogram,
-            logtimer,
-            cumulative_timer,
-            epoch_timer,
-            eta
+            Regurgitate('valid_loss', visualizing=True),
+            Regurgitate('train_loss', visualizing=True)
+
         ]
+
+        time_monitors = [
+            Regurgitate('epoch', visualizing=False),
+            Regurgitate('iteration', visualizing=False),
+            Collect('logtime', fn='last', visualizing=False),
+            Hours(),
+            Collect('time', fn='sum', visualizing=False),
+            ETA(self.start_dt, epochs)
+        ]
+
+        model_file = os.path.join(self.exp_dir, 'model_state_dict.pt')
+        settings_file = os.path.join(self.exp_dir, 'settings.pickle')
+        saver = Saver(best_inv_fpr, model_file, settings_file, visualizing=False)
+
+        admin_monitors = [
+            saver
+        ]
+
+        optim_monitors = [
+            Collect('lr', fn='last', visualizing=True),
+            GradNorm(fn='last',visualizing=True),
+            GradVariance(fn='last', visualizing=True),
+            ParamNorm(fn='last', visualizing=True),
+            ParamVariance(fn='last', visualizing=True),
+        ]
+
+        monitors = metric_monitors + optim_monitors + time_monitors + admin_monitors
 
         monitor_dict = OrderedDict()
         for m in monitors: monitor_dict[m.name] = m
@@ -200,8 +206,7 @@ class ExperimentHandler:
     def record_settings(self, passed_args):
         with open(os.path.join(self.root_dir, self.intermediate_dir, 'command.txt'), 'w') as f:
             #import ipdb; ipdb.set_trace()
-            out_str = (' '.join(self.cmd_line_args))
-            out_strs = out_str.split(' -')
+            out_strs = self.cmd_line_args.split(' -')
             for s in out_strs[1:]:
                 f.write('-{}\n'.format(s))
 
@@ -217,10 +222,10 @@ class ExperimentHandler:
         if np.isnan(self.stats_logger.monitors['inv_fpr'].value):
             logging.warning("NaN in 1/FPR\n")
 
-        out_str = "{:5d}\t~loss(train)={:.4f}\tloss(valid)={:.4f}\troc_auc(valid)={:.4f}".format(
-                kwargs['iteration'],
-                kwargs['train_loss'],
-                kwargs['valid_loss'],
+        out_str = "{:5f}\t~loss(train)={:.4f}\tloss(valid)={:.4f}\troc_auc(valid)={:.4f}".format(
+                self.stats_logger.monitors['iteration'].value,
+                self.stats_logger.monitors['train_loss'].value,
+                self.stats_logger.monitors['valid_loss'].value,
                 self.stats_logger.monitors['roc_auc'].value)
 
         out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.5f}".format(self.stats_logger.monitors['inv_fpr'].value, self.stats_logger.monitors['best_inv_fpr'].value)
