@@ -3,7 +3,7 @@ import torch
 from torch.optim import lr_scheduler
 from .schedulers import Piecewise, Linear, CosineAnnealingLR
 
-def build_scheduler(optimizer, sched=None, decay=None, lr_min=None, period=None, epochs=None, **kwargs):
+def build_scheduler(optimizer, sched=None, decay=None, lr=None, lr_min=None, period=None, epochs=None, **kwargs):
     scheduler_name = sched
     if scheduler_name == 'none':
         Scheduler = lr_scheduler.ExponentialLR
