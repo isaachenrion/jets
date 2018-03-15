@@ -39,6 +39,7 @@ def train(
     t_start = time.time()
 
     eh = ExperimentHandler(
+        train=True,
         **vars(admin_args),
         **vars(training_args),
         **vars(computing_args),
@@ -141,7 +142,7 @@ def train(
             y_pred = model(x, logger=eh.stats_logger, epoch=i, iters=j, iters_left=n_batches-j-1)
             l = loss(y_pred, y)
             l.backward()
-            
+
             train_losses.append(unwrap(l))
             if optim_args.clip is not None:
                 torch.nn.utils.clip_grad_norm(model.parameters(), optim_args.clip)
