@@ -190,11 +190,11 @@ class ExperimentHandler:
         ]
 
         optim_monitors = [
-            #Collect('lr', fn='last', visualizing=True),
+            Collect('lr', fn='last', visualizing=True),
             #GradNorm(fn='last',visualizing=True),
             #GradVariance(fn='last', visualizing=True),
-            #ParamNorm(fn='last', visualizing=True),
-            #ParamVariance(fn='last', visualizing=True),
+            ParamNorm(fn='last', visualizing=True),
+            ParamVariance(fn='last', visualizing=True),
         ]
 
         monitors = metric_monitors + optim_monitors + time_monitors + admin_monitors
