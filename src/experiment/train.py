@@ -147,7 +147,7 @@ def train(
             train_losses.append(unwrap(l))
             if optim_args.clip is not None:
                 torch.nn.utils.clip_grad_norm(model.parameters(), optim_args.clip)
-            optimizer.step()
+            optimizer.step()q
 
             ''' VALIDATION '''
             '''----------------------------------------------------------------------- '''
@@ -163,7 +163,7 @@ def train(
         scheduler.step()
 
 
-        if t1 - t_start > training_args.experiment_time - 60:
+        if t1 - t_start > training_args.experiment_time * 60 * 60 - 60:
             break
 
     eh.finished()
