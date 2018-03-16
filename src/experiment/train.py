@@ -35,10 +35,12 @@ def train(
     **kwargs
     ):
 
+    t_start = time.time()
+
+    ''' FIX ARGS AND CREATE EXPERIMENT HANDLER '''
+    '''----------------------------------------------------------------------- '''
+
     optim_args.epochs = training_args.epochs
-
-
-
 
     # handle debugging
     optim_args.debug = admin_args.debug
@@ -69,17 +71,14 @@ def train(
     if data_args.n_train <= 5 * data_args.n_valid and data_args.n_train > 0:
         data_args.n_valid = data_args.n_train // 5
 
-
-    #args = arg_groups[]
-    t_start = time.time()
+    all_args = vars(admin_args)
+    all_args.update(vars(training_args))
+    all_args.update(vars(computing_args))
+    all_args.update(vars(model_args))
+    all_args.update(vars(data_args))
 
     eh = ExperimentHandler(
-        train=True,
-        **vars(admin_args),
-        **vars(training_args),
-        **vars(computing_args),
-        **vars(model_args),
-        **vars(data_args)
+        train=True,**all_args
         )
 
     ''' DATA '''
@@ -116,10 +115,13 @@ def train(
     optimizer = build_optimizer(model, **vars(optim_args))
     scheduler = build_scheduler(optimizer, **vars(optim_args))
 
+    ''' LOSS AND VALIDATION '''
+    '''----------------------------------------------------------------------- '''
+
     def loss(y_pred, y):
         return F.binary_cross_entropy(y_pred.squeeze(1), y)
 
-    def callback(epoch, model, train_loss):
+    def validation(epoch, model, train_loss):
 
             t0 = time.time()
             model.eval()
@@ -177,23 +179,25 @@ def train(
             t_train = time.time()
             iteration += 1
 
+            # forward
             model.train()
             optimizer.zero_grad()
             y_pred = model(x, logger=eh.stats_logger, epoch=i, iters=j, iters_left=n_batches-j-1)
             l = loss(y_pred, y)
-            l.backward()
 
-            train_losses.append(unwrap(l))
+            # backward
+            l.backward()
             if optim_args.clip is not None:
                 torch.nn.utils.clip_grad_norm(model.parameters(), optim_args.clip)
             optimizer.step()
-            train_times.append(time.time() - t_train)
 
-            ''' VALIDATION '''
-            '''----------------------------------------------------------------------- '''
+            train_times.append(time.time() - t_train)
+            train_losses.append(unwrap(l))
+
+            # validation
             if iteration % n_batches == 0:
                 train_loss = np.mean(train_losses)
-                logdict = callback(i, model, train_loss)
+                logdict = validation(i, model, train_loss)
                 t_log = time.time()
                 eh.log(**logdict)
                 logging.warning("Logging took {:.1f} seconds".format(time.time() - t_log))
