@@ -35,7 +35,19 @@ def train(
     **kwargs
     ):
 
+    optim_args.epochs = training_args.epochs
+
+
+
+
     # handle debugging
+    optim_args.debug = admin_args.debug
+    model_args.debug = admin_args.debug
+    data_args.debug = admin_args.debug
+    computing_args.debug = admin_args.debug
+    loading_args.debug = admin_args.debug
+    training_args.debug = admin_args.debug
+
     if admin_args.debug:
         admin_args.no_email = True
         admin_args.verbose = True
