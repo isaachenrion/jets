@@ -50,7 +50,6 @@ def build_scheduler(optimizer, sched=None, decay=None, lr=None, lr_min=None, per
     else:
         raise ValueError("bad scheduler name: {}".format(scheduler_name))
 
-    logging.info('***********')
     logging.info('Scheduler is {}'.format(scheduler_name))
     for k, v in sched_kwargs.items(): logging.info('{}: {}'.format(k, v))
     logging.info('***********')

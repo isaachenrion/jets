@@ -76,6 +76,7 @@ def train(
     all_args.update(vars(computing_args))
     all_args.update(vars(model_args))
     all_args.update(vars(data_args))
+    all_args.update(vars(optim_args))
 
     eh = ExperimentHandler(
         train=True,**all_args
@@ -204,7 +205,7 @@ def train(
 
 
         mean_train_time = np.mean(train_times)
-        logging.warning("Training {} batches took {:.2f} seconds at {:.1f} batches per second".format(n_batches, n_batches * mean_train_time, 1/mean_train_time))
+        logging.warning("Training {} batches took {:.2f} seconds at {:.1f} examples per second".format(n_batches, n_batches * mean_train_time, training_args.batch_size/mean_train_time))
 
         t1 = time.time()
         logging.info("Epoch took {:.1f} seconds".format(t1-t0))
