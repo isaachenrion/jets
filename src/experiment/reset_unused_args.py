@@ -29,20 +29,10 @@ def reset_unused_args(args):
     args.experiment_time *= (60 * 60)
 
     args.train = True
-    if args.debug:
-        args.no_email = True
-        args.hidden = 7
-        args.batch_size = 5
-        args.verbose = True
-        args.epochs = 10
-        args.n_train = 1000
-        args.seed = 1
-        args.lf = 1
-        args.iters = 2
 
 
-    if args.n_train <= 5 * args.n_valid and args.n_train > 0:
-        args.n_valid = args.n_train // 5
+
+
 
     #if args.pileup:
     #    args.dataset = 'pileup'

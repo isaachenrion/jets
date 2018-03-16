@@ -22,23 +22,21 @@ def build_scheduler(optimizer, sched=None, decay=None, lr=None, lr_min=None, per
         sched_kwargs = dict(gamma=decay)
     elif scheduler_name == 'cos':
         Scheduler = CosineAnnealingLR
-        T_max = 3 if debug else period / 2
+        T_max = period / 2
         sched_kwargs = dict(eta_min=lr, T_max=T_max)
         #settings['lr']=0.
     elif scheduler_name == 'trap':
         Scheduler = Piecewise
-        i = 1 if debug else period
+        i = period
         sched_kwargs = dict(milestones=[i, epochs-i, epochs], lrs=[lr_min, lr, lr, lr_min])
         #settings['lr']=lr_min
     elif scheduler_name == 'lin-osc':
         Scheduler = Piecewise
-        #i = 1 if debug else 10
         m = period
         sched_kwargs = dict(milestones=[i * m for i in range(1, m+1)], lrs=[lr_min] + [lr,lr_min] * int(m//2))
         #settings['lr']=lr_min
     elif scheduler_name == 'damp':
         Scheduler = Piecewise
-        #i = 1 if debug else 10
         m = period
         n_waves = epochs // period
         lr_lists = [[lr * decay ** (i),lr_min] for i in range(int(n_waves//2))]
@@ -46,7 +44,6 @@ def build_scheduler(optimizer, sched=None, decay=None, lr=None, lr_min=None, per
         #settings['lr']=lr_min
     elif scheduler_name == 'lin':
         Scheduler = Linear
-        #i = 1 if debug else 10
         sched_kwargs = dict(start_lr=lr, end_lr=lr_min, interval_length=epochs)
         #lr=0.
 

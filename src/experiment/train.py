@@ -35,6 +35,29 @@ def train(
     **kwargs
     ):
 
+    # handle debugging
+    if admin_args.debug:
+        admin_args.no_email = True
+        admin_args.verbose = True
+
+        training_args.batch_size = 100
+        training_args.epochs = 10
+
+        data_args.n_train = 2000
+
+        optim_args.lr = 0.1
+        optim_args.period = 2
+
+        computing_args.seed = 1
+
+        model_args.hidden = 1
+        model_args.iters = 1
+        model_args.lf = 2
+
+    if data_args.n_train <= 5 * data_args.n_valid and data_args.n_train > 0:
+        data_args.n_valid = data_args.n_train // 5
+
+
     #args = arg_groups[]
     t_start = time.time()
 
@@ -98,11 +121,13 @@ def train(
                 yy.append(yv); yy_pred.append(y_pred)
 
             #valid_loss.backward()
+            valid_loss /= len(valid_data_loader)
 
             yy = np.concatenate(yy, 0)
             yy_pred = np.concatenate(yy_pred, 0)
 
             t1=time.time()
+            logging.warning('Validation took {:.1f} seconds'.format(t1-t0))
 
             logdict = dict(
                 epoch=epoch,
@@ -127,7 +152,6 @@ def train(
     logging.warning("Training...")
     iteration=1
     n_batches = len(train_data_loader)
-    train_losses = []
 
     for i in range(training_args.epochs):
         logging.info("epoch = %d" % i)
@@ -135,7 +159,10 @@ def train(
         logging.info("lr = %.8f" % lr)
         t0 = time.time()
 
+        train_losses = []
+        train_times = []
         for j, (x, y) in enumerate(train_data_loader):
+            t_train = time.time()
             iteration += 1
 
             model.train()
@@ -147,18 +174,25 @@ def train(
             train_losses.append(unwrap(l))
             if optim_args.clip is not None:
                 torch.nn.utils.clip_grad_norm(model.parameters(), optim_args.clip)
-            optimizer.step()q
+            optimizer.step()
+            train_times.append(time.time() - t_train)
 
             ''' VALIDATION '''
             '''----------------------------------------------------------------------- '''
             if iteration % n_batches == 0:
                 train_loss = np.mean(train_losses)
                 logdict = callback(i, model, train_loss)
+                t_log = time.time()
                 eh.log(**logdict)
-                train_losses = []
+                logging.warning("Logging took {:.1f} seconds".format(time.time() - t_log))
+
+
+        mean_train_time = np.mean(train_times)
+        logging.warning("Training {} batches took {:.2f} seconds at {:.1f} batches per second".format(n_batches, mean_train_time, n_batches/mean_train_time))
 
         t1 = time.time()
         logging.info("Epoch took {:.1f} seconds".format(t1-t0))
+        logging.info('*'.center(80, '*'))
 
         scheduler.step()
 

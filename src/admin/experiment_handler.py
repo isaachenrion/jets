@@ -4,6 +4,7 @@ import os
 import datetime
 import numpy as np
 import socket
+import time
 import shutil
 
 from collections import OrderedDict
@@ -193,8 +194,8 @@ class ExperimentHandler:
             Collect('lr', fn='last', visualizing=True),
             #GradNorm(fn='last',visualizing=True),
             #GradVariance(fn='last', visualizing=True),
-            ParamNorm(fn='last', visualizing=True),
-            ParamVariance(fn='last', visualizing=True),
+            #ParamNorm(fn='last', visualizing=True),
+            #ParamVariance(fn='last', visualizing=True),
         ]
 
         monitors = metric_monitors + optim_monitors + time_monitors + admin_monitors
@@ -218,7 +219,9 @@ class ExperimentHandler:
         logging.warning("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
 
     def log(self, **kwargs):
+
         self.stats_logger.log(**kwargs)
+        #t_log = time.time()
         if kwargs['epoch'] == 1 and self.emailer is not None:
             self.emailer.send_msg(self.stats_logger.monitors['eta'].value, "Job {}-{} on {} ETA: {}".format(self.slurm_array_job_id, self.slurm_array_task_id, self.host.split('.')[0], self.stats_logger.monitors['eta'].value))
         if np.isnan(self.stats_logger.monitors['inv_fpr'].value):
@@ -233,6 +236,7 @@ class ExperimentHandler:
         out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.5f}".format(self.stats_logger.monitors['inv_fpr'].value, self.stats_logger.monitors['best_inv_fpr'].value)
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)
+        #logging.warning("Time in exp_handler log {:.1f} seconds".format(time.time() - t_log))
 
     def save(self, model, settings):
         self.saver.save(model, settings)
