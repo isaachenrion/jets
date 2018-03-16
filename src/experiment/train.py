@@ -204,7 +204,7 @@ def train(
 
 
         mean_train_time = np.mean(train_times)
-        logging.warning("Training {} batches took {:.2f} seconds at {:.1f} batches per second".format(n_batches, mean_train_time, n_batches/mean_train_time))
+        logging.warning("Training {} batches took {:.2f} seconds at {:.1f} batches per second".format(n_batches, n_batches * mean_train_time, 1/mean_train_time))
 
         t1 = time.time()
         logging.info("Epoch took {:.1f} seconds".format(t1-t0))
