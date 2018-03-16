@@ -93,7 +93,7 @@ def train(
             yy, yy_pred = [], []
             for i, (x, y) in enumerate(valid_data_loader):
                 y_pred = model(x)
-                vl = loss(y_pred, y); valid_loss += vl
+                vl = loss(y_pred, y); valid_loss += unwrap(vl)
                 yv = unwrap(y); y_pred = unwrap(y_pred)
                 yy.append(yv); yy_pred.append(y_pred)
 
