@@ -16,4 +16,4 @@ from .time_monitors import Hours
 
 from .batch_matrix_monitor import BatchMatrixMonitor
 
-from .optim import *
+from .optim_monitors import *

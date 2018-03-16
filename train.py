@@ -47,8 +47,8 @@ loading.add_argument("-r", "--restart", help="restart a loaded model from where 
 '''
 # Training args
 training = parser.add_argument_group('training')
-training.add_argument("-e", "--epochs", type=int, default=50)
-training.add_argument("-b", "--batch_size", type=int, default=100)
+training.add_argument("-e", "--epochs", type=int, default=64)
+training.add_argument("-b", "--batch_size", type=int, default=128)
 training.add_argument("--experiment_time", type=int, default=1000000)
 
 '''
@@ -62,7 +62,7 @@ optim.add_argument("--decay", type=float, default=.5)
 optim.add_argument("--clip", type=float, default=None)
 optim.add_argument("--reg", type=float, default=.00001)
 optim.add_argument("--sched", type=str, default='m2')
-optim.add_argument("--period", type=int, default=10)
+optim.add_argument("--period", type=int, default=8)
 optim.add_argument("--momentum", type=float, default=0.0)
 optim.add_argument("--optim", type=str, default='adam')
 

@@ -122,7 +122,7 @@ def train(
     def loss(y_pred, y):
         return F.binary_cross_entropy(y_pred.squeeze(1), y)
 
-    def validation(epoch, model, train_loss):
+    def validation(epoch, model, **train_dict):
 
             t0 = time.time()
             model.eval()
@@ -142,7 +142,6 @@ def train(
             yy_pred = np.concatenate(yy_pred, 0)
 
             t1=time.time()
-            logging.warning('Validation took {:.1f} seconds'.format(t1-t0))
 
             logdict = dict(
                 epoch=epoch,
@@ -150,7 +149,6 @@ def train(
                 yy=yy,
                 yy_pred=yy_pred,
                 w_valid=valid_dataset.weights,
-                train_loss=train_loss,
                 valid_loss=valid_loss,
                 settings=settings,
                 model=model,
@@ -158,6 +156,7 @@ def train(
                 time=((t1-t_start)),
                 lr=scheduler.get_lr()[0],
             )
+            logdict.update(train_dict)
             model.train()
             return logdict
 
@@ -190,7 +189,10 @@ def train(
             l.backward()
             if optim_args.clip is not None:
                 torch.nn.utils.clip_grad_norm(model.parameters(), optim_args.clip)
+            old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
+            grads = torch.cat([p.grad.view(-1) for p in model.parameters()], 0)
             optimizer.step()
+            new_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
 
             train_times.append(time.time() - t_train)
             train_losses.append(unwrap(l))
@@ -198,14 +200,23 @@ def train(
             # validation
             if iteration % n_batches == 0:
                 train_loss = np.mean(train_losses)
-                logdict = validation(i, model, train_loss)
+                t_valid = time.time()
+                logdict = validation(
+                            i, model,
+                            train_loss=train_loss,
+                            grads=grads,
+                            old_params=old_params,
+                            model_params=new_params,
+                            )
+                logging.warning("Validation took {:.1f} seconds".format(time.time() - t_valid))
+
                 t_log = time.time()
                 eh.log(**logdict)
                 logging.warning("Logging took {:.1f} seconds".format(time.time() - t_log))
 
 
         mean_train_time = np.mean(train_times)
-        logging.warning("Training {} batches took {:.2f} seconds at {:.1f} examples per second".format(n_batches, n_batches * mean_train_time, training_args.batch_size/mean_train_time))
+        logging.warning("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, n_batches * mean_train_time, training_args.batch_size/mean_train_time))
 
         t1 = time.time()
         logging.info("Epoch took {:.1f} seconds".format(t1-t0))
