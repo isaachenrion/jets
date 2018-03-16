@@ -96,7 +96,8 @@ def train(
                 vl = loss(y_pred, y); valid_loss += vl
                 yv = unwrap(y); y_pred = unwrap(y_pred)
                 yy.append(yv); yy_pred.append(y_pred)
-            valid_loss.backward()
+
+            #valid_loss.backward()
 
             yy = np.concatenate(yy, 0)
             yy_pred = np.concatenate(yy_pred, 0)
