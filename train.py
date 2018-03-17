@@ -56,10 +56,10 @@ training.add_argument("--experiment_time", type=int, default=1000000)
 '''
 # Optimization args
 optim = parser.add_argument_group('optim')
-optim.add_argument("--lr", type=float, default=.0005)
+optim.add_argument("--lr", type=float, default=.001)
 optim.add_argument("--lr_min", type=float, default=.0000005)
 optim.add_argument("--decay", type=float, default=.5)
-optim.add_argument("--clip", type=float, default=None)
+optim.add_argument("--clip", type=float, default=1.0)
 optim.add_argument("--reg", type=float, default=.00001)
 optim.add_argument("--sched", type=str, default='m2')
 optim.add_argument("--period", type=int, default=8)
