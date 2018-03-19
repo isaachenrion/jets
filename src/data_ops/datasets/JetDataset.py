@@ -86,7 +86,7 @@ class JetDataset(Dataset):
 
             delta_phi = abs(j.phi - j.photon_phi)
             if delta_phi > math.pi:
-                delta_phi = math.pi - delta_phi
+                delta_phi = delta_phi - math.pi
             if delta_phi <= delta_phi_min:
                 good = False
                 delta_phi_filter += 1
