@@ -5,8 +5,6 @@ import numpy as np
 
 from .io import load_jets_from_pickle, save_jets_to_pickle
 from .datasets import JetDataset
-from .preprocessing import crop_dataset
-
 
 def load_jets(data_dir, filename, redo=False):
     #preprocessed_dir = os.path.join(data_dir, 'preprocessed')
@@ -30,31 +28,38 @@ def load_jets(data_dir, filename, redo=False):
 
         preprocess(raw_data_dir, preprocessed_dir, filename)
 
-        logging.warning("Preprocessed the data and saved it to {}".format(path_to_preprocessed))
+        logging.warning("\tPreprocessed the data and saved it to {}".format(path_to_preprocessed))
     else:
-        logging.warning("Data loaded and already preprocessed")
+        logging.warning("\tData loaded and already preprocessed")
 
     jets = load_jets_from_pickle(path_to_preprocessed)
     return jets
 
 
-def load_train_dataset(data_dir, filename, n_train, n_valid, pileup, redo):
+def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
+    problem = data_dir.split('/')[-1]
+    subproblem = filename
+
     logging.warning("Loading data...")
     filename = "{}-train.pickle".format(filename)
     jets = load_jets(data_dir, filename, redo)
     jets = jets[:n_train]
+
+
     logging.warning("Splitting into train and validation...")
 
     train_jets = jets[n_valid:]
-    train_dataset = JetDataset(train_jets)
+    train_dataset = JetDataset(train_jets, problem=problem, subproblem=subproblem)
 
     valid_jets = jets[:n_valid]
-    valid_dataset = JetDataset(valid_jets)
+    valid_dataset = JetDataset(valid_jets, problem=problem, subproblem=subproblem)
+
+    logging.warning("\tpre-cropping train size = %d" % len(train_dataset))
+    logging.warning("\tpre-cropping valid size = %d" % len(valid_dataset))
 
     # crop validation set and add the excluded data to the training set
-    if 'w-vs-qcd' in data_dir:
-        valid_dataset, cropped_dataset = crop_dataset(valid_dataset, pileup)
-        train_dataset.extend(cropped_dataset)
+    cropped_dataset = valid_dataset.crop()
+    train_dataset.extend(cropped_dataset)
 
     # add cropped indices to training data
     logging.warning("\tfinal train size = %d" % len(train_dataset))
@@ -62,7 +67,7 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, pileup, redo):
 
     return train_dataset, valid_dataset
 
-def load_test_dataset(data_dir, filename, n_test, pileup, redo):
+def load_test_dataset(data_dir, filename, n_test, redo):
     logging.warning("Loading test data...")
     filename = "{}-test.pickle".format(filename)
     jets = load_jets(data_dir, filename, redo)
@@ -72,7 +77,7 @@ def load_test_dataset(data_dir, filename, n_test, pileup, redo):
 
     # crop validation set and add the excluded data to the training set
     if 'w-vs-qcd' in data_dir:
-        dataset, _ = crop_dataset(dataset, pileup)
+        dataset, _ = crop_dataset(dataset)
 
     # add cropped indices to training data
     logging.warning("\tfinal test size = %d" % len(dataset))

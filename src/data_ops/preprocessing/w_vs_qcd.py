@@ -2,12 +2,10 @@ import os
 import pickle
 import numpy as np
 
-from ..Jet import Jet
 from .extract_four_vectors import extract_four_vectors
-from ..io import save_jets_to_pickle
+from ..io import save_jet_dicts_to_pickle
 
 from sklearn.preprocessing import RobustScaler
-#from ..old.preprocessing import rewrite_content, permute_by_pt
 
 def _pt(v):
     pz = v[2]
@@ -63,7 +61,7 @@ def rewrite_content(jet):
 
     return jet
 
-def convert_to_jet(x, y):
+def convert_to_jet_dict(x, y):
     x = permute_by_pt(rewrite_content(x))
 
     tree_content = x['content']
@@ -80,7 +78,7 @@ def convert_to_jet(x, y):
     #constituents = extract_four_vectors(np.stack([tree_content[i] for i in outers], 0))
     progenitor = 'w' if y == 1 else 'qcd'
 
-    jet = Jet(
+    jet_dict = dict(
         progenitor=progenitor,
         constituents=constituents,
         mass=mass,
@@ -92,23 +90,23 @@ def convert_to_jet(x, y):
         root_id=root_id,
         tree_content=tree_content
     )
-    return jet
+    return jet_dict
 
 def preprocess(raw_data_dir, preprocessed_dir, filename):
 
     raw_filename = os.path.join(raw_data_dir, filename)
     with open(raw_filename, 'rb') as f:
         X, Y = pickle.load(f, encoding='latin-1')
-    jets = [convert_to_jet(x, y) for x, y in zip(X, Y)]
+    jet_dicts = [convert_to_jet_dict(x, y) for x, y in zip(X, Y)]
 
     new_jets = []
-    tf = RobustScaler().fit(np.vstack([jet.constituents for jet in jets]))
-    for ij, jet in enumerate(jets):
-        jet.constituents = tf.transform(jet.constituents)
-        new_jets.append(jet)
-    jets = new_jets
+    tf = RobustScaler().fit(np.vstack([jet_dict['constituents'] for jet_dict in jet_dicts]))
+    for ij, jet_dict in enumerate(jet_dicts):
+        jet_dict['constituents'] = tf.transform(jet_dict['constituents'])
+        new_jets.append(jet_dict)
+    jet_dicts = new_jet_dicts
 
-    save_jets_to_pickle(jets, os.path.join(preprocessed_dir, filename))
+    save_jet_dicts_to_pickle(jet_dicts, os.path.join(preprocessed_dir, filename))
 
 
     return None
