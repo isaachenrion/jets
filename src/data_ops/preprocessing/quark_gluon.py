@@ -120,18 +120,18 @@ def preprocess(raw_data_dir, preprocessed_dir, filename):
     # split into train and test
     test_fraction = 0.1
     n_test = int(len(jet_dicts) * test_fraction)
-    test_jets = jet_dicts[:n_test]
-    train_jets = jet_dicts[n_test:]
+    test_jet_dicts = jet_dicts[:n_test]
+    train_jet_dicts = jet_dicts[n_test:]
 
-    tf = RobustScaler().fit(np.vstack([jet['constituents'] for jet_dict in train_jet_dicts]))
+    tf = RobustScaler().fit(np.vstack([jet_dict['constituents'] for jet_dict in train_jet_dicts]))
 
     new_test_jet_dicts, new_train_jet_dicts = [], []
     for i, jet_dict in enumerate(jet_dicts):
         jet_dict['constituents'] = tf.transform(jet_dict['constituents'])
         if i < n_test:
-            new_test_jets.append(jet_dict)
+            new_test_jet_dicts.append(jet_dict)
         else:
-            new_train_jets.append(jet_dict)
+            new_train_jet_dicts.append(jet_dict)
 
     save_jet_dicts_to_pickle(new_train_jet_dicts, os.path.join(preprocessed_dir, env_type + '-train.pickle'))
     save_jet_dicts_to_pickle(new_test_jet_dicts, os.path.join(preprocessed_dir, env_type + '-test.pickle'))

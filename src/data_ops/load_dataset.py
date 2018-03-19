@@ -43,23 +43,36 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
     logging.warning("Loading data...")
     filename = "{}-train.pickle".format(filename)
     jets = load_jets(data_dir, filename, redo)
-    jets = jets[:n_train]
 
+    logging.warning("Found {} jets in total".format(len(jets)))
 
     logging.warning("Splitting into train and validation...")
 
-    train_jets = jets[n_valid:]
-    train_dataset = JetDataset(train_jets, problem=problem, subproblem=subproblem)
+    all_jet_dataset = JetDataset(jets, problem=problem,subproblem=subproblem)
 
-    valid_jets = jets[:n_valid]
+    cropped_jets = all_jet_dataset.crop()
+
+    logging.warning("\tcropped {} jets".format(len(cropped_jets)))
+
+    train_jets = all_jet_dataset.jets[n_valid:]
+    valid_jets = all_jet_dataset.jets[:n_valid]
+
+    train_jets += cropped_jets
+    train_jets = train_jets[:n_train]
+
+    train_dataset = JetDataset(train_jets, problem=problem, subproblem=subproblem)
+    train_dataset.shuffle()
+
     valid_dataset = JetDataset(valid_jets, problem=problem, subproblem=subproblem)
 
-    logging.warning("\tpre-cropping train size = %d" % len(train_dataset))
-    logging.warning("\tpre-cropping valid size = %d" % len(valid_dataset))
+    #train_dataset.extend(cropped_dataset)
 
-    # crop validation set and add the excluded data to the training set
-    cropped_dataset = valid_dataset.crop()
-    train_dataset.extend(cropped_dataset)
+
+    #train_jets = jets[n_valid:]
+
+    #logging.warning("\tpre-cropping train size = %d" % len(train_dataset))
+    #logging.warning("\tpre-cropping valid size = %d" % len(valid_dataset))
+
 
     # add cropped indices to training data
     logging.warning("\tfinal train size = %d" % len(train_dataset))

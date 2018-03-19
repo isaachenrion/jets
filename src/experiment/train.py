@@ -189,30 +189,34 @@ def train(
             l.backward()
             if optim_args.clip is not None:
                 torch.nn.utils.clip_grad_norm(model.parameters(), optim_args.clip)
-            old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
-            grads = torch.cat([p.grad.view(-1) for p in model.parameters()], 0)
+
+            if iteration % n_batches == 0:
+                old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
+                grads = torch.cat([p.grad.view(-1) for p in model.parameters()], 0)
+
             optimizer.step()
-            new_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
+
+            if iteration % n_batches == 0:
+                new_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
 
             train_times.append(time.time() - t_train)
             train_losses.append(unwrap(l))
 
-            # validation
-            if iteration % n_batches == 0:
-                train_loss = np.mean(train_losses)
-                t_valid = time.time()
-                logdict = validation(
-                            i, model,
-                            train_loss=train_loss,
-                            grads=grads,
-                            old_params=old_params,
-                            model_params=new_params,
-                            )
-                logging.warning("Validation took {:.1f} seconds".format(time.time() - t_valid))
+        # validation
+        train_loss = np.mean(train_losses)
+        t_valid = time.time()
+        logdict = validation(
+                    i, model,
+                    train_loss=train_loss,
+                    grads=grads,
+                    old_params=old_params,
+                    model_params=new_params,
+                    )
+        logging.warning("Validation took {:.1f} seconds".format(time.time() - t_valid))
 
-                t_log = time.time()
-                eh.log(**logdict)
-                logging.warning("Logging took {:.1f} seconds".format(time.time() - t_log))
+        t_log = time.time()
+        eh.log(**logdict)
+        logging.warning("Logging took {:.1f} seconds".format(time.time() - t_log))
 
 
         mean_train_time = np.mean(train_times)

@@ -1,6 +1,7 @@
 import logging
 from torch.utils.data import Dataset
 import numpy as np
+import math
 
 class JetDataset(Dataset):
     def __init__(self, jets, weights=None, problem=None, subproblem=None):
@@ -16,6 +17,13 @@ class JetDataset(Dataset):
     def __getitem__(self, idx):
         return self.jets[idx], self.jets[idx].y
 
+    def shuffle(self):
+        perm = np.random.permutation(len(self.jets))
+        self.jets = [self.jets[i] for i in perm]
+        #self.y = [self.y[i] for i in perm]
+        if self.weights is not None:
+            self.weights = [self.weights[i] for i in perm]
+
     @property
     def dim(self):
         return self.jets[0].constituents.shape[1]
@@ -30,10 +38,9 @@ class JetDataset(Dataset):
     def crop(self):
 
         good_jets, bad_jets, w = self._crop()
-        cropped_dataset = JetDataset(bad_jets)
         self.jets = good_jets
         self.weights = w
-        return cropped_dataset
+        return bad_jets
 
     def _crop(self):
         logging.info('Cropping dataset...')
@@ -48,24 +55,54 @@ class JetDataset(Dataset):
     def _crop_quark_gluon(self):
         jets = self.jets
         #logging.warning("Cropping...")
-        pt_min, pt_max = 50
+        pt_min = 50
         eta_max = 1.5
-        photon_pt_min = 150
+        photon_pt_min = 100
         delta_phi_min = 2 * math.pi / 3
 
         good_jets = []
         bad_jets = []
         #good_indices = []
+        pt_filter = 0
+        eta_filter = 0
+        photon_pt_filter = 0
+        photon_eta_filter = 0
+        delta_phi_filter = 0
+
         for i, j in enumerate(jets):
-            if j.pt > pt_min \
-                and abs(j.eta) < eta_max \
-                and j.photon_pt > photon_pt_min \
-                and abs(j.photon_eta) < eta_max \
-                and abs(j.phi - j.photon_phi) > delta_phi_min:
+            good = True
+            if j.pt <= pt_min:
+                good = False
+                pt_filter += 1
+            if abs(j.eta) >= eta_max:
+                good = False
+                eta_filter += 1
+            if abs(j.photon_eta) >= eta_max:
+                good = False
+                photon_eta_filter += 1
+            if j.photon_pt <= photon_pt_min:
+                good = False
+                photon_pt_filter += 1
+
+            delta_phi = abs(j.phi - j.photon_phi)
+            if delta_phi > math.pi:
+                delta_phi = math.pi - delta_phi
+            if delta_phi <= delta_phi_min:
+                good = False
+                delta_phi_filter += 1
+
+            if good:
                 good_jets.append(j)
             else:
                 bad_jets.append(j)
 
+        logging.warning('applied cuts to {} jets'.format(len(jets)))
+
+        logging.warning('bad pt = {}'.format(pt_filter))
+        logging.warning('bad eta = {}'.format(eta_filter))
+        logging.warning('bad photon_pt = {}'.format(photon_pt_filter))
+        logging.warning('bad photon_eta = {}'.format(photon_eta_filter))
+        logging.warning('bad delta_phi = {}'.format(delta_phi_filter))
 
         return good_jets, bad_jets, None
 

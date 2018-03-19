@@ -99,11 +99,11 @@ def preprocess(raw_data_dir, preprocessed_dir, filename):
         X, Y = pickle.load(f, encoding='latin-1')
     jet_dicts = [convert_to_jet_dict(x, y) for x, y in zip(X, Y)]
 
-    new_jets = []
+    new_jet_dicts = []
     tf = RobustScaler().fit(np.vstack([jet_dict['constituents'] for jet_dict in jet_dicts]))
     for ij, jet_dict in enumerate(jet_dicts):
         jet_dict['constituents'] = tf.transform(jet_dict['constituents'])
-        new_jets.append(jet_dict)
+        new_jet_dicts.append(jet_dict)
     jet_dicts = new_jet_dicts
 
     save_jet_dicts_to_pickle(jet_dicts, os.path.join(preprocessed_dir, filename))
