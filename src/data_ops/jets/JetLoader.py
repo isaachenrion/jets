@@ -2,8 +2,11 @@ import numpy as np
 import torch
 from torch.autograd import Variable
 
-from ._DataLoader import _DataLoader
+from ..utils import _DataLoader
+from ..utils import pad_tensors
+from ..utils import dropout
 from ..wrapping import wrap
+
 
 class JetLoader(_DataLoader):
     def __init__(self, dataset, batch_size):
@@ -24,37 +27,15 @@ class LeafJetLoader(JetLoader):
 
     def preprocess_x(self, x_list):
         if self.permute_particles:
-            data = [torch.from_numpy(np.random.permutation(x.constituents)) for x in x_list]
+            data = [torch.from_numpy(np.random.permutation(x)) for x in x_list]
         else:
-            data = [torch.from_numpy(x.constituents) for x in x_list]
+            data = [torch.from_numpy(x) for x in x_list]
 
-        # dropout
         if self.dropout is not None:
-            for i, x in enumerate(x_list):
-                dm = torch.bernoulli(torch.zeros(x.constituents.shape[0]).fill_(self.dropout)).byte()
-                while dm.sum() == 0:
-                    dm = torch.bernoulli(torch.zeros(x.constituents.shape[0]).fill_(self.dropout)).byte()
-                data[i] = torch.masked_select(data[i], dm.unsqueeze(1).repeat(1, data[i].shape[1])).view(-1, self.dataset.dim)
+            data = dropout(data, self.dropout)
 
-        seq_lengths = [len(x) for x in data]
-        max_seq_length = max(seq_lengths)
-        padded_data = torch.zeros(len(data), max_seq_length, self.dataset.dim+1)
-        for i, x in enumerate(data):
-            len_x = len(x)
-            padded_data[i, :len_x, :self.dataset.dim] = x
-            if len_x < max_seq_length:
-                padded_data[i, len(x):, -1] = 1
-        padded_data = wrap(padded_data)
+        return pad_tensors(data)
 
-        mask = torch.ones(len(data), max_seq_length, max_seq_length)
-        for i, x in enumerate(data):
-            seq_length = len(x)
-            if seq_length < max_seq_length:
-                mask[i, seq_length:, :].fill_(0)
-                mask[i, :, seq_length:].fill_(0)
-        mask = wrap(mask)
-
-        return (padded_data, mask)
 
 class TreeJetLoader(JetLoader):
     def __init__(self, dataset, batch_size,**kwargs):

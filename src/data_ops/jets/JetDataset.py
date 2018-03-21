@@ -15,7 +15,7 @@ class JetDataset(Dataset):
         return len(self.jets)
 
     def __getitem__(self, idx):
-        return self.jets[idx], self.jets[idx].y
+        return self.jets[idx].constituents, self.jets[idx].y
 
     def shuffle(self):
         perm = np.random.permutation(len(self.jets))

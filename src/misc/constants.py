@@ -27,6 +27,7 @@ DATASETS = {
     'wp':(w_vs_qcd,'antikt-kt-pileup25-new'),
     'pp': (quark_gluon,'pp'),
     'pbpb': (quark_gluon,'pbpb'),
+    'protein': ('proteins', 'casp11')
     #'quark_pp':(quark_gluon,'quark_pp'),
     #'quark_pbpb':(quark_gluon,'quark_pbpb'),
     #'gluon_pbpb':(quark_gluon,'gluon_pbpb'),
