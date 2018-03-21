@@ -26,6 +26,7 @@ class LeafJetLoader(JetLoader):
         self.permute_particles = permute_particles
 
     def preprocess_x(self, x_list):
+        x_list = [x.constituents for x in x_list]
         if self.permute_particles:
             data = [torch.from_numpy(np.random.permutation(x)) for x in x_list]
         else:
