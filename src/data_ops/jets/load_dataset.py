@@ -60,6 +60,7 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo, no_cropped):
     valid_jets = all_jet_dataset.jets[:n_valid]
 
     if not no_cropped:
+        logging.warning("\tUsing cropped jets as well as good ones for training")
         train_jets += cropped_jets
     if n_train > 0:
         train_jets = train_jets[:n_train]
