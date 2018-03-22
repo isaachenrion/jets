@@ -63,7 +63,7 @@ class ExperimentHandler:
         self.host = host
         self.train = train
 
-        self.cuda_and_random_seed(gpu, seed)
+        self.cuda_and_random_seed(gpu, seed, passed_args)
         self.create_all_model_dirs()
         self.setup_model_directory(dataset, model)
         self.setup_logging(silent, verbose)
@@ -72,7 +72,7 @@ class ExperimentHandler:
         self.record_settings(passed_args)
         self.initial_email()
 
-    def cuda_and_random_seed(self, gpu, seed):
+    def cuda_and_random_seed(self, gpu, seed, passed_args):
         if gpu != "" and torch.cuda.is_available():
             torch.cuda.device(gpu)
 
@@ -88,6 +88,10 @@ class ExperimentHandler:
 
         self.seed = seed
         self.gpu = gpu
+
+        passed_args['seed'] = self.seed
+        passed_args['gpu'] = self.gpu
+
 
     def setup_model_directory(self, dataset, model):
         self.current_dir = RUNNING_MODELS_DIR
@@ -219,10 +223,11 @@ class ExperimentHandler:
 
         for k, v in sorted(passed_args.items()): logging.warning('\t{} = {}'.format(k, v))
 
+        logging.warning("\n")
         logging.warning("Git commit = {}".format(get_git_revision_short_hash()))
         logging.warning("\tPID = {}".format(self.pid))
         logging.warning("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
-
+        
     def log(self, **kwargs):
 
         self.stats_logger.log(**kwargs)

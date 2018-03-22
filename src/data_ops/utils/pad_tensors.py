@@ -1,13 +1,19 @@
 import torch
-from ..wrapping import wrap
+from src.data_ops.wrapping import wrap
 
 def pad_tensors(tensor_list):
     data = tensor_list
 
     data_dim = data[0].size()[-1]
+
     seq_lengths = [len(x) for x in data]
     max_seq_length = max(seq_lengths)
-    padded_data = torch.zeros(len(data), max_seq_length, data_dim+1)
+    invariant_data_size = data[0].size()[2:]
+    if len(invariant_data_size) > 0:
+        extra_dims = invariant_data_size
+        padded_data = torch.zeros(len(data), max_seq_length, data_dim+1, *extra_dims, )
+    else:
+        padded_data = torch.zeros(len(data), max_seq_length, data_dim+1)
     for i, x in enumerate(data):
         len_x = len(x)
         padded_data[i, :len_x, :data_dim] = x

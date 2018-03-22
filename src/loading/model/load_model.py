@@ -8,7 +8,7 @@ from .model_kwargs import build_model_from_kwargs
 from .load_model_state_dict import load_model_state_dict
 
 def load_model(filename):
-    logging.info("Loading model...")
+    logging.info("Loading model from {}...".format(filename))
     model_kwargs = load_model_kwargs(filename)
     model = build_model_from_kwargs(model_kwargs)
     load_model_state_dict(model, filename)

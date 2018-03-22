@@ -77,6 +77,7 @@ def train(
     all_args.update(vars(model_args))
     all_args.update(vars(data_args))
     all_args.update(vars(optim_args))
+    all_args.update(vars(loading_args))
 
     eh = ExperimentHandler(
         train=True,**all_args
@@ -135,6 +136,7 @@ def train(
                 yv = unwrap(y); y_pred = unwrap(y_pred)
                 yy.append(yv); yy_pred.append(y_pred)
 
+
             #valid_loss.backward()
             valid_loss /= len(valid_data_loader)
 
@@ -173,10 +175,10 @@ def train(
         logging.info("lr = %.8f" % lr)
         t0 = time.time()
 
-        train_losses = []
-        train_times = []
+        train_loss = 0.0
+        t_train = time.time()
+
         for j, (x, y) in enumerate(train_data_loader):
-            t_train = time.time()
             iteration += 1
 
             # forward
@@ -199,11 +201,13 @@ def train(
             if iteration % n_batches == 0:
                 new_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
 
-            train_times.append(time.time() - t_train)
-            train_losses.append(unwrap(l))
+            train_loss += unwrap(l)[0]
+
+        train_loss = train_loss / n_batches
+        train_time = time.time() - t_train
+        logging.warning("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, train_time, len(train_dataset)/train_time))
 
         # validation
-        train_loss = np.mean(train_losses)
         t_valid = time.time()
         logdict = validation(
                     i, model,
@@ -219,8 +223,6 @@ def train(
         logging.warning("Logging took {:.1f} seconds".format(time.time() - t_log))
 
 
-        mean_train_time = np.mean(train_times)
-        logging.warning("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, n_batches * mean_train_time, training_args.batch_size/mean_train_time))
 
         t1 = time.time()
         logging.info("Epoch took {:.1f} seconds".format(t1-t0))

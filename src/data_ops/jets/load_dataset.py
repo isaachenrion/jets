@@ -30,9 +30,10 @@ def load_jets(data_dir, filename, redo=False):
 
         logging.warning("\tPreprocessed the data and saved it to {}".format(path_to_preprocessed))
     else:
-        logging.warning("\tData loaded and already preprocessed")
+        logging.warning("\tData at {} and already preprocessed".format(path_to_preprocessed))
 
     jets = load_jets_from_pickle(path_to_preprocessed)
+    logging.warning("\tSuccessfully loaded data")
     return jets
 
 
@@ -40,6 +41,7 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
     problem = data_dir.split('/')[-1]
     subproblem = filename
 
+    logging.warning("\n")
     logging.warning("Loading data...")
     filename = "{}-train.pickle".format(filename)
     jets = load_jets(data_dir, filename, redo)
@@ -52,13 +54,14 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
 
     cropped_jets = all_jet_dataset.crop()
 
-    logging.warning("\tcropped {} jets".format(len(cropped_jets)))
+    logging.warning("\tCropped {} jets".format(len(cropped_jets)))
 
     train_jets = all_jet_dataset.jets[n_valid:]
     valid_jets = all_jet_dataset.jets[:n_valid]
 
     train_jets += cropped_jets
-    train_jets = train_jets[:n_train]
+    if n_train > 0:
+        train_jets = train_jets[:n_train]
 
     train_dataset = JetDataset(train_jets, problem=problem, subproblem=subproblem)
     train_dataset.shuffle()
@@ -75,12 +78,13 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
 
 
     # add cropped indices to training data
-    logging.warning("\tfinal train size = %d" % len(train_dataset))
-    logging.warning("\tfinal valid size = %d" % len(valid_dataset))
+    logging.warning("\tFinal train size = %d" % len(train_dataset))
+    logging.warning("\tFinal valid size = %d" % len(valid_dataset))
 
     return train_dataset, valid_dataset
 
 def load_test_dataset(data_dir, filename, n_test, redo):
+    logging.warning("\n")
     logging.warning("Loading test data...")
     filename = "{}-test.pickle".format(filename)
     jets = load_jets(data_dir, filename, redo)

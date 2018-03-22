@@ -10,7 +10,7 @@ def build_scheduler(optimizer, sched=None, decay=None, lr=None, lr_min=None, per
         sched_kwargs = dict(gamma=1)
     elif scheduler_name == 'm1':
         Scheduler = lr_scheduler.MultiStepLR
-        sched_kwargs = dict(milestones=[period * i for i in range(1, epochs // period)], gamma=decay)
+        sched_kwargs = dict(milestones=[5,10,15,20,30,40,50,60,70,80,90], gamma=decay)
     elif scheduler_name == 'm2':
         Scheduler = lr_scheduler.MultiStepLR
         sched_kwargs = dict(milestones=[10,20,30,40,50,60,70,80,90], gamma=decay)
