@@ -87,7 +87,7 @@ def train(
     '''----------------------------------------------------------------------- '''
     intermediate_dir, data_filename = DATASETS[data_args.dataset]
     data_dir = os.path.join(admin_args.data_dir, intermediate_dir)
-    train_dataset, valid_dataset = load_train_dataset(data_dir, data_filename, data_args.n_train, data_args.n_valid, data_args.pp)
+    train_dataset, valid_dataset = load_train_dataset(data_dir, data_filename, data_args.n_train, data_args.n_valid, data_args.pp, data_args.no_cropped)
 
     if model_args.model in ['recs', 'recg']:
         DataLoader = TreeJetLoader

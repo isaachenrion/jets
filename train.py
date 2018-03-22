@@ -87,6 +87,7 @@ data.add_argument("--dataset", type=str, default='w')
 data.add_argument("--data_dropout", type=float, default=.99)
 data.add_argument("--pp", action='store_true', default=False)
 data.add_argument("--permute_particles", action='store_true')
+data.add_argument("--no_cropped", action='store_true')
 
 '''
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
