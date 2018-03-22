@@ -37,7 +37,7 @@ def load_jets(data_dir, filename, redo=False):
     return jets
 
 
-def load_train_dataset(data_dir, filename, n_train, n_valid, redo, add_cropped=True):
+def load_train_dataset(data_dir, filename, n_train, n_valid, redo, no_cropped):
     problem = data_dir.split('/')[-1]
     subproblem = filename
 
@@ -59,7 +59,7 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo, add_cropped=T
     train_jets = all_jet_dataset.jets[n_valid:]
     valid_jets = all_jet_dataset.jets[:n_valid]
 
-    if add_cropped:
+    if not no_cropped:
         train_jets += cropped_jets
     if n_train > 0:
         train_jets = train_jets[:n_train]
