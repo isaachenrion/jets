@@ -5,23 +5,6 @@ import torch.nn.functional as F
 
 from .set2set import Set2Vec
 
-from ...misc.abstract_constructor import construct_object
-
-def construct_readout(key, *args, **kwargs):
-    dictionary = dict(
-        dtnn=DTNNReadout,
-        simple=SimpleReadout,
-        set=SetReadout,
-        mult=MultipleReadout,
-        clf=ClassificationReadout,
-        constant=Constant
-    )
-    try:
-        return construct_object(key, dictionary, *args, **kwargs)
-    except ValueError as e:
-        raise ValueError('Readout layer {}'.format(e))
-
-
 class Readout(nn.Module):
     def __init__(self, hidden_dim, target_dim):
         super().__init__()
@@ -93,3 +76,12 @@ class SetReadout(Readout):
     def forward(self, h):
         x = self.set2vec(h)
         return x
+
+READOUTS = dict(
+    dtnn=DTNNReadout,
+    simple=SimpleReadout,
+    set=SetReadout,
+    mult=MultipleReadout,
+    clf=ClassificationReadout,
+    constant=Constant
+)

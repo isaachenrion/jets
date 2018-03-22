@@ -1,1 +1,1 @@
-from .readout import construct_readout
+from .readout import READOUTS

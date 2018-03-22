@@ -4,8 +4,8 @@ import torch.nn.functional as F
 
 from .transformer import Transformer
 
-from ....architectures.readout import construct_readout
-from ....architectures.embedding import construct_embedding
+from ....architectures.readout import READOUTS
+from ....architectures.embedding import EMBEDDINGS
 
 class TransformerTransform(nn.Module):
     def __init__(self,
@@ -14,16 +14,20 @@ class TransformerTransform(nn.Module):
         n_heads=None,
         n_layers=None,
         readout=None,
+        emb_init=None,
         **kwargs
         ):
         super().__init__()
+        
+        emb_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
+        self.embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, n_layers=int(emb_init), **emb_kwargs)
 
-        self.embedding = construct_embedding('simple', features + 1, hidden, act='relu')
-        self.readout = construct_readout(readout, hidden, hidden)
+        #self.embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, **emb_kwargs)
+        self.readout = READOUTS[readout](hidden, hidden)
         self.transformer = Transformer(hidden, n_heads, n_layers, **kwargs)
 
     def forward(self, jets, **kwargs):
         h = self.embedding(jets)
         h = self.transformer(h)
         out = self.readout(h)
-        return out, None
+        return out

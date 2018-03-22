@@ -3,10 +3,14 @@ import pickle
 from ...architectures import construct_classifier
 
 def construct_model_kwargs(args):
+    #import ipdb; ipdb.set_trace()
     model_kwargs = {
         # model dimensions
-        'features': args.features,
+        'features': args.features+1 if args.model == 'nmp' else args.features,
         'hidden': args.hidden,
+
+        # logging
+        'logging_frequency': args.lf,
 
         # activation
         'act': args.act,
@@ -15,14 +19,19 @@ def construct_model_kwargs(args):
         'predict':args.predict,
 
         # jet transform
-        'jet_transform':args.jet_transform,
+        'jet_transform':args.model,
 
         # NMP
         'iters': args.iters,
+        'update': args.update,
+        'message': args.message,
+        'emb_init':args.emb_init,
         'mp_layer':args.mp,
-        'symmetric':args.sym,
+        'symmetric':not args.asym,
         'readout':args.readout,
-        'adaptive_matrix':args.matrix,
+        'matrix':args.adj[0] if len(args.adj) == 1 else args.adj,
+        'activation':args.m_act,
+        'wn': args.wn,
 
         # Stacked NMP
         'scales': args.scales,
@@ -35,16 +44,15 @@ def construct_model_kwargs(args):
         'trainable_physics':args.trainable_physics,
 
         # Physics plus learned NMP
-        'physics_component':args.physics_component,
-        'learned_tradeoff':args.learned_tradeoff,
-
+        #'physics_component':args.physics_component,
+        'learned_tradeoff':not args.equal_weight,
 
         # Transformer
         'n_heads':args.n_heads,
         'n_layers':args.n_layers,
         'dq':args.dq,
         'dv':args.dv,
-        'dropout':args.dropout
+        'dropout':args.model_dropout
     }
     return model_kwargs
 
@@ -54,6 +62,6 @@ def load_model_kwargs(filename):
         model_kwargs = settings["model_kwargs"]
     return model_kwargs
 
-def build_model_from_kwargs(model_kwargs):
-    model = construct_classifier(model_kwargs.get('predict'), **model_kwargs)
+def build_model_from_kwargs(model_kwargs, **kwargs):
+    model = construct_classifier(model_kwargs.get('predict'), **model_kwargs, **kwargs)
     return model

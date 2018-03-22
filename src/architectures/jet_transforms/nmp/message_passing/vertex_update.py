@@ -42,3 +42,18 @@ class GRUUpdate(VertexUpdate):
     def _forward_without_vertex_state(self, h, message):
         h = self.gru(message, h)
         return h
+
+class Overwrite(VertexUpdate):
+    def __init__(self, message_dim, hidden_dim, vertex_state_dim=0):
+        super().__init__(message_dim, hidden_dim, vertex_state_dim)
+
+    def _forward_with_vertex_state(self, h, message, s):
+        return message
+
+    def _forward_without_vertex_state(self, h, message):
+        return message
+
+VERTEX_UPDATES = dict(
+    gru=GRUUpdate,
+    overwrite=Overwrite
+)

@@ -5,15 +5,16 @@ import logging
 from ..misc.constants import FINISHED_MODELS_DIR, DEBUG_MODELS_DIR, KILLED_MODELS_DIR, INTERRUPTED_MODELS_DIR
 
 class Mover:
-    def __init__(self, root_dir, intermediate_dir, leaf_dir):
-        self.current_root = root_dir
+    def __init__(self, models_dir, current_dir, intermediate_dir, leaf_dir):
+        self.current_dir = current_dir
+        self.models_dir = models_dir
         self.leaf_dir = leaf_dir
         self.intermediate_dir = intermediate_dir
 
     def move_to_folder(self, folder):
-        src = os.path.join(self.current_root, self.intermediate_dir, self.leaf_dir)
-        dst = os.path.join(folder, self.intermediate_dir, self.leaf_dir)
-        intermediate_path = os.path.join(folder, self.intermediate_dir)
+        src = os.path.join(self.models_dir, self.current_dir, self.intermediate_dir, self.leaf_dir)
+        dst = os.path.join(self.models_dir, folder, self.intermediate_dir, self.leaf_dir)
+        intermediate_path = os.path.join(self.models_dir, folder, self.intermediate_dir)
         if len(self.leaf_dir) > 0 and not os.path.exists(intermediate_path):
             os.makedirs(intermediate_path)
         shutil.move(src, dst)

@@ -3,11 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .jet_transforms import construct_transform
-from .readout import construct_readout
-from .embedding import construct_embedding
-from .reduction import construct_reduction
+from .readout import READOUTS
 
-from ..data_ops.batching import batch_leaves, batch_trees
+#from ..data_ops.batching import batch_leaves, batch_trees
 
 class JetClassifier(nn.Module):
     '''
@@ -24,8 +22,7 @@ class JetClassifier(nn.Module):
         self.transform = construct_transform(
                             kwargs.get('jet_transform', None),
                             **kwargs)
-        self.predictor = construct_readout(
-                            'clf',
+        self.predictor = READOUTS['clf'](
                             kwargs.get('hidden', None)
                         )
 
@@ -37,9 +34,10 @@ class TreeJetClassifier(JetClassifier):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def forward(self, jets, **kwargs):
-        jets = batch_trees(jets)
-        h, _ = self.transform(jets, **kwargs)
+    def forward(self, x, **kwargs):
+        jets = x
+        #jets = batch_trees(x)
+        h = self.transform(jets, **kwargs)
         outputs = self.predictor(h)
         return outputs
 
@@ -47,8 +45,11 @@ class LeafJetClassifier(JetClassifier):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def forward(self, jets, **kwargs):
-        jets, mask = batch_leaves(jets)
-        h, _ = self.transform(jets=jets, mask=mask, **kwargs)
+    def forward(self, x, **kwargs):
+
+        jets, mask = x
+
+        #jets, mask = batch_leaves(jets)
+        h = self.transform(jets, mask, **kwargs)
         outputs = self.predictor(h)
         return outputs

@@ -8,7 +8,8 @@ from .mover import Mover
 class SignalHandler:
     def __init__(self,
             emailer=None,
-            root_dir=None,
+            models_dir=None,
+            current_dir=None,
             leaf_dir=None,
             intermediate_dir=None,
             logfile=None,
@@ -19,7 +20,7 @@ class SignalHandler:
             train=None,
         ):
         self.emailer = emailer
-        self.mover = Mover(root_dir, intermediate_dir, leaf_dir)
+        self.mover = Mover(models_dir, current_dir, intermediate_dir, leaf_dir)
         self.results_strings = ["FAILURE: No results to print!"]
         self.need_input = need_input
         self.model = model

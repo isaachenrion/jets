@@ -1,1 +1,1 @@
-from .visualize_batch_2D import visualize_batch_2D
+from .visualize_batch_matrix import visualize_batch_matrix

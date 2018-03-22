@@ -32,18 +32,45 @@
 #SBATCH --mail-user=henrion@nyu.edu
 
 RES=$1
+MODELS_DIR=$2
+END_DIR=$3
 
-MODEL_RUNDIR=$(find models/running -depth -name $RES)
-rm -rf $MODEL_RUNDIR
-MODEL_OUTDIR=$(find models -depth -name $RES)
+RUNNING='running'
+FINISHED='finished'
+
+MODEL_RUNDIR=$(find $MODELS_DIR/$RUNNING -depth -name $RES)
+
+str=$MODEL_RUNDIR
+delimiter=$RUNNING
+s=$str$delimiter
+array=();
+while [[ $s ]]; do
+    array+=( "${s%%"$delimiter"*}" );
+    s=${s#*"$delimiter"};
+done;
+
+ROOT_DIR=${array[0]}
+LEAF_DIR=${array[1]}
+
+COMMAND_FILE="$ROOT_DIR$RUNNING$LEAF_DIR/command.txt"
+MODEL_OUTDIR="$ROOT_DIR$FINISHED$LEAF_DIR"
+
+echo $COMMAND_FILE
 echo $MODEL_RUNDIR
 echo $MODEL_OUTDIR
+
+mv $COMMAND_FILE $MODEL_OUTDIR
+
+rm -rf $MODEL_RUNDIR
 
 PYTHONARGS="-j $MODEL_OUTDIR -e"
 
 read SRCDIR _DATADIR _GPU _QOS < <(bash misc/paths.sh)
 
 cd $SRCDIR
-source activate jets
+#source activate jets
 
 python $SRCDIR/summary.py $PYTHONARGS
+
+# move to scratch
+mv $MODEL_OUTDIR $END_DIR

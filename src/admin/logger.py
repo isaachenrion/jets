@@ -1,36 +1,43 @@
 import csv
 import os
-import visdom
 import logging
+from collections import OrderedDict
 
-from ..analysis.plot_training_stats import plot_training_stats
+from ..visualizing.plot_training_stats import plot_training_stats
 
 
 class StatsLogger:
-    def __init__(self, directory, monitors, visualizing, train):
+    def __init__(self, directory, monitor_dict, visualizing, train):
         self.train = train
         self.visualizing = visualizing
-        if self.visualizing:
-            self.viz = visdom.Visdom()
-        else:
-            self.viz = None
 
         self.statsdir = os.path.join(directory, 'stats')
         self.plotsdir = os.path.join(directory, 'plots')
         os.makedirs(self.statsdir)
         os.makedirs(self.plotsdir)
         self.scalar_filename = os.path.join(self.statsdir, 'scalars.csv')
-        self.monitors = monitors
-        self.visualized_scalar_monitors = [monitor.name for monitor in self.monitors.values() if monitor.scalar and monitor.visualizing]
 
-        for monitor in self.monitors.values():
-            monitor.initialize(self.statsdir, self.plotsdir, self.viz)
-        self.headers = [name for name, m in self.monitors.items() if m.scalar]
+        self.monitors = OrderedDict()
+        self.visualized_scalar_monitors = []
+        self.headers = []
+        self.add_many_monitors(**monitor_dict)
 
         with open(self.scalar_filename, 'a', newline='') as f:
             writer = csv.DictWriter(f, self.headers)
             writer.writeheader()
 
+    def add_many_monitors(self, **monitors):
+        for name, monitor in monitors.items():
+            self.add_monitor(name, monitor)
+
+    def add_monitor(self, name, monitor):
+        self.monitors[name] = monitor
+        if monitor.scalar and monitor.visualizing:
+            self.visualized_scalar_monitors.append(name)
+        if monitor.scalar:
+            self.headers.append(name)
+        monitor.initialize(self.statsdir, self.plotsdir)
+        return monitor
 
     def compute_monitors(self, **kwargs):
         stats_dict = {}
@@ -53,7 +60,6 @@ class StatsLogger:
             self.log_scalars(stats_dict)
         else:
             self.log_scalars(kwargs)
-
 
     def complete_logging(self):
         for monitor in self.monitors.values():

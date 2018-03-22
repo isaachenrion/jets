@@ -8,4 +8,3 @@ def construct_classifier(key, *args, **kwargs):
         return TreeJetClassifier(**kwargs)
     else:
         return LeafJetClassifier(**kwargs)
-    
