@@ -1,4 +1,5 @@
 import os
+import logging
 import pickle
 import numpy as np
 
@@ -90,7 +91,7 @@ def convert_to_jet_dict(x, y):
         root_id=root_id,
         tree_content=tree_content
     )
-    
+
     return jet_dict
 
 def preprocess(raw_data_dir, preprocessed_dir, filename):
@@ -98,14 +99,21 @@ def preprocess(raw_data_dir, preprocessed_dir, filename):
     raw_filename = os.path.join(raw_data_dir, filename)
     with open(raw_filename, 'rb') as f:
         X, Y = pickle.load(f, encoding='latin-1')
+    #if True:
+    #    X = X[:100]
+    #    Y = Y[:100]
+    logging.warning("Loaded raw files")
     jet_dicts = [convert_to_jet_dict(x, y) for x, y in zip(X, Y)]
+    logging.warning("Converted to jet dicts")
 
-    new_jet_dicts = []
-    tf = RobustScaler().fit(np.vstack([jet_dict['constituents'] for jet_dict in jet_dicts]))
-    for ij, jet_dict in enumerate(jet_dicts):
-        jet_dict['constituents'] = tf.transform(jet_dict['constituents'])
-        new_jet_dicts.append(jet_dict)
-    jet_dicts = new_jet_dicts
+
+
+    #new_jet_dicts = []
+    #tf = RobustScaler().fit(np.vstack([jet_dict['constituents'] for jet_dict in jet_dicts]))
+    #for ij, jet_dict in enumerate(jet_dicts):
+    #    jet_dict['constituents'] = tf.transform(jet_dict['constituents'])
+    #    new_jet_dicts.append(jet_dict)
+    #jet_dicts = new_jet_dicts
 
     save_jet_dicts_to_pickle(jet_dicts, os.path.join(preprocessed_dir, filename))
 
