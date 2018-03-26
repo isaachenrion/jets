@@ -3,6 +3,7 @@ from torch.utils.data import Dataset
 import numpy as np
 import math
 
+from sklearn.preprocessing import RobustScaler
 class JetDataset(Dataset):
     def __init__(self, jets, weights=None, problem=None, subproblem=None):
         super().__init__()
@@ -34,6 +35,18 @@ class JetDataset(Dataset):
     @classmethod
     def concatenate(cls, dataset1, dataset2):
         return cls(dataset1.jet + dataset2.jets)
+
+    def get_scaler(self):
+        self.tf = RobustScaler().fit(np.vstack([jet.constituents for jet in self.jets]))
+        return self.tf
+
+    def transform(self, tf=None):
+        if tf is None:
+            tf = self.get_scaler()
+        for i, jet in enumerate(self.jets):
+            jet.constituents = tf.transform(jet.constituents)
+            self.jets[i] = jet
+        #jet_dicts = new_jet_dicts
 
     def crop(self):
 
