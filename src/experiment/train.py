@@ -119,7 +119,8 @@ def train(
     '''----------------------------------------------------------------------- '''
 
     def loss(y_pred, y, unknown_mask):
-        return F.mse_loss(y_pred * unknown_mask, y * unknown_mask)
+        #return F.mse_loss(y_pred * unknown_mask, y * unknown_mask)
+        return F.binary_cross_entropy(y_pred * unknown_mask, y * unknown_mask)
 
     def validation(epoch, model, **train_dict):
 
