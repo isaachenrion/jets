@@ -6,6 +6,7 @@ from torch.autograd import Variable
 from .vertex_update import VERTEX_UPDATES
 from src.architectures.embedding import EMBEDDINGS
 from src.architectures.embedding import ACTIVATIONS
+from src.architectures.jet_transforms.nmp.adjacency import construct_adjacency
 
 class MessagePassingLayer(nn.Module):
     def __init__(self, hidden=None, update=None, message=None, act=None, **kwargs):
@@ -25,6 +26,22 @@ class MessagePassingLayer(nn.Module):
         message = self.activation(torch.matmul(A, self.message(h)))
         h = self.vertex_update(h, message)
         return h
+
+class MessagePassingLayer2(nn.Module):
+    def __init__(self, hidden=None, update=None, message=None, act=None, matrix=None, matrix_activation=None, **kwargs):
+        super().__init__()
+        self.activation = ACTIVATIONS[act]()
+        self.vertex_update = VERTEX_UPDATES[update](hidden, hidden)
+        self.adjacency_matrix = construct_adjacency(matrix=matrix, dim_in=hidden, dim_out=hidden, act=matrix_activation, **kwargs)
+
+        message_kwargs = {x: kwargs[x] for x in ['wn']}
+        self.message = EMBEDDINGS['n'](dim_in=hidden, dim_out=hidden, n_layers=int(message), act=act, **message_kwargs)
+
+    def forward(self, h=None, A=None, mask=None, **kwargs):
+        message = self.activation(torch.matmul(A, self.message(h)))
+        h = self.vertex_update(h, message)
+        A = self.adjacency_matrix(h, mask)
+        return h, A
 
 class GraphAttentionalLayer(nn.Module):
     def __init__(self, hidden=None, act=None, **kwargs):
@@ -59,5 +76,6 @@ class MPSimple(MessagePassingLayer):
 
 MP_LAYERS = dict(
     simple=MPSimple,
-    attn=GraphAttentionalLayer
+    attn=GraphAttentionalLayer,
+    m2=MessagePassingLayer2
 )

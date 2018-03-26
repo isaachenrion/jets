@@ -10,9 +10,8 @@ import torch.nn.functional as F
 import numpy as np
 
 from ..data_ops.load_dataset import load_train_dataset
+from ..data_ops.proteins.ProteinLoader import ProteinLoader as DataLoader
 from ..data_ops.wrapping import unwrap
-from ..data_ops.jets.JetLoader import LeafJetLoader
-from ..data_ops.jets.JetLoader import TreeJetLoader
 
 from ..misc.constants import *
 from ..optim.build_optimizer import build_optimizer
@@ -54,10 +53,11 @@ def train(
         admin_args.no_email = True
         admin_args.verbose = True
 
-        training_args.batch_size = 100
-        training_args.epochs = 10
+        training_args.batch_size = 2
+        training_args.epochs = 5
 
-        data_args.n_train = 2000
+        data_args.n_train = 6
+        data_args.n_valid = 2
 
         optim_args.lr = 0.1
         optim_args.period = 2
@@ -87,14 +87,12 @@ def train(
     '''----------------------------------------------------------------------- '''
     intermediate_dir, data_filename = DATASETS[data_args.dataset]
     data_dir = os.path.join(admin_args.data_dir, intermediate_dir)
-    train_dataset, valid_dataset = load_train_dataset(data_dir, data_filename, data_args.n_train, data_args.n_valid, data_args.pp, data_args.no_cropped)
+    train_dataset, valid_dataset = load_train_dataset(data_dir, data_filename, data_args.n_train, data_args.n_valid, data_args.pp)
 
-    if model_args.model in ['recs', 'recg']:
-        DataLoader = TreeJetLoader
-    else:
-        DataLoader = LeafJetLoader
-    train_data_loader = DataLoader(train_dataset, batch_size = training_args.batch_size, dropout=data_args.data_dropout, permute_particles=data_args.permute_particles)
-    valid_data_loader = DataLoader(valid_dataset, batch_size = training_args.batch_size, dropout=data_args.data_dropout, permute_particles=data_args.permute_particles)
+    #DataLoader = ProteinLoader
+
+    train_data_loader = DataLoader(train_dataset, batch_size = training_args.batch_size, dropout=data_args.data_dropout, permute_vertices=data_args.permute_vertices)
+    valid_data_loader = DataLoader(valid_dataset, batch_size = training_args.batch_size, dropout=data_args.data_dropout, permute_vertices=data_args.permute_vertices)
 
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
@@ -120,8 +118,8 @@ def train(
     ''' LOSS AND VALIDATION '''
     '''----------------------------------------------------------------------- '''
 
-    def loss(y_pred, y):
-        return F.binary_cross_entropy(y_pred.squeeze(1), y)
+    def loss(y_pred, y, unknown_mask):
+        return F.mse_loss(y_pred * unknown_mask, y * unknown_mask)
 
     def validation(epoch, model, **train_dict):
 
@@ -130,9 +128,9 @@ def train(
 
             valid_loss = 0.
             yy, yy_pred = [], []
-            for i, (x, y) in enumerate(valid_data_loader):
-                y_pred = model(x)
-                vl = loss(y_pred, y); valid_loss += unwrap(vl)[0]
+            for i, ((x, x_mask), (y), unknown_mask) in enumerate(valid_data_loader):
+                y_pred = model(x, mask=x_mask)
+                vl = loss(y_pred, y, unknown_mask); valid_loss += unwrap(vl)[0]
                 yv = unwrap(y); y_pred = unwrap(y_pred)
                 yy.append(yv); yy_pred.append(y_pred)
 
@@ -178,14 +176,15 @@ def train(
         train_loss = 0.0
         t_train = time.time()
 
-        for j, (x, y) in enumerate(train_data_loader):
+        for j, ((x,x_mask), (y), unknown_mask) in enumerate(train_data_loader):
+            #import ipdb; ipdb.set_trace()
             iteration += 1
 
             # forward
             model.train()
             optimizer.zero_grad()
-            y_pred = model(x, logger=eh.stats_logger, epoch=i, iters=j, iters_left=n_batches-j-1)
-            l = loss(y_pred, y)
+            y_pred = model(x, mask=x_mask, logger=eh.stats_logger, epoch=i, iters=j, iters_left=n_batches-j-1)
+            l = loss(y_pred, y, unknown_mask)
 
             # backward
             l.backward()

@@ -86,7 +86,7 @@ data.add_argument("--n_valid", type=int, default=10000)
 data.add_argument("--dataset", type=str, default='w')
 data.add_argument("--data_dropout", type=float, default=.99)
 data.add_argument("--pp", action='store_true', default=False)
-data.add_argument("--permute_particles", action='store_true')
+data.add_argument("--permute_vertices", action='store_true')
 data.add_argument("--no_cropped", action='store_true')
 
 '''
@@ -95,7 +95,7 @@ data.add_argument("--no_cropped", action='store_true')
 # Dimension and activation args
 
 model = parser.add_argument_group('model')
-model.add_argument("--features", type=int, default=7)
+model.add_argument("--features", type=int, default=41)
 model.add_argument("--hidden", type=int, default=64)
 model.add_argument("--act", type=str, default='leakyrelu')
 model.add_argument("--model_dropout", type=float, default=1.)
@@ -108,11 +108,11 @@ model.add_argument("-m", "--model", type=str, default="nmp", help="name of the m
 
 # NMP
 model.add_argument("-i", "--iters", type=int, default=10)
-model.add_argument("--mp", type=str, default='simple', help='type of message passing layer')
+model.add_argument("--mp", type=str, default='m2', help='type of message passing layer')
 model.add_argument("-u", "--update", type=str, default='gru', help='type of vertex update')
 model.add_argument("--message", type=str, default='2', help='type of message')
 model.add_argument("--emb_init", type=str, default='1', help='type of message')
-model.add_argument("-a","--adj", type=str, nargs='+', default='phy', help='type of matrix layer')
+model.add_argument("-a","--adj", type=str, nargs='+', default='dm', help='type of matrix layer')
 model.add_argument("--asym", action='store_true', default=False)
 model.add_argument("--readout", type=str, default='dtnn', help='type of readout layer')
 model.add_argument("--m_act", type=str, default='soft', help='type of nonlinearity for matrices' )

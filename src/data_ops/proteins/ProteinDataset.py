@@ -17,7 +17,10 @@ class ProteinDataset(Dataset):
     def __getitem__(self, idx):
         #import ipdb; ipdb.set_trace()
         x = np.concatenate([self.proteins[idx].primary, self.proteins[idx].evolutionary], 1)
-        return x, self.proteins[idx].tertiary
+        y = self.proteins[idx].tertiary
+        mask = self.proteins[idx].mask
+        #import ipdb; ipdb.set_trace()
+        return x, y, mask
 
     def shuffle(self):
         perm = np.random.permutation(len(self.proteins))
@@ -36,3 +39,7 @@ class ProteinDataset(Dataset):
     @classmethod
     def concatenate(cls, dataset1, dataset2):
         return cls(dataset1.jet + dataset2.proteins)
+
+    def preprocess(self):
+        for p in self.proteins:
+            pass

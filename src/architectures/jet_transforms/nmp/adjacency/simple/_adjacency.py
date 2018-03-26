@@ -16,10 +16,10 @@ class _Adjacency(nn.Module):
             self.set_monitors()
             self.initialize_monitors(logger, logging_frequency)
 
-    def initialize(self, name=None, symmetric=None, activation=None, **kwargs):
+    def initialize(self, name=None, symmetric=None, act=None, **kwargs):
         self.name = name
         self.symmetric = symmetric
-        self.activation = MATRIX_ACTIVATIONS[activation]
+        self.activation = MATRIX_ACTIVATIONS[act]
 
 
     def set_monitors(self):

@@ -169,12 +169,12 @@ class ExperimentHandler:
         roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
 
         metric_monitors = [
-            roc_auc,
-            inv_fpr,
-            #best_roc_auc,
-            best_inv_fpr,
-            roc_auc_at_best_inv_fpr,
-            #inv_fpr_at_best_roc_auc,
+            #roc_auc,
+            #inv_fpr,
+            ##best_roc_auc,
+            #best_inv_fpr,
+            #roc_auc_at_best_inv_fpr,
+            ##inv_fpr_at_best_roc_auc,
             Regurgitate('valid_loss', visualizing=True),
             Regurgitate('train_loss', visualizing=True)
 
@@ -227,23 +227,22 @@ class ExperimentHandler:
         logging.warning("Git commit = {}".format(get_git_revision_short_hash()))
         logging.warning("\tPID = {}".format(self.pid))
         logging.warning("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
-        
+
     def log(self, **kwargs):
 
         self.stats_logger.log(**kwargs)
         #t_log = time.time()
         if kwargs['epoch'] == 1 and self.emailer is not None:
             self.emailer.send_msg(self.stats_logger.monitors['eta'].value, "Job {}-{} on {} ETA: {}".format(self.slurm_array_job_id, self.slurm_array_task_id, self.host.split('.')[0], self.stats_logger.monitors['eta'].value))
-        if np.isnan(self.stats_logger.monitors['inv_fpr'].value):
-            logging.warning("NaN in 1/FPR\n")
+        #if np.isnan(self.stats_logger.monitors['inv_fpr'].value):
+        #    logging.warning("NaN in 1/FPR\n")
 
-        out_str = "{:5}\t~loss(train)={:.4f}\tloss(valid)={:.4f}\troc_auc(valid)={:.4f}".format(
+        out_str = "{:5}\t~loss(train)={:.4f}\tloss(valid)={:.4f}".format(
                 self.stats_logger.monitors['iteration'].value,
                 self.stats_logger.monitors['train_loss'].value,
-                self.stats_logger.monitors['valid_loss'].value,
-                self.stats_logger.monitors['roc_auc'].value)
+                self.stats_logger.monitors['valid_loss'].value)
 
-        out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.5f}".format(self.stats_logger.monitors['inv_fpr'].value, self.stats_logger.monitors['best_inv_fpr'].value)
+        #out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.5f}".format(self.stats_logger.monitors['inv_fpr'].value, self.stats_logger.monitors['best_inv_fpr'].value)
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)
         #logging.warning("Time in exp_handler log {:.1f} seconds".format(time.time() - t_log))

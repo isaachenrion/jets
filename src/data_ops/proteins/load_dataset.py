@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 import pickle
 import numpy as np
 
@@ -24,9 +25,11 @@ def load_proteins(data_dir, filename, redo=False):
 
         logging.warning("\tPreprocessed the data and saved it to {}".format(path_to_preprocessed))
     else:
-        logging.warning("\tData loaded and already preprocessed")
+        logging.warning("\tData already preprocessed")
 
+    t = time.time()
     proteins = load_proteins_from_pickle(path_to_preprocessed)
+    logging.warning("\tData loaded in {:.1f} seconds".format(time.time() - t))
     return proteins
 
 
@@ -38,10 +41,14 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
 
     train_filename = "{}-train.pickle".format(filename)
     train_proteins = load_proteins(data_dir, train_filename, redo)
+    if n_train > 0:
+        train_proteins = train_proteins[:n_train]
     train_dataset = ProteinDataset(train_proteins, problem=problem, subproblem=subproblem)
 
     valid_filename = "{}-valid.pickle".format(filename)
     valid_proteins = load_proteins(data_dir, valid_filename, redo)
+    if n_valid > 0:
+        valid_proteins = valid_proteins[:n_valid]
     valid_dataset = ProteinDataset(valid_proteins, problem=problem, subproblem=subproblem)
 
     # add cropped indices to training data

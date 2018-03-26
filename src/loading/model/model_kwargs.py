@@ -1,6 +1,6 @@
 import os
 import pickle
-from ...architectures import construct_classifier
+from ...architectures import GeneratorNMP
 
 def construct_model_kwargs(args):
     #import ipdb; ipdb.set_trace()
@@ -30,7 +30,7 @@ def construct_model_kwargs(args):
         'symmetric':not args.asym,
         'readout':args.readout,
         'matrix':args.adj[0] if len(args.adj) == 1 else args.adj,
-        'activation':args.m_act,
+        'matrix_activation':args.m_act,
         'wn': args.wn,
 
         # Stacked NMP
@@ -63,5 +63,5 @@ def load_model_kwargs(filename):
     return model_kwargs
 
 def build_model_from_kwargs(model_kwargs, **kwargs):
-    model = construct_classifier(model_kwargs.get('predict'), **model_kwargs, **kwargs)
+    model = GeneratorNMP(**model_kwargs, **kwargs)
     return model
