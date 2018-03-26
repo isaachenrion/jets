@@ -3,7 +3,7 @@ import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
+
 from src.data_ops.wrapping import wrap
 
 from .message_passing import MP_LAYERS
