@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
+from src.data_ops.wrapping import wrap
 
 from .message_passing import MP_LAYERS
 from .adjacency import construct_adjacency
@@ -48,7 +49,7 @@ class GeneratorNMP(nn.Module):
         A[:-1, 1:] += A_
 
         A = A.unsqueeze(0).repeat(bs, 1, 1)
-        A = Variable(A)
+        A = wrap(A)
 
 
         for mp in self.mp_layers:
