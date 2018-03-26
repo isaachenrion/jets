@@ -40,8 +40,17 @@ class GeneratorNMP(nn.Module):
         bs = x.size()[0]
         n_vertices = x.size()[1]
         h = self.embedding(x)
-        #A = Variable(torch.eye())
-        A = Variable(torch.eye(n_vertices).unsqueeze(0).repeat(bs, 1, 1))
+        A = torch.eye(n_vertices)
+
+        # adding the lower and upper diagonals for initial graph connectivity
+        A_ = torch.eye(n_vertices-1)
+        A[1:,:-1] += A_
+        A[:-1, 1:] += A_
+
+        A = A.unsqueeze(0).repeat(bs, 1, 1)
+        A = Variable(A)
+
+
         for mp in self.mp_layers:
             h, A = mp(h=h, mask=mask, A=A, **kwargs)
         A = F.sigmoid(A)
