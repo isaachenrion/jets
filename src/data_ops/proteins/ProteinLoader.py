@@ -30,7 +30,7 @@ class ProteinLoader(_DataLoader):
         mask = [torch.from_numpy(mask) for mask in mask_list]
         mask, _ = pad_tensors(mask)
         mask = torch.bmm(mask,torch.transpose(mask, 1,2))
-        mask = Variable(mask)
+        mask = wrap(mask)
         return mask
 
     def preprocess_y(self, y_list):
@@ -42,7 +42,7 @@ class ProteinLoader(_DataLoader):
         y = compute_adjacency(y)
         y = contact_map(y, threshold=50)
 
-        y = Variable(y)
+        y = wrap(y)
         #mask = Variable(mask)
 
         return y
@@ -59,7 +59,6 @@ class ProteinLoader(_DataLoader):
 
         data, mask = pad_tensors_extra_channel(data)
 
-        data = Variable(data)
-        mask = Variable(mask)
-
+        data = wrap(data)
+        mask = wrap(mask)
         return data, mask
