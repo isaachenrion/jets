@@ -75,9 +75,11 @@ def convert_to_jet(x, y):
     mass = x['mass']
 
     outers = [node for node in range(len(x['content'])) if x['tree'][node,0] == -1]
-    tree_content = extract_four_vectors(tree_content)
-    constituents = np.stack([tree_content[i] for i in outers], 0)
-    #constituents = extract_four_vectors(np.stack([tree_content[i] for i in outers], 0))
+    constituents = extract_four_vectors(np.stack([tree_content[i] for i in outers], 0))
+    #constituents = const
+    #tree_content = extract_four_vectors(tree_content)
+    #constituents = np.stack([tree_content[i] for i in outers], 0)
+    #import ipdb; ipdb.set_trace()
     progenitor = 'w' if y == 1 else 'qcd'
 
     jet = Jet(
