@@ -116,8 +116,8 @@ def convert_to_protein_dict(entry_text):
     tertiary = [[float(x) for x in line.split('\t')] for line in protein_dict['tertiary']]
     tertiary = np.array(tertiary).reshape((3,-1,3))
     tertiary = np.transpose(tertiary, [1,0,2])
-    tertiary = torch.from_numpy(tertiary).unsqueeze(0)
-    tertiary = compute_adjacency(tertiary).numpy()[0]
+    #tertiary = torch.from_numpy(tertiary).unsqueeze(0)
+    #tertiary = compute_adjacency(tertiary).numpy()[0]
     protein_dict['tertiary'] = tertiary
     #import ipdb; ipdb.set_trace()
     #import ipdb; ipdb.set_trace()

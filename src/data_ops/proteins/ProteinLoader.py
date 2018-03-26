@@ -37,7 +37,9 @@ class ProteinLoader(_DataLoader):
 
         y_list = [torch.from_numpy(y) for y in y_list]
         #y = torch.stack(y_list, 0)
-        y = pad_matrices(y_list)
+        #y = pad_matrices(y_list)
+        y,_ = pad_tensors(y_list)
+        y = compute_adjacency(y)
         y = contact_map(y, threshold=50)
 
         y = Variable(y)
