@@ -118,9 +118,10 @@ def train(
     ''' LOSS AND VALIDATION '''
     '''----------------------------------------------------------------------- '''
 
-    def loss(y_pred, y, unknown_mask):
+    def loss(y_pred, y, mask):
         #return F.mse_loss(y_pred * unknown_mask, y * unknown_mask)
-        return F.binary_cross_entropy(y_pred * unknown_mask, y * unknown_mask)
+        #import ipdb; ipdb.set_trace()
+        return F.binary_cross_entropy(y_pred * mask, y * mask)
 
     def validation(epoch, model, **train_dict):
 
@@ -129,9 +130,9 @@ def train(
 
             valid_loss = 0.
             yy, yy_pred = [], []
-            for i, ((x, x_mask), (y), unknown_mask) in enumerate(valid_data_loader):
+            for i, ((x, x_mask), (y), mask) in enumerate(valid_data_loader):
                 y_pred = model(x, mask=x_mask)
-                vl = loss(y_pred, y, unknown_mask); valid_loss += unwrap(vl)[0]
+                vl = loss(y_pred, y, mask); valid_loss += unwrap(vl)[0]
                 yv = unwrap(y); y_pred = unwrap(y_pred)
                 yy.append(yv); yy_pred.append(y_pred)
 
@@ -177,7 +178,7 @@ def train(
         train_loss = 0.0
         t_train = time.time()
 
-        for j, ((x,x_mask), (y), unknown_mask) in enumerate(train_data_loader):
+        for j, ((x,x_mask), (y), mask) in enumerate(train_data_loader):
             #import ipdb; ipdb.set_trace()
             iteration += 1
 
@@ -185,7 +186,7 @@ def train(
             model.train()
             optimizer.zero_grad()
             y_pred = model(x, mask=x_mask, logger=eh.stats_logger, epoch=i, iters=j, iters_left=n_batches-j-1)
-            l = loss(y_pred, y, unknown_mask)
+            l = loss(y_pred, y, mask)
 
             # backward
             l.backward()

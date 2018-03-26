@@ -22,14 +22,14 @@ class ProteinLoader(_DataLoader):
         t = time.time()
         X = self.preprocess_x([x for x, _, _ in data_tuples])
         Y = self.preprocess_y([y for _, y, _ in data_tuples])
-        unknown_mask = self.preprocess_mask([mask for _, _, mask in data_tuples])
+        mask = self.preprocess_mask([mask for _, _, mask in data_tuples])
         #logging.warning("Collating {} examples took {:.1f}s".format(len(data_tuples), time.time() - t))
-        return X, Y, unknown_mask
+        return X, Y, mask
 
     def preprocess_mask(self, mask_list):
         mask = [torch.from_numpy(mask) for mask in mask_list]
         mask, _ = pad_tensors(mask)
-        mask = torch.bmm(mask,torch.transpose(mask, 1,2))
+        mask = 1 - torch.bmm(mask,torch.transpose(mask, 1,2))
         mask = wrap(mask)
         return mask
 
@@ -38,9 +38,10 @@ class ProteinLoader(_DataLoader):
         y_list = [torch.from_numpy(y) for y in y_list]
         #y = torch.stack(y_list, 0)
         #y = pad_matrices(y_list)
+        #import ipdb; ipdb.set_trace()
         y,_ = pad_tensors(y_list)
         y = compute_adjacency(y)
-        y = contact_map(y, threshold=50)
+        y = contact_map(y, threshold=800)
 
         y = wrap(y)
         #mask = Variable(mask)
