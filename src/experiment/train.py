@@ -139,17 +139,17 @@ def train(
             #valid_loss.backward()
             valid_loss /= len(valid_data_loader)
 
-            yy = np.concatenate(yy, 0)
-            yy_pred = np.concatenate(yy_pred, 0)
+            #yy = np.concatenate(yy, 0)
+            #yy_pred = np.concatenate(yy_pred, 0)
 
             t1=time.time()
 
             logdict = dict(
                 epoch=epoch,
                 iteration=iteration,
-                yy=yy,
-                yy_pred=yy_pred,
-                w_valid=valid_dataset.weights,
+                #yy=yy,
+                #yy_pred=yy_pred,
+                #w_valid=valid_dataset.weights,
                 valid_loss=valid_loss,
                 settings=settings,
                 model=model,
