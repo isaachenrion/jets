@@ -46,7 +46,7 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
     train_dataset = ProteinDataset(train_proteins, problem=problem, subproblem=subproblem)
 
     valid_filename = "{}-valid.pickle".format(filename)
-    valid_proteins = load_proteins(data_dir, valid_filename, redo)
+    valid_proteins = load_proteins(data_dir, valid_filename, redo=False)
     if n_valid > 0:
         valid_proteins = valid_proteins[:n_valid]
     valid_dataset = ProteinDataset(valid_proteins, problem=problem, subproblem=subproblem)
