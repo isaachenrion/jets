@@ -101,12 +101,12 @@ def preprocess(raw_data_dir, preprocessed_dir, filename):
         X, Y = pickle.load(f, encoding='latin-1')
     jets = [convert_to_jet(x, y) for x, y in zip(X, Y)]
 
-    new_jets = []
-    tf = RobustScaler().fit(np.vstack([jet.constituents for jet in jets]))
-    for ij, jet in enumerate(jets):
-        jet.constituents = tf.transform(jet.constituents)
-        new_jets.append(jet)
-    jets = new_jets
+    #new_jets = []
+    #tf = RobustScaler().fit(np.vstack([jet.constituents for jet in jets]))
+    #for ij, jet in enumerate(jets):
+    #    jet.constituents = tf.transform(jet.constituents)
+    #    new_jets.append(jet)
+    #jets = new_jets
 
     save_jets_to_pickle(jets, os.path.join(preprocessed_dir, filename))
 
