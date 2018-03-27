@@ -203,28 +203,29 @@ def train(
             #train_times.append(time.time() - t_train)
             train_loss += (unwrap(l))[0]
 
-            # validation
-            if iteration % n_batches == 0:
-                train_loss /= n_batches
-                t_valid = time.time()
-                logdict = validation(
-                            i, model,
-                            train_loss=train_loss,
-                            grads=grads,
-                            old_params=old_params,
-                            model_params=new_params,
-                            )
-                logging.warning("Validation took {:.1f} seconds".format(time.time() - t_valid))
-
-                t_log = time.time()
-                eh.log(**logdict)
-                logging.warning("Logging took {:.1f} seconds".format(time.time() - t_log))
-
-
         train_time = time.time() - t_train
-        #mean_train_time = np.mean(train_times)
-        #logging.warning("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, n_batches * mean_train_time, training_args.batch_size/mean_train_time))
+
         logging.warning("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, train_time, len(train_dataset)/train_time))
+
+        # validation
+        #if iteration % n_batches == 0:
+        train_loss /= n_batches
+        t_valid = time.time()
+        logdict = validation(
+                    i, model,
+                    train_loss=train_loss,
+                    grads=grads,
+                    old_params=old_params,
+                    model_params=new_params,
+                    )
+
+        logging.warning("Validation took {:.1f} seconds".format(time.time() - t_valid))
+
+        t_log = time.time()
+        eh.log(**logdict)
+        logging.warning("Logging took {:.1f} seconds".format(time.time() - t_log))
+
+
 
         t1 = time.time()
         logging.info("Epoch took {:.1f} seconds".format(t1-t0))
