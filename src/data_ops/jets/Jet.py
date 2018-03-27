@@ -29,8 +29,6 @@ class Jet:
         self.root_id = root_id
         self.tree_content = tree_content
 
-    def to_tensor(self):
-        return torch.Tensor(self.constituents)
 
     def __len__(self):
         return len(self.constituents)

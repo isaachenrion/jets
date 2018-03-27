@@ -201,13 +201,14 @@ def train(
             if iteration % n_batches == 0:
                 new_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
 
-            train_loss += unwrap(l)[0]
+            #train_times.append(time.time() - t_train)
+            train_loss += (unwrap(l))[0]
 
-        train_loss = train_loss / n_batches
         train_time = time.time() - t_train
+
         logging.warning("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, train_time, len(train_dataset)/train_time))
 
-        # validation
+        train_loss /= n_batches
         t_valid = time.time()
         logdict = validation(
                     i, model,

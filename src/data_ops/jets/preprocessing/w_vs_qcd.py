@@ -74,9 +74,11 @@ def convert_to_jet_dict(x, y):
     mass = x['mass']
 
     outers = [node for node in range(len(x['content'])) if x['tree'][node,0] == -1]
-    tree_content = extract_four_vectors(tree_content)
-    constituents = np.stack([tree_content[i] for i in outers], 0)
-    #constituents = extract_four_vectors(np.stack([tree_content[i] for i in outers], 0))
+    constituents = extract_four_vectors(np.stack([tree_content[i] for i in outers], 0))
+    #constituents = const
+    #tree_content = extract_four_vectors(tree_content)
+    #constituents = np.stack([tree_content[i] for i in outers], 0)
+    #import ipdb; ipdb.set_trace()
     progenitor = 'w' if y == 1 else 'qcd'
 
     jet_dict = dict(
@@ -108,14 +110,8 @@ def preprocess(raw_data_dir, preprocessed_dir, filename):
 
 
 
-    #new_jet_dicts = []
-    #tf = RobustScaler().fit(np.vstack([jet_dict['constituents'] for jet_dict in jet_dicts]))
-    #for ij, jet_dict in enumerate(jet_dicts):
-    #    jet_dict['constituents'] = tf.transform(jet_dict['constituents'])
-    #    new_jet_dicts.append(jet_dict)
-    #jet_dicts = new_jet_dicts
 
-    save_jet_dicts_to_pickle(jet_dicts, os.path.join(preprocessed_dir, filename))
+    save_jets_to_pickle(jets, os.path.join(preprocessed_dir, filename))
 
 
     return None

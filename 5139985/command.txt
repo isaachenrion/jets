@@ -1,0 +1,13 @@
+-a phy
+--epochs 128
+--sched m1
+--lr 0.001
+--decay .7
+--period 8
+--data_dir /scratch/ih692/data
+--experiment_time 8
+--models_dir /home/ih692/jets/models
+--slurm
+--gpu 0
+--slurm_array_job_id 5139985
+--slurm_array_task_id 5

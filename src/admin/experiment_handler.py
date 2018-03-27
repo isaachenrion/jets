@@ -8,6 +8,8 @@ import time
 import shutil
 import subprocess
 
+import subprocess
+
 from collections import OrderedDict
 
 from .utils import get_logfile
@@ -19,7 +21,10 @@ from ..monitors import *
 from ..misc.constants import RUNNING_MODELS_DIR, ALL_MODEL_DIRS
 
 def get_git_revision_short_hash():
-    return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
+    s = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
+    #import ipdb; ipdb.set_trace()
+    s = str(s).split('\'')[1]
+    return s
 
 class ExperimentHandler:
     def __init__(
@@ -63,16 +68,17 @@ class ExperimentHandler:
         self.host = host
         self.train = train
 
-        self.cuda_and_random_seed(gpu, seed, passed_args)
+
         self.create_all_model_dirs()
         self.setup_model_directory(dataset, model)
         self.setup_logging(silent, verbose)
+        self.cuda_and_random_seed(gpu, seed)
         self.setup_signal_handler(email)
         self.setup_stats_logger(epochs, visualizing)
         self.record_settings(passed_args)
         self.initial_email()
 
-    def cuda_and_random_seed(self, gpu, seed, passed_args):
+    def cuda_and_random_seed(self, gpu, seed):
         if gpu != "" and torch.cuda.is_available():
             torch.cuda.device(gpu)
 
@@ -89,9 +95,8 @@ class ExperimentHandler:
         self.seed = seed
         self.gpu = gpu
 
-        passed_args['seed'] = self.seed
-        passed_args['gpu'] = self.gpu
-
+        logging.info("Seed = {}".format(self.seed))
+        logging.info("GPU = {}".format(self.gpu))
 
     def setup_model_directory(self, dataset, model):
         self.current_dir = RUNNING_MODELS_DIR
@@ -227,7 +232,7 @@ class ExperimentHandler:
         logging.warning("Git commit = {}".format(get_git_revision_short_hash()))
         logging.warning("\tPID = {}".format(self.pid))
         logging.warning("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
-        
+
     def log(self, **kwargs):
 
         self.stats_logger.log(**kwargs)
@@ -252,6 +257,7 @@ class ExperimentHandler:
         self.saver.save(model, settings)
 
     def finished(self):
+        self.signal_handler.mover.leaf_dir = "{:.1f}".format(self.stats_logger.monitors['best_inv_fpr'])
         self.stats_logger.complete_logging()
         self.signal_handler.completed()
 

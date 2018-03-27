@@ -62,7 +62,7 @@ optim.add_argument("--decay", type=float, default=.7)
 optim.add_argument("--clip", type=float, default=1.0)
 optim.add_argument("--reg", type=float, default=.00001)
 optim.add_argument("--sched", type=str, default='m1')
-optim.add_argument("--period", type=int, default=16)
+optim.add_argument("--period", type=int, default=8)
 optim.add_argument("--momentum", type=float, default=0.0)
 optim.add_argument("--optim", type=str, default='adam')
 
