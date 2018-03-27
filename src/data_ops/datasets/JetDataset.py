@@ -54,22 +54,28 @@ class JetDataset(Dataset):
         return self.tf
 
     def transform(self, tf=None):
+        logging.info("\nPRE-TRANSFORM")
         self.log_input_stats(self.jets)
         if tf is None:
             tf = self.get_scaler()
         for i, jet in enumerate(self.jets):
             jet.constituents = tf(jet.constituents)
             self.jets[i] = jet
+
+        logging.info("\nPOST-TRANSFORM")
         self.log_input_stats(self.jets)
 
     def log_input_stats(self, jets):
         constituents = np.concatenate([j.constituents for j in jets], 0)
-        min_x = constituents.min()
-        max_x = constituents.max()
-        mean_x = constituents.mean()
-        std_x = constituents.std()
-        logging.info("max = {:.2f}, min = {:.2f}, mean = {:.2f}, std = {:.2f}".format(max_x, min_x, mean_x, std_x))
-        return max_x, min_x, mean_x, std_x
+        min_xs = constituents.min(0)
+        max_xs = constituents.max(0)
+        mean_xs = constituents.mean(0)
+        std_xs = constituents.std(0)
+
+        dim_names = ['p', 'eta', 'phi', 'E', 'E/total_E', 'pt', 'theta']
+        for dn, max_x, min_x, mean_x, std_x in zip(dim_names, max_xs, min_xs, mean_xs, std_xs):
+            logging.info("{}:\tmax = {:.2f}\tmin = {:.2f}\tmean = {:.2f}\tstd = {:.2f}".format(dn, max_x, min_x, mean_x, std_x))
+        #return max_x, min_x, mean_x, std_x
 
     def crop(self):
 
