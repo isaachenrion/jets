@@ -52,7 +52,8 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo, no_cropped):
 
     old_crop=True
     if old_crop:
-        jets = jets[:n_train]
+        if n_train > 0:
+            jets = jets[:n_train]
         logging.warning("Splitting into train and validation...")
         #
         train_jets = jets[n_valid:]

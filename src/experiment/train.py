@@ -97,6 +97,7 @@ def train(
 
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
+    model_args.features = train_dataset.dim
     model, model_kwargs = build_model(loading_args.load, model_args, logger=eh.stats_logger)
     if loading_args.restart:
         with open(os.path.join(filename, 'settings.pickle'), "rb") as f:

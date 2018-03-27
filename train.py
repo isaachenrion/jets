@@ -96,7 +96,7 @@ data.add_argument("--no_cropped", action='store_true')
 # Dimension and activation args
 
 model = parser.add_argument_group('model')
-model.add_argument("--features", type=int, default=7)
+model.add_argument("--features", type=int, default=None)
 model.add_argument("--hidden", type=int, default=64)
 model.add_argument("--act", type=str, default='leakyrelu')
 model.add_argument("--model_dropout", type=float, default=1.)
