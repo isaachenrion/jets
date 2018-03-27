@@ -15,6 +15,7 @@ class JetDataset(Dataset):
         return len(self.jets)
 
     def __getitem__(self, idx):
+        #import ipdb; ipdb.set_trace()
         return self.jets[idx], self.jets[idx].y
 
     @property
@@ -38,7 +39,7 @@ class JetDataset(Dataset):
         #tf = RobustScaler().fit(np.vstack([jet.constituents for jet in self.jets])).transform
 
         #max_x, min_x, mean_x, std_x = self.log_input_stats(self.jets)
-        constituents = np.concatenate([j.constituents for j in self.jets[:1000]], 0)
+        constituents = np.concatenate([j.constituents for j in self.jets], 0)
         #import ipdb; ipdb.set_trace()
         min_x = constituents.min(0)
         max_x = constituents.max(0)
@@ -72,13 +73,14 @@ class JetDataset(Dataset):
         mean_xs = constituents.mean(0)
         std_xs = constituents.std(0)
 
-        dim_names = ['p', 'eta', 'phi', 'E', 'E/total_E', 'pt', 'theta']
+        dim_names = ['p', 'eta', 'phi', 'E', 'E/sumE', 'pt', 'theta']
         for dn, max_x, min_x, mean_x, std_x in zip(dim_names, max_xs, min_xs, mean_xs, std_xs):
             logging.info("{}:\tmax = {:.2f}\tmin = {:.2f}\tmean = {:.2f}\tstd = {:.2f}".format(dn, max_x, min_x, mean_x, std_x))
         #return max_x, min_x, mean_x, std_x
 
     def crop(self):
-
+        logging.info("pre crop")
+        self.log_input_stats(self.jets)
         good_jets, bad_jets, w = self._crop()
         self.jets = good_jets
         self.weights = w
