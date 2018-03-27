@@ -6,6 +6,7 @@ import numpy as np
 import socket
 import time
 import shutil
+import subprocess
 
 import subprocess
 
@@ -255,6 +256,7 @@ class ExperimentHandler:
         self.saver.save(model, settings)
 
     def finished(self):
+        self.signal_handler.mover.leaf_dir = "{:.1f}".format(self.stats_logger.monitors['best_inv_fpr'])
         self.stats_logger.complete_logging()
         self.signal_handler.completed()
 

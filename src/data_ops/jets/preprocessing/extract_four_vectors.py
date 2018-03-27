@@ -27,5 +27,8 @@ def extract_four_vectors(four_vectors):
         content[i, 4] = E / total_E
         content[i, 5] = pt if np.isfinite(pt) else 0.0
         content[i, 6] = theta if np.isfinite(theta) else 0.0
+        #content[i, 7] = px
+        #content[i, 8] = py
+        #content[i, 9] = pz
 
     return content

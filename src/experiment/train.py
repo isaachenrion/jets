@@ -11,8 +11,8 @@ import numpy as np
 
 from ..data_ops.load_dataset import load_train_dataset
 from ..data_ops.wrapping import unwrap
-from ..data_ops.data_loaders import LeafJetLoader
-from ..data_ops.data_loaders import TreeJetLoader
+from ..data_ops.jets.JetLoader import LeafJetLoader
+from ..data_ops.jets.JetLoader import TreeJetLoader
 
 from ..misc.constants import *
 from ..optim.build_optimizer import build_optimizer
@@ -77,6 +77,7 @@ def train(
     all_args.update(vars(model_args))
     all_args.update(vars(data_args))
     all_args.update(vars(optim_args))
+    all_args.update(vars(loading_args))
 
     eh = ExperimentHandler(
         train=True,**all_args
@@ -97,7 +98,6 @@ def train(
 
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
-    model_args.features = train_dataset.dim
     model, model_kwargs = build_model(loading_args.load, model_args, logger=eh.stats_logger)
     if loading_args.restart:
         with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
@@ -135,6 +135,7 @@ def train(
                 vl = loss(y_pred, y); valid_loss += unwrap(vl)[0]
                 yv = unwrap(y); y_pred = unwrap(y_pred)
                 yy.append(yv); yy_pred.append(y_pred)
+
 
             #valid_loss.backward()
             valid_loss /= len(valid_data_loader)
@@ -174,11 +175,8 @@ def train(
         logging.info("lr = %.8f" % lr)
         t0 = time.time()
 
-        #train_losses = []
-        #train_times = []
         train_loss = 0.0
         t_train = time.time()
-        #t_train = time.time()
 
         for j, (x, y) in enumerate(train_data_loader):
             iteration += 1
@@ -193,6 +191,7 @@ def train(
             l.backward()
             if optim_args.clip is not None:
                 torch.nn.utils.clip_grad_norm(model.parameters(), optim_args.clip)
+
             if iteration % n_batches == 0:
                 old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
                 grads = torch.cat([p.grad.view(-1) for p in model.parameters()], 0)
@@ -218,12 +217,13 @@ def train(
                     old_params=old_params,
                     model_params=new_params,
                     )
-
         logging.warning("Validation took {:.1f} seconds".format(time.time() - t_valid))
 
         t_log = time.time()
         eh.log(**logdict)
         logging.warning("Logging took {:.1f} seconds".format(time.time() - t_log))
+
+
 
         t1 = time.time()
         logging.info("Epoch took {:.1f} seconds".format(t1-t0))
