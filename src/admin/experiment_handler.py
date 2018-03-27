@@ -93,6 +93,9 @@ class ExperimentHandler:
         self.seed = seed
         self.gpu = gpu
 
+        logging.info("Seed = {}".format(self.seed))
+        logging.info("GPU = {}".format(self.gpu))
+
     def setup_model_directory(self, dataset, model):
         self.current_dir = RUNNING_MODELS_DIR
         self.root_dir = os.path.join(self.models_dir, self.current_dir)
