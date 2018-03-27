@@ -20,7 +20,10 @@ from ..monitors import *
 from ..misc.constants import RUNNING_MODELS_DIR, ALL_MODEL_DIRS
 
 def get_git_revision_short_hash():
-    return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
+    s = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
+    #import ipdb; ipdb.set_trace()
+    s = str(s).split('\'')[1]
+    return s
 
 class ExperimentHandler:
     def __init__(
