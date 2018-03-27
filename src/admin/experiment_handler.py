@@ -7,6 +7,8 @@ import socket
 import time
 import shutil
 
+import subprocess
+
 from collections import OrderedDict
 
 from .utils import get_logfile
@@ -17,6 +19,8 @@ from .logger import StatsLogger
 from ..monitors import *
 from ..misc.constants import RUNNING_MODELS_DIR, ALL_MODEL_DIRS
 
+def get_git_revision_short_hash():
+    return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
 
 class ExperimentHandler:
     def __init__(
@@ -216,6 +220,8 @@ class ExperimentHandler:
 
         for k, v in sorted(passed_args.items()): logging.warning('\t{} = {}'.format(k, v))
 
+        logging.warning("\n")
+        logging.warning("Git commit = {}".format(get_git_revision_short_hash()))
         logging.warning("\tPID = {}".format(self.pid))
         logging.warning("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
 
