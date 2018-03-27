@@ -68,7 +68,7 @@ class ExperimentHandler:
         self.host = host
         self.train = train
 
-        self.cuda_and_random_seed(gpu, seed, passed_args)
+
         self.create_all_model_dirs()
         self.setup_model_directory(dataset, model)
         self.setup_logging(silent, verbose)
@@ -78,7 +78,7 @@ class ExperimentHandler:
         self.record_settings(passed_args)
         self.initial_email()
 
-    def cuda_and_random_seed(self, gpu, seed, passed_args):
+    def cuda_and_random_seed(self, gpu, seed):
         if gpu != "" and torch.cuda.is_available():
             torch.cuda.device(gpu)
 
