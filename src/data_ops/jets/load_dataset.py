@@ -67,10 +67,10 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo, no_cropped):
 
     train_dataset = JetDataset(train_jets, problem=problem, subproblem=subproblem)
     train_dataset.shuffle()
-    train_dataset.transform()
+    #train_dataset.transform()
 
     valid_dataset = JetDataset(valid_jets, problem=problem, subproblem=subproblem)
-    valid_dataset.transform(train_dataset.tf)
+    #valid_dataset.transform(train_dataset.tf)
     #train_dataset.extend(cropped_dataset)
 
 
