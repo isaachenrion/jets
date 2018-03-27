@@ -17,8 +17,8 @@ from ..misc.constants import *
 
 from ..data_ops.load_dataset import load_test_dataset
 from ..data_ops.wrapping import unwrap
-from ..data_ops.data_loaders import LeafJetLoader
-from ..data_ops.data_loaders import TreeJetLoader
+from ..data_ops.jets.JetLoader import LeafJetLoader
+from ..data_ops.jets.JetLoader import TreeJetLoader
 
 from ..loading.model import load_model
 

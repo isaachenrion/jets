@@ -1,11 +1,4 @@
-import logging
-import os
-import pickle
-import numpy as np
 
-from .io import load_jets_from_pickle, save_jets_to_pickle
-from .datasets import JetDataset
-from .preprocessing import crop_dataset
 
 
 def load_jets(data_dir, filename, redo=False):
@@ -95,7 +88,6 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo, no_cropped):
     logging.warning("\tfinal train size = %d" % len(train_dataset))
     logging.warning("\tfinal valid size = %d" % len(valid_dataset))
 
-    return train_dataset, valid_dataset
 
 def load_test_dataset(data_dir, filename, n_test, redo):
     logging.warning("Loading test data...")

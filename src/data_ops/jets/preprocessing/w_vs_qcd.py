@@ -1,13 +1,12 @@
 import os
+import logging
 import pickle
 import numpy as np
 
-from ..Jet import Jet
 from .extract_four_vectors import extract_four_vectors
-from ..io import save_jets_to_pickle
+from ..io import save_jet_dicts_to_pickle
 
 from sklearn.preprocessing import RobustScaler
-#from ..old.preprocessing import rewrite_content, permute_by_pt
 
 def _pt(v):
     pz = v[2]
@@ -63,7 +62,7 @@ def rewrite_content(jet):
 
     return jet
 
-def convert_to_jet(x, y):
+def convert_to_jet_dict(x, y):
     x = permute_by_pt(rewrite_content(x))
 
     tree_content = x['content']
@@ -82,7 +81,7 @@ def convert_to_jet(x, y):
     #import ipdb; ipdb.set_trace()
     progenitor = 'w' if y == 1 else 'qcd'
 
-    jet = Jet(
+    jet_dict = dict(
         progenitor=progenitor,
         constituents=constituents,
         mass=mass,
@@ -94,14 +93,22 @@ def convert_to_jet(x, y):
         root_id=root_id,
         tree_content=tree_content
     )
-    return jet
+
+    return jet_dict
 
 def preprocess(raw_data_dir, preprocessed_dir, filename):
 
     raw_filename = os.path.join(raw_data_dir, filename)
     with open(raw_filename, 'rb') as f:
         X, Y = pickle.load(f, encoding='latin-1')
-    jets = [convert_to_jet(x, y) for x, y in zip(X, Y)]
+    #if True:
+    #    X = X[:100]
+    #    Y = Y[:100]
+    logging.warning("Loaded raw files")
+    jet_dicts = [convert_to_jet_dict(x, y) for x, y in zip(X, Y)]
+    logging.warning("Converted to jet dicts")
+
+
 
 
     save_jets_to_pickle(jets, os.path.join(preprocessed_dir, filename))

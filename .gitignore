@@ -1,5 +1,6 @@
 bash_snippets.txt
 /data
+*.ipynb
 models
 archive
 magic_commands.txt
