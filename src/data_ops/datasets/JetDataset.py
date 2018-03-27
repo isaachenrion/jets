@@ -35,15 +35,41 @@ class JetDataset(Dataset):
             self.weights = [self.weights[i] for i in perm]
 
     def get_scaler(self):
-        self.tf = RobustScaler().fit(np.vstack([jet.constituents for jet in self.jets]))
+        #tf = RobustScaler().fit(np.vstack([jet.constituents for jet in self.jets])).transform
+
+        #max_x, min_x, mean_x, std_x = self.log_input_stats(self.jets)
+        constituents = np.concatenate([j.constituents for j in self.jets[:1000]], 0)
+        #import ipdb; ipdb.set_trace()
+        min_x = constituents.min(0)
+        max_x = constituents.max(0)
+        mean_x = constituents.mean(0)
+        std_x = constituents.std(0)
+        #import ipdb; ipdb.set_trace()
+        def tf(x):
+            x = (x - mean_x) / std_x
+            return x
+
+        self.tf = tf
+
         return self.tf
 
     def transform(self, tf=None):
+        self.log_input_stats(self.jets)
         if tf is None:
             tf = self.get_scaler()
         for i, jet in enumerate(self.jets):
-            jet.constituents = tf.transform(jet.constituents)
+            jet.constituents = tf(jet.constituents)
             self.jets[i] = jet
+        self.log_input_stats(self.jets)
+
+    def log_input_stats(self, jets):
+        constituents = np.concatenate([j.constituents for j in jets], 0)
+        min_x = constituents.min()
+        max_x = constituents.max()
+        mean_x = constituents.mean()
+        std_x = constituents.std()
+        logging.info("max = {:.2f}, min = {:.2f}, mean = {:.2f}, std = {:.2f}".format(max_x, min_x, mean_x, std_x))
+        return max_x, min_x, mean_x, std_x
 
     def crop(self):
 
@@ -51,7 +77,7 @@ class JetDataset(Dataset):
         self.jets = good_jets
         self.weights = w
         return bad_jets
- 
+
     def _crop(self):
         logging.info('Cropping dataset...')
         if self.problem == 'w-vs-qcd':

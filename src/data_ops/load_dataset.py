@@ -81,11 +81,11 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo, no_cropped):
     train_dataset = JetDataset(train_jets, problem=problem, subproblem=subproblem)
     train_dataset.shuffle()
 
-    #logging.warning("Building RobustScaler transform from training set...")
-    #train_dataset.transform()
+    logging.warning("Building normalizing transform from training set...")
+    train_dataset.transform()
 
     valid_dataset = JetDataset(valid_jets, problem=problem, subproblem=subproblem)
-    #valid_dataset.transform(train_dataset.tf)
+    valid_dataset.transform(train_dataset.tf)
 
     # add cropped indices to training data
     logging.warning("\tfinal train size = %d" % len(train_dataset))
