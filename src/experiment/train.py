@@ -173,8 +173,10 @@ def train(
         logging.info("lr = %.8f" % lr)
         t0 = time.time()
 
-        train_losses = []
-        train_times = []
+        #train_losses = []
+        #train_times = []
+        train_loss = 0.0
+        t_train = time.time()
         for j, (x, y) in enumerate(train_data_loader):
             t_train = time.time()
             iteration += 1
@@ -189,17 +191,21 @@ def train(
             l.backward()
             if optim_args.clip is not None:
                 torch.nn.utils.clip_grad_norm(model.parameters(), optim_args.clip)
-            old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
-            grads = torch.cat([p.grad.view(-1) for p in model.parameters()], 0)
-            optimizer.step()
-            new_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
+            if iteration % n_batches == 0:
+                old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
+                grads = torch.cat([p.grad.view(-1) for p in model.parameters()], 0)
 
-            train_times.append(time.time() - t_train)
-            train_losses.append(unwrap(l))
+            optimizer.step()
+
+            if iteration % n_batches == 0:
+                new_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
+
+            #train_times.append(time.time() - t_train)
+            train_loss += (unwrap(l))[0]
 
             # validation
             if iteration % n_batches == 0:
-                train_loss = np.mean(train_losses)
+                train_loss /= n_batches
                 t_valid = time.time()
                 logdict = validation(
                             i, model,
@@ -215,8 +221,10 @@ def train(
                 logging.warning("Logging took {:.1f} seconds".format(time.time() - t_log))
 
 
-        mean_train_time = np.mean(train_times)
-        logging.warning("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, n_batches * mean_train_time, training_args.batch_size/mean_train_time))
+        train_time = time.time() - t_train
+        #mean_train_time = np.mean(train_times)
+        #logging.warning("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, n_batches * mean_train_time, training_args.batch_size/mean_train_time))
+        logging.warning("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, train_time, len(train_dataset)/train_time))
 
         t1 = time.time()
         logging.info("Epoch took {:.1f} seconds".format(t1-t0))

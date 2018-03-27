@@ -67,10 +67,10 @@ class ExperimentHandler:
         self.host = host
         self.train = train
 
-        self.cuda_and_random_seed(gpu, seed)
         self.create_all_model_dirs()
         self.setup_model_directory(dataset, model)
         self.setup_logging(silent, verbose)
+        self.cuda_and_random_seed(gpu, seed)
         self.setup_signal_handler(email)
         self.setup_stats_logger(epochs, visualizing)
         self.record_settings(passed_args)
