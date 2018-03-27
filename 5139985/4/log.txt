@@ -1,0 +1,1298 @@
+COMPLETED on Mar-27 at 11:43:57
+2018-03-27 06:00:17,207 running on gpu-24
+2018-03-27 06:00:17,208 /home/ih692/jets/models/running/w/nmp/5139985/4
+2018-03-27 06:00:17,212 	R = 1
+2018-03-27 06:00:17,212 	act = leakyrelu
+2018-03-27 06:00:17,213 	adj = ['phy']
+2018-03-27 06:00:17,213 	alpha = 1
+2018-03-27 06:00:17,213 	asym = False
+2018-03-27 06:00:17,214 	batch_size = 128
+2018-03-27 06:00:17,214 	clip = 1.0
+2018-03-27 06:00:17,215 	cmd_line_args = train.py -a phy --epochs 128 --sched m1 --lr 0.001 --decay .7 --period 8 --data_dir /scratch/ih692/data --experiment_time 8 --models_dir /home/ih692/jets/models --slurm --gpu 0 --slurm_array_job_id 5139985 --slurm_array_task_id 4
+2018-03-27 06:00:17,215 	data_dir = /scratch/ih692/data
+2018-03-27 06:00:17,216 	data_dropout = 0.99
+2018-03-27 06:00:17,216 	dataset = w
+2018-03-27 06:00:17,217 	debug = False
+2018-03-27 06:00:17,217 	decay = 0.7
+2018-03-27 06:00:17,217 	dq = 32
+2018-03-27 06:00:17,218 	dv = 32
+2018-03-27 06:00:17,218 	email = None
+2018-03-27 06:00:17,219 	emb_init = 1
+2018-03-27 06:00:17,220 	epochs = 128
+2018-03-27 06:00:17,220 	equal_weight = False
+2018-03-27 06:00:17,220 	experiment_time = 8
+2018-03-27 06:00:17,221 	features = 7
+2018-03-27 06:00:17,221 	gpu = 0
+2018-03-27 06:00:17,222 	hidden = 64
+2018-03-27 06:00:17,222 	host = gpu-24
+2018-03-27 06:00:17,223 	iters = 10
+2018-03-27 06:00:17,223 	lf = 20
+2018-03-27 06:00:17,223 	lr = 0.001
+2018-03-27 06:00:17,224 	lr_min = 5e-07
+2018-03-27 06:00:17,224 	m_act = soft
+2018-03-27 06:00:17,225 	message = 2
+2018-03-27 06:00:17,225 	model = nmp
+2018-03-27 06:00:17,226 	model_dropout = 1.0
+2018-03-27 06:00:17,226 	models_dir = /home/ih692/jets/models
+2018-03-27 06:00:17,226 	momentum = 0.0
+2018-03-27 06:00:17,227 	mp = simple
+2018-03-27 06:00:17,227 	n_heads = 8
+2018-03-27 06:00:17,228 	n_layers = 3
+2018-03-27 06:00:17,228 	n_train = -1
+2018-03-27 06:00:17,229 	n_valid = 27000
+2018-03-27 06:00:17,229 	no_email = False
+2018-03-27 06:00:17,229 	optim = adam
+2018-03-27 06:00:17,230 	period = 8
+2018-03-27 06:00:17,230 	permute_particles = False
+2018-03-27 06:00:17,231 	pid = 15469
+2018-03-27 06:00:17,231 	pileup = False
+2018-03-27 06:00:17,232 	pool = attn
+2018-03-27 06:00:17,232 	pool_first = False
+2018-03-27 06:00:17,233 	pp = False
+2018-03-27 06:00:17,233 	predict = simple
+2018-03-27 06:00:17,233 	profile = False
+2018-03-27 06:00:17,234 	readout = dtnn
+2018-03-27 06:00:17,234 	reg = 1e-05
+2018-03-27 06:00:17,235 	root_dir = models
+2018-03-27 06:00:17,235 	scales = None
+2018-03-27 06:00:17,236 	sched = m1
+2018-03-27 06:00:17,236 	seed = None
+2018-03-27 06:00:17,236 	silent = False
+2018-03-27 06:00:17,237 	slurm = True
+2018-03-27 06:00:17,237 	slurm_array_job_id = 5139985
+2018-03-27 06:00:17,238 	slurm_array_task_id = 4
+2018-03-27 06:00:17,238 	train = True
+2018-03-27 06:00:17,239 	trainable_physics = False
+2018-03-27 06:00:17,239 	update = gru
+2018-03-27 06:00:17,239 	verbose = False
+2018-03-27 06:00:17,240 	visualizing = False
+2018-03-27 06:00:17,240 	wn = False
+2018-03-27 06:00:17,241 	PID = 15469
+2018-03-27 06:00:17,241 	Running on GPU
+2018-03-27 06:00:17,242 Loading data...
+2018-03-27 06:00:17,243 Data loaded and already preprocessed
+2018-03-27 06:00:21,157 Splitting into train and validation...
+2018-03-27 06:00:21,548 	final train size = 89900
+2018-03-27 06:00:21,548 	final valid size = 10099
+2018-03-27 06:00:21,550 Initializing model...
+2018-03-27 06:00:24,022 LeafJetClassifier(
+  (transform): FixedNMP(
+    (embedding): NLayer(
+      (activation): LeakyReLU(0.01)
+      (fcs): ModuleList(
+        (0): Linear(in_features=8, out_features=64)
+      )
+    )
+    (mp_layers): ModuleList(
+      (0): MPSimple(
+        (activation): LeakyReLU(0.01)
+        (vertex_update): GRUUpdate(
+          (gru): AnyBatchGRUCell(
+            (linear_ih): Linear(in_features=64, out_features=192)
+            (linear_hh): Linear(in_features=64, out_features=192)
+          )
+        )
+        (message): NLayer(
+          (activation): LeakyReLU(0.01)
+          (fcs): ModuleList(
+            (0): Linear(in_features=64, out_features=64)
+            (1): Linear(in_features=64, out_features=64)
+          )
+        )
+      )
+      (1): MPSimple(
+        (activation): LeakyReLU(0.01)
+        (vertex_update): GRUUpdate(
+          (gru): AnyBatchGRUCell(
+            (linear_ih): Linear(in_features=64, out_features=192)
+            (linear_hh): Linear(in_features=64, out_features=192)
+          )
+        )
+        (message): NLayer(
+          (activation): LeakyReLU(0.01)
+          (fcs): ModuleList(
+            (0): Linear(in_features=64, out_features=64)
+            (1): Linear(in_features=64, out_features=64)
+          )
+        )
+      )
+      (2): MPSimple(
+        (activation): LeakyReLU(0.01)
+        (vertex_update): GRUUpdate(
+          (gru): AnyBatchGRUCell(
+            (linear_ih): Linear(in_features=64, out_features=192)
+            (linear_hh): Linear(in_features=64, out_features=192)
+          )
+        )
+        (message): NLayer(
+          (activation): LeakyReLU(0.01)
+          (fcs): ModuleList(
+            (0): Linear(in_features=64, out_features=64)
+            (1): Linear(in_features=64, out_features=64)
+          )
+        )
+      )
+      (3): MPSimple(
+        (activation): LeakyReLU(0.01)
+        (vertex_update): GRUUpdate(
+          (gru): AnyBatchGRUCell(
+            (linear_ih): Linear(in_features=64, out_features=192)
+            (linear_hh): Linear(in_features=64, out_features=192)
+          )
+        )
+        (message): NLayer(
+          (activation): LeakyReLU(0.01)
+          (fcs): ModuleList(
+            (0): Linear(in_features=64, out_features=64)
+            (1): Linear(in_features=64, out_features=64)
+          )
+        )
+      )
+      (4): MPSimple(
+        (activation): LeakyReLU(0.01)
+        (vertex_update): GRUUpdate(
+          (gru): AnyBatchGRUCell(
+            (linear_ih): Linear(in_features=64, out_features=192)
+            (linear_hh): Linear(in_features=64, out_features=192)
+          )
+        )
+        (message): NLayer(
+          (activation): LeakyReLU(0.01)
+          (fcs): ModuleList(
+            (0): Linear(in_features=64, out_features=64)
+            (1): Linear(in_features=64, out_features=64)
+          )
+        )
+      )
+      (5): MPSimple(
+        (activation): LeakyReLU(0.01)
+        (vertex_update): GRUUpdate(
+          (gru): AnyBatchGRUCell(
+            (linear_ih): Linear(in_features=64, out_features=192)
+            (linear_hh): Linear(in_features=64, out_features=192)
+          )
+        )
+        (message): NLayer(
+          (activation): LeakyReLU(0.01)
+          (fcs): ModuleList(
+            (0): Linear(in_features=64, out_features=64)
+            (1): Linear(in_features=64, out_features=64)
+          )
+        )
+      )
+      (6): MPSimple(
+        (activation): LeakyReLU(0.01)
+        (vertex_update): GRUUpdate(
+          (gru): AnyBatchGRUCell(
+            (linear_ih): Linear(in_features=64, out_features=192)
+            (linear_hh): Linear(in_features=64, out_features=192)
+          )
+        )
+        (message): NLayer(
+          (activation): LeakyReLU(0.01)
+          (fcs): ModuleList(
+            (0): Linear(in_features=64, out_features=64)
+            (1): Linear(in_features=64, out_features=64)
+          )
+        )
+      )
+      (7): MPSimple(
+        (activation): LeakyReLU(0.01)
+        (vertex_update): GRUUpdate(
+          (gru): AnyBatchGRUCell(
+            (linear_ih): Linear(in_features=64, out_features=192)
+            (linear_hh): Linear(in_features=64, out_features=192)
+          )
+        )
+        (message): NLayer(
+          (activation): LeakyReLU(0.01)
+          (fcs): ModuleList(
+            (0): Linear(in_features=64, out_features=64)
+            (1): Linear(in_features=64, out_features=64)
+          )
+        )
+      )
+      (8): MPSimple(
+        (activation): LeakyReLU(0.01)
+        (vertex_update): GRUUpdate(
+          (gru): AnyBatchGRUCell(
+            (linear_ih): Linear(in_features=64, out_features=192)
+            (linear_hh): Linear(in_features=64, out_features=192)
+          )
+        )
+        (message): NLayer(
+          (activation): LeakyReLU(0.01)
+          (fcs): ModuleList(
+            (0): Linear(in_features=64, out_features=64)
+            (1): Linear(in_features=64, out_features=64)
+          )
+        )
+      )
+      (9): MPSimple(
+        (activation): LeakyReLU(0.01)
+        (vertex_update): GRUUpdate(
+          (gru): AnyBatchGRUCell(
+            (linear_ih): Linear(in_features=64, out_features=192)
+            (linear_hh): Linear(in_features=64, out_features=192)
+          )
+        )
+        (message): NLayer(
+          (activation): LeakyReLU(0.01)
+          (fcs): ModuleList(
+            (0): Linear(in_features=64, out_features=64)
+            (1): Linear(in_features=64, out_features=64)
+          )
+        )
+      )
+    )
+    (readout): DTNNReadout(
+      (fc1): Linear(in_features=64, out_features=64)
+      (fc2): Linear(in_features=64, out_features=64)
+    )
+    (adjacency_matrix): FixedPhysicsAdjacency(
+    )
+  )
+  (predictor): ClassificationReadout(
+    (fc): Linear(in_features=64, out_features=1)
+  )
+)
+2018-03-27 06:00:24,040 Number of parameters: 341761
+2018-03-27 06:00:24,041 Moving model to GPU
+2018-03-27 06:00:24,053 Moved model to GPU
+2018-03-27 06:00:24,055 ***********
+2018-03-27 06:00:24,055 Building optimizer and scheduler...
+2018-03-27 06:00:24,056 Optimizer is adam
+2018-03-27 06:00:24,056 lr: 0.001
+2018-03-27 06:00:24,056 weight_decay: 1e-05
+2018-03-27 06:00:24,057 ***********
+2018-03-27 06:00:24,064 Scheduler is m1
+2018-03-27 06:00:24,065 milestones: [8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120]
+2018-03-27 06:00:24,065 gamma: 0.7
+2018-03-27 06:00:24,066 ***********
+2018-03-27 06:00:24,124 Training...
+2018-03-27 06:00:24,125 epoch = 0
+2018-03-27 06:00:24,125 lr = 0.00100000
+2018-03-27 06:03:38,062 Validation took 5.9 seconds
+2018-03-27 06:03:43,032 703.0	~loss(train)=0.6121	loss(valid)=0.5518	roc_auc(valid)=0.8827	1/FPR @ TPR = 0.5: 23.58	Best 1/FPR @ TPR = 0.5: 23.57880
+2018-03-27 06:03:43,032 Logging took 5.0 seconds
+2018-03-27 06:03:43,196 Training 703 batches took 161.1 seconds at 558.6 examples per second
+2018-03-27 06:03:43,197 Epoch took 199.1 seconds
+2018-03-27 06:03:43,197 ********************************************************************************
+2018-03-27 06:03:43,198 epoch = 1
+2018-03-27 06:03:43,198 lr = 0.00100000
+2018-03-27 06:06:16,727 Validation took 6.0 seconds
+2018-03-27 06:06:21,725 1406.0	~loss(train)=0.5114	loss(valid)=0.4323	roc_auc(valid)=0.9062	1/FPR @ TPR = 0.5: 40.84	Best 1/FPR @ TPR = 0.5: 40.84351
+2018-03-27 06:06:21,725 Logging took 5.0 seconds
+2018-03-27 06:06:21,872 Training 703 batches took 120.4 seconds at 747.1 examples per second
+2018-03-27 06:06:21,872 Epoch took 158.7 seconds
+2018-03-27 06:06:21,873 ********************************************************************************
+2018-03-27 06:06:21,874 epoch = 2
+2018-03-27 06:06:21,874 lr = 0.00100000
+2018-03-27 06:08:55,472 Validation took 6.0 seconds
+2018-03-27 06:09:00,998 2109.0	~loss(train)=0.4985	loss(valid)=0.4092	roc_auc(valid)=0.9078	1/FPR @ TPR = 0.5: 38.73	Best 1/FPR @ TPR = 0.5: 40.84351
+2018-03-27 06:09:00,999 Logging took 5.5 seconds
+2018-03-27 06:09:01,151 Training 703 batches took 120.6 seconds at 746.3 examples per second
+2018-03-27 06:09:01,152 Epoch took 159.3 seconds
+2018-03-27 06:09:01,152 ********************************************************************************
+2018-03-27 06:09:01,153 epoch = 3
+2018-03-27 06:09:01,154 lr = 0.00100000
+2018-03-27 06:11:34,499 Validation took 6.0 seconds
+2018-03-27 06:11:39,646 2812.0	~loss(train)=0.4894	loss(valid)=0.4248	roc_auc(valid)=0.9102	1/FPR @ TPR = 0.5: 48.32	Best 1/FPR @ TPR = 0.5: 48.32354
+2018-03-27 06:11:39,647 Logging took 5.1 seconds
+2018-03-27 06:11:39,796 Training 703 batches took 120.3 seconds at 747.7 examples per second
+2018-03-27 06:11:39,796 Epoch took 158.6 seconds
+2018-03-27 06:11:39,797 ********************************************************************************
+2018-03-27 06:11:39,798 epoch = 4
+2018-03-27 06:11:39,798 lr = 0.00100000
+2018-03-27 06:14:13,174 Validation took 6.0 seconds
+2018-03-27 06:14:18,603 3515.0	~loss(train)=0.4800	loss(valid)=0.3992	roc_auc(valid)=0.9115	1/FPR @ TPR = 0.5: 48.05	Best 1/FPR @ TPR = 0.5: 48.32354
+2018-03-27 06:14:18,604 Logging took 5.4 seconds
+2018-03-27 06:14:18,750 Training 703 batches took 120.3 seconds at 747.7 examples per second
+2018-03-27 06:14:18,750 Epoch took 159.0 seconds
+2018-03-27 06:14:18,751 ********************************************************************************
+2018-03-27 06:14:18,752 epoch = 5
+2018-03-27 06:14:18,752 lr = 0.00100000
+2018-03-27 06:16:51,992 Validation took 6.0 seconds
+2018-03-27 06:16:57,015 4218.0	~loss(train)=0.4718	loss(valid)=0.3839	roc_auc(valid)=0.9132	1/FPR @ TPR = 0.5: 46.76	Best 1/FPR @ TPR = 0.5: 48.32354
+2018-03-27 06:16:57,015 Logging took 5.0 seconds
+2018-03-27 06:16:57,156 Training 703 batches took 120.2 seconds at 748.5 examples per second
+2018-03-27 06:16:57,156 Epoch took 158.4 seconds
+2018-03-27 06:16:57,157 ********************************************************************************
+2018-03-27 06:16:57,158 epoch = 6
+2018-03-27 06:16:57,158 lr = 0.00100000
+2018-03-27 06:19:30,380 Validation took 6.0 seconds
+2018-03-27 06:19:35,614 4921.0	~loss(train)=0.4659	loss(valid)=0.3739	roc_auc(valid)=0.9151	1/FPR @ TPR = 0.5: 53.27	Best 1/FPR @ TPR = 0.5: 53.26793
+2018-03-27 06:19:35,615 Logging took 5.2 seconds
+2018-03-27 06:19:35,761 Training 703 batches took 120.2 seconds at 748.6 examples per second
+2018-03-27 06:19:35,762 Epoch took 158.6 seconds
+2018-03-27 06:19:35,763 ********************************************************************************
+2018-03-27 06:19:35,763 epoch = 7
+2018-03-27 06:19:35,764 lr = 0.00100000
+2018-03-27 06:22:09,145 Validation took 5.9 seconds
+2018-03-27 06:22:14,517 5624.0	~loss(train)=0.4605	loss(valid)=0.3872	roc_auc(valid)=0.9084	1/FPR @ TPR = 0.5: 36.96	Best 1/FPR @ TPR = 0.5: 53.26793
+2018-03-27 06:22:14,518 Logging took 5.4 seconds
+2018-03-27 06:22:14,666 Training 703 batches took 120.5 seconds at 746.8 examples per second
+2018-03-27 06:22:14,667 Epoch took 158.9 seconds
+2018-03-27 06:22:14,668 ********************************************************************************
+2018-03-27 06:22:14,669 epoch = 8
+2018-03-27 06:22:14,669 lr = 0.00100000
+2018-03-27 06:24:48,166 Validation took 6.1 seconds
+2018-03-27 06:24:53,833 6327.0	~loss(train)=0.4578	loss(valid)=0.3766	roc_auc(valid)=0.9160	1/FPR @ TPR = 0.5: 60.37	Best 1/FPR @ TPR = 0.5: 60.37242
+2018-03-27 06:24:53,833 Logging took 5.7 seconds
+2018-03-27 06:24:53,979 Training 703 batches took 120.4 seconds at 747.4 examples per second
+2018-03-27 06:24:53,980 Epoch took 159.3 seconds
+2018-03-27 06:24:53,981 ********************************************************************************
+2018-03-27 06:24:53,982 epoch = 9
+2018-03-27 06:24:53,982 lr = 0.00070000
+2018-03-27 06:27:27,279 Validation took 6.0 seconds
+2018-03-27 06:27:32,334 7030.0	~loss(train)=0.4474	loss(valid)=0.3753	roc_auc(valid)=0.9152	1/FPR @ TPR = 0.5: 65.18	Best 1/FPR @ TPR = 0.5: 65.17941
+2018-03-27 06:27:32,334 Logging took 5.1 seconds
+2018-03-27 06:27:32,479 Training 703 batches took 120.3 seconds at 747.7 examples per second
+2018-03-27 06:27:32,479 Epoch took 158.5 seconds
+2018-03-27 06:27:32,480 ********************************************************************************
+2018-03-27 06:27:32,481 epoch = 10
+2018-03-27 06:27:32,481 lr = 0.00070000
+2018-03-27 06:30:06,330 Validation took 6.0 seconds
+2018-03-27 06:30:11,406 7733.0	~loss(train)=0.4463	loss(valid)=0.3767	roc_auc(valid)=0.9168	1/FPR @ TPR = 0.5: 56.79	Best 1/FPR @ TPR = 0.5: 65.17941
+2018-03-27 06:30:11,407 Logging took 5.1 seconds
+2018-03-27 06:30:11,553 Training 703 batches took 120.8 seconds at 745.1 examples per second
+2018-03-27 06:30:11,554 Epoch took 159.1 seconds
+2018-03-27 06:30:11,554 ********************************************************************************
+2018-03-27 06:30:11,555 epoch = 11
+2018-03-27 06:30:11,556 lr = 0.00070000
+2018-03-27 06:32:45,213 Validation took 6.0 seconds
+2018-03-27 06:32:50,326 8436.0	~loss(train)=0.4405	loss(valid)=0.3912	roc_auc(valid)=0.9125	1/FPR @ TPR = 0.5: 49.66	Best 1/FPR @ TPR = 0.5: 65.17941
+2018-03-27 06:32:50,326 Logging took 5.1 seconds
+2018-03-27 06:32:50,476 Training 703 batches took 120.7 seconds at 745.7 examples per second
+2018-03-27 06:32:50,477 Epoch took 158.9 seconds
+2018-03-27 06:32:50,477 ********************************************************************************
+2018-03-27 06:32:50,478 epoch = 12
+2018-03-27 06:32:50,478 lr = 0.00070000
+2018-03-27 06:35:24,098 Validation took 6.1 seconds
+2018-03-27 06:35:29,263 9139.0	~loss(train)=0.4430	loss(valid)=0.3745	roc_auc(valid)=0.9173	1/FPR @ TPR = 0.5: 51.76	Best 1/FPR @ TPR = 0.5: 65.17941
+2018-03-27 06:35:29,264 Logging took 5.2 seconds
+2018-03-27 06:35:29,411 Training 703 batches took 120.5 seconds at 747.0 examples per second
+2018-03-27 06:35:29,412 Epoch took 158.9 seconds
+2018-03-27 06:35:29,412 ********************************************************************************
+2018-03-27 06:35:29,413 epoch = 13
+2018-03-27 06:35:29,414 lr = 0.00070000
+2018-03-27 06:38:02,985 Validation took 5.9 seconds
+2018-03-27 06:38:08,147 9842.0	~loss(train)=0.4414	loss(valid)=0.3967	roc_auc(valid)=0.9113	1/FPR @ TPR = 0.5: 44.17	Best 1/FPR @ TPR = 0.5: 65.17941
+2018-03-27 06:38:08,147 Logging took 5.2 seconds
+2018-03-27 06:38:08,293 Training 703 batches took 120.6 seconds at 745.9 examples per second
+2018-03-27 06:38:08,294 Epoch took 158.9 seconds
+2018-03-27 06:38:08,295 ********************************************************************************
+2018-03-27 06:38:08,295 epoch = 14
+2018-03-27 06:38:08,296 lr = 0.00070000
+2018-03-27 06:40:42,077 Validation took 6.0 seconds
+2018-03-27 06:40:47,483 10545.0	~loss(train)=0.4381	loss(valid)=0.3959	roc_auc(valid)=0.9110	1/FPR @ TPR = 0.5: 39.73	Best 1/FPR @ TPR = 0.5: 65.17941
+2018-03-27 06:40:47,484 Logging took 5.4 seconds
+2018-03-27 06:40:47,629 Training 703 batches took 120.7 seconds at 745.3 examples per second
+2018-03-27 06:40:47,630 Epoch took 159.3 seconds
+2018-03-27 06:40:47,630 ********************************************************************************
+2018-03-27 06:40:47,631 epoch = 15
+2018-03-27 06:40:47,632 lr = 0.00070000
+2018-03-27 06:43:21,685 Validation took 6.1 seconds
+2018-03-27 06:43:26,965 11248.0	~loss(train)=0.4380	loss(valid)=0.3716	roc_auc(valid)=0.9174	1/FPR @ TPR = 0.5: 56.20	Best 1/FPR @ TPR = 0.5: 65.17941
+2018-03-27 06:43:26,966 Logging took 5.3 seconds
+2018-03-27 06:43:27,110 Training 703 batches took 120.9 seconds at 744.2 examples per second
+2018-03-27 06:43:27,111 Epoch took 159.5 seconds
+2018-03-27 06:43:27,111 ********************************************************************************
+2018-03-27 06:43:27,112 epoch = 16
+2018-03-27 06:43:27,113 lr = 0.00070000
+2018-03-27 06:46:00,823 Validation took 6.0 seconds
+2018-03-27 06:46:06,362 11951.0	~loss(train)=0.4389	loss(valid)=0.3752	roc_auc(valid)=0.9156	1/FPR @ TPR = 0.5: 60.05	Best 1/FPR @ TPR = 0.5: 65.17941
+2018-03-27 06:46:06,362 Logging took 5.5 seconds
+2018-03-27 06:46:06,508 Training 703 batches took 120.7 seconds at 745.8 examples per second
+2018-03-27 06:46:06,509 Epoch took 159.4 seconds
+2018-03-27 06:46:06,509 ********************************************************************************
+2018-03-27 06:46:06,510 epoch = 17
+2018-03-27 06:46:06,511 lr = 0.00049000
+2018-03-27 06:48:40,211 Validation took 6.1 seconds
+2018-03-27 06:48:45,549 12654.0	~loss(train)=0.4297	loss(valid)=0.3695	roc_auc(valid)=0.9183	1/FPR @ TPR = 0.5: 54.79	Best 1/FPR @ TPR = 0.5: 65.17941
+2018-03-27 06:48:45,550 Logging took 5.3 seconds
+2018-03-27 06:48:45,697 Training 703 batches took 120.6 seconds at 746.2 examples per second
+2018-03-27 06:48:45,698 Epoch took 159.2 seconds
+2018-03-27 06:48:45,698 ********************************************************************************
+2018-03-27 06:48:45,699 epoch = 18
+2018-03-27 06:48:45,700 lr = 0.00049000
+2018-03-27 06:51:19,462 Validation took 6.0 seconds
+2018-03-27 06:51:24,947 13357.0	~loss(train)=0.4279	loss(valid)=0.3681	roc_auc(valid)=0.9198	1/FPR @ TPR = 0.5: 65.60	Best 1/FPR @ TPR = 0.5: 65.60394
+2018-03-27 06:51:24,947 Logging took 5.5 seconds
+2018-03-27 06:51:25,094 Training 703 batches took 120.7 seconds at 745.8 examples per second
+2018-03-27 06:51:25,095 Epoch took 159.4 seconds
+2018-03-27 06:51:25,096 ********************************************************************************
+2018-03-27 06:51:25,096 epoch = 19
+2018-03-27 06:51:25,097 lr = 0.00049000
+2018-03-27 06:53:58,750 Validation took 6.1 seconds
+2018-03-27 06:54:04,144 14060.0	~loss(train)=0.4296	loss(valid)=0.3821	roc_auc(valid)=0.9182	1/FPR @ TPR = 0.5: 66.44	Best 1/FPR @ TPR = 0.5: 66.43810
+2018-03-27 06:54:04,145 Logging took 5.4 seconds
+2018-03-27 06:54:04,294 Training 703 batches took 120.5 seconds at 746.5 examples per second
+2018-03-27 06:54:04,295 Epoch took 159.2 seconds
+2018-03-27 06:54:04,295 ********************************************************************************
+2018-03-27 06:54:04,296 epoch = 20
+2018-03-27 06:54:04,297 lr = 0.00049000
+2018-03-27 06:57:15,974 Validation took 6.0 seconds
+2018-03-27 06:57:21,514 14763.0	~loss(train)=0.4307	loss(valid)=0.3710	roc_auc(valid)=0.9204	1/FPR @ TPR = 0.5: 58.78	Best 1/FPR @ TPR = 0.5: 66.43810
+2018-03-27 06:57:21,515 Logging took 5.5 seconds
+2018-03-27 06:57:21,668 Training 703 batches took 158.8 seconds at 566.8 examples per second
+2018-03-27 06:57:21,669 Epoch took 197.4 seconds
+2018-03-27 06:57:21,669 ********************************************************************************
+2018-03-27 06:57:21,670 epoch = 21
+2018-03-27 06:57:21,671 lr = 0.00049000
+2018-03-27 06:59:55,328 Validation took 6.0 seconds
+2018-03-27 07:00:00,240 15466.0	~loss(train)=0.4287	loss(valid)=0.3670	roc_auc(valid)=0.9190	1/FPR @ TPR = 0.5: 58.02	Best 1/FPR @ TPR = 0.5: 66.43810
+2018-03-27 07:00:00,240 Logging took 4.9 seconds
+2018-03-27 07:00:00,387 Training 703 batches took 120.5 seconds at 746.8 examples per second
+2018-03-27 07:00:00,388 Epoch took 158.7 seconds
+2018-03-27 07:00:00,388 ********************************************************************************
+2018-03-27 07:00:00,389 epoch = 22
+2018-03-27 07:00:00,390 lr = 0.00049000
+2018-03-27 07:02:34,653 Validation took 6.0 seconds
+2018-03-27 07:02:39,653 16169.0	~loss(train)=0.4276	loss(valid)=0.3751	roc_auc(valid)=0.9179	1/FPR @ TPR = 0.5: 50.29	Best 1/FPR @ TPR = 0.5: 66.43810
+2018-03-27 07:02:39,654 Logging took 5.0 seconds
+2018-03-27 07:02:39,793 Training 703 batches took 121.1 seconds at 743.4 examples per second
+2018-03-27 07:02:39,794 Epoch took 159.4 seconds
+2018-03-27 07:02:39,795 ********************************************************************************
+2018-03-27 07:02:39,796 epoch = 23
+2018-03-27 07:02:39,796 lr = 0.00049000
+2018-03-27 07:05:13,803 Validation took 6.0 seconds
+2018-03-27 07:05:18,704 16872.0	~loss(train)=0.4270	loss(valid)=0.3724	roc_auc(valid)=0.9201	1/FPR @ TPR = 0.5: 54.56	Best 1/FPR @ TPR = 0.5: 66.43810
+2018-03-27 07:05:18,705 Logging took 4.9 seconds
+2018-03-27 07:05:18,853 Training 703 batches took 120.7 seconds at 745.4 examples per second
+2018-03-27 07:05:18,854 Epoch took 159.1 seconds
+2018-03-27 07:05:18,855 ********************************************************************************
+2018-03-27 07:05:18,855 epoch = 24
+2018-03-27 07:05:18,856 lr = 0.00049000
+2018-03-27 07:07:53,360 Validation took 6.0 seconds
+2018-03-27 07:07:58,498 17575.0	~loss(train)=0.4276	loss(valid)=0.3663	roc_auc(valid)=0.9218	1/FPR @ TPR = 0.5: 69.38	Best 1/FPR @ TPR = 0.5: 69.38127
+2018-03-27 07:07:58,499 Logging took 5.1 seconds
+2018-03-27 07:07:58,649 Training 703 batches took 121.2 seconds at 742.4 examples per second
+2018-03-27 07:07:58,650 Epoch took 159.8 seconds
+2018-03-27 07:07:58,650 ********************************************************************************
+2018-03-27 07:07:58,651 epoch = 25
+2018-03-27 07:07:58,652 lr = 0.00034300
+2018-03-27 07:10:32,513 Validation took 5.9 seconds
+2018-03-27 07:10:37,658 18278.0	~loss(train)=0.4231	loss(valid)=0.3721	roc_auc(valid)=0.9209	1/FPR @ TPR = 0.5: 62.46	Best 1/FPR @ TPR = 0.5: 69.38127
+2018-03-27 07:10:37,660 Logging took 5.1 seconds
+2018-03-27 07:10:37,804 Training 703 batches took 120.9 seconds at 744.4 examples per second
+2018-03-27 07:10:37,805 Epoch took 159.2 seconds
+2018-03-27 07:10:37,805 ********************************************************************************
+2018-03-27 07:10:37,806 epoch = 26
+2018-03-27 07:10:37,807 lr = 0.00034300
+2018-03-27 07:13:11,556 Validation took 6.0 seconds
+2018-03-27 07:13:16,607 18981.0	~loss(train)=0.4211	loss(valid)=0.3773	roc_auc(valid)=0.9213	1/FPR @ TPR = 0.5: 69.35	Best 1/FPR @ TPR = 0.5: 69.38127
+2018-03-27 07:13:16,608 Logging took 5.1 seconds
+2018-03-27 07:13:16,756 Training 703 batches took 120.7 seconds at 745.6 examples per second
+2018-03-27 07:13:16,756 Epoch took 158.9 seconds
+2018-03-27 07:13:16,757 ********************************************************************************
+2018-03-27 07:13:16,758 epoch = 27
+2018-03-27 07:13:16,758 lr = 0.00034300
+2018-03-27 07:15:50,763 Validation took 6.0 seconds
+2018-03-27 07:15:56,015 19684.0	~loss(train)=0.4213	loss(valid)=0.3664	roc_auc(valid)=0.9209	1/FPR @ TPR = 0.5: 72.24	Best 1/FPR @ TPR = 0.5: 72.24468
+2018-03-27 07:15:56,015 Logging took 5.3 seconds
+2018-03-27 07:15:56,165 Training 703 batches took 120.9 seconds at 744.2 examples per second
+2018-03-27 07:15:56,166 Epoch took 159.4 seconds
+2018-03-27 07:15:56,167 ********************************************************************************
+2018-03-27 07:15:56,167 epoch = 28
+2018-03-27 07:15:56,168 lr = 0.00034300
+2018-03-27 07:18:29,955 Validation took 6.0 seconds
+2018-03-27 07:18:35,060 20387.0	~loss(train)=0.4219	loss(valid)=0.3700	roc_auc(valid)=0.9226	1/FPR @ TPR = 0.5: 64.84	Best 1/FPR @ TPR = 0.5: 72.24468
+2018-03-27 07:18:35,061 Logging took 5.1 seconds
+2018-03-27 07:18:35,209 Training 703 batches took 120.7 seconds at 745.8 examples per second
+2018-03-27 07:18:35,209 Epoch took 159.0 seconds
+2018-03-27 07:18:35,210 ********************************************************************************
+2018-03-27 07:18:35,211 epoch = 29
+2018-03-27 07:18:35,211 lr = 0.00034300
+2018-03-27 07:21:09,022 Validation took 6.0 seconds
+2018-03-27 07:21:14,306 21090.0	~loss(train)=0.4225	loss(valid)=0.3761	roc_auc(valid)=0.9203	1/FPR @ TPR = 0.5: 58.91	Best 1/FPR @ TPR = 0.5: 72.24468
+2018-03-27 07:21:14,307 Logging took 5.3 seconds
+2018-03-27 07:21:14,453 Training 703 batches took 120.8 seconds at 745.0 examples per second
+2018-03-27 07:21:14,454 Epoch took 159.2 seconds
+2018-03-27 07:21:14,454 ********************************************************************************
+2018-03-27 07:21:14,455 epoch = 30
+2018-03-27 07:21:14,456 lr = 0.00034300
+2018-03-27 07:23:48,445 Validation took 6.0 seconds
+2018-03-27 07:23:53,658 21793.0	~loss(train)=0.4219	loss(valid)=0.3674	roc_auc(valid)=0.9216	1/FPR @ TPR = 0.5: 67.40	Best 1/FPR @ TPR = 0.5: 72.24468
+2018-03-27 07:23:53,659 Logging took 5.2 seconds
+2018-03-27 07:23:53,807 Training 703 batches took 120.9 seconds at 744.3 examples per second
+2018-03-27 07:23:53,808 Epoch took 159.4 seconds
+2018-03-27 07:23:53,808 ********************************************************************************
+2018-03-27 07:23:53,809 epoch = 31
+2018-03-27 07:23:53,810 lr = 0.00034300
+2018-03-27 07:26:27,909 Validation took 6.1 seconds
+2018-03-27 07:26:33,210 22496.0	~loss(train)=0.4197	loss(valid)=0.3685	roc_auc(valid)=0.9225	1/FPR @ TPR = 0.5: 78.87	Best 1/FPR @ TPR = 0.5: 78.87336
+2018-03-27 07:26:33,210 Logging took 5.3 seconds
+2018-03-27 07:26:33,358 Training 703 batches took 121.0 seconds at 743.9 examples per second
+2018-03-27 07:26:33,358 Epoch took 159.5 seconds
+2018-03-27 07:26:33,359 ********************************************************************************
+2018-03-27 07:26:33,360 epoch = 32
+2018-03-27 07:26:33,360 lr = 0.00034300
+2018-03-27 07:29:06,701 Validation took 5.9 seconds
+2018-03-27 07:29:12,002 23199.0	~loss(train)=0.4207	loss(valid)=0.3657	roc_auc(valid)=0.9223	1/FPR @ TPR = 0.5: 71.99	Best 1/FPR @ TPR = 0.5: 78.87336
+2018-03-27 07:29:12,003 Logging took 5.3 seconds
+2018-03-27 07:29:12,142 Training 703 batches took 120.5 seconds at 746.5 examples per second
+2018-03-27 07:29:12,143 Epoch took 158.8 seconds
+2018-03-27 07:29:12,143 ********************************************************************************
+2018-03-27 07:29:12,144 epoch = 33
+2018-03-27 07:29:12,145 lr = 0.00024010
+2018-03-27 07:31:45,450 Validation took 6.0 seconds
+2018-03-27 07:31:50,781 23902.0	~loss(train)=0.4173	loss(valid)=0.3587	roc_auc(valid)=0.9228	1/FPR @ TPR = 0.5: 80.21	Best 1/FPR @ TPR = 0.5: 80.20534
+2018-03-27 07:31:50,781 Logging took 5.3 seconds
+2018-03-27 07:31:50,926 Training 703 batches took 120.3 seconds at 747.9 examples per second
+2018-03-27 07:31:50,927 Epoch took 158.8 seconds
+2018-03-27 07:31:50,927 ********************************************************************************
+2018-03-27 07:31:50,928 epoch = 34
+2018-03-27 07:31:50,929 lr = 0.00024010
+2018-03-27 07:34:24,522 Validation took 6.0 seconds
+2018-03-27 07:34:30,029 24605.0	~loss(train)=0.4160	loss(valid)=0.3616	roc_auc(valid)=0.9233	1/FPR @ TPR = 0.5: 73.09	Best 1/FPR @ TPR = 0.5: 80.20534
+2018-03-27 07:34:30,030 Logging took 5.5 seconds
+2018-03-27 07:34:30,176 Training 703 batches took 120.7 seconds at 745.5 examples per second
+2018-03-27 07:34:30,177 Epoch took 159.2 seconds
+2018-03-27 07:34:30,177 ********************************************************************************
+2018-03-27 07:34:30,178 epoch = 35
+2018-03-27 07:34:30,179 lr = 0.00024010
+2018-03-27 07:37:03,535 Validation took 5.9 seconds
+2018-03-27 07:37:09,054 25308.0	~loss(train)=0.4157	loss(valid)=0.3586	roc_auc(valid)=0.9233	1/FPR @ TPR = 0.5: 84.80	Best 1/FPR @ TPR = 0.5: 84.79703
+2018-03-27 07:37:09,055 Logging took 5.5 seconds
+2018-03-27 07:37:09,201 Training 703 batches took 120.4 seconds at 747.6 examples per second
+2018-03-27 07:37:09,202 Epoch took 159.0 seconds
+2018-03-27 07:37:09,202 ********************************************************************************
+2018-03-27 07:37:09,203 epoch = 36
+2018-03-27 07:37:09,204 lr = 0.00024010
+2018-03-27 07:39:42,901 Validation took 6.0 seconds
+2018-03-27 07:39:48,471 26011.0	~loss(train)=0.4154	loss(valid)=0.3637	roc_auc(valid)=0.9228	1/FPR @ TPR = 0.5: 88.83	Best 1/FPR @ TPR = 0.5: 88.82899
+2018-03-27 07:39:48,471 Logging took 5.6 seconds
+2018-03-27 07:39:48,617 Training 703 batches took 120.7 seconds at 745.7 examples per second
+2018-03-27 07:39:48,617 Epoch took 159.4 seconds
+2018-03-27 07:39:48,618 ********************************************************************************
+2018-03-27 07:39:48,619 epoch = 37
+2018-03-27 07:39:48,619 lr = 0.00024010
+2018-03-27 07:42:21,825 Validation took 5.9 seconds
+2018-03-27 07:42:27,325 26714.0	~loss(train)=0.4164	loss(valid)=0.3663	roc_auc(valid)=0.9227	1/FPR @ TPR = 0.5: 81.91	Best 1/FPR @ TPR = 0.5: 88.82899
+2018-03-27 07:42:27,326 Logging took 5.5 seconds
+2018-03-27 07:42:27,472 Training 703 batches took 120.3 seconds at 747.9 examples per second
+2018-03-27 07:42:27,473 Epoch took 158.9 seconds
+2018-03-27 07:42:27,473 ********************************************************************************
+2018-03-27 07:42:27,474 epoch = 38
+2018-03-27 07:42:27,474 lr = 0.00024010
+2018-03-27 07:45:01,135 Validation took 6.0 seconds
+2018-03-27 07:45:06,754 27417.0	~loss(train)=0.4155	loss(valid)=0.3611	roc_auc(valid)=0.9235	1/FPR @ TPR = 0.5: 88.99	Best 1/FPR @ TPR = 0.5: 88.98735
+2018-03-27 07:45:06,755 Logging took 5.6 seconds
+2018-03-27 07:45:06,901 Training 703 batches took 120.7 seconds at 745.7 examples per second
+2018-03-27 07:45:06,901 Epoch took 159.4 seconds
+2018-03-27 07:45:06,902 ********************************************************************************
+2018-03-27 07:45:06,903 epoch = 39
+2018-03-27 07:45:06,903 lr = 0.00024010
+2018-03-27 07:47:40,568 Validation took 6.0 seconds
+2018-03-27 07:47:46,173 28120.0	~loss(train)=0.4144	loss(valid)=0.3576	roc_auc(valid)=0.9231	1/FPR @ TPR = 0.5: 61.86	Best 1/FPR @ TPR = 0.5: 88.98735
+2018-03-27 07:47:46,175 Logging took 5.6 seconds
+2018-03-27 07:47:46,321 Training 703 batches took 120.6 seconds at 746.4 examples per second
+2018-03-27 07:47:46,322 Epoch took 159.4 seconds
+2018-03-27 07:47:46,323 ********************************************************************************
+2018-03-27 07:47:46,324 epoch = 40
+2018-03-27 07:47:46,324 lr = 0.00024010
+2018-03-27 07:50:58,122 Validation took 5.9 seconds
+2018-03-27 07:51:03,878 28823.0	~loss(train)=0.4156	loss(valid)=0.3599	roc_auc(valid)=0.9232	1/FPR @ TPR = 0.5: 84.80	Best 1/FPR @ TPR = 0.5: 88.98735
+2018-03-27 07:51:03,879 Logging took 5.8 seconds
+2018-03-27 07:51:04,036 Training 703 batches took 158.9 seconds at 566.2 examples per second
+2018-03-27 07:51:04,037 Epoch took 197.7 seconds
+2018-03-27 07:51:04,038 ********************************************************************************
+2018-03-27 07:51:04,038 epoch = 41
+2018-03-27 07:51:04,039 lr = 0.00016807
+2018-03-27 07:53:37,378 Validation took 6.0 seconds
+2018-03-27 07:53:42,428 29526.0	~loss(train)=0.4121	loss(valid)=0.3564	roc_auc(valid)=0.9246	1/FPR @ TPR = 0.5: 82.11	Best 1/FPR @ TPR = 0.5: 88.98735
+2018-03-27 07:53:42,428 Logging took 5.0 seconds
+2018-03-27 07:53:42,577 Training 703 batches took 120.2 seconds at 748.4 examples per second
+2018-03-27 07:53:42,577 Epoch took 158.5 seconds
+2018-03-27 07:53:42,578 ********************************************************************************
+2018-03-27 07:53:42,579 epoch = 42
+2018-03-27 07:53:42,579 lr = 0.00016807
+2018-03-27 07:56:16,372 Validation took 6.0 seconds
+2018-03-27 07:56:21,331 30229.0	~loss(train)=0.4116	loss(valid)=0.3594	roc_auc(valid)=0.9237	1/FPR @ TPR = 0.5: 74.95	Best 1/FPR @ TPR = 0.5: 88.98735
+2018-03-27 07:56:21,332 Logging took 5.0 seconds
+2018-03-27 07:56:21,475 Training 703 batches took 120.7 seconds at 745.4 examples per second
+2018-03-27 07:56:21,476 Epoch took 158.9 seconds
+2018-03-27 07:56:21,476 ********************************************************************************
+2018-03-27 07:56:21,477 epoch = 43
+2018-03-27 07:56:21,478 lr = 0.00016807
+2018-03-27 07:58:55,447 Validation took 6.1 seconds
+2018-03-27 07:59:00,349 30932.0	~loss(train)=0.4130	loss(valid)=0.3581	roc_auc(valid)=0.9237	1/FPR @ TPR = 0.5: 84.23	Best 1/FPR @ TPR = 0.5: 88.98735
+2018-03-27 07:59:00,350 Logging took 4.9 seconds
+2018-03-27 07:59:00,496 Training 703 batches took 120.7 seconds at 745.6 examples per second
+2018-03-27 07:59:00,497 Epoch took 159.0 seconds
+2018-03-27 07:59:00,498 ********************************************************************************
+2018-03-27 07:59:00,499 epoch = 44
+2018-03-27 07:59:00,499 lr = 0.00016807
+2018-03-27 08:01:34,284 Validation took 6.1 seconds
+2018-03-27 08:01:39,406 31635.0	~loss(train)=0.4119	loss(valid)=0.3529	roc_auc(valid)=0.9254	1/FPR @ TPR = 0.5: 90.97	Best 1/FPR @ TPR = 0.5: 90.96913
+2018-03-27 08:01:39,407 Logging took 5.1 seconds
+2018-03-27 08:01:39,552 Training 703 batches took 120.6 seconds at 746.0 examples per second
+2018-03-27 08:01:39,552 Epoch took 159.1 seconds
+2018-03-27 08:01:39,553 ********************************************************************************
+2018-03-27 08:01:39,554 epoch = 45
+2018-03-27 08:01:39,554 lr = 0.00016807
+2018-03-27 08:04:13,030 Validation took 6.0 seconds
+2018-03-27 08:04:18,055 32338.0	~loss(train)=0.4113	loss(valid)=0.3553	roc_auc(valid)=0.9243	1/FPR @ TPR = 0.5: 71.91	Best 1/FPR @ TPR = 0.5: 90.96913
+2018-03-27 08:04:18,055 Logging took 5.0 seconds
+2018-03-27 08:04:18,201 Training 703 batches took 120.5 seconds at 747.0 examples per second
+2018-03-27 08:04:18,202 Epoch took 158.6 seconds
+2018-03-27 08:04:18,203 ********************************************************************************
+2018-03-27 08:04:18,203 epoch = 46
+2018-03-27 08:04:18,204 lr = 0.00016807
+2018-03-27 08:06:51,629 Validation took 6.1 seconds
+2018-03-27 08:06:56,580 33041.0	~loss(train)=0.4112	loss(valid)=0.3574	roc_auc(valid)=0.9253	1/FPR @ TPR = 0.5: 88.23	Best 1/FPR @ TPR = 0.5: 90.96913
+2018-03-27 08:06:56,581 Logging took 5.0 seconds
+2018-03-27 08:06:56,728 Training 703 batches took 120.3 seconds at 747.8 examples per second
+2018-03-27 08:06:56,728 Epoch took 158.5 seconds
+2018-03-27 08:06:56,729 ********************************************************************************
+2018-03-27 08:06:56,730 epoch = 47
+2018-03-27 08:06:56,730 lr = 0.00016807
+2018-03-27 08:09:30,152 Validation took 6.0 seconds
+2018-03-27 08:09:35,186 33744.0	~loss(train)=0.4102	loss(valid)=0.3573	roc_auc(valid)=0.9249	1/FPR @ TPR = 0.5: 86.18	Best 1/FPR @ TPR = 0.5: 90.96913
+2018-03-27 08:09:35,186 Logging took 5.0 seconds
+2018-03-27 08:09:35,333 Training 703 batches took 120.5 seconds at 746.6 examples per second
+2018-03-27 08:09:35,334 Epoch took 158.6 seconds
+2018-03-27 08:09:35,334 ********************************************************************************
+2018-03-27 08:09:35,335 epoch = 48
+2018-03-27 08:09:35,335 lr = 0.00016807
+2018-03-27 08:12:08,685 Validation took 5.9 seconds
+2018-03-27 08:12:13,767 34447.0	~loss(train)=0.4116	loss(valid)=0.3552	roc_auc(valid)=0.9241	1/FPR @ TPR = 0.5: 69.84	Best 1/FPR @ TPR = 0.5: 90.96913
+2018-03-27 08:12:13,768 Logging took 5.1 seconds
+2018-03-27 08:12:13,916 Training 703 batches took 120.4 seconds at 747.3 examples per second
+2018-03-27 08:12:13,917 Epoch took 158.6 seconds
+2018-03-27 08:12:13,917 ********************************************************************************
+2018-03-27 08:12:13,918 epoch = 49
+2018-03-27 08:12:13,919 lr = 0.00011765
+2018-03-27 08:14:47,216 Validation took 5.9 seconds
+2018-03-27 08:14:52,342 35150.0	~loss(train)=0.4095	loss(valid)=0.3544	roc_auc(valid)=0.9248	1/FPR @ TPR = 0.5: 83.04	Best 1/FPR @ TPR = 0.5: 90.96913
+2018-03-27 08:14:52,343 Logging took 5.1 seconds
+2018-03-27 08:14:52,488 Training 703 batches took 120.4 seconds at 747.4 examples per second
+2018-03-27 08:14:52,488 Epoch took 158.6 seconds
+2018-03-27 08:14:52,489 ********************************************************************************
+2018-03-27 08:14:52,490 epoch = 50
+2018-03-27 08:14:52,490 lr = 0.00011765
+2018-03-27 08:17:25,585 Validation took 5.9 seconds
+2018-03-27 08:17:30,777 35853.0	~loss(train)=0.4093	loss(valid)=0.3568	roc_auc(valid)=0.9242	1/FPR @ TPR = 0.5: 81.17	Best 1/FPR @ TPR = 0.5: 90.96913
+2018-03-27 08:17:30,777 Logging took 5.2 seconds
+2018-03-27 08:17:30,923 Training 703 batches took 120.3 seconds at 747.8 examples per second
+2018-03-27 08:17:30,924 Epoch took 158.4 seconds
+2018-03-27 08:17:30,924 ********************************************************************************
+2018-03-27 08:17:30,925 epoch = 51
+2018-03-27 08:17:30,926 lr = 0.00011765
+2018-03-27 08:20:04,465 Validation took 6.0 seconds
+2018-03-27 08:20:09,593 36556.0	~loss(train)=0.4084	loss(valid)=0.3552	roc_auc(valid)=0.9243	1/FPR @ TPR = 0.5: 86.89	Best 1/FPR @ TPR = 0.5: 90.96913
+2018-03-27 08:20:09,594 Logging took 5.1 seconds
+2018-03-27 08:20:09,734 Training 703 batches took 120.5 seconds at 746.6 examples per second
+2018-03-27 08:20:09,734 Epoch took 158.8 seconds
+2018-03-27 08:20:09,735 ********************************************************************************
+2018-03-27 08:20:09,736 epoch = 52
+2018-03-27 08:20:09,736 lr = 0.00011765
+2018-03-27 08:22:43,003 Validation took 6.0 seconds
+2018-03-27 08:22:48,214 37259.0	~loss(train)=0.4078	loss(valid)=0.3564	roc_auc(valid)=0.9237	1/FPR @ TPR = 0.5: 67.33	Best 1/FPR @ TPR = 0.5: 90.96913
+2018-03-27 08:22:48,215 Logging took 5.2 seconds
+2018-03-27 08:22:48,362 Training 703 batches took 120.3 seconds at 748.1 examples per second
+2018-03-27 08:22:48,363 Epoch took 158.6 seconds
+2018-03-27 08:22:48,363 ********************************************************************************
+2018-03-27 08:22:48,364 epoch = 53
+2018-03-27 08:22:48,364 lr = 0.00011765
+2018-03-27 08:25:21,781 Validation took 6.0 seconds
+2018-03-27 08:25:26,855 37962.0	~loss(train)=0.4083	loss(valid)=0.3542	roc_auc(valid)=0.9258	1/FPR @ TPR = 0.5: 88.09	Best 1/FPR @ TPR = 0.5: 90.96913
+2018-03-27 08:25:26,856 Logging took 5.1 seconds
+2018-03-27 08:25:27,006 Training 703 batches took 120.4 seconds at 747.4 examples per second
+2018-03-27 08:25:27,006 Epoch took 158.6 seconds
+2018-03-27 08:25:27,007 ********************************************************************************
+2018-03-27 08:25:27,008 epoch = 54
+2018-03-27 08:25:27,008 lr = 0.00011765
+2018-03-27 08:28:00,578 Validation took 5.9 seconds
+2018-03-27 08:28:05,751 38665.0	~loss(train)=0.4074	loss(valid)=0.3538	roc_auc(valid)=0.9255	1/FPR @ TPR = 0.5: 79.65	Best 1/FPR @ TPR = 0.5: 90.96913
+2018-03-27 08:28:05,752 Logging took 5.2 seconds
+2018-03-27 08:28:05,897 Training 703 batches took 120.7 seconds at 745.7 examples per second
+2018-03-27 08:28:05,898 Epoch took 158.9 seconds
+2018-03-27 08:28:05,899 ********************************************************************************
+2018-03-27 08:28:05,900 epoch = 55
+2018-03-27 08:28:05,900 lr = 0.00011765
+2018-03-27 08:30:39,818 Validation took 6.1 seconds
+2018-03-27 08:30:44,909 39368.0	~loss(train)=0.4090	loss(valid)=0.3591	roc_auc(valid)=0.9253	1/FPR @ TPR = 0.5: 81.71	Best 1/FPR @ TPR = 0.5: 90.96913
+2018-03-27 08:30:44,910 Logging took 5.1 seconds
+2018-03-27 08:30:45,055 Training 703 batches took 120.7 seconds at 745.4 examples per second
+2018-03-27 08:30:45,055 Epoch took 159.2 seconds
+2018-03-27 08:30:45,056 ********************************************************************************
+2018-03-27 08:30:45,057 epoch = 56
+2018-03-27 08:30:45,057 lr = 0.00011765
+2018-03-27 08:33:18,698 Validation took 6.0 seconds
+2018-03-27 08:33:23,787 40071.0	~loss(train)=0.4074	loss(valid)=0.3552	roc_auc(valid)=0.9233	1/FPR @ TPR = 0.5: 69.50	Best 1/FPR @ TPR = 0.5: 90.96913
+2018-03-27 08:33:23,788 Logging took 5.1 seconds
+2018-03-27 08:33:23,934 Training 703 batches took 120.6 seconds at 746.2 examples per second
+2018-03-27 08:33:23,935 Epoch took 158.9 seconds
+2018-03-27 08:33:23,935 ********************************************************************************
+2018-03-27 08:33:23,936 epoch = 57
+2018-03-27 08:33:23,937 lr = 0.00008235
+2018-03-27 08:35:57,197 Validation took 5.9 seconds
+2018-03-27 08:36:02,333 40774.0	~loss(train)=0.4060	loss(valid)=0.3534	roc_auc(valid)=0.9252	1/FPR @ TPR = 0.5: 77.02	Best 1/FPR @ TPR = 0.5: 90.96913
+2018-03-27 08:36:02,333 Logging took 5.1 seconds
+2018-03-27 08:36:02,471 Training 703 batches took 120.4 seconds at 747.4 examples per second
+2018-03-27 08:36:02,472 Epoch took 158.5 seconds
+2018-03-27 08:36:02,473 ********************************************************************************
+2018-03-27 08:36:02,473 epoch = 58
+2018-03-27 08:36:02,474 lr = 0.00008235
+2018-03-27 08:38:35,619 Validation took 6.0 seconds
+2018-03-27 08:38:40,933 41477.0	~loss(train)=0.4056	loss(valid)=0.3527	roc_auc(valid)=0.9265	1/FPR @ TPR = 0.5: 103.31	Best 1/FPR @ TPR = 0.5: 103.30661
+2018-03-27 08:38:40,933 Logging took 5.3 seconds
+2018-03-27 08:38:41,071 Training 703 batches took 120.1 seconds at 749.3 examples per second
+2018-03-27 08:38:41,072 Epoch took 158.6 seconds
+2018-03-27 08:38:41,072 ********************************************************************************
+2018-03-27 08:38:41,073 epoch = 59
+2018-03-27 08:38:41,074 lr = 0.00008235
+2018-03-27 08:41:14,450 Validation took 6.0 seconds
+2018-03-27 08:41:19,700 42180.0	~loss(train)=0.4053	loss(valid)=0.3555	roc_auc(valid)=0.9256	1/FPR @ TPR = 0.5: 83.28	Best 1/FPR @ TPR = 0.5: 103.30661
+2018-03-27 08:41:19,701 Logging took 5.2 seconds
+2018-03-27 08:41:19,845 Training 703 batches took 120.3 seconds at 747.7 examples per second
+2018-03-27 08:41:19,846 Epoch took 158.8 seconds
+2018-03-27 08:41:19,847 ********************************************************************************
+2018-03-27 08:41:19,847 epoch = 60
+2018-03-27 08:41:19,848 lr = 0.00008235
+2018-03-27 08:44:30,924 Validation took 5.9 seconds
+2018-03-27 08:44:36,102 42883.0	~loss(train)=0.4050	loss(valid)=0.3545	roc_auc(valid)=0.9248	1/FPR @ TPR = 0.5: 74.97	Best 1/FPR @ TPR = 0.5: 103.30661
+2018-03-27 08:44:36,103 Logging took 5.2 seconds
+2018-03-27 08:44:36,255 Training 703 batches took 158.2 seconds at 568.7 examples per second
+2018-03-27 08:44:36,256 Epoch took 196.4 seconds
+2018-03-27 08:44:36,257 ********************************************************************************
+2018-03-27 08:44:36,257 epoch = 61
+2018-03-27 08:44:36,258 lr = 0.00008235
+2018-03-27 08:47:09,287 Validation took 5.9 seconds
+2018-03-27 08:47:14,538 43586.0	~loss(train)=0.4055	loss(valid)=0.3543	roc_auc(valid)=0.9250	1/FPR @ TPR = 0.5: 81.81	Best 1/FPR @ TPR = 0.5: 103.30661
+2018-03-27 08:47:14,538 Logging took 5.3 seconds
+2018-03-27 08:47:14,684 Training 703 batches took 120.2 seconds at 748.5 examples per second
+2018-03-27 08:47:14,685 Epoch took 158.4 seconds
+2018-03-27 08:47:14,685 ********************************************************************************
+2018-03-27 08:47:14,686 epoch = 62
+2018-03-27 08:47:14,687 lr = 0.00008235
+2018-03-27 08:49:48,513 Validation took 6.0 seconds
+2018-03-27 08:49:53,700 44289.0	~loss(train)=0.4050	loss(valid)=0.3531	roc_auc(valid)=0.9263	1/FPR @ TPR = 0.5: 92.81	Best 1/FPR @ TPR = 0.5: 103.30661
+2018-03-27 08:49:53,701 Logging took 5.2 seconds
+2018-03-27 08:49:53,845 Training 703 batches took 120.8 seconds at 745.0 examples per second
+2018-03-27 08:49:53,846 Epoch took 159.2 seconds
+2018-03-27 08:49:53,846 ********************************************************************************
+2018-03-27 08:49:53,847 epoch = 63
+2018-03-27 08:49:53,848 lr = 0.00008235
+2018-03-27 08:52:27,114 Validation took 6.0 seconds
+2018-03-27 08:52:32,417 44992.0	~loss(train)=0.4049	loss(valid)=0.3547	roc_auc(valid)=0.9248	1/FPR @ TPR = 0.5: 74.54	Best 1/FPR @ TPR = 0.5: 103.30661
+2018-03-27 08:52:32,417 Logging took 5.3 seconds
+2018-03-27 08:52:32,569 Training 703 batches took 120.4 seconds at 747.5 examples per second
+2018-03-27 08:52:32,570 Epoch took 158.7 seconds
+2018-03-27 08:52:32,571 ********************************************************************************
+2018-03-27 08:52:32,572 epoch = 64
+2018-03-27 08:52:32,572 lr = 0.00008235
+2018-03-27 08:55:06,161 Validation took 6.0 seconds
+2018-03-27 08:55:11,371 45695.0	~loss(train)=0.4047	loss(valid)=0.3539	roc_auc(valid)=0.9253	1/FPR @ TPR = 0.5: 75.90	Best 1/FPR @ TPR = 0.5: 103.30661
+2018-03-27 08:55:11,372 Logging took 5.2 seconds
+2018-03-27 08:55:11,520 Training 703 batches took 120.5 seconds at 746.7 examples per second
+2018-03-27 08:55:11,521 Epoch took 158.9 seconds
+2018-03-27 08:55:11,521 ********************************************************************************
+2018-03-27 08:55:11,522 epoch = 65
+2018-03-27 08:55:11,522 lr = 0.00005765
+2018-03-27 08:57:45,210 Validation took 6.1 seconds
+2018-03-27 08:57:50,484 46398.0	~loss(train)=0.4031	loss(valid)=0.3532	roc_auc(valid)=0.9261	1/FPR @ TPR = 0.5: 97.65	Best 1/FPR @ TPR = 0.5: 103.30661
+2018-03-27 08:57:50,484 Logging took 5.3 seconds
+2018-03-27 08:57:50,631 Training 703 batches took 120.7 seconds at 745.7 examples per second
+2018-03-27 08:57:50,632 Epoch took 159.1 seconds
+2018-03-27 08:57:50,632 ********************************************************************************
+2018-03-27 08:57:50,633 epoch = 66
+2018-03-27 08:57:50,634 lr = 0.00005765
+2018-03-27 09:00:24,186 Validation took 6.0 seconds
+2018-03-27 09:00:29,433 47101.0	~loss(train)=0.4033	loss(valid)=0.3553	roc_auc(valid)=0.9248	1/FPR @ TPR = 0.5: 81.20	Best 1/FPR @ TPR = 0.5: 103.30661
+2018-03-27 09:00:29,434 Logging took 5.2 seconds
+2018-03-27 09:00:29,584 Training 703 batches took 120.4 seconds at 747.2 examples per second
+2018-03-27 09:00:29,584 Epoch took 159.0 seconds
+2018-03-27 09:00:29,585 ********************************************************************************
+2018-03-27 09:00:29,586 epoch = 67
+2018-03-27 09:00:29,586 lr = 0.00005765
+2018-03-27 09:03:03,098 Validation took 5.9 seconds
+2018-03-27 09:03:08,438 47804.0	~loss(train)=0.4031	loss(valid)=0.3550	roc_auc(valid)=0.9258	1/FPR @ TPR = 0.5: 88.51	Best 1/FPR @ TPR = 0.5: 103.30661
+2018-03-27 09:03:08,439 Logging took 5.3 seconds
+2018-03-27 09:03:08,577 Training 703 batches took 120.6 seconds at 746.3 examples per second
+2018-03-27 09:03:08,577 Epoch took 159.0 seconds
+2018-03-27 09:03:08,578 ********************************************************************************
+2018-03-27 09:03:08,579 epoch = 68
+2018-03-27 09:03:08,579 lr = 0.00005765
+2018-03-27 09:05:41,784 Validation took 6.0 seconds
+2018-03-27 09:05:47,234 48507.0	~loss(train)=0.4025	loss(valid)=0.3557	roc_auc(valid)=0.9260	1/FPR @ TPR = 0.5: 70.71	Best 1/FPR @ TPR = 0.5: 103.30661
+2018-03-27 09:05:47,235 Logging took 5.4 seconds
+2018-03-27 09:05:47,386 Training 703 batches took 120.3 seconds at 748.3 examples per second
+2018-03-27 09:05:47,386 Epoch took 158.8 seconds
+2018-03-27 09:05:47,387 ********************************************************************************
+2018-03-27 09:05:47,388 epoch = 69
+2018-03-27 09:05:47,388 lr = 0.00005765
+2018-03-27 09:08:20,610 Validation took 6.0 seconds
+2018-03-27 09:08:25,979 49210.0	~loss(train)=0.4024	loss(valid)=0.3551	roc_auc(valid)=0.9253	1/FPR @ TPR = 0.5: 80.60	Best 1/FPR @ TPR = 0.5: 103.30661
+2018-03-27 09:08:25,979 Logging took 5.4 seconds
+2018-03-27 09:08:26,123 Training 703 batches took 120.3 seconds at 748.1 examples per second
+2018-03-27 09:08:26,124 Epoch took 158.7 seconds
+2018-03-27 09:08:26,125 ********************************************************************************
+2018-03-27 09:08:26,126 epoch = 70
+2018-03-27 09:08:26,126 lr = 0.00005765
+2018-03-27 09:10:59,557 Validation took 6.0 seconds
+2018-03-27 09:11:05,071 49913.0	~loss(train)=0.4026	loss(valid)=0.3553	roc_auc(valid)=0.9261	1/FPR @ TPR = 0.5: 109.74	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:11:05,071 Logging took 5.5 seconds
+2018-03-27 09:11:05,217 Training 703 batches took 120.5 seconds at 746.8 examples per second
+2018-03-27 09:11:05,218 Epoch took 159.1 seconds
+2018-03-27 09:11:05,218 ********************************************************************************
+2018-03-27 09:11:05,219 epoch = 71
+2018-03-27 09:11:05,220 lr = 0.00005765
+2018-03-27 09:13:38,717 Validation took 6.0 seconds
+2018-03-27 09:13:44,114 50616.0	~loss(train)=0.4022	loss(valid)=0.3552	roc_auc(valid)=0.9251	1/FPR @ TPR = 0.5: 81.36	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:13:44,115 Logging took 5.4 seconds
+2018-03-27 09:13:44,262 Training 703 batches took 120.5 seconds at 746.7 examples per second
+2018-03-27 09:13:44,263 Epoch took 159.0 seconds
+2018-03-27 09:13:44,263 ********************************************************************************
+2018-03-27 09:13:44,264 epoch = 72
+2018-03-27 09:13:44,265 lr = 0.00005765
+2018-03-27 09:16:17,971 Validation took 5.9 seconds
+2018-03-27 09:16:23,434 51319.0	~loss(train)=0.4025	loss(valid)=0.3553	roc_auc(valid)=0.9259	1/FPR @ TPR = 0.5: 92.62	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:16:23,435 Logging took 5.5 seconds
+2018-03-27 09:16:23,580 Training 703 batches took 120.8 seconds at 744.8 examples per second
+2018-03-27 09:16:23,581 Epoch took 159.3 seconds
+2018-03-27 09:16:23,581 ********************************************************************************
+2018-03-27 09:16:23,582 epoch = 73
+2018-03-27 09:16:23,582 lr = 0.00004035
+2018-03-27 09:18:57,189 Validation took 6.0 seconds
+2018-03-27 09:19:02,556 52022.0	~loss(train)=0.4012	loss(valid)=0.3536	roc_auc(valid)=0.9259	1/FPR @ TPR = 0.5: 92.92	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:19:02,556 Logging took 5.4 seconds
+2018-03-27 09:19:02,702 Training 703 batches took 120.6 seconds at 746.4 examples per second
+2018-03-27 09:19:02,703 Epoch took 159.1 seconds
+2018-03-27 09:19:02,703 ********************************************************************************
+2018-03-27 09:19:02,704 epoch = 74
+2018-03-27 09:19:02,705 lr = 0.00004035
+2018-03-27 09:21:36,440 Validation took 6.0 seconds
+2018-03-27 09:21:41,953 52725.0	~loss(train)=0.4011	loss(valid)=0.3552	roc_auc(valid)=0.9265	1/FPR @ TPR = 0.5: 88.18	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:21:41,953 Logging took 5.5 seconds
+2018-03-27 09:21:42,100 Training 703 batches took 120.7 seconds at 745.5 examples per second
+2018-03-27 09:21:42,101 Epoch took 159.4 seconds
+2018-03-27 09:21:42,101 ********************************************************************************
+2018-03-27 09:21:42,102 epoch = 75
+2018-03-27 09:21:42,103 lr = 0.00004035
+2018-03-27 09:24:15,805 Validation took 6.0 seconds
+2018-03-27 09:24:21,209 53428.0	~loss(train)=0.4008	loss(valid)=0.3539	roc_auc(valid)=0.9262	1/FPR @ TPR = 0.5: 84.63	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:24:21,210 Logging took 5.4 seconds
+2018-03-27 09:24:21,356 Training 703 batches took 120.6 seconds at 746.0 examples per second
+2018-03-27 09:24:21,357 Epoch took 159.3 seconds
+2018-03-27 09:24:21,357 ********************************************************************************
+2018-03-27 09:24:21,358 epoch = 76
+2018-03-27 09:24:21,359 lr = 0.00004035
+2018-03-27 09:26:55,025 Validation took 6.0 seconds
+2018-03-27 09:27:00,370 54131.0	~loss(train)=0.4008	loss(valid)=0.3525	roc_auc(valid)=0.9263	1/FPR @ TPR = 0.5: 93.66	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:27:00,371 Logging took 5.3 seconds
+2018-03-27 09:27:00,516 Training 703 batches took 120.7 seconds at 745.6 examples per second
+2018-03-27 09:27:00,517 Epoch took 159.2 seconds
+2018-03-27 09:27:00,517 ********************************************************************************
+2018-03-27 09:27:00,518 epoch = 77
+2018-03-27 09:27:00,519 lr = 0.00004035
+2018-03-27 09:29:34,210 Validation took 6.0 seconds
+2018-03-27 09:29:39,681 54834.0	~loss(train)=0.4011	loss(valid)=0.3528	roc_auc(valid)=0.9252	1/FPR @ TPR = 0.5: 74.67	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:29:39,682 Logging took 5.5 seconds
+2018-03-27 09:29:39,828 Training 703 batches took 120.6 seconds at 746.4 examples per second
+2018-03-27 09:29:39,829 Epoch took 159.3 seconds
+2018-03-27 09:29:39,829 ********************************************************************************
+2018-03-27 09:29:39,830 epoch = 78
+2018-03-27 09:29:39,831 lr = 0.00004035
+2018-03-27 09:32:13,469 Validation took 6.0 seconds
+2018-03-27 09:32:18,933 55537.0	~loss(train)=0.4007	loss(valid)=0.3541	roc_auc(valid)=0.9259	1/FPR @ TPR = 0.5: 77.07	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:32:18,934 Logging took 5.5 seconds
+2018-03-27 09:32:19,078 Training 703 batches took 120.6 seconds at 746.3 examples per second
+2018-03-27 09:32:19,079 Epoch took 159.2 seconds
+2018-03-27 09:32:19,079 ********************************************************************************
+2018-03-27 09:32:19,080 epoch = 79
+2018-03-27 09:32:19,080 lr = 0.00004035
+2018-03-27 09:34:52,488 Validation took 6.0 seconds
+2018-03-27 09:34:58,028 56240.0	~loss(train)=0.4007	loss(valid)=0.3522	roc_auc(valid)=0.9258	1/FPR @ TPR = 0.5: 77.33	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:34:58,029 Logging took 5.5 seconds
+2018-03-27 09:34:58,174 Training 703 batches took 120.5 seconds at 746.8 examples per second
+2018-03-27 09:34:58,175 Epoch took 159.1 seconds
+2018-03-27 09:34:58,175 ********************************************************************************
+2018-03-27 09:34:58,176 epoch = 80
+2018-03-27 09:34:58,177 lr = 0.00004035
+2018-03-27 09:38:09,428 Validation took 6.1 seconds
+2018-03-27 09:38:14,971 56943.0	~loss(train)=0.4008	loss(valid)=0.3516	roc_auc(valid)=0.9261	1/FPR @ TPR = 0.5: 84.72	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:38:14,972 Logging took 5.5 seconds
+2018-03-27 09:38:15,135 Training 703 batches took 158.1 seconds at 569.1 examples per second
+2018-03-27 09:38:15,136 Epoch took 197.0 seconds
+2018-03-27 09:38:15,136 ********************************************************************************
+2018-03-27 09:38:15,137 epoch = 81
+2018-03-27 09:38:15,137 lr = 0.00002825
+2018-03-27 09:40:48,581 Validation took 5.9 seconds
+2018-03-27 09:40:54,225 57646.0	~loss(train)=0.4001	loss(valid)=0.3536	roc_auc(valid)=0.9255	1/FPR @ TPR = 0.5: 80.49	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:40:54,225 Logging took 5.6 seconds
+2018-03-27 09:40:54,372 Training 703 batches took 120.6 seconds at 746.1 examples per second
+2018-03-27 09:40:54,373 Epoch took 159.2 seconds
+2018-03-27 09:40:54,373 ********************************************************************************
+2018-03-27 09:40:54,374 epoch = 82
+2018-03-27 09:40:54,375 lr = 0.00002825
+2018-03-27 09:43:28,238 Validation took 6.1 seconds
+2018-03-27 09:43:33,140 58349.0	~loss(train)=0.4002	loss(valid)=0.3533	roc_auc(valid)=0.9260	1/FPR @ TPR = 0.5: 83.72	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:43:33,140 Logging took 4.9 seconds
+2018-03-27 09:43:33,285 Training 703 batches took 120.7 seconds at 745.3 examples per second
+2018-03-27 09:43:33,285 Epoch took 158.9 seconds
+2018-03-27 09:43:33,286 ********************************************************************************
+2018-03-27 09:43:33,287 epoch = 83
+2018-03-27 09:43:33,287 lr = 0.00002825
+2018-03-27 09:46:06,740 Validation took 5.9 seconds
+2018-03-27 09:46:11,790 59052.0	~loss(train)=0.3998	loss(valid)=0.3538	roc_auc(valid)=0.9261	1/FPR @ TPR = 0.5: 79.98	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:46:11,790 Logging took 5.0 seconds
+2018-03-27 09:46:11,929 Training 703 batches took 120.6 seconds at 746.0 examples per second
+2018-03-27 09:46:11,930 Epoch took 158.6 seconds
+2018-03-27 09:46:11,930 ********************************************************************************
+2018-03-27 09:46:11,931 epoch = 84
+2018-03-27 09:46:11,931 lr = 0.00002825
+2018-03-27 09:48:45,025 Validation took 5.9 seconds
+2018-03-27 09:48:50,014 59755.0	~loss(train)=0.3997	loss(valid)=0.3541	roc_auc(valid)=0.9261	1/FPR @ TPR = 0.5: 93.01	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:48:50,015 Logging took 5.0 seconds
+2018-03-27 09:48:50,154 Training 703 batches took 120.1 seconds at 749.0 examples per second
+2018-03-27 09:48:50,154 Epoch took 158.2 seconds
+2018-03-27 09:48:50,155 ********************************************************************************
+2018-03-27 09:48:50,156 epoch = 85
+2018-03-27 09:48:50,156 lr = 0.00002825
+2018-03-27 09:51:23,600 Validation took 6.0 seconds
+2018-03-27 09:51:28,565 60458.0	~loss(train)=0.3997	loss(valid)=0.3527	roc_auc(valid)=0.9259	1/FPR @ TPR = 0.5: 80.75	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:51:28,566 Logging took 5.0 seconds
+2018-03-27 09:51:28,712 Training 703 batches took 120.5 seconds at 747.0 examples per second
+2018-03-27 09:51:28,713 Epoch took 158.6 seconds
+2018-03-27 09:51:28,714 ********************************************************************************
+2018-03-27 09:51:28,715 epoch = 86
+2018-03-27 09:51:28,715 lr = 0.00002825
+2018-03-27 09:54:02,541 Validation took 6.1 seconds
+2018-03-27 09:54:07,500 61161.0	~loss(train)=0.4002	loss(valid)=0.3531	roc_auc(valid)=0.9261	1/FPR @ TPR = 0.5: 80.44	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:54:07,500 Logging took 5.0 seconds
+2018-03-27 09:54:07,646 Training 703 batches took 120.6 seconds at 746.3 examples per second
+2018-03-27 09:54:07,647 Epoch took 158.9 seconds
+2018-03-27 09:54:07,647 ********************************************************************************
+2018-03-27 09:54:07,648 epoch = 87
+2018-03-27 09:54:07,648 lr = 0.00002825
+2018-03-27 09:56:41,286 Validation took 6.0 seconds
+2018-03-27 09:56:46,216 61864.0	~loss(train)=0.3998	loss(valid)=0.3540	roc_auc(valid)=0.9259	1/FPR @ TPR = 0.5: 88.34	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:56:46,217 Logging took 4.9 seconds
+2018-03-27 09:56:46,362 Training 703 batches took 120.6 seconds at 746.0 examples per second
+2018-03-27 09:56:46,363 Epoch took 158.7 seconds
+2018-03-27 09:56:46,363 ********************************************************************************
+2018-03-27 09:56:46,364 epoch = 88
+2018-03-27 09:56:46,365 lr = 0.00002825
+2018-03-27 09:59:19,712 Validation took 6.0 seconds
+2018-03-27 09:59:24,734 62567.0	~loss(train)=0.4000	loss(valid)=0.3545	roc_auc(valid)=0.9260	1/FPR @ TPR = 0.5: 84.29	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 09:59:24,734 Logging took 5.0 seconds
+2018-03-27 09:59:24,884 Training 703 batches took 120.5 seconds at 746.9 examples per second
+2018-03-27 09:59:24,885 Epoch took 158.5 seconds
+2018-03-27 09:59:24,885 ********************************************************************************
+2018-03-27 09:59:24,886 epoch = 89
+2018-03-27 09:59:24,887 lr = 0.00001977
+2018-03-27 10:01:58,337 Validation took 6.0 seconds
+2018-03-27 10:02:03,302 63270.0	~loss(train)=0.3993	loss(valid)=0.3526	roc_auc(valid)=0.9264	1/FPR @ TPR = 0.5: 88.65	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:02:03,303 Logging took 5.0 seconds
+2018-03-27 10:02:03,450 Training 703 batches took 120.5 seconds at 747.1 examples per second
+2018-03-27 10:02:03,451 Epoch took 158.6 seconds
+2018-03-27 10:02:03,451 ********************************************************************************
+2018-03-27 10:02:03,452 epoch = 90
+2018-03-27 10:02:03,453 lr = 0.00001977
+2018-03-27 10:04:37,266 Validation took 6.0 seconds
+2018-03-27 10:04:42,285 63973.0	~loss(train)=0.3993	loss(valid)=0.3542	roc_auc(valid)=0.9258	1/FPR @ TPR = 0.5: 84.72	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:04:42,286 Logging took 5.0 seconds
+2018-03-27 10:04:42,433 Training 703 batches took 120.8 seconds at 745.0 examples per second
+2018-03-27 10:04:42,434 Epoch took 159.0 seconds
+2018-03-27 10:04:42,434 ********************************************************************************
+2018-03-27 10:04:42,435 epoch = 91
+2018-03-27 10:04:42,436 lr = 0.00001977
+2018-03-27 10:07:15,908 Validation took 5.9 seconds
+2018-03-27 10:07:20,850 64676.0	~loss(train)=0.3996	loss(valid)=0.3525	roc_auc(valid)=0.9263	1/FPR @ TPR = 0.5: 84.63	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:07:20,851 Logging took 4.9 seconds
+2018-03-27 10:07:20,998 Training 703 batches took 120.5 seconds at 746.8 examples per second
+2018-03-27 10:07:20,999 Epoch took 158.6 seconds
+2018-03-27 10:07:21,000 ********************************************************************************
+2018-03-27 10:07:21,000 epoch = 92
+2018-03-27 10:07:21,001 lr = 0.00001977
+2018-03-27 10:09:54,433 Validation took 5.9 seconds
+2018-03-27 10:09:59,408 65379.0	~loss(train)=0.3990	loss(valid)=0.3531	roc_auc(valid)=0.9262	1/FPR @ TPR = 0.5: 83.92	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:09:59,409 Logging took 5.0 seconds
+2018-03-27 10:09:59,554 Training 703 batches took 120.5 seconds at 746.5 examples per second
+2018-03-27 10:09:59,554 Epoch took 158.6 seconds
+2018-03-27 10:09:59,555 ********************************************************************************
+2018-03-27 10:09:59,556 epoch = 93
+2018-03-27 10:09:59,556 lr = 0.00001977
+2018-03-27 10:12:32,907 Validation took 6.0 seconds
+2018-03-27 10:12:37,946 66082.0	~loss(train)=0.3994	loss(valid)=0.3532	roc_auc(valid)=0.9257	1/FPR @ TPR = 0.5: 85.33	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:12:37,947 Logging took 5.0 seconds
+2018-03-27 10:12:38,092 Training 703 batches took 120.5 seconds at 747.0 examples per second
+2018-03-27 10:12:38,093 Epoch took 158.5 seconds
+2018-03-27 10:12:38,093 ********************************************************************************
+2018-03-27 10:12:38,094 epoch = 94
+2018-03-27 10:12:38,094 lr = 0.00001977
+2018-03-27 10:15:11,609 Validation took 5.9 seconds
+2018-03-27 10:15:16,549 66785.0	~loss(train)=0.3992	loss(valid)=0.3533	roc_auc(valid)=0.9265	1/FPR @ TPR = 0.5: 84.72	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:15:16,549 Logging took 4.9 seconds
+2018-03-27 10:15:16,695 Training 703 batches took 120.6 seconds at 746.4 examples per second
+2018-03-27 10:15:16,695 Epoch took 158.6 seconds
+2018-03-27 10:15:16,696 ********************************************************************************
+2018-03-27 10:15:16,697 epoch = 95
+2018-03-27 10:15:16,697 lr = 0.00001977
+2018-03-27 10:17:50,237 Validation took 6.0 seconds
+2018-03-27 10:17:55,269 67488.0	~loss(train)=0.3990	loss(valid)=0.3530	roc_auc(valid)=0.9261	1/FPR @ TPR = 0.5: 84.63	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:17:55,269 Logging took 5.0 seconds
+2018-03-27 10:17:55,417 Training 703 batches took 120.7 seconds at 745.7 examples per second
+2018-03-27 10:17:55,418 Epoch took 158.7 seconds
+2018-03-27 10:17:55,418 ********************************************************************************
+2018-03-27 10:17:55,419 epoch = 96
+2018-03-27 10:17:55,420 lr = 0.00001977
+2018-03-27 10:20:28,889 Validation took 6.0 seconds
+2018-03-27 10:20:33,982 68191.0	~loss(train)=0.3988	loss(valid)=0.3541	roc_auc(valid)=0.9257	1/FPR @ TPR = 0.5: 77.33	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:20:33,983 Logging took 5.1 seconds
+2018-03-27 10:20:34,129 Training 703 batches took 120.6 seconds at 746.4 examples per second
+2018-03-27 10:20:34,129 Epoch took 158.7 seconds
+2018-03-27 10:20:34,130 ********************************************************************************
+2018-03-27 10:20:34,131 epoch = 97
+2018-03-27 10:20:34,131 lr = 0.00001384
+2018-03-27 10:23:07,832 Validation took 6.0 seconds
+2018-03-27 10:23:13,005 68894.0	~loss(train)=0.3987	loss(valid)=0.3531	roc_auc(valid)=0.9260	1/FPR @ TPR = 0.5: 89.07	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:23:13,006 Logging took 5.2 seconds
+2018-03-27 10:23:13,152 Training 703 batches took 120.7 seconds at 745.5 examples per second
+2018-03-27 10:23:13,153 Epoch took 159.0 seconds
+2018-03-27 10:23:13,153 ********************************************************************************
+2018-03-27 10:23:13,154 epoch = 98
+2018-03-27 10:23:13,154 lr = 0.00001384
+2018-03-27 10:25:46,984 Validation took 6.0 seconds
+2018-03-27 10:25:52,088 69597.0	~loss(train)=0.3985	loss(valid)=0.3536	roc_auc(valid)=0.9266	1/FPR @ TPR = 0.5: 87.93	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:25:52,089 Logging took 5.1 seconds
+2018-03-27 10:25:52,236 Training 703 batches took 120.7 seconds at 745.3 examples per second
+2018-03-27 10:25:52,237 Epoch took 159.1 seconds
+2018-03-27 10:25:52,237 ********************************************************************************
+2018-03-27 10:25:52,238 epoch = 99
+2018-03-27 10:25:52,239 lr = 0.00001384
+2018-03-27 10:28:26,237 Validation took 6.0 seconds
+2018-03-27 10:28:31,330 70300.0	~loss(train)=0.3985	loss(valid)=0.3540	roc_auc(valid)=0.9262	1/FPR @ TPR = 0.5: 80.75	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:28:31,331 Logging took 5.1 seconds
+2018-03-27 10:28:31,476 Training 703 batches took 121.0 seconds at 743.9 examples per second
+2018-03-27 10:28:31,477 Epoch took 159.2 seconds
+2018-03-27 10:28:31,477 ********************************************************************************
+2018-03-27 10:28:31,478 epoch = 100
+2018-03-27 10:28:31,479 lr = 0.00001384
+2018-03-27 10:31:42,861 Validation took 5.9 seconds
+2018-03-27 10:31:47,972 71003.0	~loss(train)=0.3983	loss(valid)=0.3537	roc_auc(valid)=0.9260	1/FPR @ TPR = 0.5: 88.09	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:31:47,972 Logging took 5.1 seconds
+2018-03-27 10:31:48,125 Training 703 batches took 158.5 seconds at 567.9 examples per second
+2018-03-27 10:31:48,126 Epoch took 196.6 seconds
+2018-03-27 10:31:48,127 ********************************************************************************
+2018-03-27 10:31:48,128 epoch = 101
+2018-03-27 10:31:48,128 lr = 0.00001384
+2018-03-27 10:34:21,396 Validation took 6.0 seconds
+2018-03-27 10:34:26,534 71706.0	~loss(train)=0.3984	loss(valid)=0.3524	roc_auc(valid)=0.9265	1/FPR @ TPR = 0.5: 88.28	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:34:26,535 Logging took 5.1 seconds
+2018-03-27 10:34:26,680 Training 703 batches took 120.3 seconds at 748.1 examples per second
+2018-03-27 10:34:26,681 Epoch took 158.6 seconds
+2018-03-27 10:34:26,681 ********************************************************************************
+2018-03-27 10:34:26,682 epoch = 102
+2018-03-27 10:34:26,683 lr = 0.00001384
+2018-03-27 10:37:00,338 Validation took 6.0 seconds
+2018-03-27 10:37:05,532 72409.0	~loss(train)=0.3987	loss(valid)=0.3536	roc_auc(valid)=0.9261	1/FPR @ TPR = 0.5: 88.65	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:37:05,533 Logging took 5.2 seconds
+2018-03-27 10:37:05,678 Training 703 batches took 120.7 seconds at 745.6 examples per second
+2018-03-27 10:37:05,679 Epoch took 159.0 seconds
+2018-03-27 10:37:05,680 ********************************************************************************
+2018-03-27 10:37:05,681 epoch = 103
+2018-03-27 10:37:05,681 lr = 0.00001384
+2018-03-27 10:39:39,264 Validation took 6.0 seconds
+2018-03-27 10:39:44,382 73112.0	~loss(train)=0.3984	loss(valid)=0.3520	roc_auc(valid)=0.9262	1/FPR @ TPR = 0.5: 80.18	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:39:44,383 Logging took 5.1 seconds
+2018-03-27 10:39:44,528 Training 703 batches took 120.5 seconds at 746.8 examples per second
+2018-03-27 10:39:44,529 Epoch took 158.8 seconds
+2018-03-27 10:39:44,529 ********************************************************************************
+2018-03-27 10:39:44,530 epoch = 104
+2018-03-27 10:39:44,530 lr = 0.00001384
+2018-03-27 10:42:18,172 Validation took 6.0 seconds
+2018-03-27 10:42:23,368 73815.0	~loss(train)=0.3984	loss(valid)=0.3521	roc_auc(valid)=0.9266	1/FPR @ TPR = 0.5: 84.72	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:42:23,369 Logging took 5.2 seconds
+2018-03-27 10:42:23,519 Training 703 batches took 120.7 seconds at 745.5 examples per second
+2018-03-27 10:42:23,520 Epoch took 159.0 seconds
+2018-03-27 10:42:23,520 ********************************************************************************
+2018-03-27 10:42:23,521 epoch = 105
+2018-03-27 10:42:23,522 lr = 0.00000969
+2018-03-27 10:44:56,969 Validation took 6.0 seconds
+2018-03-27 10:45:02,114 74518.0	~loss(train)=0.3984	loss(valid)=0.3530	roc_auc(valid)=0.9261	1/FPR @ TPR = 0.5: 81.04	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:45:02,114 Logging took 5.1 seconds
+2018-03-27 10:45:02,263 Training 703 batches took 120.5 seconds at 746.8 examples per second
+2018-03-27 10:45:02,264 Epoch took 158.7 seconds
+2018-03-27 10:45:02,265 ********************************************************************************
+2018-03-27 10:45:02,265 epoch = 106
+2018-03-27 10:45:02,266 lr = 0.00000969
+2018-03-27 10:47:35,975 Validation took 6.0 seconds
+2018-03-27 10:47:41,163 75221.0	~loss(train)=0.3982	loss(valid)=0.3536	roc_auc(valid)=0.9262	1/FPR @ TPR = 0.5: 80.39	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:47:41,164 Logging took 5.2 seconds
+2018-03-27 10:47:41,311 Training 703 batches took 120.6 seconds at 746.0 examples per second
+2018-03-27 10:47:41,312 Epoch took 159.0 seconds
+2018-03-27 10:47:41,313 ********************************************************************************
+2018-03-27 10:47:41,313 epoch = 107
+2018-03-27 10:47:41,314 lr = 0.00000969
+2018-03-27 10:50:15,103 Validation took 6.1 seconds
+2018-03-27 10:50:20,232 75924.0	~loss(train)=0.3981	loss(valid)=0.3533	roc_auc(valid)=0.9267	1/FPR @ TPR = 0.5: 84.54	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:50:20,232 Logging took 5.1 seconds
+2018-03-27 10:50:20,380 Training 703 batches took 120.7 seconds at 745.7 examples per second
+2018-03-27 10:50:20,381 Epoch took 159.1 seconds
+2018-03-27 10:50:20,381 ********************************************************************************
+2018-03-27 10:50:20,382 epoch = 108
+2018-03-27 10:50:20,383 lr = 0.00000969
+2018-03-27 10:52:53,994 Validation took 6.0 seconds
+2018-03-27 10:52:59,115 76627.0	~loss(train)=0.3983	loss(valid)=0.3533	roc_auc(valid)=0.9262	1/FPR @ TPR = 0.5: 88.18	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:52:59,116 Logging took 5.1 seconds
+2018-03-27 10:52:59,260 Training 703 batches took 120.6 seconds at 745.8 examples per second
+2018-03-27 10:52:59,261 Epoch took 158.9 seconds
+2018-03-27 10:52:59,261 ********************************************************************************
+2018-03-27 10:52:59,262 epoch = 109
+2018-03-27 10:52:59,263 lr = 0.00000969
+2018-03-27 10:55:33,131 Validation took 6.0 seconds
+2018-03-27 10:55:38,332 77330.0	~loss(train)=0.3981	loss(valid)=0.3545	roc_auc(valid)=0.9264	1/FPR @ TPR = 0.5: 80.65	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:55:38,332 Logging took 5.2 seconds
+2018-03-27 10:55:38,479 Training 703 batches took 120.7 seconds at 745.4 examples per second
+2018-03-27 10:55:38,479 Epoch took 159.2 seconds
+2018-03-27 10:55:38,480 ********************************************************************************
+2018-03-27 10:55:38,481 epoch = 110
+2018-03-27 10:55:38,481 lr = 0.00000969
+2018-03-27 10:58:12,069 Validation took 6.0 seconds
+2018-03-27 10:58:17,241 78033.0	~loss(train)=0.3980	loss(valid)=0.3531	roc_auc(valid)=0.9267	1/FPR @ TPR = 0.5: 99.38	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 10:58:17,242 Logging took 5.2 seconds
+2018-03-27 10:58:17,387 Training 703 batches took 120.5 seconds at 746.8 examples per second
+2018-03-27 10:58:17,388 Epoch took 158.9 seconds
+2018-03-27 10:58:17,389 ********************************************************************************
+2018-03-27 10:58:17,390 epoch = 111
+2018-03-27 10:58:17,390 lr = 0.00000969
+2018-03-27 11:00:50,861 Validation took 5.9 seconds
+2018-03-27 11:00:56,075 78736.0	~loss(train)=0.3982	loss(valid)=0.3541	roc_auc(valid)=0.9265	1/FPR @ TPR = 0.5: 93.30	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:00:56,076 Logging took 5.2 seconds
+2018-03-27 11:00:56,222 Training 703 batches took 120.6 seconds at 746.3 examples per second
+2018-03-27 11:00:56,223 Epoch took 158.8 seconds
+2018-03-27 11:00:56,224 ********************************************************************************
+2018-03-27 11:00:56,225 epoch = 112
+2018-03-27 11:00:56,225 lr = 0.00000969
+2018-03-27 11:03:29,621 Validation took 6.0 seconds
+2018-03-27 11:03:34,787 79439.0	~loss(train)=0.3981	loss(valid)=0.3534	roc_auc(valid)=0.9265	1/FPR @ TPR = 0.5: 80.50	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:03:34,788 Logging took 5.2 seconds
+2018-03-27 11:03:34,934 Training 703 batches took 120.4 seconds at 747.5 examples per second
+2018-03-27 11:03:34,935 Epoch took 158.7 seconds
+2018-03-27 11:03:34,935 ********************************************************************************
+2018-03-27 11:03:34,936 epoch = 113
+2018-03-27 11:03:34,937 lr = 0.00000678
+2018-03-27 11:06:08,456 Validation took 5.9 seconds
+2018-03-27 11:06:13,649 80142.0	~loss(train)=0.3980	loss(valid)=0.3538	roc_auc(valid)=0.9261	1/FPR @ TPR = 0.5: 102.88	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:06:13,649 Logging took 5.2 seconds
+2018-03-27 11:06:13,786 Training 703 batches took 120.6 seconds at 745.8 examples per second
+2018-03-27 11:06:13,787 Epoch took 158.8 seconds
+2018-03-27 11:06:13,787 ********************************************************************************
+2018-03-27 11:06:13,788 epoch = 114
+2018-03-27 11:06:13,789 lr = 0.00000678
+2018-03-27 11:08:47,077 Validation took 6.1 seconds
+2018-03-27 11:08:52,218 80845.0	~loss(train)=0.3979	loss(valid)=0.3537	roc_auc(valid)=0.9259	1/FPR @ TPR = 0.5: 97.67	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:08:52,218 Logging took 5.1 seconds
+2018-03-27 11:08:52,367 Training 703 batches took 120.2 seconds at 748.9 examples per second
+2018-03-27 11:08:52,368 Epoch took 158.6 seconds
+2018-03-27 11:08:52,368 ********************************************************************************
+2018-03-27 11:08:52,369 epoch = 115
+2018-03-27 11:08:52,370 lr = 0.00000678
+2018-03-27 11:11:25,927 Validation took 6.0 seconds
+2018-03-27 11:11:31,195 81548.0	~loss(train)=0.3982	loss(valid)=0.3526	roc_auc(valid)=0.9263	1/FPR @ TPR = 0.5: 81.44	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:11:31,196 Logging took 5.3 seconds
+2018-03-27 11:11:31,341 Training 703 batches took 120.6 seconds at 746.4 examples per second
+2018-03-27 11:11:31,342 Epoch took 159.0 seconds
+2018-03-27 11:11:31,342 ********************************************************************************
+2018-03-27 11:11:31,343 epoch = 116
+2018-03-27 11:11:31,344 lr = 0.00000678
+2018-03-27 11:14:04,761 Validation took 6.0 seconds
+2018-03-27 11:14:10,155 82251.0	~loss(train)=0.3978	loss(valid)=0.3517	roc_auc(valid)=0.9262	1/FPR @ TPR = 0.5: 92.64	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:14:10,156 Logging took 5.4 seconds
+2018-03-27 11:14:10,303 Training 703 batches took 120.5 seconds at 746.7 examples per second
+2018-03-27 11:14:10,304 Epoch took 159.0 seconds
+2018-03-27 11:14:10,304 ********************************************************************************
+2018-03-27 11:14:10,305 epoch = 117
+2018-03-27 11:14:10,306 lr = 0.00000678
+2018-03-27 11:16:43,971 Validation took 6.0 seconds
+2018-03-27 11:16:49,251 82954.0	~loss(train)=0.3978	loss(valid)=0.3534	roc_auc(valid)=0.9262	1/FPR @ TPR = 0.5: 88.65	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:16:49,251 Logging took 5.3 seconds
+2018-03-27 11:16:49,397 Training 703 batches took 120.6 seconds at 746.0 examples per second
+2018-03-27 11:16:49,397 Epoch took 159.1 seconds
+2018-03-27 11:16:49,398 ********************************************************************************
+2018-03-27 11:16:49,399 epoch = 118
+2018-03-27 11:16:49,399 lr = 0.00000678
+2018-03-27 11:19:22,657 Validation took 5.9 seconds
+2018-03-27 11:19:28,022 83657.0	~loss(train)=0.3980	loss(valid)=0.3541	roc_auc(valid)=0.9261	1/FPR @ TPR = 0.5: 92.55	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:19:28,022 Logging took 5.4 seconds
+2018-03-27 11:19:28,170 Training 703 batches took 120.4 seconds at 747.6 examples per second
+2018-03-27 11:19:28,171 Epoch took 158.8 seconds
+2018-03-27 11:19:28,171 ********************************************************************************
+2018-03-27 11:19:28,172 epoch = 119
+2018-03-27 11:19:28,173 lr = 0.00000678
+2018-03-27 11:22:01,729 Validation took 6.0 seconds
+2018-03-27 11:22:07,027 84360.0	~loss(train)=0.3980	loss(valid)=0.3538	roc_auc(valid)=0.9259	1/FPR @ TPR = 0.5: 84.54	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:22:07,028 Logging took 5.3 seconds
+2018-03-27 11:22:07,172 Training 703 batches took 120.5 seconds at 746.8 examples per second
+2018-03-27 11:22:07,173 Epoch took 159.0 seconds
+2018-03-27 11:22:07,173 ********************************************************************************
+2018-03-27 11:22:07,174 epoch = 120
+2018-03-27 11:22:07,175 lr = 0.00000678
+2018-03-27 11:25:18,144 Validation took 5.9 seconds
+2018-03-27 11:25:23,518 85063.0	~loss(train)=0.3979	loss(valid)=0.3530	roc_auc(valid)=0.9260	1/FPR @ TPR = 0.5: 92.55	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:25:23,519 Logging took 5.4 seconds
+2018-03-27 11:25:23,683 Training 703 batches took 158.2 seconds at 568.7 examples per second
+2018-03-27 11:25:23,684 Epoch took 196.5 seconds
+2018-03-27 11:25:23,684 ********************************************************************************
+2018-03-27 11:25:23,685 epoch = 121
+2018-03-27 11:25:23,686 lr = 0.00000475
+2018-03-27 11:27:57,221 Validation took 6.0 seconds
+2018-03-27 11:28:02,506 85766.0	~loss(train)=0.3980	loss(valid)=0.3520	roc_auc(valid)=0.9266	1/FPR @ TPR = 0.5: 92.55	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:28:02,507 Logging took 5.3 seconds
+2018-03-27 11:28:02,653 Training 703 batches took 120.5 seconds at 746.7 examples per second
+2018-03-27 11:28:02,654 Epoch took 159.0 seconds
+2018-03-27 11:28:02,655 ********************************************************************************
+2018-03-27 11:28:02,656 epoch = 122
+2018-03-27 11:28:02,656 lr = 0.00000475
+2018-03-27 11:30:36,401 Validation took 6.0 seconds
+2018-03-27 11:30:41,808 86469.0	~loss(train)=0.3978	loss(valid)=0.3532	roc_auc(valid)=0.9259	1/FPR @ TPR = 0.5: 102.94	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:30:41,809 Logging took 5.4 seconds
+2018-03-27 11:30:41,955 Training 703 batches took 120.7 seconds at 745.3 examples per second
+2018-03-27 11:30:41,956 Epoch took 159.3 seconds
+2018-03-27 11:30:41,956 ********************************************************************************
+2018-03-27 11:30:41,957 epoch = 123
+2018-03-27 11:30:41,958 lr = 0.00000475
+2018-03-27 11:33:15,469 Validation took 6.0 seconds
+2018-03-27 11:33:20,757 87172.0	~loss(train)=0.3977	loss(valid)=0.3522	roc_auc(valid)=0.9267	1/FPR @ TPR = 0.5: 88.65	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:33:20,757 Logging took 5.3 seconds
+2018-03-27 11:33:20,904 Training 703 batches took 120.4 seconds at 747.1 examples per second
+2018-03-27 11:33:20,904 Epoch took 158.9 seconds
+2018-03-27 11:33:20,905 ********************************************************************************
+2018-03-27 11:33:20,906 epoch = 124
+2018-03-27 11:33:20,906 lr = 0.00000475
+2018-03-27 11:35:54,410 Validation took 5.9 seconds
+2018-03-27 11:35:59,824 87875.0	~loss(train)=0.3978	loss(valid)=0.3533	roc_auc(valid)=0.9260	1/FPR @ TPR = 0.5: 88.68	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:35:59,825 Logging took 5.4 seconds
+2018-03-27 11:35:59,974 Training 703 batches took 120.6 seconds at 746.1 examples per second
+2018-03-27 11:35:59,975 Epoch took 159.1 seconds
+2018-03-27 11:35:59,975 ********************************************************************************
+2018-03-27 11:35:59,976 epoch = 125
+2018-03-27 11:35:59,977 lr = 0.00000475
+2018-03-27 11:38:33,488 Validation took 6.0 seconds
+2018-03-27 11:38:38,764 88578.0	~loss(train)=0.3978	loss(valid)=0.3520	roc_auc(valid)=0.9266	1/FPR @ TPR = 0.5: 98.03	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:38:38,764 Logging took 5.3 seconds
+2018-03-27 11:38:38,910 Training 703 batches took 120.4 seconds at 747.4 examples per second
+2018-03-27 11:38:38,911 Epoch took 158.9 seconds
+2018-03-27 11:38:38,911 ********************************************************************************
+2018-03-27 11:38:38,912 epoch = 126
+2018-03-27 11:38:38,912 lr = 0.00000475
+2018-03-27 11:41:12,553 Validation took 6.0 seconds
+2018-03-27 11:41:17,953 89281.0	~loss(train)=0.3976	loss(valid)=0.3535	roc_auc(valid)=0.9259	1/FPR @ TPR = 0.5: 88.47	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:41:17,954 Logging took 5.4 seconds
+2018-03-27 11:41:18,101 Training 703 batches took 120.6 seconds at 745.9 examples per second
+2018-03-27 11:41:18,102 Epoch took 159.2 seconds
+2018-03-27 11:41:18,103 ********************************************************************************
+2018-03-27 11:41:18,103 epoch = 127
+2018-03-27 11:41:18,104 lr = 0.00000475
+2018-03-27 11:43:51,791 Validation took 6.1 seconds
+2018-03-27 11:43:57,139 89984.0	~loss(train)=0.3976	loss(valid)=0.3529	roc_auc(valid)=0.9262	1/FPR @ TPR = 0.5: 92.55	Best 1/FPR @ TPR = 0.5: 109.74266
+2018-03-27 11:43:57,139 Logging took 5.3 seconds
+2018-03-27 11:43:57,285 Training 703 batches took 120.5 seconds at 746.7 examples per second
+2018-03-27 11:43:57,286 Epoch took 159.2 seconds
+2018-03-27 11:43:57,286 ********************************************************************************
+2018-03-27 11:43:57,287 COMPLETED on Mar-27 at 11:43:57
+2018-03-27 11:43:57,312 Moved model directory to /home/ih692/jets/models/finished/w/nmp/5139985/4

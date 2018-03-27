@@ -177,8 +177,9 @@ def train(
         #train_times = []
         train_loss = 0.0
         t_train = time.time()
+        #t_train = time.time()
+
         for j, (x, y) in enumerate(train_data_loader):
-            t_train = time.time()
             iteration += 1
 
             # forward
@@ -207,8 +208,6 @@ def train(
 
         logging.warning("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, train_time, len(train_dataset)/train_time))
 
-        # validation
-        #if iteration % n_batches == 0:
         train_loss /= n_batches
         t_valid = time.time()
         logdict = validation(
@@ -224,8 +223,6 @@ def train(
         t_log = time.time()
         eh.log(**logdict)
         logging.warning("Logging took {:.1f} seconds".format(time.time() - t_log))
-
-
 
         t1 = time.time()
         logging.info("Epoch took {:.1f} seconds".format(t1-t0))
