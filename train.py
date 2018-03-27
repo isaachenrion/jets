@@ -82,7 +82,7 @@ computing.add_argument("-g", "--gpu", type=str, default="")
 
 data = parser.add_argument_group('data')
 data.add_argument("-n", "--n_train", type=int, default=-1)
-data.add_argument("--n_valid", type=int, default=27000)
+data.add_argument("--n_valid", type=int, default=10000)
 data.add_argument("--dataset", type=str, default='w')
 data.add_argument("--data_dropout", type=float, default=.99)
 #data.add_argument("--pileup", action='store_true', default=False)
