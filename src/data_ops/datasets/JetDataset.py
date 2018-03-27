@@ -51,7 +51,7 @@ class JetDataset(Dataset):
         self.jets = good_jets
         self.weights = w
         return bad_jets
-
+ 
     def _crop(self):
         logging.info('Cropping dataset...')
         if self.problem == 'w-vs-qcd':
