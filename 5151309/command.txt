@@ -1,0 +1,14 @@
+-a phy
+--n_valid 27000
+--epochs 256
+--lr 0.001
+--iters 8
+--period 4
+--decay 0.7
+--data_dir /scratch/ih692/data
+--experiment_time 8
+--models_dir /home/ih692/jets/models
+--slurm
+--gpu 0
+--slurm_array_job_id 5151309
+--slurm_array_task_id 4

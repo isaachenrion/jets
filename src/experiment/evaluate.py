@@ -78,17 +78,6 @@ def evaluate(args):
                         y = unwrap(y); y_pred = unwrap(y_pred)
                         yy.append(y); yy_pred.append(y_pred)
 
-                    #for i in range(n_batches):
-                    #    X_batch = X[offset:offset+batch_size]
-                    #    X_var = wrap_jet(X_batch)
-                    #    yy_pred.append(unwrap(model(X_var)))
-                    #    unwrap_jet(X_var)
-                    #    offset+=batch_size
-                    #if remainder > 0:
-                    #    X_batch = X[-remainder:]
-                    #    X_var = wrap_jet(X_batch)
-                    #    yy_pred.append(unwrap(model(X_var)))
-                    #    unwrap_jet(X_var)
                     yy = np.concatenate(yy, 0)
                     yy_pred = np.squeeze(np.concatenate(yy_pred, 0), 1)
                     t1 = time.time()
@@ -150,17 +139,6 @@ def evaluate(args):
         else:
             DataLoader = LeafJetLoader
         test_data_loader = DataLoader(dataset, batch_size = args.batch_size)
-        #tf = load_tf(args.data_dir, "{}-train.pickle".format(dataset))
-        #X, y = load_data(args.data_dir, "{}-{}.pickle".format(dataset, args.dataset_type))
-        #for ij, jet in enumerate(X):
-        #    jet["content"] = tf.transform(jet["content"])
-        #if args.n_test > 0:
-        #    indices = torch.randperm(len(X)).numpy()[:args.n_test]
-        #    X = [X[i] for i in indices]
-        #    y = y[indices]
-        #X_test, y_test, w_test = crop(X, y, pileup=args.pileup)
-
-        #data = (X_test, y_test, w_test)
         for _, model_type_path in model_type_paths:
             logging.info('\tBuilding ROCs for instances of {}'.format(model_type_path))
             r, f, t, inv_fprs = build_rocs(test_data_loader, model_type_path, args.batch_size)

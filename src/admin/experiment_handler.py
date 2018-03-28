@@ -181,8 +181,8 @@ class ExperimentHandler:
             Regurgitate('valid_loss', visualizing=True),
             Regurgitate('train_loss', visualizing=True)
 
-        ]
 
+        ]
         time_monitors = [
             Regurgitate('epoch', visualizing=False),
             Regurgitate('iteration', visualizing=False),
@@ -199,7 +199,6 @@ class ExperimentHandler:
         admin_monitors = [
             saver
         ]
-
         optim_monitors = [
             Collect('lr', fn='last', visualizing=True),
             GradNorm(fn='last',visualizing=True),
@@ -232,7 +231,6 @@ class ExperimentHandler:
         logging.warning("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
 
     def log(self, **kwargs):
-
         self.stats_logger.log(**kwargs)
         #t_log = time.time()
         if kwargs['epoch'] == 1 and self.emailer is not None:
@@ -269,41 +267,64 @@ class EvaluationExperimentHandler(ExperimentHandler):
         super().__init__(**kwargs)
         self.latex = latex
 
-    #def model_directory(self, args):
-    #    self.root_dir = args.root_dir
-    #    self.model_type_dir = args.model_dir
-    #    self.leaf_dir = self.model_type_dir
-    #    i = 0
-    #    temp = self.leaf_dir + '/run' + str(i)
-    #    while os.path.exists(os.path.join(self.root_dir,temp)):
-    #        i += 1
-    #        temp = self.leaf_dir + '/run' + str(i)
-    #    self.leaf_dir = temp
-    #    self.exp_dir = os.path.join(self.root_dir,self.leaf_dir)
-    #    print(self.exp_dir)
-    #    os.makedirs(self.exp_dir)
-
-    def setup_stats_logger(self, _, visualizing):
+    def setup_stats_logger(self, epochs, visualizing):
         ''' STATS LOGGER '''
         '''----------------------------------------------------------------------- '''
-        roc_auc = ROCAUC()
-        inv_fpr = InvFPR()
-        roc_curve = ROCCurve()
-        #model_counter = Regurgitate('model', visualizing=False)
-        logtimer=Collect('logtime', fn='mean')
-        prediction_histogram = EachClassHistogram([0,1], 'yy', 'yy_pred', append=True)
-        monitors = [
-            #model_counter,
+        roc_auc = ROCAUC(visualizing=True)
+        inv_fpr = InvFPR(visualizing=True)
+        #best_roc_auc = Best(roc_auc)
+        best_inv_fpr = Best(inv_fpr)
+        #inv_fpr_at_best_roc_auc = LogOnImprovement(inv_fpr, best_roc_auc)
+        roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
+
+        metric_monitors = [
             roc_auc,
             inv_fpr,
-            roc_curve,
-            prediction_histogram,
-            logtimer
+            #best_roc_auc,
+            best_inv_fpr,
+            roc_auc_at_best_inv_fpr,
+            #inv_fpr_at_best_roc_auc,
+            #Regurgitate('valid_loss', visualizing=True),
+            Regurgitate('test_loss', visualizing=True)
+
+
         ]
-        monitors = {m.name: m for m in monitors}
-        self.stats_logger = StatsLogger(self.exp_dir, monitors, visualizing, train=False)
+        time_monitors = [
+            #Regurgitate('epoch', visualizing=False),
+            #Regurgitate('iteration', visualizing=False),
+            Collect('logtime', fn='last', visualizing=False),
+            Hours(),
+            Collect('time', fn='sum', visualizing=False),
+            ETA(self.start_dt, epochs)
+        ]
+
+        monitors = metric_monitors  + time_monitors
+
+        monitor_dict = OrderedDict()
+        for m in monitors: monitor_dict[m.name] = m
+
+        self.stats_logger = StatsLogger(self.exp_dir, monitor_dict, visualizing, train=self.train)
+        self.saver = saver
 
     def log(self, **kwargs):
+        self.stats_logger.log(**kwargs)
+        #t_log = time.time()
+        #if kwargs['epoch'] == 1 and self.emailer is not None:
+        #    self.emailer.send_msg(self.stats_logger.monitors['eta'].value, "Job {}-{} on {} ETA: {}".format(self.slurm_array_job_id, self.slurm_array_task_id, self.host.split('.')[0], self.stats_logger.monitors['eta'].value))
+        #if np.isnan(self.stats_logger.monitors['inv_fpr'].value):
+        #    logging.warning("NaN in 1/FPR\n")
+
+        out_str = "\tloss(test)={:.4f}\troc_auc(test)={:.4f}".format(
+                self.stats_logger.monitors['test_loss'].value,
+                self.stats_logger.monitors['roc_auc'].value)
+
+        out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.5f}".format(self.stats_logger.monitors['inv_fpr'].value, self.stats_logger.monitors['best_inv_fpr'].value)
+        self.signal_handler.results_strings.append(out_str)
+        logging.info(out_str)
+        #logging.warning("Time in exp_handler log {:.1f} seconds".format(time.time() - t_log))
+
+
+    def oldlog(self, **kwargs):
         self.stats_logger.log(**kwargs)
 
         if not self.latex:

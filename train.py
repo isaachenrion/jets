@@ -20,7 +20,7 @@ admin.add_argument("-d", "--debug", help="sets everything small for fast model d
 admin.add_argument("--profile", action='store_true', default=False)
 
 # Admin args
-admin.add_argument("-s", "--silent", action='store_true', default=False)
+admin.add_argument("--silent", action='store_true', default=False)
 admin.add_argument("-v", "--verbose", action='store_true', default=False)
 admin.add_argument("--visualizing", action='store_true', default=False)
 admin.add_argument("--no_email", action='store_true', default=False)
@@ -39,8 +39,10 @@ admin.add_argument("--slurm_array_task_id", default=0)
 '''
 # Loading previous models args
 loading = parser.add_argument_group('loading')
-loading.add_argument("-l", "--load", help="model directory from which we load a state_dict", type=str, default=None)
+loading.add_argument("-l", "--loading", help="model directory from which we load a state_dict", type=str, default=None)
 loading.add_argument("-r", "--restart", help="restart a loaded model from where it left off", action='store_true', default=False)
+#loading.add_argument("-s", "--single_model", action='store_true')
+#loading.add_argument("-i", "--inventory", type=str, default=None)
 
 '''
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -85,7 +87,6 @@ data.add_argument("-n", "--n_train", type=int, default=-1)
 data.add_argument("--n_valid", type=int, default=27000)
 data.add_argument("--dataset", type=str, default='w')
 data.add_argument("--data_dropout", type=float, default=.99)
-#data.add_argument("--pileup", action='store_true', default=False)
 data.add_argument("--pp", action='store_true', default=False)
 data.add_argument("--permute_particles", action='store_true')
 data.add_argument("--no_cropped", action='store_true')
@@ -152,7 +153,4 @@ os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 arg_groups['admin_args'].cmd_line_args = (' '.join(sys.argv))
 
 if __name__ == "__main__":
-    if args.profile:
-        cProfile.run('train(args)')
-    else:
-        train(**arg_groups)
+    train(**arg_groups)

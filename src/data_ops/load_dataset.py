@@ -39,7 +39,7 @@ def load_jets(data_dir, filename, redo=False):
     return jets
 
 
-def load_train_dataset(data_dir, filename, n_train, n_valid, redo, no_cropped):
+def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
     problem = data_dir.split('/')[-1]
     subproblem = filename
 
@@ -50,39 +50,20 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo, no_cropped):
     #import ipdb; ipdb.set_trace()
     logging.warning("Found {} jets in total".format(len(jets)))
 
-    old_crop=True
-    if old_crop:
-        if n_train > 0:
-            jets = jets[:n_train]
-        logging.warning("Splitting into train and validation...")
-        #
-        train_jets = jets[n_valid:]
-        train_dataset = JetDataset(train_jets)
-        #
-        valid_jets = jets[:n_valid]
-        valid_dataset = JetDataset(valid_jets)
+    if n_train > 0:
+        jets = jets[:n_train]
+    logging.warning("Splitting into train and validation...")
+    #
+    train_jets = jets[n_valid:]
+    train_dataset = JetDataset(train_jets)
+    #
+    valid_jets = jets[:n_valid]
+    valid_dataset = JetDataset(valid_jets)
 
-        # crop validation set and add the excluded data to the training set
-        if 'w-vs-qcd' in data_dir:
-            valid_dataset, cropped_dataset = crop_dataset(valid_dataset, pileup=False)
-            train_dataset.extend(cropped_dataset)
-    else:
-        all_jet_dataset = JetDataset(jets, problem=problem,subproblem=subproblem)
-        #
-        cropped_jets = all_jet_dataset.crop()   #
-        logging.warning("\tCropped {} jets".format(len(cropped_jets)))
-        #
-        train_jets = all_jet_dataset.jets[n_valid:]
-        valid_jets = all_jet_dataset.jets[:n_valid]
-        #
-        if not no_cropped:
-            logging.warning("\tUsing cropped jets as well as good ones for training")
-            train_jets += cropped_jets
-        if n_train > 0:
-            train_jets = train_jets[:n_train]
-        #
-        train_dataset = JetDataset(train_jets, problem=problem, subproblem=subproblem)
-        valid_dataset = JetDataset(valid_jets, problem=problem, subproblem=subproblem)
+    # crop validation set and add the excluded data to the training set
+    if 'w-vs-qcd' in data_dir:
+        valid_dataset, cropped_dataset = crop_dataset(valid_dataset, pileup=False)
+        train_dataset.extend(cropped_dataset)
 
     train_dataset.shuffle()
     ##
