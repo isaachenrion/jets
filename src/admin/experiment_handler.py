@@ -295,7 +295,7 @@ class EvaluationExperimentHandler(ExperimentHandler):
             Collect('logtime', fn='last', visualizing=False),
             Hours(),
             Collect('time', fn='sum', visualizing=False),
-            ETA(self.start_dt, epochs)
+            #ETA(self.start_dt, epochs)
         ]
 
         monitors = metric_monitors  + time_monitors
