@@ -39,7 +39,7 @@ admin.add_argument("--slurm_array_task_id", default=0)
 '''
 # Loading previous models args
 loading = parser.add_argument_group('loading')
-loading.add_argument("-l", "--loading", help="model directory from which we load a state_dict", type=str, default=None)
+loading.add_argument("-l", "--load", help="model directory from which we load a state_dict", type=str, default=None)
 loading.add_argument("-r", "--restart", help="restart a loaded model from where it left off", action='store_true', default=False)
 #loading.add_argument("-s", "--single_model", action='store_true')
 #loading.add_argument("-i", "--inventory", type=str, default=None)
