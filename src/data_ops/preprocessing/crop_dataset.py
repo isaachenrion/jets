@@ -16,7 +16,6 @@ def crop(jets, pileup=False):
     for i, j in enumerate(jets):
         if pt_min < j.pt < pt_max and m_min < j.mass < m_max:
             good_jets.append(j)
-            #good_indices.append(i)
         else:
             bad_jets.append(j)
 
