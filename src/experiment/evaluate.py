@@ -150,16 +150,6 @@ def evaluate(args):
         else:
             DataLoader = LeafJetLoader
         test_data_loader = DataLoader(dataset, batch_size = args.batch_size)
-        #tf = load_tf(args.data_dir, "{}-train.pickle".format(dataset))
-        #X, y = load_data(args.data_dir, "{}-{}.pickle".format(dataset, args.dataset_type))
-        #for ij, jet in enumerate(X):
-        #    jet["content"] = tf.transform(jet["content"])
-        #if args.n_test > 0:
-        #    indices = torch.randperm(len(X)).numpy()[:args.n_test]
-        #    X = [X[i] for i in indices]
-        #    y = y[indices]
-        #X_test, y_test, w_test = crop(X, y, pileup=args.pileup)
-
         #data = (X_test, y_test, w_test)
         for _, model_type_path in model_type_paths:
             logging.info('\tBuilding ROCs for instances of {}'.format(model_type_path))

@@ -50,9 +50,9 @@ class GeneratorNMP(nn.Module):
 
         A = A.unsqueeze(0).repeat(bs, 1, 1)
         A = wrap(A)
-
+        #import ipdb; ipdb.set_trace()
 
         for mp in self.mp_layers:
             h, A = mp(h=h, mask=mask, A=A, **kwargs)
-        A = F.sigmoid(A)
+        #A = F.sigmoid(A)
         return A

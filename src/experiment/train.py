@@ -138,7 +138,6 @@ def train(
                 yy.append(yv); yy_pred.append(y_pred)
 
 
-            #valid_loss.backward()
             valid_loss /= len(valid_data_loader)
 
             #yy = np.concatenate(yy, 0)
