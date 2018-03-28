@@ -79,12 +79,14 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
     return train_dataset, valid_dataset
 
 def load_test_dataset(data_dir, filename, n_test, redo):
+    train_dataset, _ = load_train_dataset(data_dir, filename, -1, 27000, False)
     logging.warning("Loading test data...")
     filename = "{}-test.pickle".format(filename)
     jets = load_jets(data_dir, filename, redo)
     jets = jets[:n_test]
 
     dataset = JetDataset(jets)
+    dataset.transform(train_dataset.tf)
 
     # crop validation set and add the excluded data to the training set
     if 'w-vs-qcd' in data_dir:
