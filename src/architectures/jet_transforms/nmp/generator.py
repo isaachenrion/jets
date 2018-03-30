@@ -15,6 +15,19 @@ from ....monitors import Histogram
 from ....monitors import Collect
 from ....monitors import BatchMatrixMonitor
 
+def entry_distance_matrix(n):
+    A = torch.triu(torch.ones(n, n), 0)
+    A = torch.mm(A, A)
+    A = A + torch.triu(A,1).transpose(0,1)
+    return A
+
+def upper_to_lower_diagonal_ones(n):
+    A = torch.eye(n)
+    A_ = torch.eye(n-1)
+    A[1:,:-1] += A_
+    A[:-1, 1:] += A_
+    return A
+
 class GeneratorNMP(nn.Module):
     def __init__(self,
         features=None,
@@ -41,18 +54,20 @@ class GeneratorNMP(nn.Module):
         bs = x.size()[0]
         n_vertices = x.size()[1]
         h = self.embedding(x)
-        A = torch.eye(n_vertices)
 
-        # adding the lower and upper diagonals for initial graph connectivity
-        A_ = torch.eye(n_vertices-1)
-        A[1:,:-1] += A_
-        A[:-1, 1:] += A_
+        #A = upper_to_lower_diagonal_ones(n_vertices)
+        A = entry_distance_matrix(n_vertices)
 
         A = A.unsqueeze(0).repeat(bs, 1, 1)
         A = wrap(A)
-        #import ipdb; ipdb.set_trace()
 
-        for mp in self.mp_layers:
-            h, A = mp(h=h, mask=mask, A=A, **kwargs)
+        with torch.no_grad():
+            for i, mp in enumerate(self.mp_layers[:-1]):
+                h, A = mp(h=h, mask=mask, A=A, **kwargs)
+
+        #for i, mp in enumerate(self.mp_layers[:-1]):
+        #    h, A = mp(h=h, mask=mask, A=A, **kwargs)
+
+        h, A = self.mp_layers[-1](h=h, mask=mask, A=A, **kwargs)
         #A = F.sigmoid(A)
         return A

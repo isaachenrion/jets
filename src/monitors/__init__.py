@@ -8,6 +8,8 @@ from .meta import EachClassHistogram
 from .metrics import ROCAUC
 from .metrics import ROCCurve
 from .metrics import InvFPR
+from .metrics import Precision
+from .metrics import Recall
 
 from .saver import Saver
 

@@ -18,11 +18,8 @@ class MessagePassingLayer(nn.Module):
         message_kwargs = {x: kwargs[x] for x in ['wn']}
         self.message = EMBEDDINGS['n'](dim_in=hidden, dim_out=hidden, n_layers=int(message), act=act, **message_kwargs)
 
-    def get_adjacency_matrix(self, **kwargs):
-        pass
 
-    def forward(self, h=None, **kwargs):
-        A = self.get_adjacency_matrix(h=h, **kwargs)
+    def forward(self, h=None, A=None):
         message = self.activation(torch.matmul(A, self.message(h)))
         h = self.vertex_update(h, message)
         return h
@@ -65,17 +62,8 @@ class GraphAttentionalLayer(nn.Module):
         return h
 
 
-class MPSimple(MessagePassingLayer):
-    def __init__(self,**kwargs):
-        super().__init__(**kwargs)
-
-    def get_adjacency_matrix(self, **kwargs):
-        dij = kwargs.pop('dij', None)
-        return dij
-
-
 MP_LAYERS = dict(
-    simple=MPSimple,
+    m1=MessagePassingLayer,
     attn=GraphAttentionalLayer,
     m2=MessagePassingLayer2
 )

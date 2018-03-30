@@ -177,10 +177,13 @@ class ExperimentHandler:
             #best_inv_fpr,
             #roc_auc_at_best_inv_fpr,
             ##inv_fpr_at_best_roc_auc,
+            Precision(visualizing=True),
+            Recall(visualizing=True),
             Regurgitate('valid_loss', visualizing=True),
             Regurgitate('train_loss', visualizing=True)
 
         ]
+        self.metric_monitors = metric_monitors
 
         time_monitors = [
             Regurgitate('epoch', visualizing=False),
@@ -239,11 +242,10 @@ class ExperimentHandler:
         #if np.isnan(self.stats_logger.monitors['inv_fpr'].value):
         #    logging.warning("NaN in 1/FPR\n")
 
-        out_str = "{:5}\t~loss(train)={:.4f}\tloss(valid)={:.4f}".format(
-                self.stats_logger.monitors['iteration'].value,
-                self.stats_logger.monitors['train_loss'].value,
-                self.stats_logger.monitors['valid_loss'].value)
-
+        out_str = "{:5}\t".format(
+                self.stats_logger.monitors['iteration'].value)
+        for monitor in self.metric_monitors:
+            out_str += "\t{} = {:.2f}\t".format(monitor.name, monitor.value)
         #out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.5f}".format(self.stats_logger.monitors['inv_fpr'].value, self.stats_logger.monitors['best_inv_fpr'].value)
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)

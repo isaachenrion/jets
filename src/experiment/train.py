@@ -122,6 +122,7 @@ def train(
     def loss(y_pred, y, mask):
         #return F.mse_loss(y_pred * unknown_mask, y * unknown_mask)
         #import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
         return F.binary_cross_entropy(y_pred * mask, y * mask)
 
     def validation(epoch, model, **train_dict):
@@ -133,23 +134,23 @@ def train(
             yy, yy_pred = [], []
             for i, ((x, x_mask), (y), mask) in enumerate(valid_data_loader):
                 y_pred = model(x, mask=x_mask)
-                vl = loss(y_pred, y, mask); valid_loss += unwrap(vl)[0]
+                vl = loss(y_pred, y, mask); valid_loss += unwrap(vl)
                 yv = unwrap(y); y_pred = unwrap(y_pred)
                 yy.append(yv); yy_pred.append(y_pred)
 
 
             valid_loss /= len(valid_data_loader)
 
-            #yy = np.concatenate(yy, 0)
-            #yy_pred = np.concatenate(yy_pred, 0)
+            yy = np.concatenate(yy, 0)
+            yy_pred = np.concatenate(yy_pred, 0)
 
             t1=time.time()
 
             logdict = dict(
                 epoch=epoch,
                 iteration=iteration,
-                #yy=yy,
-                #yy_pred=yy_pred,
+                yy=yy,
+                yy_pred=yy_pred,
                 #w_valid=valid_dataset.weights,
                 valid_loss=valid_loss,
                 settings=settings,
@@ -195,14 +196,14 @@ def train(
 
             if iteration % n_batches == 0:
                 old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
-                grads = torch.cat([p.grad.view(-1) for p in model.parameters()], 0)
+                grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
 
             optimizer.step()
 
             if iteration % n_batches == 0:
                 new_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
 
-            train_loss += unwrap(l)[0]
+            train_loss += unwrap(l)
 
         train_loss = train_loss / n_batches
         train_time = time.time() - t_train

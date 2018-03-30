@@ -41,10 +41,8 @@ class _Adjacency(nn.Module):
         if self.symmetric:
             M = 0.5 * (M + M.transpose(1, 2))
 
-
         if self.activation is not None:
             M = self.activation(M, mask)
-
 
         if self.monitoring:
             self.logging(dij=M, mask=mask, **kwargs)

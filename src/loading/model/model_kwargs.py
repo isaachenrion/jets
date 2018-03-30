@@ -1,6 +1,6 @@
 import os
 import pickle
-from ...architectures import GeneratorNMP
+from ...architectures import *
 
 def construct_model_kwargs(args):
     #import ipdb; ipdb.set_trace()
@@ -63,5 +63,6 @@ def load_model_kwargs(filename):
     return model_kwargs
 
 def build_model_from_kwargs(model_kwargs, **kwargs):
-    model = GeneratorNMP(**model_kwargs, **kwargs)
+    #model = GeneratorNMP(**model_kwargs, **kwargs)
+    model = GraphGen(**model_kwargs, **kwargs)
     return model

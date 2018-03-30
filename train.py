@@ -5,7 +5,6 @@ import sys
 import cProfile
 
 from src.experiment import train
-from src.experiment import reset_unused_args
 from src.misc.constants import *
 
 ''' ARGUMENTS '''

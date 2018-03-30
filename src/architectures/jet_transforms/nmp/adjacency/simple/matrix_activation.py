@@ -37,5 +37,6 @@ MATRIX_ACTIVATIONS = {
     'sigmoid': masked_function(F.sigmoid),
     'exp': masked_function(lambda x: torch.exp(x)),
     'tanh': masked_function(F.tanh),
-    'no_mask_softmax': no_mask_softmax
+    'no_mask_softmax': no_mask_softmax,
+    None: lambda x:x
 }

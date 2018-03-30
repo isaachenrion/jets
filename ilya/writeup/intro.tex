@@ -1,0 +1,65 @@
+\section{Introduction}
+
+
+%Motivate the problem: need for surface representations
+%that are not task-specific: need to combine intrinsic with extrinsic info
+3D Computer Graphics is a field whose primary object 
+of study are the representation, analysis, manipulation and synthesis of three-dimensional structures and its dynamics. 
+Despite the vast amount of high-quality data available, data-driven approaches such as Deep Learning 
+have yet to become mainstream. Contrary to Computer Vision, in which inputs are sampled on regular 
+two or three-dimensional grids, the discretization of surfaces into meshes is adaptive, creating a challenge 
+for traditional Convolutional Neural Network approaches. 
+
+Similarly as with CNNs when processing images or videos, one is interested in data-driven 
+representations that strike the right balance between expressive power and sample complexity. 
+In the case of CNNs, this is remarkably achieved by exploiting the inductive bias that most computer 
+vision tasks are locally stable to deformations, leading to localized, multiscale features. 
+In the case of surfaces and its discretized meshes, this creates a fundamental modeling choice between \emph{extrinsic} versus \emph{intrinsic} representations. 
+Extrinsic representations rely on the specific embedding of surfaces within a three-dimensional ambient space, 
+whereas intrinsic representations only capture geometric properties specific to the surface, irrespective of 
+its parametrization. Whereas the former offer arbitrary representation power, they are unable to easily exploit stability 
+priors. 
+
+Recently, the subfield \emph{geometric deep learning} has emerged to provide 
+data-driven intrinsic surface representations. Models based on Graph Neural Networks \cite{gnn1} and its Spectral 
+variants \cite{spectr1, spectr2, spectr3} have been successfully applied to Computer Graphics tasks such 
+as shape correspondence \cite{monet}. In its basic form, these models learn a deep representation 
+over the discretized surface by combining a latent representation at a given node with a local average 
+of its neighboring latent representations, followed by a point-wise nonlinearity.
+ Different models vary in their choice of local averaging and point-wise nonlinearity. By reparametrising 
+ the local smoothing with the original signal, one obtains the same model expressed in terms of the 
+ Laplacian operator, leading to the spectral interpretations.
+
+Our present work fits into this line of work, by extending both the model 
+and its applications. More specifically, we exploit the fact that surfaces in 
+$\R^3$ admit a first-order differential operator, the \emph{Dirac} operator, that
+is stable to discretization, provides a direct generalization of Laplacian-based 
+propagation models and is able to detect principal curvature directions. 
+By combining the Dirac operator with input coordinates we obtained a fully differentiable
+end-to-end feature representation that we apply to several challenging tasks. 
+
+First, we demonstrate the model efficiency on a temporal prediction task 
+of complex dynamics, based on the ARAP (As Rigid As Possible) framework. 
+Then we introduce a generative model for surfaces based on 
+the variational autoencoder \cite{kingma, danilo}.
+
+Main contributions:
+\begin{itemize}
+\item Use of Dirac Operator. 
+\item Generative Graph Neural Network model
+\item Temporal Prediction on Meshes under complex non-linear dynamics. 
+\end{itemize}
+
+%current state of affairs: on the one hand, extrinsic representations
+%on the other hand, graph neural nets are intrinsic, with several advantages, but they 
+%may fail to capture non-rigid phenomena. 
+
+
+%Recently, geometric deep learning models such as graph neural networks 
+%and spectral networks have been proposed as generic 
+%representations exploiting the intrinsic geometrical properties
+%In order to learn representations with 
+%good sample complexity and with sufficient expressive power 
+%
+% while capturing the inductive biases 
+%needed across Graphics tasks, 
