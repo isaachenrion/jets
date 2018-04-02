@@ -1,1 +1,1 @@
-from .nmp import GeneratorNMP, GraphGen
+from .nmp import *

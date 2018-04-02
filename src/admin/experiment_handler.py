@@ -164,11 +164,11 @@ class ExperimentHandler:
         ''' STATS LOGGER '''
         '''----------------------------------------------------------------------- '''
         roc_auc = ROCAUC(visualizing=True)
-        inv_fpr = InvFPR(visualizing=True)
-        #best_roc_auc = Best(roc_auc)
-        best_inv_fpr = Best(inv_fpr)
+        #inv_fpr = InvFPR(visualizing=True)
+        best_roc_auc = Best(roc_auc)
+        #best_inv_fpr = Best(inv_fpr)
         #inv_fpr_at_best_roc_auc = LogOnImprovement(inv_fpr, best_roc_auc)
-        roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
+        #roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
 
         metric_monitors = [
             #roc_auc,
@@ -177,6 +177,8 @@ class ExperimentHandler:
             #best_inv_fpr,
             #roc_auc_at_best_inv_fpr,
             ##inv_fpr_at_best_roc_auc,
+            roc_auc,
+            best_roc_auc,
             Precision(visualizing=True),
             Recall(visualizing=True),
             Regurgitate('valid_loss', visualizing=True),
@@ -196,7 +198,7 @@ class ExperimentHandler:
 
         model_file = os.path.join(self.exp_dir, 'model_state_dict.pt')
         settings_file = os.path.join(self.exp_dir, 'settings.pickle')
-        saver = Saver(best_inv_fpr, model_file, settings_file, visualizing=False)
+        saver = Saver(best_roc_auc, model_file, settings_file, visualizing=False)
 
         admin_monitors = [
             saver

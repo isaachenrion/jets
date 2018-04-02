@@ -22,6 +22,9 @@ class ROCAUC(ScalarMonitor):
         super().__init__('roc_auc', **kwargs)
 
     def call(self, yy=None, yy_pred=None, w_valid=None, **kwargs):
+        if len(yy.shape) > 1:
+            yy = yy.view(-1)
+            yy_pred = yy_pred.view(-1)
         return roc_auc_score(yy, yy_pred, sample_weight=w_valid)
 
 class ROCCurve(Monitor):
@@ -31,6 +34,9 @@ class ROCCurve(Monitor):
         self.fpr, self.tpr = None, None
 
     def call(self, yy=None, yy_pred=None, w_valid=None, **kwargs):
+        if len(yy.shape) > 1:
+            yy = yy.view(-1)
+            yy_pred = yy_pred.view(-1)
         self.fpr, self.tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
         return (self.fpr, self.tpr)
 
@@ -47,19 +53,17 @@ class Precision(ScalarMonitor):
         super().__init__('prec', **kwargs)
 
     def call(self, yy=None, yy_pred=None, **kwargs):
-        predicted_hits = yy_pred > 0.5
-        real_hits = yy == 1
-        #prec = yy == hits
+        predicted_hits = (yy_pred > 0.5).float()
+        real_hits = (yy == 1).float()
         prec = (predicted_hits * real_hits).sum() / predicted_hits.sum()
-        return prec
+        return float(prec)
 
 class Recall(ScalarMonitor):
     def __init__(self, **kwargs):
         super().__init__('recall', **kwargs)
 
     def call(self, yy=None, yy_pred=None, **kwargs):
-        predicted_hits = yy_pred > 0.5
-        real_hits = yy == 1
-        #prec = yy == hits
+        predicted_hits = (yy_pred > 0.5).float()
+        real_hits = (yy == 1).float()
         recall = (predicted_hits * real_hits).sum() / real_hits.sum()
-        return recall
+        return float(recall)

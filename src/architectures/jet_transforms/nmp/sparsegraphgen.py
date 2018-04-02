@@ -68,23 +68,22 @@ class SparseGraphGen(nn.Module):
 
         self.adj = NegativeSquare(temperature=0.001,symmetric=False, act='exp', logger=kwargs['logger'], logging_frequency=kwargs['logging_frequency'])
 
+        self.k = 50
+
     def forward(self, x, mask=None, **kwargs):
         bs = x.size()[0]
         n_vertices = x.size()[1]
 
         h = self.embedding(x)
+        for i, mp in enumerate(self.mp_layers):
+            S = torch.bmm(h, h.transpose(1,2))
+            sparse_adjacency = [sparse_topk(s, self.k) for s in S]
+
+            #A = self.adj(h, mask, **kwargs)
+            for i, (ex, A) in enumerate(zip(h, sparse_adjacency)):
+                h[i] = mp(ex.unsqueeze(0), A.unsqueeze(0))
 
         S = torch.bmm(h, h.transpose(1,2))
-        #S = F.softmax(S, 3)
-
-        S_sorted, indices = torch.sort(S)
-        topk_indices, sorted_indices  = torch.sort(indices)
-        sparse_adjacency = torch.sparse.FloatTensor
-
-        for i, mp in enumerate(self.mp_layers):
-            A = self.adj(h, mask, **kwargs)
-            h = mp(h, A)
-
-        A = self.adj(h, mask, **kwargs)
+        A = torch.stack([sparse_topk(s, self.k).to_dense() for s in S],0)
         #A = torch.exp( - self.euclidean(h) / temperature ) * mask
         return A

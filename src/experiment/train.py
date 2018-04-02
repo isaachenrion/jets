@@ -22,6 +22,9 @@ from ..admin import ExperimentHandler
 from ..monitors.meta import Collect
 from ..loading.model import build_model
 
+from ..monitors import BatchMatrixMonitor
+
+from ..misc.grad_mode import no_grad
 #@profile
 def train(
     admin_args=None,
@@ -120,10 +123,12 @@ def train(
     '''----------------------------------------------------------------------- '''
 
     def loss(y_pred, y, mask):
-        #return F.mse_loss(y_pred * unknown_mask, y * unknown_mask)
-        #import ipdb; ipdb.set_trace()
-        #import ipdb; ipdb.set_trace()
         return F.binary_cross_entropy(y_pred * mask, y * mask)
+
+    y_matrix_monitor = BatchMatrixMonitor('matrix')
+    y_pred_matrix_monitor = BatchMatrixMonitor('matrix')
+    y_matrix_monitor.initialize(None, eh.stats_logger.plotsdir)
+    y_pred_matrix_monitor.initialize(None, eh.stats_logger.plotsdir)
 
     def validation(epoch, model, **train_dict):
 
@@ -132,11 +137,17 @@ def train(
 
             valid_loss = 0.
             yy, yy_pred = [], []
-            for i, ((x, x_mask), (y), mask) in enumerate(valid_data_loader):
-                y_pred = model(x, mask=x_mask)
+            for i, (x, x_mask, y, mask) in enumerate(valid_data_loader):
+                with no_grad():
+                    y_pred = model(x, mask=x_mask)
                 vl = loss(y_pred, y, mask); valid_loss += unwrap(vl)
-                yv = unwrap(y); y_pred = unwrap(y_pred)
-                yy.append(yv); yy_pred.append(y_pred)
+                yy.append(unwrap(y)); yy_pred.append(unwrap(y_pred))
+
+            if epoch % admin_args.lf == 0:
+                y_matrix_monitor(matrix=y)
+                y_matrix_monitor.visualize('epoch-{}/{}'.format(epoch, 'y'), n=10)
+                y_pred_matrix_monitor(matrix=y_pred)
+                y_pred_matrix_monitor.visualize('epoch-{}/{}'.format(epoch, 'y_pred'), n=10)
 
 
             valid_loss /= len(valid_data_loader)
@@ -149,8 +160,8 @@ def train(
             logdict = dict(
                 epoch=epoch,
                 iteration=iteration,
-                yy=yy,
-                yy_pred=yy_pred,
+                yy=(yy*mask).view(training_args.batch_size, -1),
+                yy_pred=(yy_pred*mask).view(training_args.batch_size, -1),
                 #w_valid=valid_dataset.weights,
                 valid_loss=valid_loss,
                 settings=settings,
@@ -179,7 +190,8 @@ def train(
         train_loss = 0.0
         t_train = time.time()
 
-        for j, ((x,x_mask), (y), mask) in enumerate(train_data_loader):
+        for j, (x, x_mask, y, mask) in enumerate(train_data_loader):
+
             #import ipdb; ipdb.set_trace()
             iteration += 1
 

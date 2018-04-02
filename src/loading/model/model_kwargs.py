@@ -6,7 +6,7 @@ def construct_model_kwargs(args):
     #import ipdb; ipdb.set_trace()
     model_kwargs = {
         # model dimensions
-        'features': args.features+1 if args.model == 'nmp' else args.features,
+        'features': args.features+1,
         'hidden': args.hidden,
 
         # logging
@@ -19,7 +19,7 @@ def construct_model_kwargs(args):
         'predict':args.predict,
 
         # jet transform
-        'jet_transform':args.model,
+        'model':args.model,
 
         # NMP
         'iters': args.iters,
@@ -64,5 +64,13 @@ def load_model_kwargs(filename):
 
 def build_model_from_kwargs(model_kwargs, **kwargs):
     #model = GeneratorNMP(**model_kwargs, **kwargs)
-    model = GraphGen(**model_kwargs, **kwargs)
+    model = model_kwargs.pop('model', None)
+    model_dict = dict(
+        sg=SparseGraphGen,
+        g=GraphGen,
+        ng=NoGradGraphGen
+    )
+
+    ModelClass = model_dict[model]
+    model = ModelClass(**model_kwargs, **kwargs)
     return model
