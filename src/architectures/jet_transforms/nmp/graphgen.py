@@ -1,8 +1,12 @@
 import os
 
+import numpy as np
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn.parameter import Parameter
+from torch.autograd import Variable
 
 from src.data_ops.wrapping import wrap
 
@@ -115,13 +119,24 @@ class NoGradGraphGen(nn.Module):
         self.adj = NegativeSquare(temperature=0.01,symmetric=False, act='exp', logger=kwargs['logger'], logging_frequency=kwargs['logging_frequency'])
         self.spatial_embedding = nn.Linear(hidden, 3)
 
+        self.pos_embedding = nn.Embedding(1000, hidden)
+        pos_enc_weight = position_encoding_init(1000, hidden)
+        self.pos_embedding.weight = Parameter(pos_enc_weight)
+
     def forward(self, x, mask=None, **kwargs):
 
         bs = x.size()[0]
         n_vertices = x.size()[1]
 
+
+        #import ipdb; ipdb.set_trace()
         h = self.embedding(x)
 
+        pos = Variable(
+            torch.arange(n_vertices).expand(x.size()[:-1]).long(), requires_grad=False)
+        pos_embedding = self.pos_embedding(pos)
+
+        h += pos_embedding
         spatial = self.spatial_embedding(h)
         A = self.adj(spatial, mask, **kwargs)
         h = self.mp(h, A)
