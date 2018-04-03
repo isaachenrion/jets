@@ -137,6 +137,7 @@ class NoGradGraphGen(nn.Module):
         pos_embedding = self.pos_embedding(pos)
 
         h += pos_embedding
+
         spatial = self.spatial_embedding(h)
         A = self.adj(spatial, mask, **kwargs)
         h = self.mp(h, A)
