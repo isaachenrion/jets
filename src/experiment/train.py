@@ -140,8 +140,8 @@ def train(
             for i, (x, x_mask, y, mask) in enumerate(valid_data_loader):
                 y_pred = model(x, mask=x_mask)
                 vl = loss(y_pred, y, mask); valid_loss += float(unwrap(vl))
-                yy.append(unwrap((y*mask).view(training_args.batch_size, -1)))
-                yy_pred.append(unwrap((y_pred*mask).view(training_args.batch_size, -1)))
+                yy.append(unwrap((y*mask).view(-1)))
+                yy_pred.append(unwrap((y_pred*mask).view(-1)))
 
             if epoch % admin_args.lf == 0:
                 y_matrix_monitor(matrix=y)
