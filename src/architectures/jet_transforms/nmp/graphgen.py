@@ -103,7 +103,7 @@ class GraphGen(nn.Module):
         h = self.embedding(x)
 
         pos = Variable(
-            torch.arange(n_vertices).expand(x.size()[:-1]).long(), requires_grad=False)
+            torch.arange(0.0, float(n_vertices)).expand(x.size()[:-1]).long(), requires_grad=False)
         pos_embedding = self.pos_embedding(pos)
 
         h += pos_embedding
