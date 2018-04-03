@@ -104,6 +104,8 @@ class GraphGen(nn.Module):
 
         pos = Variable(
             torch.arange(0.0, float(n_vertices)).expand(x.size()[:-1]).long(), requires_grad=False)
+        if torch.cuda.is_available():
+            pos = pos.cuda()
         pos_embedding = self.pos_embedding(pos)
 
         h += pos_embedding
