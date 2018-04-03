@@ -117,6 +117,8 @@ model.add_argument("--readout", type=str, default='dtnn', help='type of readout 
 model.add_argument("--m_act", type=str, default='sigmoid', help='type of nonlinearity for matrices' )
 model.add_argument("--lf", type=int, default=20)
 model.add_argument("--wn", action='store_true')
+model.add_argument("--no_grad", action='store_true')
+model.add_argument("--tied", action='store_true')
 
 # Stack NMP
 model.add_argument("--pool_first", action='store_true', default=False)

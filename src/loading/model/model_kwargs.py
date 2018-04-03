@@ -32,6 +32,8 @@ def construct_model_kwargs(args):
         'matrix':args.adj[0] if len(args.adj) == 1 else args.adj,
         'matrix_activation':args.m_act,
         'wn': args.wn,
+        'no_grad': args.no_grad,
+        'tied': args.tied,
 
         # Stacked NMP
         'scales': args.scales,
@@ -68,7 +70,6 @@ def build_model_from_kwargs(model_kwargs, **kwargs):
     model_dict = dict(
         sg=SparseGraphGen,
         g=GraphGen,
-        ng=NoGradGraphGen
     )
 
     ModelClass = model_dict[model]
