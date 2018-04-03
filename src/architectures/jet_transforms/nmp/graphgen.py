@@ -81,7 +81,7 @@ class GraphGen(nn.Module):
         MPLayer = MP_LAYERS['m1']
         if tied:
             mp = MPLayer(hidden=hidden,**mp_kwargs)
-            self.mp_layers = [mp] * iters
+            self.mp_layers = nn.ModuleList([mp] * iters)
         else:
             self.mp_layers = nn.ModuleList([MPLayer(hidden=hidden,**mp_kwargs) for _ in range(iters)])
 
