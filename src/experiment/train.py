@@ -138,10 +138,10 @@ def train(
             valid_loss = 0.
             yy, yy_pred = [], []
             for i, (x, x_mask, y, mask) in enumerate(valid_data_loader):
-                with no_grad():
-                    y_pred = model(x, mask=x_mask)
-                vl = loss(y_pred, y, mask); valid_loss += unwrap(vl)
-                yy.append(unwrap(y)); yy_pred.append(unwrap(y_pred))
+                y_pred = model(x, mask=x_mask)
+                vl = loss(y_pred, y, mask); valid_loss += float(unwrap(vl))
+                yy.append(unwrap((y*mask).view(training_args.batch_size, -1)))
+                yy_pred.append(unwrap((y_pred*mask).view(training_args.batch_size, -1)))
 
             if epoch % admin_args.lf == 0:
                 y_matrix_monitor(matrix=y)
@@ -152,16 +152,16 @@ def train(
 
             valid_loss /= len(valid_data_loader)
 
-            yy = np.concatenate(yy, 0)
-            yy_pred = np.concatenate(yy_pred, 0)
+            yy = torch.Tensor(np.concatenate(yy, 0))
+            yy_pred = torch.Tensor(np.concatenate(yy_pred, 0))
 
             t1=time.time()
 
             logdict = dict(
                 epoch=epoch,
                 iteration=iteration,
-                yy=(yy*mask).view(training_args.batch_size, -1),
-                yy_pred=(yy_pred*mask).view(training_args.batch_size, -1),
+                yy=yy,
+                yy_pred=yy_pred,
                 #w_valid=valid_dataset.weights,
                 valid_loss=valid_loss,
                 settings=settings,
@@ -215,7 +215,7 @@ def train(
             if iteration % n_batches == 0:
                 new_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
 
-            train_loss += unwrap(l)
+            train_loss += float(unwrap(l))
 
         train_loss = train_loss / n_batches
         train_time = time.time() - t_train

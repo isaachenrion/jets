@@ -95,6 +95,16 @@ class GraphGen(nn.Module):
 
     def forward(self, x, mask=None, **kwargs):
 
+
+        if self.no_grad:
+            A = self.forward_no_grad(x, mask, **kwargs)
+        else:
+            A = self.forward_with_grad(x, mask, **kwargs)
+
+        return A
+
+    def forward_with_grad(self, x, mask, **kwargs):
+
         bs = x.size()[0]
         n_vertices = x.size()[1]
 
@@ -109,15 +119,6 @@ class GraphGen(nn.Module):
         pos_embedding = self.pos_embedding(pos)
 
         h += pos_embedding
-
-        if self.no_grad:
-            A = self.mp_no_grad(h, mask, **kwargs)
-        else:
-            A = self.mp_with_grad(h, mask, **kwargs)
-
-        return A
-
-    def mp_with_grad(self, h, mask, **kwargs):
         for i, mp in enumerate(self.mp_layers):
             spatial = self.spatial_embedding(h)
             A = self.adj(spatial, mask, **kwargs)
@@ -126,16 +127,31 @@ class GraphGen(nn.Module):
         A = self.adj(h, mask, **kwargs)
         return A
 
-    def mp_no_grad(self, h, mask, **kwargs):
+    def forward_no_grad(self, x, mask, **kwargs):
+
+        bs = x.size()[0]
+        n_vertices = x.size()[1]
+
+        #import ipdb; ipdb.set_trace()
+        h = self.embedding(x)
+
+        pos = Variable(
+            torch.arange(0.0, float(n_vertices)).expand(x.size()[:-1]).long(), requires_grad=False)
+        if torch.cuda.is_available():
+            pos = pos.cuda()
+        pos_embedding = self.pos_embedding(pos)
+
+        h += pos_embedding
 
         spatial = self.spatial_embedding(h)
         A = self.adj(spatial, mask, **kwargs)
 
-        with no_grad():
-            for i, mp in enumerate(self.mp_layers[:-1]):
-                h = mp(h, A)
-                spatial = self.spatial_embedding(h)
-                A = self.adj(spatial, mask, **kwargs)
+        for i, mp in enumerate(self.mp_layers[:-1]):
+            h = mp(h, A)
+            spatial = self.spatial_embedding(h)
+            A = self.adj(spatial, mask, **kwargs)
+
+        #
 
         h = self.mp_layers[-1](h, A)
         spatial = self.spatial_embedding(h)
