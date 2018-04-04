@@ -218,9 +218,12 @@ def train(
                 if torch.cuda.is_available():
                     gpus = GPUtil.getGPUs()
                     gpu_util = float(gpus[0].memoryUsed)
+                    gpu_total = float(gpus[0].memoryTotal)
+                    gpu_free = float(gpus[0].memoryFree)
                     gpu_load = float(gpus[0].load)
-                    logging.warning("GPU UTIL: {}".format(gpu_util))
+                    logging.warning("GPU UTIL: {}/{}. {} free".format(gpu_util, gpu_total, gpu_free))
                     logging.warning("GPU LOAD: {}".format(gpu_load))
+                    #logging.warning("GPU LOAD: {}".format(gpu_load))
 
 
             optimizer.step()
