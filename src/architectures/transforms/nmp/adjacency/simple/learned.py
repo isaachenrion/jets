@@ -81,8 +81,9 @@ class NegativeSquare(_Adjacency):
 
     def raw_matrix(self, h):
         shp = h.size()
-        h_l = h.view(shp[0], shp[1], 1, shp[2])
-        h_r = h.view(shp[0], 1, shp[1], shp[2])
+        h_l = h.unsqueeze(1).repeat(1, shp[1], 1, 1)
+        h_r = h.unsqueeze(2).repeat(1, 1, shp[1], 1)
+        #h_r = h.view(shp[0], 1, shp[1], shp[2])
         A = torch.sum((h_l - h_r)**2, 3)
 
         return -A / self.temperature
