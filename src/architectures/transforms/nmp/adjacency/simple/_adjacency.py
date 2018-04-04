@@ -53,7 +53,7 @@ class _Adjacency(nn.Module):
     def logging(self, dij=None, mask=None, epoch=None, iters=None, **kwargs):
 
         #import ipdb; ipdb.set_trace()
-        if epoch is not None and epoch % self.logging_frequency == 0:
+        if False and epoch is not None and epoch % self.logging_frequency == 0:
             #print(self.name)
             #import ipdb; ipdb.set_trace()
             if mask is not None:
