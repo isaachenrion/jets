@@ -55,7 +55,10 @@ class Precision(ScalarMonitor):
     def call(self, yy=None, yy_pred=None, **kwargs):
         predicted_hits = (yy_pred > 0.5).float()
         real_hits = (yy == 1).float()
-        prec = (predicted_hits * real_hits).sum() / predicted_hits.sum()
+        try:
+            prec = (predicted_hits * real_hits).sum() / predicted_hits.sum()
+        except ZeroDivisionError:
+            prec = 'NaN'
         return float(prec)
 
 class Recall(ScalarMonitor):

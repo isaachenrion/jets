@@ -69,6 +69,7 @@ def build_model_from_kwargs(model_kwargs, **kwargs):
     model = model_kwargs.pop('model', None)
     model_dict = dict(
         #sg=SparseGraphGen,
+        w=WangNet,
         g=GraphGen,
     )
 

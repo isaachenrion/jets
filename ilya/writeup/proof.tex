@@ -1,0 +1,175 @@
+\section{Proof of Theorem \ref{stabtheo}}
+ 
+ \subsection{Proof of (a)}
+ We first show the result for the mapping $x \mapsto \rho \left( A x + B \Delta x \right)$, 
+ corresponding to one layer of $\Phi_\Delta$. 
+ By definition, the Laplacian $\Delta$ of $\M$ is 
+ $$\Delta = \text{diag}(\bar{\ba})^{-1}( D - W)~,~$$
+where $\bar{\ba}_j$ is one third of the total area of triangles incident to node $j$, 
+and $W=(w_{i,j})$ contains the cotangent  weights \cite{laplacian_conv}.
+
+From \cite{laplace_bound} we verify that 
+\begin{eqnarray}
+\label{ble4}
+\| D - W \| &\leq& \sqrt{2} \max_{j} \left( d(j)^2 + \sum_{i \sim j} d(i) \right)^{1/2}  \\
+&\leq& 2\sqrt{2} \sup_{i,j} w_{i,j} \sup_j S(j) \nonumber \\
+&\leq& 2 \sqrt{2} \cot ( \alpha_{\text{min}} ) S_{\text{max}} ~, \nonumber
+\end{eqnarray}
+where $S(j)$ denotes the number of neighbors of node $j$, 
+$\alpha_{\text{min}}$ is the smallest angle in the triangulation of $\M$ and $S_{\text{max}}$ the 
+largest number of incident triangles. 
+It results that 
+$$\| \Delta \| \leq C \frac{\cot ( \alpha_{\text{min}} ) S_{\text{max}}}{\inf_j \bar{\ba}_j}:= L_\M~,$$
+which depends uniquely on the mesh $\M$ and is finite for non-degenerate meshes. 
+Moreover, since $\rho(\,\cdot \,)$ is non-expansive, we have
+\begin{eqnarray}
+\label{za1}
+\left\| \rho \left( A x + B \Delta x \right) - \rho\left( A x' + B \Delta x' \right) \right \| & \leq & \| A( x - x') + B \Delta (x-x') \| \\ \nonumber
+& \leq & (\| A \| + \| B \| L_\M ) \| x - x'\|~. 
+\end{eqnarray}
+
+By cascading (\ref{za1}) across the $K$ layers of the network, we obtain
+\begin{equation*}
+\| \Phi(\M; x) - \Phi(\M; x') \| \leq \left(\prod_{k \leq K} ( \| A_k \| + \| B_k \| L_\M) \right) \| x - x' \|~,
+\end{equation*}
+which proves (\ref{ya1}).
+
+\subsection{Proof of (b)}
+
+To establish (\ref{ya2}) we first observe that given three points $p, q, r \in \R^3$ forming any of the triangles of $\M$, 
+\begin{eqnarray}
+\| p - q \|^2 (1 - | \tau |_\infty)^2 &\leq \| \tau(p) - \tau(q) \|^2 \leq& \| p - q \|^2 (1 + | \tau |_\infty)^2 \label{za3} \\
+\ba(p,q,r)^2 ( 1 - | \tau |_\infty C \alpha_{\text{min}}^{-1} - o(|\tau |_\infty^2) & \leq \ba(\tau(p), \tau(q), \tau(r) )^2 \leq & \ba(p,q,r)^2 ( 1 + | \tau |_\infty C \alpha_{\text{min}}^{-1} + o(|\tau |_\infty^2))~. \label{za4}  
+\end{eqnarray}
+Indeed, (\ref{za3}) is a direct consequence of the lower and upper Lipschitz constants of $\tau(u)$, which are bounded respectively by $1- | \tau|_\infty$ 
+and $1 + | \tau|_\infty$. As for (\ref{za4}), we use the Heron formula 
+$$\ba(p,q,r)^2 = s ( s - \| p - q \|)( s - \| p - r \|)( s - \| r - q \|)~,$$
+with $s = \frac{1}{2}( \| p - q \| + \| p - r \| + \| r - q \|)$ being the half-perimeter.
+By denoting $s_\tau$ the corresponding half-perimeter determined by the deformed points $\tau(p), \tau(q), \tau(r)$, 
+we have that 
+$$ s_\tau - \| \tau(p) - \tau(q) \| \leq s(1 + |\tau|_\infty) - \| p - q \| ( 1 - |\tau|_\infty) = s -  \| p - q \|  + |\tau|_\infty( s + \| p - q \|)~\text{and }$$
+$$ s_\tau - \| \tau(p) - \tau(q) \| \geq s(1 - |\tau|_\infty) - \| p - q \| ( 1 + |\tau|_\infty) = s -  \| p - q \|  - |\tau|_\infty( s + \| p - q \|)~,$$
+and similarly for the $\| r - q\|$ and $\|r - p \|$ terms. 
+It results that
+\begin{eqnarray*}
+\ba(\tau(p),\tau(q),\tau(r))^2 &\geq& \ba(p,q,r)^2 \left[ 1 - | \tau|_\infty \left( 1 + \frac{s + \| p - q \|}{s - \| p -q \|} + \frac{s + \| p - q \|}{s - \| p -q \|} + \frac{s + \| p - q \|}{s - \| p -q \|} \right) - o( |\tau|^2 )\right ]  \\
+&\geq & \ba(p,q,r)^2 \left[ 1 - C | \tau|_\infty \alpha_{\text{min}}^{-1}  - o( |\tau|^2) \right]~,
+\end{eqnarray*}
+and similarly 
+$$\ba(\tau(p),\tau(q),\tau(r))^2  \leq \ba(p,q,r)^2 \left[ 1 + C | \tau|_\infty \alpha_{\text{min}}^{-1}  - o( |\tau|^2) \right] ~.$$
+
+By noting that the cotangent Laplacian weights can be written (see Fig. ?) as
+$$w_{i,j} = \frac{- \ell_{ij}^2 + \ell_{jk}^2 + \ell_{ik}^2 }{\ba(i,j,k)} + \frac{- \ell_{ij}^2 + \ell_{jh}^2 + \ell_{ih}^2 }{\ba(i,j,h)}~, $$
+we have from the previous Bilipschitz bounds that
+$$\tau( w_{i,j}) \leq w_{i,j} \left[ 1 - C | \tau|_\infty \alpha_{\text{min}}^{-1}\right]^{-1} + 2 | \tau|_\infty \left[ 1 - C | \tau|_\infty \alpha_{\text{min}}^{-1}\right]^{-1} \left( \frac{\ell_{ij}^2 + \ell_{jk}^2 + \ell_{ik}^2}{\ba(i,j,k)} + \frac{\ell_{ij}^2 + \ell_{jh}^2 + \ell_{ih}^2}{\ba(i,j,h)} \right)~,$$
+$$\tau( w_{i,j}) \geq w_{i,j} \left[ 1 + C | \tau|_\infty \alpha_{\text{min}}^{-1}\right]^{-1} - 2 | \tau|_\infty \left[ 1 + C | \tau|_\infty \alpha_{\text{min}}^{-1}\right]^{-1} \left( \frac{\ell_{ij}^2 + \ell_{jk}^2 + \ell_{ik}^2}{\ba(i,j,k)} + \frac{\ell_{ij}^2 + \ell_{jh}^2 + \ell_{ih}^2}{\ba(i,j,h)} \right)~,$$
+which proves that, up to second order terms, the cotangent weights are Lipschitz continuous to deformations. 
+
+Finally, since the mesh Laplacian operator is constructed as $\text{diag}(\bar{\ba})^{-1} (D - W)$, 
+with $\bar{\ba}_{i,i} = \frac{1}{3} \sum_{j,k; (i,j,k) \in F} \ba(i,j,k)$, and $D = \text{diag}( W {\bf 1})$,
+let us show how to bound $\| \Delta - \tau(\Delta) \|$ from
+\begin{equation}
+\label{pep1}
+\bar{\ba}_{i,i} ( 1 - \alpha_\M | \tau|_\infty - o( | \tau|^2) ) \leq \tau(\bar{\ba}_{i,i}) \leq \bar{\ba}_{i,i} ( 1 + \alpha_\M | \tau|_\infty + o( | \tau|^2) )
+\end{equation} 
+and
+\begin{equation}
+\label{pep2}
+w_{i,j} ( 1 - \beta_\M | \tau|_\infty - o( | \tau|^2) ) \leq \tau(w_{i,j}) \leq w_{i,j} ( 1 + \beta_\M | \tau|_\infty + o( | \tau|^2) )~.
+\end{equation} 
+Using the fact that $\bar{\ba}$, $\tau(\bar{\ba})$ are diagonal, and using the spectral bound for $k \times m$ sparse matrices 
+from \cite{splitting}, Lemma 5.12, 
+$$\| Y \|^2 \leq \max_i \sum_{j ; \, Y_{i,j} \neq 0} |Y_{i,j}| \left( \sum_{r=1}^l | Y_{r,j}| \right)~, $$
+the bounds (\ref{pep1}) and (\ref{pep2}) 
+yield respectively 
+\begin{eqnarray*}
+\label{pep3}
+ \tau(\bar{\ba}) &=& \bar{\ba} ( {\bf 1} + \epsilon_\tau)~,~\text{with } \| \epsilon_\tau \| = o( | \tau|_\infty)~,\text{and}  \\
+ \tau( D - W) &=& D - W + \eta_\tau~,~\text{with } \| \eta_\tau \| = o ( | \tau|_\infty )~.
+\end{eqnarray*}
+%We note that the bound only depends on $N$, the size of the mesh, through the largest degree 
+%of the mesh, which is bounded in regular meshes, and through the smallest angle $\alpha_{\min}$. 
+It results that, up to second order terms, 
+\begin{eqnarray*}
+\| \Delta - \tau(\Delta) \| &=& \left \| \tau(\bar{\ba})^{-1} ( \tau(D) - \tau(W) ) - \bar{\ba}^{-1} ( D - W) \right\| \\
+&=& \left \| \left( \bar{\ba} [{\bf 1} + \epsilon_\tau ] \right)^{-1} \left[ D - W + \eta_\tau \right] - \bar{\ba}^{-1} ( D - W) \right\| \\
+&=& \left \| \left( {\bf 1} - \epsilon_\tau + o(|\tau|_\infty^2) \right) \bar{\ba}^{-1} ( D - W + \eta_\tau) - \bar{\ba}^{-1} ( D - W)  \right\| \\
+&=& \left \| \epsilon_\tau \Delta + \bar{\ba}^{-1} \eta_\tau \right\| + o( | \tau |_\infty^2) \\ 
+&=& o( | \tau|_\infty)~,
+\end{eqnarray*}
+which shows that the Laplacian is stable to deformations in operator norm. 
+Finally, by denoting $\tilde{x}_\tau$ a layer of the deformed Laplacian network 
+$$\tilde{x}_\tau = \rho( A x + B \tau(\Delta) x)~,$$
+it follows that 
+\begin{eqnarray}
+\label{pep4}
+\| \tilde{x} - \tilde{x}_\tau \| &\leq& \| B ( \Delta - \tau(\Delta) x \| \\
+&\leq & C \| B \| | \tau|_\infty \|x \| ~.
+\end{eqnarray}
+Also, 
+\begin{eqnarray*}
+\| \tilde{x} - \tilde{x'}_\tau \| &\leq& \| A( x - x') + B ( \Delta x - \tau(\Delta) x') \| \\
+&\leq & (\| A \| + \| B \| \| \Delta \|  )\| x - x'\|  + \| \Delta - \tau(\Delta) \| \| x\| \\
+& \leq & \underbrace{(\| A \| + \| B \| \| \Delta \|  )}_{\delta_1}\| x - x'\|  + \underbrace{C | \tau |_\infty}_{\delta_2} \| x \|~, 
+\end{eqnarray*}
+and therefore, by plugging (\ref{pep4}) with $x' = \tilde{x}_\tau$, 
+$K$ layers of the Laplacian network satisfy 
+\begin{eqnarray*}
+\| \Phi(x; \Delta) - \Phi(x; \tau(\Delta) \| &\leq& \left(\prod_{j \leq K-1} \delta_1(j)\right) \| \tilde{x} - \tilde{x}_\tau\| + \left(\sum_{j < K-1} \prod_{j' \leq j} \delta_1(j') \delta_2(j) \right)  | \tau \|_\infty \|x \| \\
+&\leq & \left[C  \left(\prod_{j \leq K-1} \delta_1(j)\right)  \|B \| +  \left(\sum_{j < K-1} \prod_{j' \leq j} \delta_1(j') \delta_2(j) \right)  \right] | \tau |_\infty \|x \| ~. ~~~ \square~.
+\end{eqnarray*}
+
+%We conclude by observing that the proof can be reproduced if we replace the Laplacian operator by the Dirac operator, since it 
+%is defined in terms of the matrix $\bar{\ba}^{-1}$ and $L_{i,j} = v_i - v_j$. We can thus apply the same stability arguments of lengths
+%and 
+
+
+\subsection{Proof of (c)}
+
+This result is an immediate consequence of the consistency of the cotangent Laplacian to the Laplace-Beltrami operator on $S$ \cite{laplacian_convergence}:
+\begin{theorem}[\cite{laplacian_convergence}, Thm 3.4] Let $\M$ be a compact polyhedral surface which is a normal graph over a smooth surface $S$ 
+with distortion tensor $\mathcal{T}$, and let $\bar{\mathcal{T}} = (\det \mathcal{T})^{1/2} \mathcal{T}^{-1}$. 
+If the normal field uniform distance $\| \bar{\mathcal{T}} - {\bf 1} \|_\infty \leq \epsilon$, then
+\begin{equation}
+\label{blabla1}
+\| \Delta_\M - \Delta_S\| \leq \epsilon~.
+\end{equation}
+\end{theorem}
+
+Thus, given two meshes $\M$, $\M'$ approximating a smooth surface $S$ in terms of uniform normal distance, 
+and the corresponding irregular sampling $x$ and $x'$ of an underlying function $\bar{x} : S \to \R$, we have 
+\begin{equation}
+\label{blabla2}
+\| \rho( A x + B \Delta_{\M} x) - \rho( A x' + B \Delta_{\M'} x') \| \leq \| A \| \| x - x' \| + \|B \| \| \Delta_\M x - \Delta_{\M'} x' \|~.
+\end{equation}
+Since $\M$ and $\M'$ both converge uniformly normally to $S$ and $\bar{x}$ is Lipschitz on $S$, it results 
+that 
+$$\| x - \bar{x} \| \leq \beta \epsilon~,\text{ and }~\| x' - \bar{x} \| \leq \beta \epsilon~,$$
+thus $\| x - x' \| \leq 2 \beta \epsilon$. 
+Moreover, thanks to (\ref{blabla1}) we have 
+$$\| \Delta_{\M} - \Delta_{\M'} \| \leq 2 \epsilon~, $$
+which from (\ref{blabla2}) results in 
+\begin{eqnarray}
+\| \rho( A x + B \Delta_{\M} x) - \rho( A x' + B \Delta_{\M'} x') \| &\leq& 2 \| A \| \beta \epsilon +  \\
+&& + \| B \| \| \Delta_\M x - \Delta_{\M'} x + \Delta_{\M'} x - \Delta_{\M'} x'  \| \nonumber \\
+&\leq & \epsilon \left( 2 \|A \| \beta + \| B \| \|x\| \right) +  \| B \| \| \Delta_{\M'}\|  \|x - x' \| \nonumber ~,
+%&\leq & 2\epsilon \beta \left( \|A \|  + \| B \| \|x\|  +  \| B \| \| \Delta_{\M'}\| \right)~.
+\end{eqnarray}
+and therefore 
+\begin{eqnarray*}
+\| \Phi_\M(x) - \Phi_{\M'}(x') \| &\leq& \left(\prod_{k \leq K} \|B_k \| \| \Delta_{\M} \| \right) \| x - x'\| + \epsilon \left[\sum_{k \leq K} \left( 2 \|A_k \| \beta + \| B_k \| \|x\| \right)  \prod_{k' \leq k} \|B_{k'} \| \| \Delta_{\M} \| \right]~ \\
+&\leq& \epsilon \left\{2 \beta  \left(\prod_{k \leq K} \|B_k \| \| \Delta_{\M} \| \right) + \left[\sum_{k \leq K} \left( 2 \|A_k \| \beta + \| B_k \| \|x\| \right)  \prod_{k' \leq k} \|B_{k'} \| \| \Delta_{\M} \| \right]  \right\}~.~~~\square~.
+\end{eqnarray*}
+
+
+\section{Proof of Corollary \ref{corocombine}}
+
+$D_\tau S$ is linear: $D_\tau S = S + b(\tau)$, 
+$\| \Delta b(\tau) \|$ small if $b(\tau)$ is smooth.  
+
+
+\section{Proof of Theorem \ref{diractheo}}
+
+
+
+

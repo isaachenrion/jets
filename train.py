@@ -103,7 +103,7 @@ model.add_argument("--model_dropout", type=float, default=1.)
 model.add_argument("--predict", type=str, default='simple', help='type of prediction layer')
 
 # Transform
-model.add_argument("-m", "--model", type=str, default="nmp", help="name of the model you want to train")
+model.add_argument("-m", "--model", type=str, default="g", help="name of the model you want to train")
 
 # NMP
 model.add_argument("-i", "--iters", type=int, default=10)

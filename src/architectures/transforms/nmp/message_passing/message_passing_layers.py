@@ -4,9 +4,9 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from .vertex_update import VERTEX_UPDATES
-from src.architectures.embedding import EMBEDDINGS
-from src.architectures.embedding import ACTIVATIONS
-from src.architectures.jet_transforms.nmp.adjacency import construct_adjacency
+from ....embedding import EMBEDDINGS
+from ....embedding import ACTIVATIONS
+from ..adjacency import construct_adjacency
 
 class MessagePassingLayer(nn.Module):
     def __init__(self, hidden=None, update=None, message=None, act=None, **kwargs):

@@ -1,0 +1,257 @@
+\section{Surface Neural Networks}
+\label{snnsec}
+
+This section presents our Surface Neural Network model
+and its basic properties. We start by introducing the 
+problem setup and notations using the Laplacian formalism, 
+and then introduce the Surface Neural Network model.
+
+\subsection{Laplacian Graph NNs}
+
+Our first goal is to define a trainable representation of 
+discretized $\R^3$ surfaces. Let $\M=\{V,E,A\}$ be a triangular 
+mesh, where $V=(v_i \in \R^3)_{i \leq N}$ contains the node coordinates, 
+$E = (e_{i,j} )$ corresponds to edges, and $A$ is the triangulation. 
+Since $\M$ can be cast as a discretization of a smooth manifold $S_{\M}$, 
+the Laplace-Beltrami operator on $S_{\M}$ admits a stable discretization 
+into $\M$, for instance using the cotangent angles \cite{gnnreview}, that we
+denote by $\Delta$. 
+
+%describe the graph Neural Net in terms of the Laplacian. 
+%mention that it is related to several existing models.
+This operator can be interpreted as a local, linear high-pass filter in $\M$ 
+that acts on signals $x \in \R^{|V| \times d}$ defined on the nodes of the mesh 
+as a simple matrix multiplication $\tilde{x} = \Delta x$.
+By complementing $\Delta$ with an \emph{all-pass} filter and learning generic 
+linear combinations followed by a point-wise nonlinearity, we thus obtain 
+a simple generalization of localized convolutional operators in $\M$ 
+that update a feature map from layer $k$ to layer $k+1$ using trainable parameters $A_k$ and $B_k$:
+\begin{equation}
+\label{laplacenet}
+x^{k+1} = \rho \left( A_k \Delta x^k + B_k x^k \right)~,~A_k,B_k \in \R^{d_{k+1} \times d_k} ~.
+\end{equation}
+
+By noticing that the Laplacian itself can be written in terms of the graph weight similarity 
+by diagonal renormalization, this model is a specific instance of the graph neural network \cite{gnn1, gnnreview, kipf} 
+and a generalization of the spectrum-free Laplacian networks from \cite{deferrand}. 
+As shown in these previous works, convolutional-like layers (\ref{laplacenet}) can be 
+combined with graph coarsening or pooling layers, although in our current work, since 
+we are interested in tasks that require keeping the mesh resolution, we will not use them. 
+
+%feed input coordinates; show that they can produce normals and mean curvature. 
+In contrast to general graphs, meshes also contain a low-dimensional Euclidean embedding that 
+contains potentially useful information in many graphics tasks, despite being extrinsic and thus 
+not invariant to the global position of the surface. A simple strategy to strike a good balance between 
+expressivity and invariance is to include the node canonical coordinates as input channels to the network: $x^{1}:=V \in \R^{|V| \times 3}$. 
+One can verify \cite{geom} that 
+\begin{equation}
+\label{laplacenorm}
+\Delta V = -2 H \bf{n}~,
+\end{equation}
+where $H$ is the mean curvature function and ${\bf n}(u)$ is the normal vector of the surface at point $u$.
+It results that the Laplacian Neural model (\ref{laplacenet}) has access to mean curvature and normal information.
+As discussed previously, this strategy increases the expressive power of the model, at the expense of losing 
+invariance in the representation. %However, (\ref{laplacenorm}) shows that we retain translation invariance (but not rotation/scaling invariance).  
+Feeding Euclidean embedding coordinates into graph neural network models is related to the use of generalized coordinates from \cite{monet}.
+
+By cascading $K$ layers of the form (\ref{laplacenet}) we obtain a representation $\Phi_{\Delta}(\M)$ 
+that contains generic features at each node location. When the number of layers $K$ is of the order of 
+$\text{diam}(\M)$, the diameter of the graph determined by $\M$, then the network is able to propagate and aggregate
+information across the whole surface. On regular meshes, $\text{diam}(\M) \simeq |V|$, but one can leverage 
+the multigrid structure to reduce the number of layers to $\simeq \log |V|$  \cite{gnnreview} if necessary.
+
+%what are the limitations of this? How to be sensitive to principal curvature directions? 
+%dirac. 
+Equation (\ref{laplacenorm}) illustrates that a Laplacian layer is only able to extract isotropic high-frequency information, 
+corresponding to the mean variations across all directions. Although in general graphs there is no well-defined procedure 
+to recover anisotropic local variations, in the case of surfaces some authors (\cite{bronstein1} and references therein) have 
+considered anisotropic extensions. We describe next a particularly simple procedure to increase 
+the expressive power of the network using a related operator from quantuum mechanics: the Dirac Operator.
+ 
+\subsection{Dirac Surface Neural Networks}
+
+The Laplace-Beltrami operator $\Lambda$ is a second-order differential operator, 
+constructed as $\Lambda = -\text{div} \nabla$ by combining the gradient (a first-order differential 
+operator) with its adjoint, the divergence operator. In an Euclidean space, one has access to 
+these first-order differential operators separately, enabling oriented high-pass filters. 
+Inspired from \cite{diracpaper}, let us describe how to recover first-order differential operators in a surface that are 
+stable to discretization on meshes. 
+
+%need to introduce quaternions? maybe in the appendix. 
+%why map nodes --> faces --> nodes rather than nodes --> edges --> nodes ? 
+For convenience, we embed $\R^3$ to the imaginary quaternion space $\text{Im}(\HH)$ (see Appendix for details). 
+The Dirac operator is then defined as a matrix $D  \in \HH^{|F| \times |V|}$ that maps (quaternion) signals on the nodes to signals on the faces. 
+In coordinates, 
+$$D_{f,j} = \frac{-1}{2 | \ba_f | }e_j~,~f \in F, j \in V~,$$
+where $e_j$ is the opposing edge vector of node $j$ in the face $f$, and $\ba_f$ is 
+the area, as illustrated in Fig. ?.
+using counter-clockwise orientations on all faces. 
+
+%important property: D D* = Laplace + other terms. 
+%so the nonlinear version is immediate. 
+The Dirac operator provides first-order differential information 
+and is sensitive to local orientations. 
+Moreover, one can verify \cite{diracpaper} that 
+$$D^* D  = \Delta  ~,$$
+where $D^*$ is the adjoint operator of $D$ in the quaternion space (see Appendix). 
+
+The Dirac operator can be used to define a new neural surface representation 
+that alternates layers with signals defined over nodes with layers defined over faces. 
+Given a $d$-dimensional feature representation over the nodes of the mesh, $x \in \R^{|V| \times d}$, 
+we define a $d'$-dimensional mapping to a face representation as 
+\begin{equation}
+\label{dir1}
+y_l(f) =  \rho \left(\sum_{j \in f} x(j)^T C_l  e_j \right)~,~l=1\dots d'~,~f \in F~,
+\end{equation}
+where $C_l \in \R^{d \times 3}$, $l =1 \dots, d'$ are trainable parameters.
+Similarly, we define the adjoint layer that maps back to a $\tilde{d}$-dimensional signal over nodes as
+\begin{equation}
+\label{dir2}
+\tilde{x}_l(j) = \rho \left(B_l x(j) + \frac{3}{\sum_{f \in j} |\ba_f| }  \sum_{f \in j} y(f)^T D_l  \overline{e_j} \right)~,~l=1\dots \tilde{d}~,~j \in V~,
+\end{equation}
+where $D_l \in \R^{d' \times 3}$, $B_l \in \R^d$, $l =1 \dots, \tilde{d}$ are trainable parameters.
+A surface Neural Network layer is thus determined by parameters $\{B, C, D\}$ using equations (\ref{dir1}) and (\ref{dir2}) 
+to define $x^{k+1} \in \R^{V \times d_{k+1}}$.  We denote by $\Phi_D(\M)$ the mesh representation resulting 
+from applying $K$ such layers.
+
+
+%$x \in \R^{|V| \times d} \mapsto y \in \R^{|F| \times d'} \mapsto \tilde{x} \in \R^{|V| \times d''}$
+
+%From \cite{diracpaper} 
+
+%%dirac operator
+%Appendix \ref{diracappendix} describes in detail the 
+%Dirac operator and its properties using quaternion calculus. 
+
+\begin{itemize}
+\item Relationship to edge feature transforms of \cite{quantum_chemistry}.
+But here instead of lifting to edge signals, we lift to face signals. Why is
+this a better property? Orientability? 
+
+\item Why is this useful? 
+Capture geometric information beyond the mean variations. What properties 
+can we capture with Dirac that cannot be captured with Laplace? 
+\end{itemize}
+
+\subsection{Stability of Surface NNs}
+\label{stabsection}
+
+Here we describe how the Surface NNs are geometrically stable, 
+because surface deformations become additive noise under the model. 
+
+Given a surface $S \subset \R^3$ or mesh $\M$, and a smooth deformation field $\tau: \R^3 \to \R^3$, 
+% acting on $S$ (resp. $\M$), as $D_\tau (x) = \tau(x)$, 
+%and we denote for simplicity $D_\tau(S)$ (resp. $D_\tau(\M)$). 
+we are particularly interested in two forms of stability: 
+\begin{itemize} 
+\item Given a discrete mesh $\M$ and a certain non-rigid deformation $\tau$ 
+acting on $\M$, we want to certify that $ \| \Phi(\M) - \Phi(\tau(\M)) \|$ is 
+small if $\| \nabla \tau ( \nabla \tau)^* - {\bf I} \| $ is small, i.e when the deformation is nearly rigid.
+ \item Given two discretizations $\M_1$ and $\M_2$ of the same underlying surface, 
+we would like to control $\| \Phi( \M_1) - \Phi(\M_2) \| $ in terms of the resolution of the meshes. 
+\end{itemize}
+These stability properties are important in applications, since most tasks we are interested in 
+are stable to deformation and to discretization. The following theorem shows that both $\Phi_\Delta$ and $\Phi_D$ 
+preserve stability to deformations and discretizations. 
+\begin{theorem}
+\label{stabtheo}
+Let $\M$ be a $N$-node mesh and $x,\,x' \in \R^{|V| \times d}$ be 
+ input signals defined on the nodes. Assume the nonlinearity $\rho(\,\cdot \,)$ is 
+ non-expansive. Then
+\begin{enumerate}[label=(\alph*)]
+\item 
+\begin{equation}
+\label{ya1}
+\| \Phi_\Delta(\M; x) - \Phi_\Delta(\M; x') \| \leq \alpha \| x - x' \|~,
+\end{equation}
+where $\alpha$ depends only on the trained weights and the mesh.
+\item Let $| \tau |_\infty := \sup_u \| \nabla \tau(u) (\nabla \tau(u))^* - {\bf 1} \|$, where $\nabla \tau(u)$ is the Jacobian
+matrix of $u \mapsto \tau(u)$. 
+\begin{equation}
+\label{ya2}
+\| \Phi_\Delta(\M; x) - \Phi_\Delta( \tau(\M); x) \| \leq \beta | \tau |_\infty \|x \|~,
+\end{equation}
+where $\beta$ is independent of $\tau$ and $x$.
+\item Let $x,\,x'$ be piece-wise polyhedral constant approximations of $\bar{x}(t)$, $t \in S$, 
+on discretizations $\M$ and $\M'$ of $S$, and assume $\bar{x}$ is Lipschitz with constant $\beta$.
+If $\epsilon$ is an upper bound of the \emph{normal field uniform distance} \cite{laplacian_convergence} between $\M$ and $S$ 
+and $\M$ and $S$, then
+\begin{equation}
+\label{ya3}
+\| \Phi_\Delta(\M;x) - \Phi_\Delta(\M', x') \| \leq \epsilon \gamma \|\bar{x} \|~,
+\end{equation}
+where $\gamma$ is independent of $x$ and $S$.
+\end{enumerate}
+\end{theorem}
+
+This theorem gives a simple stability certificate of Laplace-based Surface Neural 
+Network representations with respect to geometric deformations and 
+additive noise. Property (a) is not specific to surface representations, and 
+is a simple consequence of the non-expansive property of our chosen 
+nonlinearities. The constant $\alpha$ is controlled by the product 
+of $\ell_2$ norms of the network weights at each layer and the 
+norm of the discrete Laplacian operator. 
+Property (b) is based on the fact that the Laplacian operator 
+is itself stable to deformations, a property that 
+depends on two key aspects: first, the Laplacian is localized 
+in space, and next, that it is a high-pass filter and therefore only depends 
+on relative changes in position. 
+Finally, property (c) certifies that if we use as generator 
+of the SNN an operator that is consistent as the mesh resolution 
+increases, the resulting surface representation is also consistent. 
+
+One caveat of our analysis is that the constants $\alpha, \beta, \gamma$ 
+appearing in our bounds depend upon the bandwidth parameter $\bar{\ba}^{-1}$, which increases
+as size of the mesh increases. This corresponds to the 
+fact that the Laplacian operator is unbounded in the limit of continuous manifolds, 
+but our current proof does not exploit the regularity of the incoming signals 
+at each layer, which is controllable if one considers half (or full) rectifications 
+as nonlinearities. This analysis is left for future work.
+
+
+%Signal-to-noise ratio: discuss it. 
+
+%If the weights that we learn are bounded (or regularized), then we can directly 
+%obtain a bound. 
+%Question: show that large but smooth deformations are also OK. 
+
+A specific setup that we use in experiments is to 
+use as input signal the canonical coordinates of the mesh $\M$.
+In that case, an immediate application of properties (a) and (b) above yields
+the following corollary:
+\begin{corollary}
+\label{corocombine}
+Denote $\Phi(\M) := \Phi_{\M}(V)$, where $V$ are the node coordinates of $\M$. 
+%Corollary combining (\ref{ya1}) with (\ref{ya2}): feed deformed canonical coordinates
+%to the deformed mesh is also stable. 
+Then, if $A_1 =0 $, 
+\begin{equation}
+\| \Phi(\M) - \Phi(\tau(\M)) \| \leq \kappa | \tau |_\infty~.
+\end{equation}
+\end{corollary}
+
+
+We conclude this section by studying the geometric stability of the Dirac-based surface neural network. 
+In that case, the network is also shown to be stable, but using a deformation metric that in that case 
+is sensitive to rigid rotations. 
+\begin{theorem}
+\label{diractheo}
+Denote by $\widetilde{| \tau |}_\infty := \sup_u \| \nabla \tau(u) - {\bf 1} \|$. Then 
+the previous theorem is valid by replacing $\Phi_\Delta$ with $\Phi_D$ and $| \tau |_\infty$ with $\widetilde{| \tau |}_\infty$.
+%Extension to Dirac operator is straightforward, but
+%we lose rotation invariance. OK
+\end{theorem}
+
+\subsection{Spatio-Temporal Representations}
+
+One specific task we 
+
+
+\cite{michaelmathieu}
+
+
+
+
+
+
+
