@@ -119,12 +119,16 @@ class GraphGen(nn.Module):
         pos_embedding = self.pos_embedding(pos)
 
         h += pos_embedding
-        for i, mp in enumerate(self.mp_layers):
-            spatial = h[:,:,:3]
-            A = self.adj(spatial, mask, **kwargs)
-            h = mp(h, A)
+        spatial = h[:,:,:3].contiguous()
+        A = self.adj(spatial, mask, **kwargs)
 
-        A = self.adj(h, mask, **kwargs)
+        for i, mp in enumerate(self.mp_layers):
+            h = mp(h, A)
+            spatial = h[:,:,:3].contiguous()
+            A = self.adj(spatial, mask, **kwargs)
+
+
+        #A = self.adj(h, mask, **kwargs)
         return A
 
     def forward_no_grad(self, x, mask, **kwargs):
