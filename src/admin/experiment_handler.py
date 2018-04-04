@@ -18,6 +18,9 @@ from .logger import StatsLogger
 from ..monitors import *
 from ..misc.constants import RUNNING_MODELS_DIR, ALL_MODEL_DIRS
 
+if torch.cuda.is_available():
+    import GPUtil
+
 def get_git_revision_short_hash():
     s = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
     s = str(s).split('\'')[1]
@@ -85,7 +88,7 @@ class ExperimentHandler:
         if gpu != "" and torch.cuda.is_available():
             torch.cuda.device(gpu)
             torch.cuda.manual_seed(seed)
-            import GPUtil
+
         else:
             torch.manual_seed(seed)
 
@@ -208,6 +211,7 @@ class ExperimentHandler:
         admin_monitors = [
             saver,
             ]
+
         if torch.cuda.is_available():
             admin_monitors += [
                 Collect('gpu-load',fn='last', visualizing=True),
