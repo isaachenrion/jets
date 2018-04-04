@@ -25,6 +25,10 @@ from ..loading.model import build_model
 from ..monitors import BatchMatrixMonitor
 
 from ..misc.grad_mode import no_grad
+
+if torch.cuda.is_available():
+    import GPUtil
+
 #@profile
 def train(
     admin_args=None,
@@ -210,10 +214,20 @@ def train(
                 old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
                 grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
 
+                # GPU LOGGING
+                if torch.cuda.is_available():
+                    gpus = GPUtil.getGPUs()
+                    gpu_util = float(gpus[0].memoryUsed)
+                    gpu_load = float(gpus[0].load)
+                    logging.warning("GPU UTIL: {}".format(gpu_util))
+                    logging.warning("GPU LOAD: {}".format(gpu_load))
+
+
             optimizer.step()
 
             if iteration % n_batches == 0:
                 new_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
+
 
             train_loss += float(unwrap(l))
 
@@ -221,14 +235,25 @@ def train(
         train_time = time.time() - t_train
         logging.warning("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, train_time, len(train_dataset)/train_time))
 
+        train_dict = dict(
+            train_loss=train_loss,
+            grads=grads,
+            old_params=old_params,
+            model_params=new_params,
+            )
+        if torch.cuda.is_available():
+            train_dict.update(
+                dict(
+                gpu_util=gpu_util,
+                gpu_load=gpu_load
+                )
+            )
+
         # validation
         t_valid = time.time()
         logdict = validation(
                     i, model,
-                    train_loss=train_loss,
-                    grads=grads,
-                    old_params=old_params,
-                    model_params=new_params,
+                    **train_dict
                     )
         logging.warning("Validation took {:.1f} seconds".format(time.time() - t_valid))
 

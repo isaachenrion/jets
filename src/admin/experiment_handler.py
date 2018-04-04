@@ -250,12 +250,6 @@ class ExperimentHandler:
         logging.warning("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
 
     def log(self, **kwargs):
-        if torch.cuda.is_available():
-            gpus = GPUtil.getGPUs()
-            logging.warning("GPU UTIL: {}".format(gpus[0].memoryUsed)
-            logging.warning("GPU LOAD: {}".format(gpus[0].load))
-            kwargs['gpu-util'] = float(gpus[0].memoryUsed)
-            kwargs['gpu-load'] = float(gpus[0].load)
 
         self.stats_logger.log(**kwargs)
         #t_log = time.time()
