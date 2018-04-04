@@ -5,11 +5,7 @@ from .meta import Collect
 from .meta import Histogram
 from .meta import EachClassHistogram
 
-from .metrics import ROCAUC
-from .metrics import ROCCurve
-from .metrics import InvFPR
-from .metrics import Precision
-from .metrics import Recall
+from .metrics import *
 
 from .saver import Saver
 

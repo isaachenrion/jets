@@ -17,8 +17,8 @@ class ProteinLoader(_DataLoader):
         super().__init__(dataset, batch_size)
         self.dropout = dropout
         self.permute_vertices = permute_vertices
-        self.n_max = 100
-        #self.n_max = None
+        #self.n_max = 100
+        self.n_max = None
 
 
     def collate(self, data_tuples):
@@ -26,6 +26,8 @@ class ProteinLoader(_DataLoader):
         X, X_mask = self.preprocess_x([x for x, _, _ in data_tuples])
         Y = self.preprocess_y([y for _, y, _ in data_tuples])
         Y_mask = self.preprocess_mask([mask for _, _, mask in data_tuples])
+        Y_mask *= X_mask
+
         if self.n_max is not None:
             X = X[:, :self.n_max]
             X_mask = X_mask[:, :self.n_max, :self.n_max]

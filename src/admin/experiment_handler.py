@@ -85,6 +85,7 @@ class ExperimentHandler:
         if gpu != "" and torch.cuda.is_available():
             torch.cuda.device(gpu)
             torch.cuda.manual_seed(seed)
+            import GPUtil
         else:
             torch.manual_seed(seed)
 
@@ -179,6 +180,10 @@ class ExperimentHandler:
             ##inv_fpr_at_best_roc_auc,
             roc_auc,
             best_roc_auc,
+            #TopLK(1, visualizing=True),
+            #TopLK(2, visualizing=True),
+            #TopLK(5, visualizing=True),
+            #TopLK(10, visualizing=True),
             Precision(visualizing=True),
             Recall(visualizing=True),
             Regurgitate('valid_loss', visualizing=True),
@@ -201,8 +206,13 @@ class ExperimentHandler:
         saver = Saver(best_roc_auc, model_file, settings_file, visualizing=False)
 
         admin_monitors = [
-            saver
-        ]
+            saver,
+            ]
+        if torch.cuda.is_available():
+            admin_monitors += [
+                Collect('gpu-load',fn='last', visualizing=True),
+                Collect('gpu-util',fn='last', visualizing=True),
+                ]
 
         optim_monitors = [
             Collect('lr', fn='last', visualizing=True),
@@ -236,6 +246,10 @@ class ExperimentHandler:
         logging.warning("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
 
     def log(self, **kwargs):
+        if torch.cuda.is_available():
+            gpus = GPUtil.getGPU()
+            kwargs['gpu-util'] = gpus[0].memoryUsed
+            kwargs['gpu-load'] = gpus[0].load
 
         self.stats_logger.log(**kwargs)
         #t_log = time.time()

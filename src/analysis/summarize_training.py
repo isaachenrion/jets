@@ -74,7 +74,7 @@ def summarize_one_job_training(jobdir, email=False, verbose=False):
                 except (ValueError, TypeError):
                     out_str += '{}\n'.format(s)
 
-    headline = aggregate_stats_dict['best_inv_fpr'][0]
+    headline = aggregate_stats_dict['best_roc_auc'][0]
 
     # pretty print to results file
     statsfile = os.path.join(jobdir, 'stats.txt')

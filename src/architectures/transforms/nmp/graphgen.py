@@ -87,7 +87,7 @@ class GraphGen(nn.Module):
 
 
         self.adj = NegativeSquare(temperature=0.01,symmetric=False, act='exp', logger=kwargs['logger'], logging_frequency=kwargs['logging_frequency'])
-        self.spatial_embedding = nn.Linear(hidden, 3)
+
 
         self.pos_embedding = nn.Embedding(1000, hidden)
         pos_enc_weight = position_encoding_init(1000, hidden)
@@ -120,7 +120,7 @@ class GraphGen(nn.Module):
 
         h += pos_embedding
         for i, mp in enumerate(self.mp_layers):
-            spatial = self.spatial_embedding(h)
+            spatial = h[:,:,:3]
             A = self.adj(spatial, mask, **kwargs)
             h = mp(h, A)
 
@@ -132,29 +132,48 @@ class GraphGen(nn.Module):
         bs = x.size()[0]
         n_vertices = x.size()[1]
 
-        #import ipdb; ipdb.set_trace()
-        h = self.embedding(x)
+        h = x
+
+        n_volatile_layers = np.random.randint(0, self.iters)
+
+        if n_volatile_layers == 0:
+            h = self.embedding(h)
+            h += self.encode_position(bs, n_vertices)
+            spatial = h[:,:,:3].contiguous()
+            A = self.adj(spatial, mask, **kwargs)
+            return A
+
+        h.volatile = True
+
+        h = self.embedding(h)
+        h += self.encode_position(bs, n_vertices)
+
+        spatial = h[:,:,:3].contiguous()
+        A = self.adj(spatial, mask, **kwargs)
+
+
+
+        for i in range(n_volatile_layers):
+            mp = self.mp_layers[i]
+            h = mp(h, A)
+            spatial = h[:,:,:3].contiguous()
+            A = self.adj(spatial, mask, **kwargs)
+
+        h.volatile = False
+        A.volatile = False
+
+        mp = self.mp_layers[n_volatile_layers]
+        h = mp(h, A)
+        spatial = h[:,:,:3].contiguous()
+        A = self.adj(spatial, mask, **kwargs)
+
+        return A
+
+    def encode_position(self, bs, n):
 
         pos = Variable(
-            torch.arange(0.0, float(n_vertices)).expand(x.size()[:-1]).long(), requires_grad=False)
+            torch.arange(0.0, float(n)).expand(bs, n).long(), requires_grad=False)
         if torch.cuda.is_available():
             pos = pos.cuda()
         pos_embedding = self.pos_embedding(pos)
-
-        h += pos_embedding
-
-        spatial = self.spatial_embedding(h)
-        A = self.adj(spatial, mask, **kwargs)
-
-        for i, mp in enumerate(self.mp_layers[:-1]):
-            h = mp(h, A)
-            spatial = self.spatial_embedding(h)
-            A = self.adj(spatial, mask, **kwargs)
-
-        #
-
-        h = self.mp_layers[-1](h, A)
-        spatial = self.spatial_embedding(h)
-        A = self.adj(spatial, mask, **kwargs)
-        #A = torch.exp( - self.euclidean(h) / temperature ) * mask
-        return A
+        return pos_embedding

@@ -72,8 +72,8 @@ def train(
         model_args.iters = 1
         model_args.lf = 2
 
-    if data_args.n_train <= 5 * data_args.n_valid and data_args.n_train > 0:
-        data_args.n_valid = data_args.n_train // 5
+    #if data_args.n_train <= 5 * data_args.n_valid and data_args.n_train > 0:
+    #    data_args.n_valid = data_args.n_train // 5
 
     all_args = vars(admin_args)
     all_args.update(vars(training_args))
@@ -137,11 +137,13 @@ def train(
 
             valid_loss = 0.
             yy, yy_pred = [], []
-            for i, (x, x_mask, y, mask) in enumerate(valid_data_loader):
+            mask = []
+            for i, (x, x_mask, y, y_mask) in enumerate(valid_data_loader):
                 y_pred = model(x, mask=x_mask)
-                vl = loss(y_pred, y, mask); valid_loss += float(unwrap(vl))
-                yy.append(unwrap((y*mask).view(-1)))
-                yy_pred.append(unwrap((y_pred*mask).view(-1)))
+                vl = loss(y_pred, y, y_mask); valid_loss += float(unwrap(vl))
+                yy.append(unwrap(y))
+                yy_pred.append(unwrap(y_pred))
+                mask.append(unwrap(y_mask))
 
             if epoch % admin_args.lf == 0:
                 y_matrix_monitor(matrix=y)
@@ -152,9 +154,6 @@ def train(
 
             valid_loss /= len(valid_data_loader)
 
-            yy = torch.Tensor(np.concatenate(yy, 0))
-            yy_pred = torch.Tensor(np.concatenate(yy_pred, 0))
-
             t1=time.time()
 
             logdict = dict(
@@ -162,6 +161,7 @@ def train(
                 iteration=iteration,
                 yy=yy,
                 yy_pred=yy_pred,
+                mask=mask,
                 #w_valid=valid_dataset.weights,
                 valid_loss=valid_loss,
                 settings=settings,
@@ -190,7 +190,7 @@ def train(
         train_loss = 0.0
         t_train = time.time()
 
-        for j, (x, x_mask, y, mask) in enumerate(train_data_loader):
+        for j, (x, x_mask, y, y_mask) in enumerate(train_data_loader):
 
             #import ipdb; ipdb.set_trace()
             iteration += 1
@@ -199,7 +199,7 @@ def train(
             model.train()
             optimizer.zero_grad()
             y_pred = model(x, mask=x_mask, logger=eh.stats_logger, epoch=i, iters=j, iters_left=n_batches-j-1)
-            l = loss(y_pred, y, mask)
+            l = loss(y_pred, y, y_mask)
 
             # backward
             l.backward()
