@@ -132,7 +132,7 @@ class GraphGen(nn.Module):
         bs = x.size()[0]
         n_vertices = x.size()[1]
 
-        h = x
+        h = Variable(x.data)
 
         n_volatile_layers = np.random.randint(0, self.iters)
 
