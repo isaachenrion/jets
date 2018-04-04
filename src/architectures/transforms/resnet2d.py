@@ -86,7 +86,7 @@ class ResNet2d(nn.Module):
         self.layer3 = self._make_layer(block, hidden, layers[2], stride=1)
         self.layer4 = self._make_layer(block, hidden, layers[3], stride=1)
 
-        self.avgpool = nn.Sequential(nn.AvgPool2d(7))
+        #self.avgpool = nn.Sequential(nn.AvgPool2d(7))
 
 
         for m in self.modules():

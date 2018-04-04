@@ -214,8 +214,8 @@ class ExperimentHandler:
 
         if torch.cuda.is_available():
             admin_monitors += [
-                Collect('gpu-load',fn='last', visualizing=True),
-                Collect('gpu-util',fn='last', visualizing=True),
+                Collect('gpu_load',fn='last', visualizing=True),
+                Collect('gpu_util',fn='last', visualizing=True),
                 ]
 
         optim_monitors = [
