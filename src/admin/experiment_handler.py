@@ -252,7 +252,8 @@ class ExperimentHandler:
     def log(self, **kwargs):
         if torch.cuda.is_available():
             gpus = GPUtil.getGPUs()
-            logging.warning("{}, {}, {}".format(len(gpus), gpus[0].memoryUsed, gpus[0].load))
+            logging.warning("GPU UTIL: {}".format(gpus[0].memoryUsed)
+            logging.warning("GPU LOAD: {}".format(gpus[0].load))
             kwargs['gpu-util'] = float(gpus[0].memoryUsed)
             kwargs['gpu-load'] = float(gpus[0].load)
 
