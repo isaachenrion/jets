@@ -119,12 +119,12 @@ class GraphGen(nn.Module):
         pos_embedding = self.pos_embedding(pos)
 
         h += pos_embedding
-        spatial = h[:,:,:3].contiguous()
+        spatial = h[:,:,:3]
         A = self.adj(spatial, mask, **kwargs)
 
         for i, mp in enumerate(self.mp_layers):
             h = mp(h, A)
-            spatial = h[:,:,:3].contiguous()
+            spatial = h[:,:,:3]
             A = self.adj(spatial, mask, **kwargs)
 
 
