@@ -75,10 +75,11 @@ class GraphGen(nn.Module):
             tied = True
 
         emb_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
-        self.embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, n_layers=int(emb_init), **emb_kwargs)
+        self.content_embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, n_layers=int(emb_init), **emb_kwargs)
+        self.spatial_embedding = EMBEDDINGS['n'](dim_in=hidden, dim_out=3, n_layers=int(emb_init), **emb_kwargs)
 
         mp_kwargs = {x: kwargs[x] for x in ['act', 'wn', 'update', 'message', 'matrix', 'matrix_activation']}
-        MPLayer = MP_LAYERS['m1']
+        MPLayer = MP_LAYERS['m1s']
         if tied:
             mp = MPLayer(hidden=hidden,**mp_kwargs)
             self.mp_layers = nn.ModuleList([mp] * iters)
@@ -108,9 +109,7 @@ class GraphGen(nn.Module):
         bs = x.size()[0]
         n_vertices = x.size()[1]
 
-
-        #import ipdb; ipdb.set_trace()
-        h = self.embedding(x)
+        h = self.content_embedding(x)
 
         pos = Variable(
             torch.arange(0.0, float(n_vertices)).expand(x.size()[:-1]).long(), requires_grad=False)
@@ -119,13 +118,12 @@ class GraphGen(nn.Module):
         pos_embedding = self.pos_embedding(pos)
 
         h += pos_embedding
-        spatial = h[:,:,:3]
-        A = self.adj(spatial, mask, **kwargs)
+        s = self.spatial_embedding(h)
+        A = self.adj(s, mask, **kwargs)
 
         for i, mp in enumerate(self.mp_layers):
-            h = mp(h, A)
-            spatial = h[:,:,:3]
-            A = self.adj(spatial, mask, **kwargs)
+            h, s = mp(h, s, A)
+            A = self.adj(s, mask, **kwargs)
 
 
         #A = self.adj(h, mask, **kwargs)
