@@ -26,6 +26,8 @@ class StatsLogger:
             writer = csv.DictWriter(f, self.headers)
             writer.writeheader()
 
+        #import ipdb; ipdb.set_trace()
+
     def add_many_monitors(self, **monitors):
         for name, monitor in monitors.items():
             self.add_monitor(name, monitor)
@@ -45,6 +47,8 @@ class StatsLogger:
             monitor_value = monitor(**kwargs)
             if monitor.scalar:
                 stats_dict[name] = monitor_value
+            if monitor.visualizing:
+                monitor.visualize()
         return stats_dict
 
     def log_scalars(self, stats_dict):
@@ -52,6 +56,7 @@ class StatsLogger:
             writer = csv.DictWriter(f, self.headers)
             writer.writerow(stats_dict)
         if self.train:
+            ##pass
             plot_training_stats(self.scalar_filename, self.visualized_scalar_monitors, self.plotsdir)
 
     def log(self, compute_monitors=True,**kwargs):

@@ -183,12 +183,16 @@ class ExperimentHandler:
             ##inv_fpr_at_best_roc_auc,
             roc_auc,
             best_roc_auc,
+            ProteinMetrics(k=1,visualizing=True),
+            ProteinMetrics(k=2,visualizing=True),
+            ProteinMetrics(k=5,visualizing=True),
+            ProteinMetrics(k=10,visualizing=True),
             #TopLK(1, visualizing=True),
             #TopLK(2, visualizing=True),
             #TopLK(5, visualizing=True),
             #TopLK(10, visualizing=True),
-            Precision(visualizing=True),
-            Recall(visualizing=True),
+            #Precision(visualizing=True),
+            #Recall(visualizing=True),
             Regurgitate('valid_loss', visualizing=True),
             Regurgitate('train_loss', visualizing=True)
 
@@ -261,7 +265,7 @@ class ExperimentHandler:
         out_str = "{:5}\t".format(
                 self.stats_logger.monitors['iteration'].value)
         for monitor in self.metric_monitors:
-            out_str += "\t{} = {:.2f}\t".format(monitor.name, monitor.value)
+            out_str += monitor.string
         #out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.5f}".format(self.stats_logger.monitors['inv_fpr'].value, self.stats_logger.monitors['best_inv_fpr'].value)
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)
