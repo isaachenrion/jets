@@ -210,6 +210,9 @@ def train(
 
         for j, (x, x_mask, y, y_mask) in enumerate(train_data_loader):
             gc.collect()
+
+            log_gpu_usage()
+
             #import ipdb; ipdb.set_trace()
             iteration += 1
 
@@ -225,6 +228,7 @@ def train(
                 torch.nn.utils.clip_grad_norm(model.parameters(), optim_args.clip)
 
             if iteration % n_batches == 0:
+                logging.info("COMPUTING GRADS FOR LOGGING")
                 old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
                 grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
 
