@@ -2,6 +2,8 @@ import os
 import logging
 import sys
 import datetime
+
+import torch
 if torch.cuda.is_available():
     import GPUtil
 
