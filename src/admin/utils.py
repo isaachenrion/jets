@@ -2,7 +2,8 @@ import os
 import logging
 import sys
 import datetime
-
+if torch.cuda.is_available():
+    import GPUtil
 
 def get_immediate_subdirectories(a_dir):
     return [name for name in os.listdir(a_dir)
@@ -35,3 +36,13 @@ def timestring():
     dt = datetime.datetime.now()
     d = "{}-{} at {:02d}:{:02d}:{:02d}".format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
     return d
+
+
+def log_gpu_usage():
+    if torch.cuda.is_available():
+        gpus = GPUtil.getGPUs()
+        gpu_util = float(gpus[0].memoryUsed)
+        gpu_total = float(gpus[0].memoryTotal)
+        logging.info("GPU UTIL: {}/{}. {:.2f}%% used".format(gpu_util, gpu_total, gpu_util/gpu_total))
+    else:
+        pass

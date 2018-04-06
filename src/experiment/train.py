@@ -26,8 +26,7 @@ from ..monitors import BatchMatrixMonitor
 
 from ..misc.grad_mode import no_grad
 
-if torch.cuda.is_available():
-    import GPUtil
+from ..admin.utils import log_gpu_usage
 
 #@profile
 def train(
@@ -102,6 +101,8 @@ def train(
     train_data_loader = DataLoader(train_dataset, batch_size = training_args.batch_size, dropout=data_args.data_dropout, permute_vertices=data_args.permute_vertices)
     valid_data_loader = DataLoader(valid_dataset, batch_size = training_args.batch_size, dropout=data_args.data_dropout, permute_vertices=data_args.permute_vertices)
 
+    log_gpu_usage()
+
     ''' MODEL '''
     '''----------------------------------------------------------------------- '''
     model, model_kwargs = build_model(loading_args.load, model_args, logger=eh.stats_logger)
@@ -114,6 +115,7 @@ def train(
         "lr": optim_args.lr
         }
     eh.signal_handler.set_model(model)
+    log_gpu_usage()
 
     ''' OPTIMIZER AND SCHEDULER '''
     '''----------------------------------------------------------------------- '''
@@ -193,6 +195,9 @@ def train(
     iteration=1
     n_batches = len(train_data_loader)
 
+    new_params, old_params = None, None
+    log_gpu_usage()
+
     for i in range(training_args.epochs):
         logging.info("epoch = %d" % i)
         lr = scheduler.get_lr()[0]
@@ -222,17 +227,7 @@ def train(
                 old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
                 grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
 
-                # GPU LOGGING
-                if torch.cuda.is_available():
-                    gpus = GPUtil.getGPUs()
-                    gpu_util = float(gpus[0].memoryUsed)
-                    gpu_total = float(gpus[0].memoryTotal)
-                    gpu_free = float(gpus[0].memoryFree)
-                    gpu_load = float(gpus[0].load)
-                    logging.info("GPU UTIL: {}/{}. {} free".format(gpu_util, gpu_total, gpu_free))
-                    logging.info("GPU LOAD: {}".format(gpu_load))
-                    #logging.info("GPU LOAD: {}".format(gpu_load))
-
+                log_gpu_usage()
 
             optimizer.step()
 
@@ -258,13 +253,6 @@ def train(
             grads=grads,
             old_params=old_params,
             model_params=new_params,
-            )
-        if torch.cuda.is_available():
-            train_dict.update(
-                dict(
-                gpu_util=gpu_util,
-                gpu_load=gpu_load
-                )
             )
 
         # validation
