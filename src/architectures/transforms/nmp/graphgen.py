@@ -123,6 +123,8 @@ class GraphGen(nn.Module):
         #A = self.adj(h, mask, **kwargs)
         #s = self.spatial_embedding(h)
         s = Variable(torch.randn(bs, n_vertices, 3))
+        if torch.cuda.is_available(): s = s.cuda()
+        #s = Variable(torch.arange(n_vertices))
         A = self.adj(s, mask, **kwargs)
 
         for i, mp in enumerate(self.mp_layers):
