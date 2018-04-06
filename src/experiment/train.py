@@ -12,7 +12,7 @@ import numpy as np
 
 from ..data_ops.load_dataset import load_train_dataset
 from ..data_ops.proteins.ProteinLoader import ProteinLoader as DataLoader
-from ..data_ops.wrapping import unwrap
+from ..data_ops.utils.wrapping import unwrap
 
 from ..misc.constants import *
 from ..optim.build_optimizer import build_optimizer

@@ -9,7 +9,7 @@ import torch.nn.functional as F
 from torch.nn.parameter import Parameter
 from torch.autograd import Variable
 
-from src.data_ops.wrapping import wrap
+from src.data_ops.utils.wrapping import wrap
 
 from .message_passing import MP_LAYERS
 from .adjacency import construct_adjacency

@@ -8,7 +8,7 @@ from torch.autograd import Variable
 from ..utils._DataLoader import _DataLoader
 from ..utils import pad_tensors, pad_matrices, pad_tensors_extra_channel
 from ..utils import dropout
-from ..wrapping import wrap
+from ..utils.wrapping import wrap
 from .adjacency import compute_adjacency, contact_map
 from .preprocessing import make_mask
 

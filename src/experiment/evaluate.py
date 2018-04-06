@@ -9,7 +9,7 @@ import torch.nn.functional as F
 import numpy as np
 
 from ..data_ops.load_dataset import load_test_dataset
-from ..data_ops.wrapping import unwrap
+from ..data_ops.utils.wrapping import unwrap
 from ..data_ops.data_loaders import LeafJetLoader
 from ..data_ops.data_loaders import TreeJetLoader
 
