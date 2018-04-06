@@ -65,7 +65,7 @@ def train(
         training_args.epochs = 5
 
         data_args.n_train = 6
-        data_args.n_valid = 4
+        data_args.n_valid = 224
 
         optim_args.lr = 0.1
         optim_args.period = 2
@@ -176,6 +176,14 @@ def train(
             )
             logdict.update(train_dict)
             model.train()
+
+            del vl
+            del y_pred
+            del x
+            del y
+            del x_mask
+            del y_mask
+
             return logdict
 
     ''' TRAINING '''
@@ -233,6 +241,13 @@ def train(
 
 
             train_loss += float(unwrap(l))
+
+            del l
+            del y_pred
+            del x
+            del y
+            del x_mask
+            del y_mask
 
         train_loss = train_loss / n_batches
         train_time = time.time() - t_train
