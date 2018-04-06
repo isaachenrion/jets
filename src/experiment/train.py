@@ -1,5 +1,6 @@
 import logging
 import time
+import gc
 #from memory_profiler import profile, memory_usage
 
 import torch
@@ -208,7 +209,7 @@ def train(
         t_train = time.time()
 
         for j, (x, x_mask, y, y_mask) in enumerate(train_data_loader):
-
+            gc.collect()
             #import ipdb; ipdb.set_trace()
             iteration += 1
 

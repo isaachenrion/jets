@@ -45,6 +45,6 @@ def log_gpu_usage():
         gpus = GPUtil.getGPUs()
         gpu_util = float(gpus[0].memoryUsed)
         gpu_total = float(gpus[0].memoryTotal)
-        logging.info("GPU UTIL: {}/{}. {:.2f}%% used".format(gpu_util, gpu_total, gpu_util/gpu_total))
+        logging.info("GPU UTIL: {}/{}. {:.1f}% used".format(gpu_util, gpu_total, 100*gpu_util/gpu_total))
     else:
         pass
