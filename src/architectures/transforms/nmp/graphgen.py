@@ -18,6 +18,7 @@ from .adjacency.simple.matrix_activation import padded_matrix_softmax
 
 from ....architectures.readout import READOUTS
 from ....architectures.embedding import EMBEDDINGS
+from ....architectures.transforms.nmp.message_passing.vertex_update import GRUUpdate
 
 from ....monitors import Histogram
 from ....monitors import Collect
@@ -89,6 +90,7 @@ class GraphGen(nn.Module):
 
         self.adj = NegativeSquare(temperature=0.01,symmetric=False, act='exp', logger=kwargs['logger'], logging_frequency=kwargs['logging_frequency'])
 
+        self.positional_update = GRUUpdate(hidden, 3)
 
         self.pos_embedding = nn.Embedding(1000, hidden)
         pos_enc_weight = position_encoding_init(1000, hidden)
@@ -118,15 +120,18 @@ class GraphGen(nn.Module):
         pos_embedding = self.pos_embedding(pos)
 
         h += pos_embedding
-        A = self.adj(h, mask, **kwargs)
+        #A = self.adj(h, mask, **kwargs)
         #s = self.spatial_embedding(h)
-        #A = self.adj(s, mask, **kwargs)
+        s = Variable(torch.randn(bs, n_vertices, 3))
+        A = self.adj(s, mask, **kwargs)
 
         for i, mp in enumerate(self.mp_layers):
             #h, s = mp(h, s, A)
             #A = self.adj(s, mask, **kwargs)
             h = mp(h, A)
-            A = self.adj(h, mask, **kwargs)
+            #s = h
+            s = self.positional_update(s, h)
+            A = self.adj(s, mask, **kwargs)
 
 
         #A = self.adj(h, mask, **kwargs)
