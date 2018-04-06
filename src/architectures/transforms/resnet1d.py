@@ -37,6 +37,8 @@ class BasicBlock(nn.Module):
 
         out = self.relu(out)
 
+        del residual
+
         return out
 
 
