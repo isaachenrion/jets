@@ -1,4 +1,5 @@
 import os
+import time
 import numpy as np
 from .baseclasses import ScalarMonitor, Monitor
 from .meta import Collect
@@ -58,9 +59,11 @@ class ProteinMetrics(ScalarMonitor):
         self.collectors = [Collect(name, fn='last', plotname=name+'_L_'+str(k), **kwargs) for name in names]
 
     def call(self, yy=None, yy_pred=None, mask=None, **kwargs):
+        t = time.time()
         stats_dict = compute_protein_metrics(yy, yy_pred, self.k)
         for c in self.collectors:
             c(**stats_dict)
+        logging.info("Protein metric {} took {:.2f}s".format(self.k, time.time() - t))
         return None
 
     def initialize(self, statsdir, plotsdir):

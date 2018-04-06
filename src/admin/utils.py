@@ -10,8 +10,14 @@ def get_immediate_subdirectories(a_dir):
 
 def get_logfile(exp_dir, silent, verbose):
     logfile = os.path.join(exp_dir, 'log.txt')
-    logging.basicConfig(level=logging.DEBUG, filename=logfile, filemode="a+",
+
+    logging.basicConfig(level=logging.INFO, filename=logfile, filemode="a+",
                         format="%(message)s")
+
+    debugfile = os.path.join(exp_dir, 'debug.txt')
+    ch_debug = logging.StreamHandler(debugfile)
+    ch_debug.setLevel(logging.DEBUG)
+
     if not silent:
         root = logging.getLogger()
         root.setLevel(logging.DEBUG)
