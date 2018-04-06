@@ -211,6 +211,7 @@ def train(
         for j, (x, x_mask, y, y_mask) in enumerate(train_data_loader):
             gc.collect()
 
+            logging.info("PRE-MODEL USAGE")
             log_gpu_usage()
 
             #import ipdb; ipdb.set_trace()
@@ -232,6 +233,7 @@ def train(
                 old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
                 grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
 
+            logging.info("POST-MODEL, PRE-OPTIM USAGE")
             log_gpu_usage()
 
             optimizer.step()
@@ -248,6 +250,9 @@ def train(
             del y
             del x_mask
             del y_mask
+
+            logging.info("FINAL USAGE")
+            log_gpu_usage()
 
         train_loss = train_loss / n_batches
         train_time = time.time() - t_train
