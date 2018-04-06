@@ -126,7 +126,7 @@ class GraphGen(nn.Module):
             pos = pos.cuda()
         pos_embedding = self.pos_embedding(pos)
 
-        h += pos_embedding
+        h = h + pos_embedding
 
         s = spatial_variable(bs, n_vertices)
 
@@ -153,7 +153,8 @@ class GraphGen(nn.Module):
 
         if n_volatile_layers == 0:
             h = self.embedding(h)
-            h += self.encode_position(bs, n_vertices)
+            h = h + self.encode_position(bs, n_vertices)
+            s = self.positional_update(s, h)
             #spatial = h[:,:,:3].contiguous()
             A = self.adj(s, mask, **kwargs)
             return A
@@ -161,7 +162,7 @@ class GraphGen(nn.Module):
         h.volatile = True
 
         h = self.embedding(h)
-        h += self.encode_position(bs, n_vertices)
+        h = h + self.encode_position(bs, n_vertices)
 
         #spatial = h[:,:,:3].contiguous()
         A = self.adj(s, mask, **kwargs)
