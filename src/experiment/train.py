@@ -65,7 +65,7 @@ def train(
         training_args.epochs = 5
 
         data_args.n_train = 6
-        data_args.n_valid = 2
+        data_args.n_valid = 4
 
         optim_args.lr = 0.1
         optim_args.period = 2
@@ -181,7 +181,7 @@ def train(
     ''' TRAINING '''
     '''----------------------------------------------------------------------- '''
     eh.save(model, settings)
-    logging.warning("Training...")
+    logging.info("Training...")
     iteration=1
     n_batches = len(train_data_loader)
 
@@ -221,9 +221,9 @@ def train(
                     gpu_total = float(gpus[0].memoryTotal)
                     gpu_free = float(gpus[0].memoryFree)
                     gpu_load = float(gpus[0].load)
-                    logging.warning("GPU UTIL: {}/{}. {} free".format(gpu_util, gpu_total, gpu_free))
-                    logging.warning("GPU LOAD: {}".format(gpu_load))
-                    #logging.warning("GPU LOAD: {}".format(gpu_load))
+                    logging.info("GPU UTIL: {}/{}. {} free".format(gpu_util, gpu_total, gpu_free))
+                    logging.info("GPU LOAD: {}".format(gpu_load))
+                    #logging.info("GPU LOAD: {}".format(gpu_load))
 
 
             optimizer.step()
@@ -236,7 +236,7 @@ def train(
 
         train_loss = train_loss / n_batches
         train_time = time.time() - t_train
-        logging.warning("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, train_time, len(train_dataset)/train_time))
+        logging.info("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, train_time, len(train_dataset)/train_time))
 
         train_dict = dict(
             train_loss=train_loss,
@@ -258,11 +258,11 @@ def train(
                     i, model,
                     **train_dict
                     )
-        logging.warning("Validation took {:.1f} seconds".format(time.time() - t_valid))
+        logging.info("Validation took {:.1f} seconds".format(time.time() - t_valid))
 
         t_log = time.time()
         eh.log(**logdict)
-        logging.warning("Logging took {:.1f} seconds".format(time.time() - t_log))
+        logging.info("Logging took {:.1f} seconds".format(time.time() - t_log))
 
 
 

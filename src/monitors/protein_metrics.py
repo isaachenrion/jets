@@ -12,7 +12,7 @@ def accuracy_wrt_indices(target, prediction, indices, k):
     return accuracy
 
 def compute_protein_metrics(targets, predictions, k):
-    acc, acc_med, acc_long, acc_short = ([[None] * len(targets)] for _ in range(4))
+    acc, acc_med, acc_long, acc_short = ([[None] for _ in range(len(targets))] for _ in range(4))
 
     for i, (target, prediction) in enumerate(zip(targets, predictions)):
         M = int(float(prediction.shape[1]) / k)

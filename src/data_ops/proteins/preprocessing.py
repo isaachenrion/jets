@@ -138,19 +138,19 @@ def make_protein_dicts_from_textfile(filename):
 def preprocess(raw_data_dir, preprocessed_dir, filename):
     subproblem = filename.split('-')[0]
 
-    logging.warning("Preprocessing training data...")
+    logging.info("Preprocessing training data...")
     #import ipdb; ipdb.set_trace()
 
     train_protein_filename = os.path.join(raw_data_dir, subproblem + '-train.txt')
     train_protein_dicts = make_protein_dicts_from_textfile(train_protein_filename)
     save_protein_dicts_to_pickle(train_protein_dicts, os.path.join(preprocessed_dir, subproblem + '-train.pickle'))
 
-    logging.warning("Preprocessing validation data...")
+    logging.info("Preprocessing validation data...")
     valid_protein_filename = os.path.join(raw_data_dir, subproblem + '-valid.txt')
     valid_protein_dicts = make_protein_dicts_from_textfile(valid_protein_filename)
     save_protein_dicts_to_pickle(valid_protein_dicts, os.path.join(preprocessed_dir, subproblem + '-valid.pickle'))
 
-    logging.warning("Preprocessing test data...")
+    logging.info("Preprocessing test data...")
     test_protein_filename = os.path.join(raw_data_dir, subproblem + '-test.txt')
     test_protein_dicts = make_protein_dicts_from_textfile(test_protein_filename)
     save_protein_dicts_to_pickle(test_protein_dicts, os.path.join(preprocessed_dir, subproblem + '-test.pickle'))

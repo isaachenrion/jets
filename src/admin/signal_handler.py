@@ -42,7 +42,7 @@ class SignalHandler:
     def signal_admin(self, signal, cleanup=True):
         d = timestring()
         alert = '{} on {}'.format(signal, timestring())
-        logging.warning(alert)
+        logging.info(alert)
         self.prepend_to_logfile(alert)
         subject = "Job {} {}".format(signal, self.subject_string)
         text = "{}\n{}\n{}".format(alert, self.results_strings[-1], self.model)

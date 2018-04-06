@@ -149,12 +149,12 @@ def evaluate(
 
     ''' TESTING '''
     '''----------------------------------------------------------------------- '''
-    logging.warning("Testing...")
+    logging.info("Testing...")
 
     for i, filename in enumerate(model_filenames):
-        logging.warning("\n")
+        logging.info("\n")
         model = load_model(filename)
-        logging.warning("Loaded {}. Now testing".format(filename))
+        logging.info("Loaded {}. Now testing".format(filename))
 
         eh.signal_handler.set_model(model)
 
@@ -163,7 +163,7 @@ def evaluate(
                     i, model,
                     )
 
-        logging.warning("Testing took {:.1f} seconds".format(time.time() - t_valid))
+        logging.info("Testing took {:.1f} seconds".format(time.time() - t_valid))
 
         t_log = time.time()
         eh.log(**logdict)

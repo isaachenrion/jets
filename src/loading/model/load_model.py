@@ -14,8 +14,8 @@ def load_model(filename):
     load_model_state_dict(model, filename)
 
     if torch.cuda.is_available():
-        logging.warning("Moving model to GPU")
+        logging.info("Moving model to GPU")
         model.cuda()
-        logging.warning("Moved model to GPU")
+        logging.info("Moved model to GPU")
 
     return model

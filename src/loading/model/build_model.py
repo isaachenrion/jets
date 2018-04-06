@@ -20,17 +20,17 @@ def build_model(filename, model_args, **kwargs):
     model = build_model_from_kwargs(model_kwargs, **kwargs)
 
     if filename is None:
-        logging.warning(model)
+        logging.info(model)
         out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))
-        logging.warning(out_str)
+        logging.info(out_str)
 
     else:
         load_model_state_dict(model, filename)
 
 
     if torch.cuda.is_available():
-        logging.warning("Moving model to GPU")
+        logging.info("Moving model to GPU")
         model.cuda()
-        logging.warning("Moved model to GPU")
+        logging.info("Moved model to GPU")
 
     return model, model_kwargs

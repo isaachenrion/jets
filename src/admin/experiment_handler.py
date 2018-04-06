@@ -133,8 +133,8 @@ class ExperimentHandler:
         ''' SET UP LOGGING '''
         '''----------------------------------------------------------------------- '''
         self.logfile = get_logfile(self.exp_dir, silent, verbose)
-        logging.warning("running on {}".format(self.host))
-        logging.warning(self.exp_dir)
+        logging.info("running on {}".format(self.host))
+        logging.info(self.exp_dir)
 
     def setup_signal_handler(self, email):
         ''' SIGNAL HANDLER '''
@@ -246,12 +246,12 @@ class ExperimentHandler:
             for s in out_strs[1:]:
                 f.write('-{}\n'.format(s))
 
-        for k, v in sorted(passed_args.items()): logging.warning('\t{} = {}'.format(k, v))
+        for k, v in sorted(passed_args.items()): logging.info('\t{} = {}'.format(k, v))
 
-        logging.warning("\n")
-        logging.warning("Git commit = {}".format(get_git_revision_short_hash()))
-        logging.warning("\tPID = {}".format(self.pid))
-        logging.warning("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
+        logging.info("\n")
+        logging.info("Git commit = {}".format(get_git_revision_short_hash()))
+        logging.info("\tPID = {}".format(self.pid))
+        logging.info("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
 
     def log(self, **kwargs):
 
@@ -260,7 +260,7 @@ class ExperimentHandler:
         if kwargs['epoch'] == 1 and self.emailer is not None:
             self.emailer.send_msg(self.stats_logger.monitors['eta'].value, "Job {}-{} on {} ETA: {}".format(self.slurm_array_job_id, self.slurm_array_task_id, self.host.split('.')[0], self.stats_logger.monitors['eta'].value))
         #if np.isnan(self.stats_logger.monitors['inv_fpr'].value):
-        #    logging.warning("NaN in 1/FPR\n")
+        #    logging.info("NaN in 1/FPR\n")
 
         out_str = "{:5}\t".format(
                 self.stats_logger.monitors['iteration'].value)
@@ -269,7 +269,7 @@ class ExperimentHandler:
         #out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.5f}".format(self.stats_logger.monitors['inv_fpr'].value, self.stats_logger.monitors['best_inv_fpr'].value)
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)
-        #logging.warning("Time in exp_handler log {:.1f} seconds".format(time.time() - t_log))
+        #logging.info("Time in exp_handler log {:.1f} seconds".format(time.time() - t_log))
 
     def save(self, model, settings):
         self.saver.save(model, settings)

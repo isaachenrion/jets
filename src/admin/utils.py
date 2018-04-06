@@ -11,7 +11,7 @@ def get_immediate_subdirectories(a_dir):
 def get_logfile(exp_dir, silent, verbose):
     logfile = os.path.join(exp_dir, 'log.txt')
     logging.basicConfig(level=logging.DEBUG, filename=logfile, filemode="a+",
-                        format="%(asctime)-15s %(message)s")
+                        format="%(message)s")
     if not silent:
         root = logging.getLogger()
         root.setLevel(logging.DEBUG)
@@ -20,7 +20,7 @@ def get_logfile(exp_dir, silent, verbose):
             ch.setLevel(logging.INFO)
         else:
             ch.setLevel(logging.WARNING)
-        formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        formatter = logging.Formatter('%(message)s')
         ch.setFormatter(formatter)
         root.addHandler(ch)
     return logfile
