@@ -1,5 +1,6 @@
 import os
 import time
+import logging
 import numpy as np
 from .baseclasses import ScalarMonitor, Monitor
 from .meta import Collect
