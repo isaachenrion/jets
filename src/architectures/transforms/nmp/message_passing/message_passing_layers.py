@@ -22,6 +22,7 @@ class MessagePassingLayer(nn.Module):
     def forward(self, h=None, A=None):
         message = self.activation(torch.matmul(A, self.message(h)))
         h = self.vertex_update(h, message)
+        del message 
         return h
 
 class MessagePassingLayerSpatial(nn.Module):

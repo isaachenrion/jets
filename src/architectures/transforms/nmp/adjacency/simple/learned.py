@@ -86,6 +86,9 @@ class NegativeSquare(_Adjacency):
         #h_r = h.view(shp[0], 1, shp[1], shp[2])
         A = torch.sum((h_l - h_r)**2, 3)
 
+        del h_l
+        del h_r
+
         return -A / self.temperature
 
 LEARNED_ADJACENCIES = dict(

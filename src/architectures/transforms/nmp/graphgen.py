@@ -119,15 +119,6 @@ class GraphGen(nn.Module):
         n_vertices = x.size()[1]
 
         h = self.content_embedding(x)
-
-        #pos = Variable(
-        #    torch.arange(0.0, float(n_vertices)).expand(x.size()[:-1]).long(), requires_grad=False)
-        #if torch.cuda.is_available():
-        #    pos = pos.cuda()
-        #pos_embedding = self.pos_embedding(pos)
-
-        #h = h + pos_embedding
-
         s = spatial_variable(bs, n_vertices)
 
         A = self.adj(s, mask, **kwargs)
@@ -137,9 +128,8 @@ class GraphGen(nn.Module):
             s = self.positional_update(s, h)
             A = self.adj(s, mask, **kwargs)
 
-        del s
-        del h
-        #A = self.adj(h, mask, **kwargs)
+        #del s
+        #del h
         return A
 
     def forward_no_grad(self, x, mask, **kwargs):
