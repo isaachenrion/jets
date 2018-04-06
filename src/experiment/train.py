@@ -228,7 +228,7 @@ def train(
                 old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
                 grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
 
-                log_gpu_usage()
+            log_gpu_usage()
 
             optimizer.step()
 
