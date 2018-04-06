@@ -228,7 +228,7 @@ def train(
             if optim_args.clip is not None:
                 torch.nn.utils.clip_grad_norm(model.parameters(), optim_args.clip)
 
-            if iteration % n_batches == 0:
+            if j == 0:
                 logging.info("COMPUTING GRADS FOR LOGGING")
                 old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
                 grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
@@ -238,7 +238,7 @@ def train(
 
             optimizer.step()
 
-            if iteration % n_batches == 0:
+            if j == 0:
                 new_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
 
 
@@ -253,6 +253,7 @@ def train(
 
             logging.info("FINAL USAGE")
             log_gpu_usage()
+            logging.info("\n")
 
         train_loss = train_loss / n_batches
         train_time = time.time() - t_train

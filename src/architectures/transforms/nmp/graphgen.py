@@ -140,7 +140,8 @@ class GraphGen(nn.Module):
             s = self.positional_update(s, h)
             A = self.adj(s, mask, **kwargs)
 
-
+        del s
+        del h
         #A = self.adj(h, mask, **kwargs)
         return A
 
