@@ -122,9 +122,14 @@ class GraphGen(nn.Module):
         h += pos_embedding
         #A = self.adj(h, mask, **kwargs)
         #s = self.spatial_embedding(h)
-        s = Variable(torch.randn(bs, n_vertices, 3))
-        if torch.cuda.is_available(): s = s.cuda()
-        #s = Variable(torch.arange(n_vertices))
+        #s = Variable(torch.randn(bs, n_vertices, 3))
+        s = Variable(torch.stack([torch.arange(n_vertices), torch.zeros(n_vertices), torch.zeros(n_vertices)], 1).unsqueeze(0).repeat(bs, 1, 1))
+        s = s - s.mean(1, keepdim=True)
+        s = s / s.size(1)
+        #import ipdb; ipdb.set_trace()
+        if torch.cuda.is_available():
+            s = s.cuda()
+
         A = self.adj(s, mask, **kwargs)
 
         for i, mp in enumerate(self.mp_layers):
