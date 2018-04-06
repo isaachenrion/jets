@@ -51,6 +51,13 @@ def position_encoding_init(n_position, d_pos_vec):
     position_enc[1:, 1::2] = np.cos(position_enc[1:, 1::2]) # dim 2i+1
     return torch.from_numpy(position_enc).type(torch.FloatTensor)
 
+def spatial_variable(bs, n_vertices):
+    s = Variable(torch.stack([torch.arange(n_vertices), torch.zeros(n_vertices), torch.zeros(n_vertices)], 1).unsqueeze(0).repeat(bs, 1, 1))
+    s = s - s.mean(1, keepdim=True)
+    s = s / s.size(1)
+    if torch.cuda.is_available():
+        s = s.cuda()
+    return s
 
 
 
@@ -120,23 +127,13 @@ class GraphGen(nn.Module):
         pos_embedding = self.pos_embedding(pos)
 
         h += pos_embedding
-        #A = self.adj(h, mask, **kwargs)
-        #s = self.spatial_embedding(h)
-        #s = Variable(torch.randn(bs, n_vertices, 3))
-        s = Variable(torch.stack([torch.arange(n_vertices), torch.zeros(n_vertices), torch.zeros(n_vertices)], 1).unsqueeze(0).repeat(bs, 1, 1))
-        s = s - s.mean(1, keepdim=True)
-        s = s / s.size(1)
-        #import ipdb; ipdb.set_trace()
-        if torch.cuda.is_available():
-            s = s.cuda()
+
+        s = spatial_variable(bs, n_vertices)
 
         A = self.adj(s, mask, **kwargs)
 
         for i, mp in enumerate(self.mp_layers):
-            #h, s = mp(h, s, A)
-            #A = self.adj(s, mask, **kwargs)
             h = mp(h, A)
-            #s = h
             s = self.positional_update(s, h)
             A = self.adj(s, mask, **kwargs)
 
@@ -147,18 +144,18 @@ class GraphGen(nn.Module):
 
     def forward_no_grad(self, x, mask, **kwargs):
 
-        bs = x.size()[0]
-        n_vertices = x.size()[1]
+        bs, n_vertices, _ = x.size()
 
         h = Variable(x.data)
+        s = spatial_variable(bs, n_vertices)
 
         n_volatile_layers = np.random.randint(0, self.iters)
 
         if n_volatile_layers == 0:
             h = self.embedding(h)
             h += self.encode_position(bs, n_vertices)
-            spatial = h[:,:,:3].contiguous()
-            A = self.adj(spatial, mask, **kwargs)
+            #spatial = h[:,:,:3].contiguous()
+            A = self.adj(s, mask, **kwargs)
             return A
 
         h.volatile = True
@@ -166,24 +163,26 @@ class GraphGen(nn.Module):
         h = self.embedding(h)
         h += self.encode_position(bs, n_vertices)
 
-        spatial = h[:,:,:3].contiguous()
-        A = self.adj(spatial, mask, **kwargs)
+        #spatial = h[:,:,:3].contiguous()
+        A = self.adj(s, mask, **kwargs)
 
 
 
         for i in range(n_volatile_layers):
             mp = self.mp_layers[i]
             h = mp(h, A)
-            spatial = h[:,:,:3].contiguous()
-            A = self.adj(spatial, mask, **kwargs)
+            s = self.positional_update(s, h)
+            #spatial = h[:,:,:3].contiguous()
+            A = self.adj(s, mask, **kwargs)
 
         h.volatile = False
         A.volatile = False
 
         mp = self.mp_layers[n_volatile_layers]
         h = mp(h, A)
-        spatial = h[:,:,:3].contiguous()
-        A = self.adj(spatial, mask, **kwargs)
+        s = self.positional_update(s, h)
+        #spatial = h[:,:,:3].contiguous()
+        A = self.adj(s, mask, **kwargs)
 
         return A
 
