@@ -4,16 +4,24 @@ import torch
 import os
 import pickle
 
-from .model_kwargs import construct_model_kwargs
-from .model_kwargs import load_model_kwargs
+#from .model_kwargs import construct_model_kwargs
+#from .model_kwargs import load_model_kwargs
 from .model_kwargs import build_model_from_kwargs
 from .load_model_state_dict import load_model_state_dict
+
+
+def load_model_kwargs(filename):
+    with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
+        settings = pickle.load(f)
+        model_kwargs = settings["model_kwargs"]
+    return model_kwargs
 
 def build_model(filename, model_args, **kwargs):
     if filename is None:
         logging.info("Initializing model...")
         model_kwargs = construct_model_kwargs(model_args)
     else:
+        assert model_kwargs is None
         logging.info("Loading model...")
         model_kwargs = load_model_kwargs(filename)
 

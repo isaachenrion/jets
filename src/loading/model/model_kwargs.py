@@ -1,6 +1,6 @@
 import os
 import pickle
-from ...architectures import *
+from models import *
 
 def construct_model_kwargs(args):
     #import ipdb; ipdb.set_trace()
@@ -56,12 +56,6 @@ def construct_model_kwargs(args):
         'dv':args.dv,
         'dropout':args.model_dropout
     }
-    return model_kwargs
-
-def load_model_kwargs(filename):
-    with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
-        settings = pickle.load(f)
-        model_kwargs = settings["model_kwargs"]
     return model_kwargs
 
 def build_model_from_kwargs(model_kwargs, **kwargs):

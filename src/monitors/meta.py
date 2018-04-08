@@ -44,6 +44,7 @@ class LogOnImprovement(ScalarMonitor):
         super().__init__('{}_at_{}'.format(monitor.name, trigger_monitor.name))
         self.monitor = monitor
         self.trigger_monitor = trigger_monitor
+        self.value = -99999999999
 
     def call(self, **kwargs):
         if self.trigger_monitor.changed:

@@ -3,7 +3,7 @@ import pickle
 import torch
 import logging
 
-from .model_kwargs import load_model_kwargs
+#from .model_kwargs import load_model_kwargs
 from .model_kwargs import build_model_from_kwargs
 from .load_model_state_dict import load_model_state_dict
 

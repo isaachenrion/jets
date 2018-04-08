@@ -6,7 +6,7 @@ from collections import OrderedDict
 from ..visualizing.plot_training_stats import plot_training_stats
 
 
-class StatsLogger:
+class Logger:
     def __init__(self, directory, monitor_dict, visualizing, train):
         self.train = train
         self.visualizing = visualizing

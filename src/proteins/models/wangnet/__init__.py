@@ -1,0 +1,1 @@
+from .wangnet import WangNet
