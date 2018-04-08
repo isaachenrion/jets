@@ -18,11 +18,21 @@ def load_model_state_dict(model, path_to_state_dict):
 
 
 class _ModelBuilder:
+    '''
+    Builds a model, given either a filename to load or model arguments.
+    You should subclass this for your experiments, and need to implement
+    1) model_dict
+    2) construct_model_kwargs
+    '''
     def __init__(self, filename, model_args, **kwargs):
         self.model, self.model_kwargs = self.build_model(filename, model_args, **kwargs)
 
     @property
     def model_dict(self):
+        '''
+        a dictionary with strings as keys, which looks up your main model classes.
+        e.g. dict(lin=nn.Linear, conv=nn.Conv1d)
+        '''
         raise NotImplementedError
 
 
@@ -62,4 +72,9 @@ class _ModelBuilder:
 
 
     def construct_model_kwargs(self, args):
+        '''
+        Input: a namespace of model arguments
+        Output: a dictionary of model arguments, possibly modifying the names From
+        the namespace, should this be convenient/necessary
+        '''
         raise NotImplementedError

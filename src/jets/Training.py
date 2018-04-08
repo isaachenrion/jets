@@ -18,7 +18,7 @@ from src.monitors import BatchMatrixMonitor
 
 from src.admin.utils import log_gpu_usage
 
-from src.misc._Training import _Training
+from src.utils._Training import _Training
 
 
 from .models.ModelBuilder import ModelBuilder

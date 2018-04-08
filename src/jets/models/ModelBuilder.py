@@ -1,4 +1,4 @@
-from src.misc._ModelBuilder import _ModelBuilder
+from src.utils._ModelBuilder import _ModelBuilder
 from .FixedNMP import FixedNMP
 #from .graphgen import GraphGen
 

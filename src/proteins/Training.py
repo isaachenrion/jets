@@ -12,13 +12,13 @@ from .data_ops.ProteinLoader import ProteinLoader as DataLoader
 
 from src.data_ops.utils.wrapping import unwrap
 
-from ..misc.constants import DATASETS
+from src.misc.constants import DATASETS
 
-from ..monitors import BatchMatrixMonitor
+from src.monitors import BatchMatrixMonitor
 
-from ..admin.utils import log_gpu_usage
+from src.admin.utils import log_gpu_usage
 
-from ..misc._Training import _Training
+from src.utils._Training import _Training
 
 from .models import ModelBuilder
 from .Administrator import Administrator

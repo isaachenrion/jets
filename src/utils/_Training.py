@@ -32,6 +32,17 @@ from src.admin.utils import log_gpu_usage
 
 
 class _Training:
+    '''
+    Base class for a training experiment. This contains the overall training loop.
+    When you subclass this, you need to implement:
+
+    1) load_data
+    2) validation
+    3) train_one_batch
+    4) Administrator
+    5) ModelBuilder
+
+    '''
     def __init__(self,
         admin_args=None,
         model_args=None,
@@ -100,10 +111,12 @@ class _Training:
 
     @property
     def ModelBuilder(self):
+        '''(see src.admin._ModelBuilder for details)'''
         raise NotImplementedError
 
     @property
     def Administrator(self):
+        '''(see src.utils._Administrator for details)'''
         raise NotImplementedError
 
 

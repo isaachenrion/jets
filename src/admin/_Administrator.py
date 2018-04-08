@@ -27,6 +27,18 @@ def get_git_revision_short_hash():
     return s
 
 class _Administrator:
+    '''
+    Base class for experiment administrators. This object performs a number of crucial jobs.
+    1) Sets random seeds and handles GPU device
+    2) Creates model directories to store results files
+    3) Sets logging outputs
+    4) Contains signal handler which reacts to signal events e.g. "kill", "interrupt"
+    5) Contains emailer which is responsible for sending results by email
+    6) Sets up the monitors, e.g. for loss, gradient norms, lr, accuracy etc.
+
+    Function (6) is handled on a per-problem basis, therefore is not implemented.
+    You should subclass this and implement setup_monitors
+    '''
     def __init__(
             self,
             train=None,
@@ -76,6 +88,9 @@ class _Administrator:
         self.setup_logger(epochs, visualizing)
         self.record_settings(passed_args)
         self.initial_email()
+
+    def setup_monitors(*args, **kwargs):
+        raise NotImplementedError
 
     def cuda_and_random_seed(self, gpu, seed, passed_args):
         if gpu != "" and torch.cuda.is_available():
@@ -167,9 +182,7 @@ class _Administrator:
     def setup_logger(self, visualizing, *args, **kwargs):
         monitor_dict = self.setup_monitors(visualizing, *args, **kwargs)
         self.logger = Logger(self.exp_dir, monitor_dict, visualizing, train=self.train)
-        
-    def setup_monitors(*args, **kwargs):
-        raise NotImplementedError
+
 
     def record_settings(self, passed_args):
         with open(os.path.join(self.root_dir, self.intermediate_dir, 'command.txt'), 'w') as f:

@@ -1,4 +1,4 @@
-from src.misc._ModelBuilder import _ModelBuilder
+from src.utils._ModelBuilder import _ModelBuilder
 from .wangnet import WangNet
 from .graphgen import GraphGen
 
