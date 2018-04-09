@@ -2,7 +2,7 @@ import argparse
 import os
 import sys
 sys.path.append('../..')
-from src.analysis.summarize_training import summarize_training
+from src.admin.summarize_training import summarize_training
 
 parser = argparse.ArgumentParser(description='Jets')
 parser.add_argument('-j', '--jobdir', type=str, default=None)
