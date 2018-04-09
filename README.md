@@ -34,4 +34,6 @@ python train.py [argparse args]
 python evaluation.py [argparse args]
 ```
 
-You will find all the python source code in /src.
+### Directory structure
+- sh contains bash and slurm scripts for submitting jobs onto a slurm cluster
+- src contains the python source code
