@@ -1,37 +1,19 @@
-# Graph neural nets for jet physics
+# Python source code
 
 
-## Instructions
+## Overview
+This library is written in PyTorch.
 
-### Requirements
-
-- python 3
-- pytorch
-- scikit-learn
-
-### Email results
-If you want email results, you must create a file called email_addresses.txt
-in the misc directory. The file must contain:
-First line: recipient email address
-Second line: sender email address
-Third line: sender password
-(You are advised to create a dummy account to send results.)
-If you want to turn email off, add the flag --no_email.
-
-### Data
-
-You need to unzip the tars and put the raw pickle files into data/w-vs-qcd/pickles/raw (make this directory).
-The training script will look for data in  data/w-vs-qcd/pickles/preprocessed and if it doesn't find it, make it from the raw stuff.
-
-### Usage
-
-Classification of W vs QCD jets:
-
-```
-# Training
-python train.py [argparse args]
-# Test
-python evaluation.py [argparse args]
-```
-
-You will find all the python source code in /src.
+## Directory Structure 
+- admin contains useful experiment administrator code for logging, emailing, saving, organizing
+- analysis contains code for analyzing a finished experiment. Mostly deprecated
+- architectures contains all the basic neural network components used for building models
+- data_ops contains basic preprocessing code like padding, wrapping etc.
+- experiment contains some wrapper code, providing access to the proteins and jets scripts
+- jets contains code for training and evaluating jet models
+- misc contains constants and email addresses, and some deprecated stuff
+- monitors contains code for monitoring and measuring experiments: losses, gradient norms, accuracy, time etc.
+- proteins contains code for training and evaluating protein models
+- scripts contains the main python scripts to run - these take command line arguments
+- utils contains the shadow apparatus for running experiments
+- visualizing contains visualization code for creating graphs, histograms etc.
