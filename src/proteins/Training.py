@@ -74,7 +74,7 @@ class Training(_Training):
             model_args.iters = 1
             model_args.lf = 2
 
-        admin_args,model_args, data_args, computing_args, training_args, optim_args, loading_args
+        return admin_args,model_args, data_args, computing_args, training_args, optim_args, loading_args
 
     def load_data(self,dataset, data_dir, n_train, n_valid, batch_size, preprocess, **kwargs):
         intermediate_dir, data_filename = DATASETS[dataset]
