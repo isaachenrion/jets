@@ -2,7 +2,6 @@ import logging
 import time
 import gc
 import os
-#from memory_profiler import profile, memory_usage
 
 import torch
 import torch.nn.functional as F
@@ -10,7 +9,7 @@ import torch.nn.functional as F
 from .data_ops.load_dataset import load_train_dataset
 from .data_ops.ProteinLoader import ProteinLoader as DataLoader
 
-from src.data_ops.utils.wrapping import unwrap
+from src.data_ops.wrapping import unwrap
 
 from src.misc.constants import DATASETS
 
@@ -80,7 +79,6 @@ class Training(_Training):
         intermediate_dir, data_filename = DATASETS[dataset]
         data_dir = os.path.join(data_dir, intermediate_dir)
         train_dataset, valid_dataset = load_train_dataset(data_dir, data_filename,n_train, n_valid, preprocess)
-
         train_data_loader = DataLoader(train_dataset, batch_size, **kwargs)
         valid_data_loader = DataLoader(valid_dataset, batch_size, **kwargs)
 
@@ -133,11 +131,6 @@ class Training(_Training):
     def train_one_batch(self,model, batch, optimizer, administrator, epoch, batch_number, clip):
         logger = administrator.logger
         (x, x_mask, y, y_mask) = batch
-        #gc.collect()
-        #logging.info("PRE-MODEL USAGE")
-        #log_gpu_usage()
-
-        #import ipdb; ipdb.set_trace()
 
         # forward
         model.train()

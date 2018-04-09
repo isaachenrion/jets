@@ -6,7 +6,7 @@ import os
 import torch
 import torch.nn.functional as F
 
-from src.data_ops.utils.wrapping import unwrap
+from src.data_ops.wrapping import unwrap
 
 
 
