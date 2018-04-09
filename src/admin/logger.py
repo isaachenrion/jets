@@ -3,7 +3,7 @@ import os
 import logging
 from collections import OrderedDict
 
-from ..visualizing.plot_training_stats import plot_training_stats
+from src.visualizing.plot_training_stats import plot_training_stats
 
 
 class Logger:

@@ -54,13 +54,7 @@ class Training(_Training):
 
     def set_debug_args(self,*args):
 
-        admin_args,
-        model_args,
-        data_args,
-        computing_args,
-        training_args,
-        optim_args,
-        loading_args = super().set_debug_args(*args)
+        admin_args,model_args, data_args, computing_args, training_args, optim_args, loading_args = super().set_debug_args(*args)
 
         if admin_args.debug:
             admin_args.no_email = True

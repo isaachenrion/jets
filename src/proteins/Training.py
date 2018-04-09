@@ -53,13 +53,7 @@ class Training(_Training):
 
     def set_debug_args(self,*args):
 
-        admin_args,
-        model_args,
-        data_args,
-        computing_args,
-        training_args,
-        optim_args,
-        loading_args = super().set_debug_args(*args)
+        admin_args,model_args, data_args, computing_args, training_args, optim_args, loading_args = super().set_debug_args(*args)
 
         if admin_args.debug:
             admin_args.no_email = True
@@ -79,7 +73,7 @@ class Training(_Training):
             model_args.hidden = 1
             model_args.iters = 1
             model_args.lf = 2
-            
+
     def load_data(self,dataset, data_dir, n_train, n_valid, batch_size, preprocess, **kwargs):
         intermediate_dir, data_filename = DATASETS[dataset]
         data_dir = os.path.join(data_dir, intermediate_dir)
