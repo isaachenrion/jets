@@ -84,7 +84,6 @@ class Training(_Training):
 
         return train_data_loader, valid_data_loader
 
-
     def loss(self, y_pred, y, mask):
         return F.binary_cross_entropy(y_pred * mask, y * mask)
 
@@ -131,6 +130,9 @@ class Training(_Training):
     def train_one_batch(self,model, batch, optimizer, administrator, epoch, batch_number, clip):
         logger = administrator.logger
         (x, x_mask, y, y_mask) = batch
+
+        logging.info("PRE-MODEL USAGE")
+        log_gpu_usage()
 
         # forward
         model.train()
