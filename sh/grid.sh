@@ -1,4 +1,4 @@
-commands="$(python ../src/scripts/_grid.py "$@")"
+commands="$(python src/scripts/_grid.py "$@")"
 IFS=$'\n' read -r -d '' -a arr < <(printf '%s\0' "$commands")
 IFS=$'\n'
 #commands=("$commands")
