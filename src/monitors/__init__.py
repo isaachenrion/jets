@@ -5,9 +5,7 @@ from .meta import Collect
 from .meta import Histogram
 from .meta import EachClassHistogram
 
-from .metrics import ROCAUC
-from .metrics import ROCCurve
-from .metrics import InvFPR
+from .metrics import *
 
 from .saver import Saver
 
@@ -17,3 +15,5 @@ from .time_monitors import Hours
 from .batch_matrix_monitor import BatchMatrixMonitor
 
 from .optim_monitors import *
+
+from .protein_metrics import *

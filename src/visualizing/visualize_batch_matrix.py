@@ -52,7 +52,8 @@ def visualize_batch_matrix(tensor, plotsdir, path_to_visualizations):
 
     assert tensor.max() <= 1.0
     assert tensor.min() >= 0.0
-
+    if not os.path.exists(os.path.join(plotsdir, path_to_visualizations)):
+        os.makedirs(os.path.join(plotsdir, path_to_visualizations))
     #tensor = 1 - tensor
     for i, matrix in enumerate(tensor):
         visualize_matrix(matrix, prefix=os.path.join(plotsdir, path_to_visualizations, str(i)))

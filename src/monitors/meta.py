@@ -44,6 +44,7 @@ class LogOnImprovement(ScalarMonitor):
         super().__init__('{}_at_{}'.format(monitor.name, trigger_monitor.name))
         self.monitor = monitor
         self.trigger_monitor = trigger_monitor
+        self.value = -99999999999
 
     def call(self, **kwargs):
         if self.trigger_monitor.changed:
@@ -56,13 +57,17 @@ class Regurgitate(ScalarMonitor):
         super().__init__(value_name, **kwargs)
 
     def call(self, **kwargs):
-        self.value = ensure_numpy_float(kwargs[self.value_name])
+        v = kwargs[self.value_name]
+        if self.numerical:
+            v = ensure_numpy_float(v)
+        self.value = v
         return self.value
 
 class Collect(ScalarMonitor):
-    def __init__(self, value_name, fn=None,**kwargs):
+    def __init__(self, value_name, fn=None, plotname=None,**kwargs):
         super().__init__(value_name, **kwargs)
         self.value_name = value_name
+        self.plotname = value_name if plotname is None else plotname
         if fn == 'mean':
             self.fn = np.mean
         elif fn == 'sum':
@@ -74,7 +79,10 @@ class Collect(ScalarMonitor):
         self.collection = []
 
     def call(self, **kwargs):
-        value = ensure_numpy_float(kwargs[self.value_name])
+        v = kwargs[self.value_name]
+        if self.numerical:
+            v = ensure_numpy_float(v)
+        value = v
         self.collection.append(value)
         self.value = self.fn(self.collection)
         return self.value
@@ -82,7 +90,7 @@ class Collect(ScalarMonitor):
     def visualize(self, plotname=None, **kwargs):
         super().visualize()
         if plotname is None:
-            plotname = self.name
+            plotname = self.plotname
         plot_one_training_stat(
             plotname,
             self.collection,

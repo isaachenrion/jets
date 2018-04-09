@@ -2,7 +2,7 @@ import os
 
 ''' CONSTANTS '''
 '''----------------------------------------------------------------------- '''
-MODELS_DIR = 'models'
+
 RUNNING_MODELS_DIR = 'running'
 FINISHED_MODELS_DIR = 'finished'
 DEBUG_MODELS_DIR = 'debugging'
@@ -35,15 +35,5 @@ DATASETS = {
 }
 
 ''' argparse args '''
-#STEP_SIZE=0.0005
-#DECAY=.5
-#L2_REGULARIZATION=0.0
-#
-#FEATURES=7
-#HIDDEN=64
-#
-#BATCH_SIZE=100
-#EPOCHS=50
-#
-#VALID=27000
-DATA_DIR = 'data'
+DATA_DIR = '/Users/isaachenrion/x/research/proteins/data'
+MODELS_DIR = '/Users/isaachenrion/x/research/proteins/models'

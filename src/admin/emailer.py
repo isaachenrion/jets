@@ -19,6 +19,10 @@ def get_emailer():
         return None
 
 class Emailer:
+    '''
+    Handles email. Given a sender, password and recipient, it can send messages
+    with attachments over a server.
+    '''
     def __init__(self, sender, password, recipient):
         self.sender = sender
         self.password = password

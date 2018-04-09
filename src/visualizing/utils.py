@@ -24,7 +24,7 @@ def ensure_numpy_float(one_d_tensor):
     if isinstance(tensor, torch.Tensor):
         assert np.prod([s for s in tensor.size()]) == 1
         tensor = tensor.squeeze()
-        tensor = tensor.numpy()[0]
+        tensor = tensor.numpy().item()
     if isinstance(tensor, float) or isinstance(tensor, int):
         tensor = np.float32(tensor)
     assert isinstance(tensor, np.float32)

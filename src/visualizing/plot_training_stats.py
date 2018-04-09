@@ -28,8 +28,8 @@ def convert_strings_to_numbers(stats_dict):
 
 def plot_training_stats_dict(stats_dict, plotsdir):
 
-    for k, v in stats_dict.items():
-        plot_one_training_stat(k, v, plotsdir)
+    #for k, v in stats_dict.items():
+    #    plot_one_training_stat(k, v, plotsdir)
     tl = [float(x) for x in stats_dict['train_loss']]
     vl = [float(x) for x in stats_dict['valid_loss']]
     plot_training_versus_validation_loss(tl, vl, plotsdir)

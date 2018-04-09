@@ -1,6 +1,7 @@
 bash_snippets.txt
+ilya
 /data
-models
+/models
 archive
 magic_commands.txt
 documents
@@ -19,3 +20,4 @@ recnn-gated-gilles.py
 *.pyc
 *.pyo
 */__pycache__/*
+*.ipynb

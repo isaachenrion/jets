@@ -28,11 +28,16 @@ class Monitor:
         pass
 
 class ScalarMonitor(Monitor):
-    def __init__(self, name, **kwargs):
+    def __init__(self, name, numerical=True,**kwargs):
         super().__init__(name, **kwargs)
+        self.numerical = numerical
         self.scalar = True
 
     def visualize(self):
         super().visualize()
 
         #self.visualize_count += 1
+
+    @property
+    def string(self):
+        return "\t{} = {:.2f}\t".format(self.name, self.value)
