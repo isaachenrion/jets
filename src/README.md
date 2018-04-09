@@ -4,7 +4,7 @@
 ## Overview
 This library is written in PyTorch.
 
-## Directory Structure 
+## Directory Structure
 - admin contains useful experiment administrator code for logging, emailing, saving, organizing
 - analysis contains code for analyzing a finished experiment. Mostly deprecated
 - architectures contains all the basic neural network components used for building models
@@ -17,3 +17,10 @@ This library is written in PyTorch.
 - scripts contains the main python scripts to run - these take command line arguments
 - utils contains the shadow apparatus for running experiments
 - visualizing contains visualization code for creating graphs, histograms etc.
+
+## How to add your own problem
+- create a directory for your problem "/problem"
+- inside it, you need to implement problem/Training, problem/Evaluation, problem/ModelBuilder and problem/Administrator
+- these subclass the basic versions provided in /admin and /utils (see these classes for details)
+- you can also add your own preprocessing logic in a folder called problem/data_ops
+- any models you build should go in problem/models

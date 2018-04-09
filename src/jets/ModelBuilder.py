@@ -1,6 +1,5 @@
 from src.utils._ModelBuilder import _ModelBuilder
-from .wangnet import WangNet
-from .graphgen import GraphGen
+from .models import FixedNMP
 
 
 class ModelBuilder(_ModelBuilder):
@@ -10,16 +9,14 @@ class ModelBuilder(_ModelBuilder):
     @property
     def model_dict(self):
         return dict(
-            #sg=SparseGraphGen,
-            w=WangNet,
-            g=GraphGen,
+            nmp=FixedNMP,
         )
 
     def construct_model_kwargs(self, args):
         #import ipdb; ipdb.set_trace()
         model_kwargs = {
             # model dimensions
-            'features': args.features+1,
+            'features': args.features+1 if args.model == 'nmp' else args.features,
             'hidden': args.hidden,
 
             # logging
@@ -36,6 +33,7 @@ class ModelBuilder(_ModelBuilder):
 
             # NMP
             'iters': args.iters,
+            'tied': args.tied,
             'update': args.update,
             'message': args.message,
             'emb_init':args.emb_init,
@@ -43,10 +41,9 @@ class ModelBuilder(_ModelBuilder):
             'symmetric':not args.asym,
             'readout':args.readout,
             'matrix':args.adj[0] if len(args.adj) == 1 else args.adj,
-            'matrix_activation':args.m_act,
-            'wn': args.wn,
+            'm_act':args.m_act,
             'no_grad': args.no_grad,
-            'tied': args.tied,
+            'wn': args.wn,
 
             # Stacked NMP
             'scales': args.scales,

@@ -19,7 +19,7 @@ from src.admin.utils import log_gpu_usage
 
 from src.utils._Training import _Training
 
-from .models import ModelBuilder
+from .ModelBuilder import ModelBuilder
 from .Administrator import Administrator
 
 class Training(_Training):
@@ -150,7 +150,6 @@ class Training(_Training):
 
         logging.info("POST-MODEL, PRE-OPTIM USAGE")
         log_gpu_usage()
-
         optimizer.step()
 
         if batch_number == 0:
