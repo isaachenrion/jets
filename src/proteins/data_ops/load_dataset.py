@@ -59,9 +59,12 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
     return train_dataset, valid_dataset
 
 def load_test_dataset(data_dir, filename, n_test, redo):
+    problem = data_dir.split('/')[-1]
+    subproblem = filename
+
     logging.info("Loading test data...")
 
-    test_filename = "{}-train.pickle".format(test_filename)
+    test_filename = "{}-train.pickle".format(filename)
     test_proteins = load_proteins(data_dir, test_filename, redo)
     test_dataset = ProteinDataset(test_proteins, problem=problem, subproblem=subproblem)
 

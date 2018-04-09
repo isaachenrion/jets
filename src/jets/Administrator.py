@@ -6,35 +6,23 @@ class Administrator(_Administrator):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def setup_monitors(self, epochs, visualizing):
-        ''' STATS LOGGER '''
-        '''----------------------------------------------------------------------- '''
+    def setup_monitors(self):
+        if self.train:
+            return self.setup_training_monitors()
+        else:
+            return self.setup_testing_monitors()
+
+    def setup_training_monitors(self):
         roc_auc = ROCAUC(visualizing=True)
         inv_fpr = InvFPR(visualizing=True)
-        #best_roc_auc = Best(roc_auc)
         best_inv_fpr = Best(inv_fpr)
-        #inv_fpr_at_best_roc_auc = LogOnImprovement(inv_fpr, best_roc_auc)
         roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
 
         metric_monitors = [
-            #roc_auc,
             inv_fpr,
-            ##best_roc_auc,
             best_inv_fpr,
-            ##inv_fpr_at_best_roc_auc,
             roc_auc,
             roc_auc_at_best_inv_fpr,
-            #best_roc_auc,
-            #ProteinMetrics(k=1,visualizing=True),
-            #ProteinMetrics(k=2,visualizing=True),
-            #ProteinMetrics(k=5,visualizing=True),
-            #ProteinMetrics(k=10,visualizing=True),
-            #TopLK(1, visualizing=True),
-            #TopLK(2, visualizing=True),
-            #TopLK(5, visualizing=True),
-            #TopLK(10, visualizing=True),
-            #Precision(visualizing=True),
-            #Recall(visualizing=True),
             Regurgitate('valid_loss', visualizing=True),
             Regurgitate('train_loss', visualizing=True)
 
@@ -47,7 +35,7 @@ class Administrator(_Administrator):
             Collect('logtime', fn='last', visualizing=False),
             Hours(),
             Collect('time', fn='sum', visualizing=False),
-            ETA(self.start_dt, epochs)
+            ETA(self.start_dt, self.epochs)
         ]
 
         model_file = os.path.join(self.exp_dir, 'model_state_dict.pt')
@@ -83,4 +71,24 @@ class Administrator(_Administrator):
         for m in monitors: monitor_dict[m.name] = m
 
 
+        return monitor_dict
+
+    def setup_testing_monitors(self):
+        roc_auc = ROCAUC(visualizing=True)
+        inv_fpr = InvFPR(visualizing=True)
+        best_inv_fpr = Best(inv_fpr)
+
+        monitors = [
+            inv_fpr,
+            best_inv_fpr,
+            roc_auc,
+            Regurgitate('test_loss', visualizing=True),
+            ]
+        self.metric_monitors = monitors
+
+        monitor_dict = OrderedDict()
+        for m in monitors:
+            monitor_dict[m.name] = m
+
+        monitor_dict['model'] = Collect('model', fn='last', visualizing=False, numerical=False)
         return monitor_dict

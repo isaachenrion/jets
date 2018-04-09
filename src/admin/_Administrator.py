@@ -79,13 +79,15 @@ class _Administrator:
         self.pid = pid
         self.host = host
         self.train = train
+        self.epochs = epochs
+
 
         self.cuda_and_random_seed(gpu, seed, passed_args)
         self.create_all_model_dirs()
         self.setup_model_directory(dataset, model)
         self.setup_logging(silent, verbose)
         self.setup_signal_handler(email)
-        self.setup_logger(epochs, visualizing)
+        self.setup_logger()
         self.record_settings(passed_args)
         self.initial_email()
 
@@ -179,9 +181,9 @@ class _Administrator:
                                 train=self.train,
                             )
 
-    def setup_logger(self, visualizing, *args, **kwargs):
-        monitor_dict = self.setup_monitors(visualizing, *args, **kwargs)
-        self.logger = Logger(self.exp_dir, monitor_dict, visualizing, train=self.train)
+    def setup_logger(self):
+        monitor_dict = self.setup_monitors()
+        self.logger = Logger(self.exp_dir, monitor_dict, visualizing=False, train=self.train)
 
 
     def record_settings(self, passed_args):
@@ -199,22 +201,31 @@ class _Administrator:
         logging.info("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
 
     def log(self, **kwargs):
+        if self.train:
+            self.log_train(**kwargs)
+        else:
+            self.log_test(**kwargs)
+
+    def log_train(self, **kwargs):
 
         self.logger.log(**kwargs)
-        #t_log = time.time()
         if kwargs['epoch'] == 1 and self.emailer is not None:
             self.emailer.send_msg(self.logger.monitors['eta'].value, "Job {}-{} on {} ETA: {}".format(self.slurm_array_job_id, self.slurm_array_task_id, self.host.split('.')[0], self.logger.monitors['eta'].value))
-        #if np.isnan(self.logger.monitors['inv_fpr'].value):
-        #    logging.info("NaN in 1/FPR\n")
-
         out_str = "{:5}\t".format(
                 self.logger.monitors['iteration'].value)
         for monitor in self.metric_monitors:
             out_str += monitor.string
-        #out_str += "\t1/FPR @ TPR = 0.5: {:.2f}\tBest 1/FPR @ TPR = 0.5: {:.5f}".format(self.logger.monitors['inv_fpr'].value, self.logger.monitors['best_inv_fpr'].value)
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)
-        #logging.info("Time in exp_handler log {:.1f} seconds".format(time.time() - t_log))
+
+    def log_test(self,**kwargs):
+        self.logger.log(**kwargs)
+        out_str = "{:5}\t".format(
+                self.logger.monitors['model'].value)
+        for monitor in self.metric_monitors:
+            out_str += monitor.string
+        self.signal_handler.results_strings.append(out_str)
+        logging.info(out_str)
 
     def save(self, model, settings):
         self.saver.save(model, settings)

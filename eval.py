@@ -5,7 +5,7 @@ import sys
 import cProfile
 
 from src.experiment import evaluate
-from src.experiment import reset_unused_args
+#from src.experiment import reset_unused_args
 from src.misc.constants import *
 
 ''' ARGUMENTS '''
@@ -86,10 +86,10 @@ data = parser.add_argument_group('data')
 data.add_argument("-n", "--n_test", type=int, default=-1)
 #data.add_argument("--n_", type=int, default=27000)
 data.add_argument("--dataset", type=str, default='w')
-data.add_argument("--data_dropout", type=float, default=.99)
+data.add_argument("--dropout", type=float, default=.99)
 data.add_argument("--pp", action='store_true', default=False)
 data.add_argument("--permute_particles", action='store_true')
-data.add_argument("--no_cropped", action='store_true')
+data.add_argument("--leaves", action='store_true')
 
 '''
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -88,7 +88,7 @@ class _Training:
             }
 
         administrator.signal_handler.set_model(model)
-        log_gpu_usage()
+        #log_gpu_usage()
 
         ''' OPTIMIZER AND SCHEDULER '''
         '''----------------------------------------------------------------------- '''
@@ -137,7 +137,7 @@ class _Training:
         loading_args.debug = admin_args.debug
         training_args.debug = admin_args.debug
 
-        
+
 
         return admin_args, model_args, data_args, computing_args, training_args, optim_args, loading_args
 
@@ -199,7 +199,7 @@ class _Training:
 
         logging.info("Training...")
         iteration=1
-        log_gpu_usage()
+        #log_gpu_usage()
 
         static_dict = dict(
             model=model,

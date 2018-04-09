@@ -77,6 +77,13 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
     return train_dataset, valid_dataset
 
 def load_test_dataset(data_dir, filename, n_test, redo):
+    if 'w-vs-qcd' in data_dir:
+        from .w_vs_qcd import preprocess, crop_dataset
+    elif 'quark-gluon' in data_dir:
+        from .quark_gluon import preprocess, crop_dataset
+    else:
+        raise ValueError('Unrecognized data_dir!')
+
     train_dataset, _ = load_train_dataset(data_dir, filename, -1, 27000, False)
     logging.warning("Loading test data...")
     filename = "{}-test.pickle".format(filename)

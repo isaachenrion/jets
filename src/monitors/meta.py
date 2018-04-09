@@ -57,7 +57,10 @@ class Regurgitate(ScalarMonitor):
         super().__init__(value_name, **kwargs)
 
     def call(self, **kwargs):
-        self.value = ensure_numpy_float(kwargs[self.value_name])
+        v = kwargs[self.value_name]
+        if self.numerical:
+            v = ensure_numpy_float(v)
+        self.value = v
         return self.value
 
 class Collect(ScalarMonitor):
@@ -76,7 +79,10 @@ class Collect(ScalarMonitor):
         self.collection = []
 
     def call(self, **kwargs):
-        value = ensure_numpy_float(kwargs[self.value_name])
+        v = kwargs[self.value_name]
+        if self.numerical:
+            v = ensure_numpy_float(v)
+        value = v
         self.collection.append(value)
         self.value = self.fn(self.collection)
         return self.value

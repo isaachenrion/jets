@@ -8,9 +8,13 @@ from src.data_ops.utils import dropout
 from src.data_ops.utils.wrapping import wrap
 
 
+
 class JetLoader(_DataLoader):
-    def __init__(self, dataset, batch_size):
+    def __init__(self, dataset, batch_size, leaves=True, dropout=None, permute_particles=False, **kwargs):
         super().__init__(dataset, batch_size)
+        self.dropout = dropout
+        self.permute_particles = permute_particles
+        self.leaves = leaves
 
     def preprocess_y(self, y_list):
         y = torch.stack([torch.Tensor([int(y)]) for y in y_list], 0)
@@ -19,13 +23,13 @@ class JetLoader(_DataLoader):
         y = wrap(y)
         return y
 
-class LeafJetLoader(JetLoader):
-    def __init__(self, dataset, batch_size, dropout=None, permute_particles=False):
-        super().__init__(dataset, batch_size)
-        self.dropout = dropout
-        self.permute_particles = permute_particles
-
     def preprocess_x(self, x_list):
+        if self.leaves:
+            return self.batch_leaves(x_list)
+        else:
+            return self.batch_trees(x_list)
+
+    def batch_leaves(self,x_list):
         x_list = [x.constituents for x in x_list]
         if self.permute_particles:
             data = [torch.from_numpy(np.random.permutation(x)) for x in x_list]
@@ -40,14 +44,6 @@ class LeafJetLoader(JetLoader):
         data = wrap(data)
         mask = wrap(mask)
         return data, mask
-
-
-class TreeJetLoader(JetLoader):
-    def __init__(self, dataset, batch_size,**kwargs):
-        super().__init__(dataset, batch_size)
-
-    def preprocess_x(self, x_list):
-        return TreeJetLoader.batch_trees(x_list)
 
     @staticmethod
     def batch_trees(jets):

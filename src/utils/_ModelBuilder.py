@@ -41,7 +41,7 @@ class _ModelBuilder:
             logging.info("Initializing model...")
             model_kwargs = self.construct_model_kwargs(model_args)
         else:
-            assert model_kwargs is None
+            assert model_args is None
             logging.info("Loading model...")
             model_kwargs = load_model_kwargs(filename)
 
@@ -65,7 +65,7 @@ class _ModelBuilder:
 
 
     def build_model_from_kwargs(self, model_kwargs, **kwargs):
-        model = model_kwargs.pop('model', None)
+        model = model_kwargs.get('model', None)
         ModelClass = self.model_dict[model]
         model = ModelClass(**model_kwargs, **kwargs)
         return model

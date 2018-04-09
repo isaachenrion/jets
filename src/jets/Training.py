@@ -8,8 +8,7 @@ import torch
 import torch.nn.functional as F
 
 from .data_ops.load_dataset import load_train_dataset
-from .data_ops.JetLoader import LeafJetLoader
-from .data_ops.JetLoader import TreeJetLoader
+from .data_ops.JetLoader import JetLoader as DataLoader
 from src.data_ops.utils.wrapping import unwrap
 
 from src.misc.constants import DATASETS
@@ -81,18 +80,16 @@ class Training(_Training):
         intermediate_dir, data_filename = DATASETS[dataset]
         data_dir = os.path.join(data_dir, intermediate_dir)
         train_dataset, valid_dataset = load_train_dataset(data_dir, data_filename,n_train, n_valid, preprocess)
-        if self.model_args.model in ['recs', 'recg']:
-            DataLoader = TreeJetLoader
-        else:
-            DataLoader = LeafJetLoader
 
-        train_data_loader = DataLoader(train_dataset, batch_size, **kwargs)
-        valid_data_loader = DataLoader(valid_dataset, batch_size, **kwargs)
+        leaves = self.model_args.model in ['recs', 'recg']
+
+        train_data_loader = DataLoader(train_dataset, batch_size, leaves=leaves,**kwargs)
+        valid_data_loader = DataLoader(valid_dataset, batch_size, leaves=leaves,**kwargs)
 
         return train_data_loader, valid_data_loader
 
     def loss(self, y_pred, y):
-        return F.binary_cross_entropy(y_pred, y)
+        return F.binary_cross_entropy(y_pred.squeeze(1), y)
 
 
     def validation(self, model, data_loader):

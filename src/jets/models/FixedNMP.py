@@ -41,10 +41,10 @@ class FixedNMP(nn.Module):
 
         self.iters = iters
         self.no_grad = no_grad
-        emb_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
+        emb_kwargs = {x: kwargs.get(x, None) for x in ['act', 'wn']}
         self.embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, n_layers=int(emb_init), **emb_kwargs)
 
-        mp_kwargs = {x: kwargs[x] for x in ['act', 'wn', 'update', 'message']}
+        mp_kwargs = {x: kwargs.get(x, None) for x in ['act', 'wn', 'update', 'message']}
         MPLayer = MP_LAYERS['m1']
         if tied:
             mp = MPLayer(hidden=hidden,**mp_kwargs)
@@ -53,7 +53,7 @@ class FixedNMP(nn.Module):
             self.mp_layers = nn.ModuleList([MPLayer(hidden=hidden,**mp_kwargs) for _ in range(iters)])
 
         Readout = READOUTS[readout]
-        adj_kwargs = {x: kwargs[x] for x in ['symmetric', 'logger', 'logging_frequency', 'wn']}
+        adj_kwargs = {x: kwargs.get(x, None) for x in ['symmetric', 'logger', 'logging_frequency', 'wn']}
         adj_kwargs['act'] = kwargs['m_act']
         self.adjacency_matrix = construct_adjacency(matrix=matrix, dim_in=features, dim_out=hidden, **adj_kwargs)
         self.readout = Readout(hidden, hidden)
