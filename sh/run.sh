@@ -10,17 +10,7 @@ do
         PYTHONARGS="$PYTHONARGS $arg"
     fi
     counter+=1
-    #echo $arg
 done
-#echo args $ARGS
-#N_JOBS="${ARGS[0]}"
-#echo n_jobs $N_JOBS
-#PYTHONARGS="${ARGS[1]}"
-#echo $1
-
-#echo $N_JOBS
-#echo pa $PYTHONARGS
-
 
 read _ DATA_DIR MODELS_DIR GPU EXPT_TIME END_DIR < <(bash $SRCDIR/sh/paths.sh)
 PYTHONARGS="$PYTHONARGS --data_dir $DATA_DIR --experiment_time $EXPT_TIME --models_dir $MODELS_DIR"

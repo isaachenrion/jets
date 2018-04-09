@@ -33,3 +33,5 @@ python train.py [argparse args]
 # Test
 python evaluation.py [argparse args]
 ```
+
+You will find all the python source code in /src.
