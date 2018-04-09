@@ -133,6 +133,9 @@ class Training(_Training):
 
         logging.info("PRE-MODEL USAGE")
         log_gpu_usage()
+        for obj in gc.get_objects():
+            if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
+            print(type(obj), obj.size())
 
         # forward
         model.train()
@@ -152,6 +155,10 @@ class Training(_Training):
 
         logging.info("POST-MODEL, PRE-OPTIM USAGE")
         log_gpu_usage()
+        for obj in gc.get_objects():
+            if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
+            print(type(obj), obj.size())
+            
         optimizer.step()
 
         if batch_number == 0:
