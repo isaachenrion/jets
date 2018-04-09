@@ -2,6 +2,7 @@ import matplotlib as mpl
 mpl.use('Agg')
 import argparse
 import sys
+sys.path.append('../..')
 import cProfile
 
 from src.experiment import evaluate

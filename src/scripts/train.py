@@ -3,7 +3,7 @@ mpl.use('Agg')
 import argparse
 import sys
 import cProfile
-
+sys.path.append('../..')
 from src.experiment import train
 from src.misc.constants import *
 

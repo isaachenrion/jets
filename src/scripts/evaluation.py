@@ -1,4 +1,5 @@
 import sys
+sys.path.append('../..')
 import argparse
 from src.experiment import evaluate
 from src.misc.constants import *

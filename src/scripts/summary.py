@@ -1,5 +1,7 @@
 import argparse
 import os
+import sys
+sys.path.append('../..')
 from src.analysis.summarize_training import summarize_training
 
 parser = argparse.ArgumentParser(description='Jets')

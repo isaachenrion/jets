@@ -1,4 +1,5 @@
 import sys
+sys.path.append('../..')
 def generate_all_commands(command):
 
     # split into list of args
