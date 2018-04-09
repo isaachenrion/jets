@@ -1,1 +1,2 @@
-from .ModelBuilder import ModelBuilder
+from .wangnet import WangNet
+from .graphgen import GraphGen

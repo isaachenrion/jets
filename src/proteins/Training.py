@@ -19,7 +19,7 @@ from src.admin.utils import log_gpu_usage
 
 from src.utils._Training import _Training
 
-from .models import ModelBuilder
+from .ModelBuilder import ModelBuilder
 from .Administrator import Administrator
 
 class Training(_Training):

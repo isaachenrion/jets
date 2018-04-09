@@ -35,5 +35,5 @@ DATASETS = {
 }
 
 ''' argparse args '''
-DATA_DIR = '/Users/isaachenrion/x/research/proteins/data'
-MODELS_DIR = '/Users/isaachenrion/x/research/proteins/models'
+DATA_DIR = '/Users/isaachenrion/x/research/graphs/data'
+MODELS_DIR = '/Users/isaachenrion/x/research/graphs/models'
