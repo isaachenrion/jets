@@ -22,7 +22,7 @@ done
 #echo pa $PYTHONARGS
 
 
-read SRCDIR DATA_DIR MODELS_DIR GPU EXPT_TIME END_DIR < <(bash $SRCDIR/sh/paths.sh)
+read _ DATA_DIR MODELS_DIR GPU EXPT_TIME END_DIR < <(bash $SRCDIR/sh/paths.sh)
 PYTHONARGS="$PYTHONARGS --data_dir $DATA_DIR --experiment_time $EXPT_TIME --models_dir $MODELS_DIR"
 RES=$(sbatch --time=$EXPT_TIME:00:00 --parsable --array=1-$N_JOBS --gres=$GPU $SRCDIR/sh/train.s $PYTHONARGS)
 echo $RES
