@@ -30,7 +30,7 @@
 #SBATCH --mail-user=henrion@nyu.edu
 
 #SRCDIR=$1
-export CUDA_LAUNCH_BLOCKING=1
+#export CUDA_LAUNCH_BLOCKING=1
 PYTHONARGS="$@"
 PYTHONARGS="$PYTHONARGS --slurm --gpu 0 --slurm_array_job_id $SLURM_ARRAY_JOB_ID --slurm_array_task_id $SLURM_ARRAY_TASK_ID"
 #cd $SRCDIR

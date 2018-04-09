@@ -65,7 +65,7 @@ rm -rf $MODEL_RUNDIR
 
 PYTHONARGS="-j $MODEL_OUTDIR -e"
 
-read SRCDIR _DATADIR _GPU _QOS < <(bash paths.sh)
+read _ _DATADIR _GPU _QOS < <(bash $SRCDIR/sh/paths.sh)
 
 cd $SRCDIR/src/scripts/
 python summary.py $PYTHONARGS
