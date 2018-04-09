@@ -137,24 +137,7 @@ class _Training:
         loading_args.debug = admin_args.debug
         training_args.debug = admin_args.debug
 
-        if admin_args.debug:
-            admin_args.no_email = True
-            admin_args.verbose = True
-
-            training_args.batch_size = 2
-            training_args.epochs = 5
-
-            data_args.n_train = 6
-            data_args.n_valid = 6
-
-            optim_args.lr = 0.1
-            optim_args.period = 2
-
-            computing_args.seed = 1
-
-            model_args.hidden = 1
-            model_args.iters = 1
-            model_args.lf = 2
+        
 
         return admin_args, model_args, data_args, computing_args, training_args, optim_args, loading_args
 
