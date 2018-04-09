@@ -1,37 +1,23 @@
-# Graph neural nets for jet physics
-
+# Bash scripts for running jobs on slurm
 
 ## Instructions
+Here we provide some utility scripts for running jobs on slurm.
 
-### Requirements
+We provide three scripts.
 
-- python 3
-- pytorch
-- scikit-learn
+### train.sh 
+The first argument is an integer specifying the number of jobs you want to run, i.e. random seeds.
+After that, it just takes the arguments you would pass to train.py 
 
-### Email results
-If you want email results, you must create a file called email_addresses.txt
-in the misc directory. The file must contain:
-First line: recipient email address
-Second line: sender email address
-Third line: sender password
-(You are advised to create a dummy account to send results.)
-If you want to turn email off, add the flag --no_email.
+### eval.sh 
+The first argument is an integer specifying the number of jobs you want to run, i.e. random seeds.
+After that, it just takes the arguments you would pass to eval.py 
 
-### Data
 
-You need to unzip the tars and put the raw pickle files into data/w-vs-qcd/pickles/raw (make this directory).
-The training script will look for data in  data/w-vs-qcd/pickles/preprocessed and if it doesn't find it, make it from the raw stuff.
+### grid.sh 
+The first argument is an integer specifying the number of jobs you want to run, i.e. random seeds.
+After that, it just takes the arguments you would pass to train.py, but comma-separated values will spawn different jobs in a combinatorial fashion.
 
-### Usage
+e.g. bash grid.sh 5 --lr 0.1, 0.01, 0.001 --batch_size 16,32,64 would create 5 random seeds * 3 learning rates * 3 batch sizes = 45 jobs.
 
-Classification of W vs QCD jets:
-
-```
-# Training
-python train.py [argparse args]
-# Test
-python evaluation.py [argparse args]
-```
-
-You will find all the python source code in /src.
+This is great for hyperparameter sweeps.
