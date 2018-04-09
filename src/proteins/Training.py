@@ -150,7 +150,6 @@ class Training(_Training):
 
         logging.info("POST-MODEL, PRE-OPTIM USAGE")
         log_gpu_usage()
-
         optimizer.step()
 
         if batch_number == 0:
