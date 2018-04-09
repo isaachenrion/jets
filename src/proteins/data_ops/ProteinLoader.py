@@ -5,10 +5,10 @@ import numpy as np
 import torch
 from torch.autograd import Variable
 
-from src.data_ops.utils._DataLoader import _DataLoader
-from src.data_ops.utils import pad_tensors, pad_matrices, pad_tensors_extra_channel
-from src.data_ops.utils import dropout
-from src.data_ops.utils.wrapping import wrap
+from src.data_ops._DataLoader import _DataLoader
+from src.data_ops.pad_tensors import pad_tensors, pad_tensors_extra_channel
+from src.data_ops.dropout import dropout
+from src.data_ops.wrapping import wrap
 from .adjacency import compute_adjacency, contact_map
 from .preprocessing import make_mask
 

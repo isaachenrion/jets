@@ -9,7 +9,7 @@ import torch.nn.functional as F
 
 from .data_ops.load_dataset import load_train_dataset
 from .data_ops.JetLoader import JetLoader as DataLoader
-from src.data_ops.utils.wrapping import unwrap
+from src.data_ops.wrapping import unwrap
 
 from src.misc.constants import DATASETS
 

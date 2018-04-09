@@ -9,7 +9,7 @@ import torch.nn.functional as F
 from torch.nn.parameter import Parameter
 from torch.autograd import Variable
 
-from src.data_ops.utils.wrapping import wrap
+from src.data_ops.wrapping import wrap
 
 from src.architectures.nmp.message_passing import MP_LAYERS
 from src.architectures.nmp.adjacency import construct_adjacency
@@ -24,7 +24,7 @@ from src.monitors import Histogram
 from src.monitors import Collect
 from src.monitors import BatchMatrixMonitor
 
-from src.misc.grad_mode import no_grad
+#from src.misc.grad_mode import no_grad
 
 def entry_distance_matrix(n):
     A = torch.triu(torch.ones(n, n), 0)

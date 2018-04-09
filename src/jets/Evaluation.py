@@ -10,7 +10,7 @@ from src.misc.constants import DATASETS
 
 from src.utils._Evaluation import _Evaluation
 
-from src.data_ops.utils.wrapping import unwrap
+from src.data_ops.wrapping import unwrap
 
 from .data_ops.load_dataset import load_test_dataset
 from .data_ops.JetLoader import JetLoader as DataLoader
