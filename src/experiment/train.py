@@ -6,4 +6,4 @@ def train(**kwargs):
     elif dataset in ['protein']:
         from src.proteins.Training import Training
 
-    Training(**kwargs)
+    Training(**kwargs) 
