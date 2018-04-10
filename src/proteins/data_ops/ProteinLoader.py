@@ -1,5 +1,6 @@
 import time
 import logging
+import gc
 
 import numpy as np
 import torch
@@ -11,6 +12,7 @@ from src.data_ops.dropout import dropout
 from src.data_ops.wrapping import wrap
 from .adjacency import compute_adjacency, contact_map
 from .preprocessing import make_mask
+from src.admin.utils import see_tensors_in_memory
 
 class ProteinLoader(_DataLoader):
     def __init__(self, dataset, batch_size, dropout=None, permute_vertices=None):
@@ -22,6 +24,10 @@ class ProteinLoader(_DataLoader):
 
 
     def collate(self, data_tuples):
+        #gc.collect()
+        #logging.info('before collation')
+        #see_tensors_in_memory(3)
+
         t = time.time()
         X, X_mask = self.preprocess_x([x for x, _, _ in data_tuples])
         Y = self.preprocess_y([y for _, y, _ in data_tuples])
@@ -33,6 +39,9 @@ class ProteinLoader(_DataLoader):
             X_mask = X_mask[:, :self.n_max, :self.n_max]
             Y = Y[:, :self.n_max, :self.n_max]
             Y_mask = Y_mask[:, :self.n_max, :self.n_max]
+
+        #logging.info('after collation')
+        #see_tensors_in_memory(3)
 
         return X, X_mask, Y, Y_mask
 

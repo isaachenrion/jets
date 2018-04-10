@@ -3,6 +3,7 @@ import time
 import gc
 import os
 
+import numpy as np
 import torch
 import torch.nn.functional as F
 
@@ -15,12 +16,13 @@ from src.misc.constants import DATASETS
 
 from src.monitors import BatchMatrixMonitor
 
-from src.admin.utils import log_gpu_usage
+from src.admin.utils import log_gpu_usage, see_tensors_in_memory, clear_all_tensors
 
 from src.utils._Training import _Training
 
 from .ModelBuilder import ModelBuilder
 from .Administrator import Administrator
+
 
 class Training(_Training):
     def __init__(self,
@@ -61,8 +63,8 @@ class Training(_Training):
             training_args.batch_size = 2
             training_args.epochs = 5
 
-            data_args.n_train = 6
-            data_args.n_valid = 6
+            data_args.n_train = 12
+            data_args.n_valid = 10
 
             optim_args.lr = 0.1
             optim_args.period = 2
@@ -94,12 +96,28 @@ class Training(_Training):
         valid_loss = 0.
         yy, yy_pred = [], []
         mask = []
-        for i, (x, x_mask, y, y_mask) in enumerate(data_loader):
+        for i, batch in enumerate(data_loader):
+            (x, x_mask, y, y_mask) = batch
+            x.volatile = True
+            y.volatile = True
+            x_mask.volatile = True
+            y_mask.volatile = True
+
             y_pred = model(x, mask=x_mask)
-            vl = self.loss(y_pred, y, y_mask); valid_loss += float(unwrap(vl))
+
+            vl = self.loss(y_pred, y, y_mask)
+            valid_loss = valid_loss + float(unwrap(vl))
+
             yy.append(unwrap(y))
             yy_pred.append(unwrap(y_pred))
             mask.append(unwrap(y_mask))
+
+            del y
+            del y_pred
+            del y_mask
+            del x
+            del x_mask
+            del batch
 
         #if epoch % admin_args.lf == 0:
         #    y_matrix_monitor(matrix=y)
@@ -120,7 +138,6 @@ class Training(_Training):
             model=model,
             logtime=0,
         )
-        #logdict.update(train_dict)
         model.train()
         logging.info("Validation took {:.1f} seconds".format(time.time() - t_valid))
 
@@ -130,12 +147,6 @@ class Training(_Training):
     def train_one_batch(self,model, batch, optimizer, administrator, epoch, batch_number, clip):
         logger = administrator.logger
         (x, x_mask, y, y_mask) = batch
-
-        logging.info("PRE-MODEL USAGE")
-        log_gpu_usage()
-        for obj in gc.get_objects():
-            if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
-            print(type(obj), obj.size())
 
         # forward
         model.train()
@@ -153,12 +164,7 @@ class Training(_Training):
             old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
             grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
 
-        logging.info("POST-MODEL, PRE-OPTIM USAGE")
-        log_gpu_usage()
-        for obj in gc.get_objects():
-            if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
-            print(type(obj), obj.size())
-            
+
         optimizer.step()
 
         if batch_number == 0:
@@ -166,8 +172,11 @@ class Training(_Training):
             for m in administrator.grad_monitors:
                 m(model_params=model_params, old_params=old_params, grads=grads)
 
-        logging.info("FINAL USAGE")
-        log_gpu_usage()
-        logging.info("\n")
+        del y
+        del y_pred
+        del y_mask
+        del x
+        del x_mask
+        del batch
 
         return float(unwrap(l))

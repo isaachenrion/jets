@@ -2,7 +2,9 @@ import os
 import logging
 import sys
 import datetime
-
+import gc
+from functools import reduce
+import operator as op
 import torch
 if torch.cuda.is_available():
     import GPUtil
@@ -48,3 +50,36 @@ def log_gpu_usage():
         logging.info("GPU UTIL: {}/{}. {:.1f}% used".format(gpu_util, gpu_total, 100*gpu_util/gpu_total))
     else:
         pass
+
+def see_tensors_in_memory(ndim=0):
+    tensor_list = []
+    for obj in gc.get_objects():
+        try:
+            cond = torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data))
+            if cond and len(obj.size()) == ndim:
+                tensor_list.append((4*reduce(op.mul, obj.size()) if len(obj.size()) > 0 else 0, type(obj), obj.size()))
+        except Exception:
+            pass
+    total_bytes = reduce(lambda x,y:x+y, map(lambda x:x[0], tensor_list)) if len(tensor_list) > 0 else 0
+    logging.info('There are {} tensors in memory, consuming {} total'.format(len(tensor_list), get_bytes(total_bytes)))
+    
+def clear_all_tensors():
+    for obj in gc.get_objects():
+        try:
+            if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
+                del obj
+        except Exception:
+            pass
+
+def get_bytes(n):
+    n = str(n)
+    if len(n) < 4:
+        return "{} b".format(n)
+    elif len(n) < 7:
+        return "{} kb".format(n[:-3])
+    elif len(n) < 10:
+        return "{} Mb".format(n[:-6])
+    elif len(n) < 14:
+        return "{} Gb".format(n[:-9])
+    else:
+        return "{} Tb".format(n[:-12])

@@ -18,15 +18,7 @@ from src.data_ops.wrapping import unwrap
 #from ..misc.constants import *
 from src.optim.build_optimizer import build_optimizer
 from src.optim.build_scheduler import build_scheduler
-
-#from ..admin import Administrator
-
-#from ..monitors.meta import Collect
-#from ..loading.model import build_model
-
-#from ..monitors import BatchMatrixMonitor
-
-#from ..misc.grad_mode import no_grad
+from src.admin.utils import see_tensors_in_memory
 
 from src.admin.utils import log_gpu_usage
 
@@ -170,6 +162,9 @@ class _Training:
             iteration += 1
             tl = self.train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip)
             train_loss += tl
+
+            #del batch
+            see_tensors_in_memory(3)
         scheduler.step()
 
         n_batches = len(data_loader)
