@@ -16,7 +16,7 @@ from src.misc.constants import DATASETS
 
 from src.monitors import BatchMatrixMonitor
 
-from src.admin.utils import log_gpu_usage, see_tensors_in_memory, clear_all_tensors
+from src.admin.utils import log_gpu_usage, see_tensors_in_memory, clear_all_tensors, see_cuda_tensors_in_memory
 
 from src.utils._Training import _Training
 
@@ -98,10 +98,10 @@ class Training(_Training):
         mask = []
         for i, batch in enumerate(data_loader):
             (x, x_mask, y, y_mask) = batch
-            x.volatile = True
-            y.volatile = True
-            x_mask.volatile = True
-            y_mask.volatile = True
+            #x.volatile = True
+            #y.volatile = True
+            #x_mask.volatile = True
+            #y_mask.volatile = True
 
             y_pred = model(x, mask=x_mask)
 
@@ -148,7 +148,12 @@ class Training(_Training):
         logger = administrator.logger
         (x, x_mask, y, y_mask) = batch
 
+        logging.info('before backward')
+
         log_gpu_usage()
+        see_cuda_tensors_in_memory()
+        #see_tensors_in_memory()
+
         # forward
         model.train()
         optimizer.zero_grad()
@@ -165,8 +170,9 @@ class Training(_Training):
             old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
             grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
 
-
+        logging.info('after backward')
         log_gpu_usage()
+        see_cuda_tensors_in_memory()
         optimizer.step()
         if batch_number == 0:
             model_params = torch.cat([p.view(-1) for p in model.parameters()], 0)

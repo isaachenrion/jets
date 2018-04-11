@@ -47,22 +47,42 @@ def log_gpu_usage():
         gpus = GPUtil.getGPUs()
         gpu_util = float(gpus[0].memoryUsed)
         gpu_total = float(gpus[0].memoryTotal)
-        logging.info("GPU UTIL: {}/{}. {:.1f}% used".format(gpu_util, gpu_total, 100*gpu_util/gpu_total))
+        logging.info("GPU: {}/{}MiB\t{:.1f}% used".format(int(gpu_util), int(gpu_total), 100*gpu_util/gpu_total))
     else:
         pass
 
-def see_tensors_in_memory(ndim=0):
+def get_tensors_in_memory(ndim=None):
     tensor_list = []
     for obj in gc.get_objects():
         try:
             cond = torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data))
-            if cond and len(obj.size()) == ndim:
-                tensor_list.append((4*reduce(op.mul, obj.size()) if len(obj.size()) > 0 else 0, type(obj), obj.size()))
+            if ndim is not None:
+                cond = cond and len(obj.size()) == ndim
+            if cond:
+                tensor_list.append(obj)
         except Exception:
             pass
-    total_bytes = reduce(lambda x,y:x+y, map(lambda x:x[0], tensor_list)) if len(tensor_list) > 0 else 0
-    logging.info('There are {} tensors in memory, consuming {} total'.format(len(tensor_list), get_bytes(total_bytes)))
-    
+    return tensor_list
+
+
+def get_bytes(tensor_list):
+    total_bytes = reduce(lambda x,y:x+y, map(lambda x: reduce(op.mul, x.size()), tensor_list)) if len(tensor_list) > 0 else 0
+    return total_bytes
+
+
+def see_tensors_in_memory(ndim=None):
+    tensor_list = get_tensors_in_memory(ndim)
+    total_bytes = get_bytes(tensor_list)
+    logging.info('There are {} tensors in memory, consuming {} total'.format(len(tensor_list), format_bytes(total_bytes)))
+
+
+def see_cuda_tensors_in_memory(ndim=None):
+    tensor_list = get_tensors_in_memory(ndim)
+    tensor_list = list(filter(lambda x: x.is_cuda, tensor_list))
+    total_bytes = get_bytes(tensor_list)
+    logging.info('There are {} CUDA tensors in memory, consuming {} total'.format(len(tensor_list), format_bytes(total_bytes)))
+
+
 def clear_all_tensors():
     for obj in gc.get_objects():
         try:
@@ -71,15 +91,15 @@ def clear_all_tensors():
         except Exception:
             pass
 
-def get_bytes(n):
+def format_bytes(n):
     n = str(n)
     if len(n) < 4:
         return "{} b".format(n)
     elif len(n) < 7:
         return "{} kb".format(n[:-3])
     elif len(n) < 10:
-        return "{} Mb".format(n[:-6])
+        return "{}.{} Mb".format(n[:-6], n[-6:-4])
     elif len(n) < 14:
-        return "{} Gb".format(n[:-9])
+        return "{}.{} Gb".format(n[:-9], n[-9:-7])
     else:
-        return "{} Tb".format(n[:-12])
+        return "{}.{} Tb".format(n[:-12], n[-12:-10])
