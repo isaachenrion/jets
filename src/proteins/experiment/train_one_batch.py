@@ -34,7 +34,8 @@ def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number
         grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
 
     #logging.info('after backward')
-    #log_gpu_usage()
+    if batch_number == 1:
+        log_gpu_usage()
     #if torch.cuda.is_available():
     #    see_cuda_tensors_in_memory()
     #else:

@@ -16,7 +16,7 @@ class Administrator(_Administrator):
     def setup_training_monitors(self):
 
         valid_loss = Regurgitate('valid_loss', visualizing=True)
-        best_valid_loss = Best(valid_loss)
+        best_valid_loss = Best(valid_loss, track='min')
         metric_monitors = [
             ProteinMetrics(k=1,visualizing=True),
             ProteinMetrics(k=2,visualizing=True),

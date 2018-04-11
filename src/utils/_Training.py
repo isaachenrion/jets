@@ -163,8 +163,6 @@ class _Training:
             tl = self.train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip)
             train_loss += tl
 
-            #del batch
-            
         scheduler.step()
 
         n_batches = len(data_loader)
@@ -180,11 +178,6 @@ class _Training:
             iteration=iteration,
             time=train_time,
             )
-
-        # validation
-        #t_valid = time.time()
-        #valid_dict = validation(model, valid_data_loader)
-
 
         return train_dict
 
