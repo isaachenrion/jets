@@ -151,8 +151,10 @@ class Training(_Training):
         logging.info('before backward')
 
         log_gpu_usage()
-        see_cuda_tensors_in_memory()
-        #see_tensors_in_memory()
+        if torch.cuda.is_available():
+            see_cuda_tensors_in_memory()
+        else:
+            see_tensors_in_memory()
 
         # forward
         model.train()
@@ -172,7 +174,11 @@ class Training(_Training):
 
         logging.info('after backward')
         log_gpu_usage()
-        see_cuda_tensors_in_memory()
+        if torch.cuda.is_available():
+            see_cuda_tensors_in_memory()
+        else:
+            see_tensors_in_memory()
+
         optimizer.step()
         if batch_number == 0:
             model_params = torch.cat([p.view(-1) for p in model.parameters()], 0)

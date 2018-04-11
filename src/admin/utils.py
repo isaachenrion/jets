@@ -66,9 +66,14 @@ def get_tensors_in_memory(ndim=None):
 
 
 def get_bytes(tensor_list):
-    total_bytes = reduce(lambda x,y:x+y, map(lambda x: reduce(op.mul, x.size()), tensor_list)) if len(tensor_list) > 0 else 0
+    total_bytes = float(reduce(lambda x,y:x+y, map(lambda x: total_size(x) * x.element_size(), tensor_list))) if len(tensor_list) > 0 else 0
     return total_bytes
 
+def total_size(t):
+    s = t.size()
+    if len(s) > 0:
+        return reduce(op.mul, s)
+    return 0
 
 def see_tensors_in_memory(ndim=None):
     tensor_list = get_tensors_in_memory(ndim)
