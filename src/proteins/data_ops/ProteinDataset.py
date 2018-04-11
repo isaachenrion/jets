@@ -4,15 +4,26 @@ import numpy as np
 import math
 
 class ProteinDataset(D):
-    def __init__(self, proteins, weights=None, problem=None, subproblem=None):
+    def __init__(self, proteins, problem=None, subproblem=None, crop=True):
         super().__init__()
+        if crop:
+            proteins = self.crop(proteins)
+
         self.proteins = proteins
-        self.weights = weights
         self.problem = problem
         self.subproblem = subproblem
 
+
     def __len__(self):
         return len(self.proteins)
+
+    def crop(self, proteins):
+        #max_len = 859 # 99th percentile
+        max_len = 539 # 95th percentile
+        #max_len = 429 # 90th percentile
+        #max_len = 293 # 75th percentile
+        proteins = list(filter(lambda x: len(x) <= max_len, proteins))
+        return proteins
 
     def __getitem__(self, idx):
         x = np.concatenate([self.proteins[idx].primary, self.proteins[idx].evolutionary], 1)
@@ -25,6 +36,14 @@ class ProteinDataset(D):
         self.proteins = [self.proteins[i] for i in perm]
         if self.weights is not None:
             self.weights = [self.weights[i] for i in perm]
+
+    @property
+    def max_length(self):
+        try:
+            return self._max_length
+        except AttributeError:
+            self._max_length = max(len(p) for p in self.proteins)
+            return self._max_length
 
     @property
     def dim(self):

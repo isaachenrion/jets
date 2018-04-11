@@ -8,6 +8,7 @@ import torch
 import torch.nn.functional as F
 
 from .data_ops.load_dataset import load_train_dataset
+from .data_ops.get_data_loader import get_train_data_loader
 from .data_ops.ProteinLoader import ProteinLoader as DataLoader
 
 from src.data_ops.wrapping import unwrap
@@ -77,14 +78,8 @@ class Training(_Training):
 
         return admin_args,model_args, data_args, computing_args, training_args, optim_args, loading_args
 
-    def load_data(self,dataset, data_dir, n_train, n_valid, batch_size, preprocess, **kwargs):
-        intermediate_dir, data_filename = DATASETS[dataset]
-        data_dir = os.path.join(data_dir, intermediate_dir)
-        train_dataset, valid_dataset = load_train_dataset(data_dir, data_filename,n_train, n_valid, preprocess)
-        train_data_loader = DataLoader(train_dataset, batch_size, **kwargs)
-        valid_data_loader = DataLoader(valid_dataset, batch_size, **kwargs)
-
-        return train_data_loader, valid_data_loader
+    def load_data(self,*args,**kwargs):
+        return get_train_data_loader(*args,**kwargs)
 
     def loss(self, y_pred, y, mask):
         return F.binary_cross_entropy(y_pred * mask, y * mask)
