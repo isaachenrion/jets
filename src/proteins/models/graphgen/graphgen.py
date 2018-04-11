@@ -24,6 +24,7 @@ from src.monitors import Histogram
 from src.monitors import Collect
 from src.monitors import BatchMatrixMonitor
 
+from src.admin.utils import memory_snapshot
 #from src.misc.grad_mode import no_grad
 
 def entry_distance_matrix(n):
@@ -105,7 +106,6 @@ class GraphGen(nn.Module):
 
     def forward(self, x, mask=None, **kwargs):
 
-
         if self.no_grad:
             A = self.forward_no_grad(x, mask, **kwargs)
         else:
@@ -114,13 +114,14 @@ class GraphGen(nn.Module):
         return A
 
     def forward_with_grad(self, x, mask, **kwargs):
-
+        #with memory_snapshot():
         bs = x.size()[0]
         n_vertices = x.size()[1]
 
-        h = self.content_embedding(x)
+        h = Variable(x.data, volatile=False)
         s = spatial_variable(bs, n_vertices)
-
+        h = self.content_embedding(h)
+        s = self.positional_update(s, h)
         A = self.adj(s, mask, **kwargs)
 
         for i, mp in enumerate(self.mp_layers):
@@ -128,51 +129,41 @@ class GraphGen(nn.Module):
             s = self.positional_update(s, h)
             A = self.adj(s, mask, **kwargs)
 
-        #del s
-        #del h
         return A
 
     def forward_no_grad(self, x, mask, **kwargs):
-
+        #with memory_snapshot():
         bs, n_vertices, _ = x.size()
-
-        h = Variable(x.data)
-        s = spatial_variable(bs, n_vertices)
-
-        n_volatile_layers = np.random.randint(0, self.iters)
+        #n_volatile_layers = np.random.randint(0, self.iters)
+        n_volatile_layers = self.iters - 1
 
         if n_volatile_layers == 0:
-            h = self.embedding(h)
-            #h = h + self.encode_position(bs, n_vertices)
+            h = Variable(x.data, volatile=False)
+            s = spatial_variable(bs, n_vertices)
+            h = self.content_embedding(h)
             s = self.positional_update(s, h)
-            #spatial = h[:,:,:3].contiguous()
             A = self.adj(s, mask, **kwargs)
             return A
 
-        h.volatile = True
-
-        h = self.embedding(h)
-        #h = h + self.encode_position(bs, n_vertices)
-
-        #spatial = h[:,:,:3].contiguous()
+        h = Variable(x.data, volatile=True)
+        s = spatial_variable(bs, n_vertices)
+        h = self.content_embedding(h)
+        s = self.positional_update(s, h)
         A = self.adj(s, mask, **kwargs)
-
-
 
         for i in range(n_volatile_layers):
             mp = self.mp_layers[i]
             h = mp(h, A)
             s = self.positional_update(s, h)
-            #spatial = h[:,:,:3].contiguous()
             A = self.adj(s, mask, **kwargs)
 
-        h.volatile = False
-        A.volatile = False
+        h = Variable(h.data)
+        s = Variable(s.data)
+        A = Variable(A.data)
 
         mp = self.mp_layers[n_volatile_layers]
         h = mp(h, A)
         s = self.positional_update(s, h)
-        #spatial = h[:,:,:3].contiguous()
         A = self.adj(s, mask, **kwargs)
 
         return A

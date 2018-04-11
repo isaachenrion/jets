@@ -3,15 +3,10 @@ import time
 import csv
 import os
 
-import torch
-import torch.nn.functional as F
-
-from src.misc.constants import DATASETS
-
 from src.utils._Evaluation import _Evaluation
 
-from .data_ops.load_dataset import load_test_dataset
-from .data_ops.ProteinLoader import ProteinLoader as DataLoader
+from .data_ops.load_dataset import get_test_data_loader
+from .experiment import _validation
 from .models import ModelBuilder
 from .Administrator import Administrator
 
@@ -76,30 +71,7 @@ class Evaluation(_Evaluation):
 
 
     def load_data(self,dataset, data_dir, n_test,  batch_size, preprocess, **kwargs):
-        intermediate_dir, data_filename = DATASETS[dataset]
-        data_dir = os.path.join(data_dir, intermediate_dir)
-        dataset = load_test_dataset(data_dir, data_filename,n_test, preprocess)
-        data_loader = DataLoader(dataset, batch_size, **kwargs)
-        return data_loader
-
-    def loss(self, y_pred, y, mask):
-        return F.binary_cross_entropy(y_pred * mask, y * mask)
+        return get_test_data_loader(dataset, data_dir, n_test,  batch_size, preprocess, **kwargs)
 
     def test_one_model(self,model, data_loader):
-        model.eval()
-
-        valid_loss = 0.
-        yy, yy_pred = [], []
-        for i, (x, x_mask, y, y_mask) in enumerate(data_loader):
-            y_pred = model(x, mask=x_mask)
-            vl = self.loss(y_pred, y, y_mask); valid_loss += float(unwrap(vl))
-            yy.append(unwrap(y))
-            yy_pred.append(unwrap(y_pred))
-
-        valid_loss /= len(data_loader)
-        logdict = dict(
-            yy=yy,
-            yy_pred=yy_pred,
-            test_loss=valid_loss,
-        )
-        return logdict
+        return _validation(model, data_loader)

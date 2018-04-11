@@ -35,6 +35,7 @@ def _flatten_all_inputs(yy, yy_pred, mask):
 
     return yy, yy_pred
 
+
 class ROCAUC(ScalarMonitor):
     def __init__(self, **kwargs):
         super().__init__('roc_auc', **kwargs)

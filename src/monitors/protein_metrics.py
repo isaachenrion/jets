@@ -37,8 +37,6 @@ def compute_protein_metrics(targets, predictions, k):
             sorted_idx = np.argsort(prediction[:, indices])[:, ::-1]
             topM_predicted_indices = indices[sorted_idx[:, :M]]
             target_topM = np.array([target[i,idx] for i,idx in enumerate(topM_predicted_indices)])
-            #import ipdb; ipdb.set_trace()
-
             accuracy = target_topM.sum(1) / M
             return accuracy
 
@@ -52,8 +50,6 @@ def compute_protein_metrics(targets, predictions, k):
     acc_long = np.concatenate(acc_long, 0)
     acc_med = np.concatenate(acc_med, 0)
     acc_short = np.concatenate(acc_short, 0)
-    #import ipdb; ipdb.set_trace()
-    #import ipdb; ipdb.set_trace()
 
     acc = np.mean(acc)
     acc_long = np.mean(acc_long)
@@ -88,6 +84,5 @@ class ProteinMetrics(ScalarMonitor):
         return "\nL/{}".format(self.k)+"\t".join([c.string for c in self.collectors])
 
     def visualize(self, **kwargs):
-        #import ipdb; ipdb.set_trace()
         for c in self.collectors:
             c.visualize(**kwargs)

@@ -6,6 +6,8 @@ import gc
 from functools import reduce
 import operator as op
 import torch
+import numpy as np
+
 if torch.cuda.is_available():
     import GPUtil
 
@@ -67,14 +69,19 @@ def get_tensors_in_memory(ndim=None):
 
 def get_bytes(tensor_list):
     #total_bytes = float(reduce(lambda x,y:x+y, map(lambda x: total_size(x) * x.element_size(), tensor_list))) if len(tensor_list) > 0 else 0
-    total_bytes = float(reduce(lambda x,y:max(x,y), map(lambda x: total_size(x) * x.element_size(), tensor_list))) if len(tensor_list) > 0 else 0
+    sizes = [t.size() for t in tensor_list]
+    total_sizes = [np.prod(s) for s in sizes]
+    total_bytes = sum(total_sizes) * 4 # 4 is for 32 bit numbers since 4 * 8 bits
+    #import ipdb; ipdb.set_trace()
+
+    #total_bytes = float(reduce(lambda x,y:max(x,y), map(lambda x: total_size(x) * x.element_size(), tensor_list))) if len(tensor_list) > 0 else 0
     return total_bytes
 
 def total_size(t):
     s = t.size()
     if len(s) > 0:
         return reduce(op.mul, s)
-    return 0
+    return 1
 
 def see_tensors_in_memory(ndim=None):
     tensor_list = get_tensors_in_memory(ndim)
@@ -87,6 +94,25 @@ def see_cuda_tensors_in_memory(ndim=None):
     tensor_list = list(filter(lambda x: x.is_cuda, tensor_list))
     total_bytes = get_bytes(tensor_list)
     logging.info('There are {} CUDA tensors in memory, consuming {} total'.format(len(tensor_list), format_bytes(total_bytes)))
+
+class memory_snapshot:
+    def __init__(self, ndim=None, cuda=False):
+        self.cuda = cuda
+        self.ndim=ndim
+
+    def __enter__(self):
+        logging.info("BEFORE")
+        if self.cuda:
+            see_cuda_tensors_in_memory(self.ndim)
+        else:
+            see_tensors_in_memory(self.ndim)
+
+    def __exit__(self, type, value, traceback):
+        logging.info("AFTER")
+        if self.cuda:
+            see_cuda_tensors_in_memory(self.ndim)
+        else:
+            see_tensors_in_memory(self.ndim)
 
 
 def clear_all_tensors():
