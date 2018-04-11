@@ -18,10 +18,10 @@ class Administrator(_Administrator):
         valid_loss = Regurgitate('valid_loss', visualizing=True)
         best_valid_loss = Best(valid_loss)
         metric_monitors = [
-            #ProteinMetrics(k=1,visualizing=True),
-            #ProteinMetrics(k=2,visualizing=True),
-            #ProteinMetrics(k=5,visualizing=True),
-            #ProteinMetrics(k=10,visualizing=True),
+            ProteinMetrics(k=1,visualizing=True),
+            ProteinMetrics(k=2,visualizing=True),
+            ProteinMetrics(k=5,visualizing=True),
+            ProteinMetrics(k=10,visualizing=True),
             valid_loss,
             best_valid_loss,
             Regurgitate('train_loss', visualizing=True)

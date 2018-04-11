@@ -148,6 +148,7 @@ class Training(_Training):
         logger = administrator.logger
         (x, x_mask, y, y_mask) = batch
 
+        log_gpu_usage()
         # forward
         model.train()
         optimizer.zero_grad()
@@ -165,8 +166,8 @@ class Training(_Training):
             grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
 
 
+        log_gpu_usage()
         optimizer.step()
-
         if batch_number == 0:
             model_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
             for m in administrator.grad_monitors:

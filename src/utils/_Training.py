@@ -164,7 +164,7 @@ class _Training:
             train_loss += tl
 
             #del batch
-            see_tensors_in_memory(3)
+            
         scheduler.step()
 
         n_batches = len(data_loader)
