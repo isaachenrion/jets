@@ -40,4 +40,5 @@ class ScalarMonitor(Monitor):
 
     @property
     def string(self):
-        return "\t{} = {:.2f}\t".format(self.name, self.value)
+        s = "\t{:>10s} = {:.2f}".format(self.name, self.value)
+        return "{}".format(s)
