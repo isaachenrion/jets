@@ -98,14 +98,14 @@ def clear_all_tensors():
             pass
 
 def format_bytes(n):
-    n = str(n)
+    n = str(int(n))
     if len(n) < 4:
         return "{} b".format(n)
     elif len(n) < 7:
         return "{} kb".format(n[:-3])
     elif len(n) < 10:
-        return "{}.{} Mb".format(n[:-6], n[-6:-4])
+        return "{}.{} Mb".format(n[:-6], n[-6:-5])
     elif len(n) < 14:
-        return "{}.{} Gb".format(n[:-9], n[-9:-7])
+        return "{}.{} Gb".format(n[:-9], n[-9:-8])
     else:
-        return "{}.{} Tb".format(n[:-12], n[-12:-10])
+        return "{}.{} Tb".format(n[:-12], n[-12:-11])
