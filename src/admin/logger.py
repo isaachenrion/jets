@@ -4,68 +4,42 @@ import logging
 from collections import OrderedDict
 
 from src.visualizing.plot_training_stats import plot_training_stats
-
+from src.admin.MonitorCollection import MonitorCollection
 
 class Logger:
-    def __init__(self, directory, monitor_dict, visualizing, train):
+    def __init__(self, directory, monitor_dict, train):
         self.train = train
-        self.visualizing = visualizing
 
         self.statsdir = os.path.join(directory, 'stats')
         self.plotsdir = os.path.join(directory, 'plots')
-        os.makedirs(self.statsdir)
-        os.makedirs(self.plotsdir)
+
+        if not os.path.exists(self.statsdir):
+            os.makedirs(self.statsdir)
+        if not os.path.exists(self.plotsdir):
+            os.makedirs(self.plotsdir)
+
         self.scalar_filename = os.path.join(self.statsdir, 'scalars.csv')
 
-        self.monitors = OrderedDict()
-        self.visualized_scalar_monitors = []
-        self.headers = []
-        self.add_many_monitors(**monitor_dict)
+        self.monitor_collection = MonitorCollection(**monitor_dict)
+        self.monitor_collection.initialize(self.statsdir, self.plotsdir)
+
+        self.headers = self.monitor_collection.scalar_monitor_names
 
         with open(self.scalar_filename, 'a', newline='') as f:
             writer = csv.DictWriter(f, self.headers)
             writer.writeheader()
 
-        #import ipdb; ipdb.set_trace()
-
-    def add_many_monitors(self, **monitors):
-        for name, monitor in monitors.items():
-            self.add_monitor(name, monitor)
-
-    def add_monitor(self, name, monitor):
-        self.monitors[name] = monitor
-        if monitor.scalar and monitor.visualizing:
-            self.visualized_scalar_monitors.append(name)
-        if monitor.scalar:
-            self.headers.append(name)
-        monitor.initialize(self.statsdir, self.plotsdir)
-        return monitor
-
-    def compute_monitors(self, **kwargs):
-        stats_dict = {}
-        for name, monitor in self.monitors.items():
-            monitor_value = monitor(**kwargs)
-            if monitor.scalar:
-                stats_dict[name] = monitor_value
-            if monitor.visualizing:
-                monitor.visualize()
-        return stats_dict
-
     def log_scalars(self, stats_dict):
         with open(self.scalar_filename, 'a', newline='') as f:
             writer = csv.DictWriter(f, self.headers)
-            writer.writerow(stats_dict)
+            writer.writerow({k:v for k,v in stats_dict.items() if k in self.headers})
         if self.train:
-            ##pass
-            plot_training_stats(self.scalar_filename, self.visualized_scalar_monitors, self.plotsdir)
+            plot_training_stats(self.scalar_filename, self.monitor_collection.visualized_scalar_monitor_names, self.plotsdir)
 
     def log(self, compute_monitors=True,**kwargs):
         if compute_monitors:
-            stats_dict = self.compute_monitors(**kwargs)
-            self.log_scalars(stats_dict)
+            stats_dict = self.monitor_collection(**kwargs)
+            self.monitor_collection.visualize()
         else:
-            self.log_scalars(kwargs)
-
-    def complete_logging(self):
-        for monitor in self.monitors.values():
-            monitor.finish()
+            stats_dict = kwargs
+        self.log_scalars(stats_dict)

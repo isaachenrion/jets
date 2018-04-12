@@ -11,13 +11,6 @@ def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number
     logger = administrator.logger
     (x, x_mask, y, y_mask) = batch
 
-    #logging.info('before backward')
-    #log_gpu_usage()
-    #if torch.cuda.is_available():
-    #    see_cuda_tensors_in_memory()
-    #else:
-    #    see_tensors_in_memory()
-
     # forward
     model.train()
     optimizer.zero_grad()
@@ -33,19 +26,20 @@ def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number
         old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
         grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
 
-    #logging.info('after backward')
     if batch_number == 1:
         log_gpu_usage()
-    #if torch.cuda.is_available():
-    #    see_cuda_tensors_in_memory()
-    #else:
-    #    see_tensors_in_memory()
 
     optimizer.step()
     if batch_number == 0:
         model_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
-        for m in administrator.grad_monitors:
-            m(model_params=model_params, old_params=old_params, grads=grads)
+
+        logdict = dict(
+            grads=grads,
+            old_params=old_params,
+            model_params=model_params
+        )
+        administrator.training_only_monitors(**logdict)
+        administrator.training_only_monitors.visualize()
 
     del y; del y_pred; del y_mask; del x; del x_mask; del batch
 

@@ -87,8 +87,30 @@ class ProteinMetrics(ScalarMonitor):
 
     @property
     def string(self):
-        return "\nL/{}".format(self.k)+"\t".join([c.string for c in self.collectors])
+        return "L/{}".format(self.k)+"\t".join([c.string for c in self.collectors])
 
     def visualize(self, **kwargs):
         for c in self.collectors:
             c.visualize(**kwargs)
+
+class ProteinMetricCollection(ScalarMonitor):
+    def __init__(self, *k_values, **kwargs):
+        super().__init__(name='protein_metrics_collection', **kwargs)
+        self.protein_metrics = [ProteinMetrics(k, **kwargs) for k in k_values]
+
+    def call(self, **kwargs):
+        for p in self.protein_metrics:
+            p(**kwargs)
+        return None
+
+    def initialize(self, *args):
+        for p in self.protein_metrics:
+            p.initialize(*args)
+
+    @property
+    def string(self):
+        return "\n".join([p.string for p in self.protein_metrics]) + "\n"
+
+    def visualize(self, **kwargs):
+        for p in self.protein_metrics:
+            p.visualize(**kwargs)

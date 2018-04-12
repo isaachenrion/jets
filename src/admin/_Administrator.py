@@ -83,6 +83,8 @@ class _Administrator:
 
 
         self.cuda_and_random_seed(gpu, seed, passed_args)
+        self.passed_args = passed_args
+
         self.create_all_model_dirs()
         self.setup_model_directory(dataset, model)
         self.setup_logging(silent, verbose)
@@ -183,7 +185,7 @@ class _Administrator:
 
     def setup_logger(self):
         monitor_dict = self.setup_monitors()
-        self.logger = Logger(self.exp_dir, monitor_dict, visualizing=False, train=self.train)
+        self.logger = Logger(self.exp_dir, monitor_dict, train=self.train)
 
 
     def record_settings(self, passed_args):
@@ -210,18 +212,18 @@ class _Administrator:
 
         self.logger.log(**kwargs)
         if kwargs['epoch'] == 1 and self.emailer is not None:
-            self.emailer.send_msg(self.logger.monitors['eta'].value, "Job {}-{} on {} ETA: {}".format(self.slurm_array_job_id, self.slurm_array_task_id, self.host.split('.')[0], self.logger.monitors['eta'].value))
+            self.emailer.send_msg(self.logger.monitor_collection.monitors['eta'].value, "Job {}-{} on {} ETA: {}".format(self.slurm_array_job_id, self.slurm_array_task_id, self.host.split('.')[0], self.logger.monitor_collection.monitors['eta'].value))
         out_str = "{:5}\t".format(
-                self.logger.monitors['iteration'].value)
-        for monitor in self.metric_monitors:
-            out_str += monitor.string
+                self.logger.monitor_collection.monitors['iteration'].value)
+        out_str += self.logger.monitor_collection.string
+        
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)
 
     def log_test(self,**kwargs):
         self.logger.log(**kwargs)
         out_str = "{:5}\t".format(
-                self.logger.monitors['model'].value)
+                self.logger.monitor_collection.monitors['model'].value)
         for monitor in self.metric_monitors:
             out_str += monitor.string
         self.signal_handler.results_strings.append(out_str)
@@ -286,8 +288,8 @@ class EvaluationExperimentHandler(_Administrator):
             out_str = "\tModel = {}\t1/FPR @ TPR = 0.5={:.4f}\troc_auc={:.4f}".format(
                     0,
                     #kwargs['model'],
-                    self.logger.monitors['inv_fpr'].value if kwargs.get('compute_monitors', True) else kwargs['inv_fpr'],
-                    self.logger.monitors['roc_auc'].value if kwargs.get('compute_monitors', True) else kwargs['roc_auc']
+                    self.logger.monitor_collection.monitors['inv_fpr'].value if kwargs.get('compute_monitors', True) else kwargs['inv_fpr'],
+                    self.logger.monitor_collection.monitors['roc_auc'].value if kwargs.get('compute_monitors', True) else kwargs['roc_auc']
                     )
         else:
             if not short:

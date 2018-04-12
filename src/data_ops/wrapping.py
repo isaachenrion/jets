@@ -9,13 +9,10 @@ def wrap(x):
         x = x.cuda()
     return x
 
-
 def unwrap(y_wrap):
     if y_wrap.is_cuda:
         y = y_wrap.cpu().data.numpy()
     else:
         y = y_wrap.data.numpy()
-    #del y_wrap
-    #gc.collect()
     y = np.array(y)
     return y

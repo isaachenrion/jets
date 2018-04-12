@@ -19,13 +19,16 @@ class Monitor:
         return self.value
 
     def visualize(self):
+        if not self.visualizing:
+            return
         self.visualize_count += 1
 
     def call(self, **kwargs):
         pass
 
-    def finish(self):
-        pass
+    @property
+    def string(self):
+        return None
 
 class ScalarMonitor(Monitor):
     def __init__(self, name, numerical=True,**kwargs):
@@ -36,9 +39,7 @@ class ScalarMonitor(Monitor):
     def visualize(self):
         super().visualize()
 
-        #self.visualize_count += 1
-
     @property
     def string(self):
-        s = "\t{:>10s} = {:.2f}".format(self.name, self.value)
-        return "{}".format(s)
+        s = "\t{:>15s} = {:.2f}".format(self.name, self.value)
+        return s
