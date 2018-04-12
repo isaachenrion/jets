@@ -46,7 +46,7 @@ def my_bce_loss(input, target, weight=None, reduce=True):
     minvar = Variable(torch.Tensor([1e-20]))
     if torch.cuda.is_available():
         minvar = minvar.cuda()
-    input = torch.log(torch.max(input, minvar)))
+    input = torch.log(torch.max(input, minvar))
 
     if not (target.size() == input.size()):
         raise ValueError("Target size ({}) must be the same as input size ({})".format(target.size(), input.size()))
