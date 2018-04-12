@@ -46,10 +46,10 @@ class Training(_Training):
             admin_args.verbose = True
 
             training_args.batch_size = 3
-            training_args.epochs = 5
+            training_args.epochs = 15
 
             data_args.n_train = 12
-            data_args.n_valid = 10
+            data_args.n_valid = 100
 
             optim_args.lr = 0.1
             optim_args.period = 2
@@ -57,7 +57,7 @@ class Training(_Training):
             computing_args.seed = 1
 
             model_args.hidden = 1
-            model_args.iters = 1
+            model_args.iters = 2
             model_args.lf = 2
 
         return admin_args,model_args, data_args, computing_args, training_args, optim_args, loading_args

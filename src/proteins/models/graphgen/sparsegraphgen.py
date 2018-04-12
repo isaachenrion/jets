@@ -22,11 +22,12 @@ from src.monitors import BatchMatrixMonitor
 def sparse_topk(matrix, k):
     n = matrix.size()[0]
     matrix_sorted, indices = torch.sort(matrix, descending=True)
-    topk_indices, sorted_indices  = torch.sort(indices[:,:k])
+    topk_indices, _  = torch.sort(indices[:,:k])
     sparse_indices = torch.LongTensor([[i, x] for i in range(n) for x in topk_indices[i] ]).t()
     sparse_data = matrix[sparse_indices[0], sparse_indices[1]]
     sparse_matrix = torch.sparse.FloatTensor(sparse_indices, sparse_data, matrix.size())
     return sparse_matrix
+
 
 def sparse(dense):
     indices = torch.nonzero(dense).t()

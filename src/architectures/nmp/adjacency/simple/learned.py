@@ -67,11 +67,7 @@ class NegativeNorm(_Adjacency):
         h_r = h.view(shp[0], 1, shp[1], shp[2])
         A = torch.norm(h_l - h_r, 2, 3)
         return -A
-        #A = F.sigmoid(A)
-        #if mask is None:
-        #    return A
-        #return mask * A
-
+        
 class NegativeSquare(_Adjacency):
     def __init__(self, index='',temperature=1, **kwargs):
         name='rbf'+index

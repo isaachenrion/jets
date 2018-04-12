@@ -6,6 +6,9 @@ from .baseclasses import ScalarMonitor, Monitor
 from .meta import Collect
 from .metrics import _flatten_all_inputs
 
+import torch
+from torch.autograd import Variable
+
 def accuracy_wrt_indices(target, prediction, indices, k):
     sorted_idx = np.argsort(prediction[:, indices])[::-1]
     topk_predicted_indices = indices[sorted_idx[:, :k]]
@@ -17,6 +20,9 @@ def compute_protein_metrics(targets, predictions, k):
     acc, acc_med, acc_long, acc_short = ([None for _ in range(len(targets))] for _ in range(4))
 
     for i, (target, prediction) in enumerate(zip(targets, predictions)):
+        #arget = np.random.randint(0,2,target.shape)
+        #import ipdb; ipdb.set_trace()
+
         M = int(float(prediction.shape[1]) / k)
 
         indices = np.arange(prediction.shape[1] ** 2)

@@ -61,8 +61,13 @@ def spatial_variable(bs, n_vertices):
     return s
 
 
+def dense_topk():
+    b, n, n = matrix.size()
+    matrix_sorted, indices = torch.sort(matrix, descending=True)
+    topk_indices, _  = torch.sort(indices[:,:,:k])
+    return topk_indices
 
-class GraphGen(nn.Module):
+class NearestNeighbors(nn.Module):
     def __init__(self,
         features=None,
         hidden=None,
@@ -119,8 +124,6 @@ class GraphGen(nn.Module):
 
         h = Variable(x.data, volatile=False)
         s = spatial_variable(bs, n_vertices)
-        #import ipdb; ipdb.set_trace()
-
         h = self.content_embedding(h)
         s = self.positional_update(s, h)
         A = self.adj(s, mask, **kwargs)
