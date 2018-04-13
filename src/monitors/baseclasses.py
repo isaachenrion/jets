@@ -1,12 +1,13 @@
 import numpy as np
 
 class Monitor:
-    def __init__(self, name, visualizing=False):
+    def __init__(self, name, visualizing=False, printing=True):
         self.value = None
         self.name = name
         self.scalar = None
         self.boolean = None
         self.visualizing = visualizing
+        self.printing = printing
         self.visualize_count = 0
 
     def initialize(self, statsdir, plotsdir):
@@ -23,12 +24,20 @@ class Monitor:
             return
         self.visualize_count += 1
 
+    @property
+    def string(self):
+        if not self.printing:
+            return None
+        else:
+            return self._string
+
+    @property
+    def _string(self):
+        return None
+
     def call(self, **kwargs):
         pass
 
-    @property
-    def string(self):
-        return None
 
 class ScalarMonitor(Monitor):
     def __init__(self, name, numerical=True,**kwargs):
@@ -40,6 +49,6 @@ class ScalarMonitor(Monitor):
         super().visualize()
 
     @property
-    def string(self):
+    def _string(self):
         s = "\t{:>15s} = {:.2f}".format(self.name, self.value)
         return s

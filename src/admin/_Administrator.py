@@ -213,10 +213,10 @@ class _Administrator:
         self.logger.log(**kwargs)
         if kwargs['epoch'] == 1 and self.emailer is not None:
             self.emailer.send_msg(self.logger.monitor_collection.monitors['eta'].value, "Job {}-{} on {} ETA: {}".format(self.slurm_array_job_id, self.slurm_array_task_id, self.host.split('.')[0], self.logger.monitor_collection.monitors['eta'].value))
-        out_str = "{:5}\t".format(
+        out_str = "ITERATION {:5}\n".format(
                 self.logger.monitor_collection.monitors['iteration'].value)
         out_str += self.logger.monitor_collection.string
-        
+
         self.signal_handler.results_strings.append(out_str)
         logging.info(out_str)
 
@@ -233,80 +233,9 @@ class _Administrator:
         self.saver.save(model, settings)
 
     def finished(self):
-        self.logger.complete_logging()
         self.signal_handler.completed()
 
     def initial_email(self):
         text = ['JOB STARTED', self.exp_dir, self.host.split('.')[0], str(self.pid)]
         if self.emailer is not None:
             self.emailer.send_msg('\n'.join(text), ' | '.join(text))
-
-
-class EvaluationExperimentHandler(_Administrator):
-    def __init__(self, latex=None, **kwargs):
-        super().__init__(**kwargs)
-        self.latex = latex
-
-    #def model_directory(self, args):
-    #    self.root_dir = args.root_dir
-    #    self.model_type_dir = args.model_dir
-    #    self.leaf_dir = self.model_type_dir
-    #    i = 0
-    #    temp = self.leaf_dir + '/run' + str(i)
-    #    while os.path.exists(os.path.join(self.root_dir,temp)):
-    #        i += 1
-    #        temp = self.leaf_dir + '/run' + str(i)
-    #    self.leaf_dir = temp
-    #    self.exp_dir = os.path.join(self.root_dir,self.leaf_dir)
-    #    print(self.exp_dir)
-    #    os.makedirs(self.exp_dir)
-
-    def setup_logger(self, _, visualizing):
-        ''' STATS LOGGER '''
-        '''----------------------------------------------------------------------- '''
-        roc_auc = ROCAUC()
-        inv_fpr = InvFPR()
-        roc_curve = ROCCurve()
-        #model_counter = Regurgitate('model', visualizing=False)
-        logtimer=Collect('logtime', fn='mean')
-        prediction_histogram = EachClassHistogram([0,1], 'yy', 'yy_pred', append=True)
-        monitors = [
-            #model_counter,
-            roc_auc,
-            inv_fpr,
-            roc_curve,
-            prediction_histogram,
-            logtimer
-        ]
-        monitors = {m.name: m for m in monitors}
-        self.logger = Logger(self.exp_dir, monitors, visualizing, train=False)
-
-    def log(self, **kwargs):
-        self.logger.log(**kwargs)
-
-        if not self.latex:
-            out_str = "\tModel = {}\t1/FPR @ TPR = 0.5={:.4f}\troc_auc={:.4f}".format(
-                    0,
-                    #kwargs['model'],
-                    self.logger.monitor_collection.monitors['inv_fpr'].value if kwargs.get('compute_monitors', True) else kwargs['inv_fpr'],
-                    self.logger.monitor_collection.monitors['roc_auc'].value if kwargs.get('compute_monitors', True) else kwargs['roc_auc']
-                    )
-        else:
-            if not short:
-                logging.info("%10s \t& %30s \t& %.4f $\pm$ %.4f \t& %.1f $\pm$ %.1f \\\\" %
-                      (input,
-                       label,
-                       np.mean(rocs),
-                       np.std(rocs),
-                       np.mean(inv_fprs[:, 225]),
-                       np.std(inv_fprs[:, 225])))
-            else:
-                logging.info("%30s \t& %.4f $\pm$ %.4f \t& %.1f $\pm$ %.1f \\\\" %
-                      (label,
-                       np.mean(rocs),
-                       np.std(rocs),
-                       np.mean(inv_fprs[:, 225]),
-                       np.std(inv_fprs[:, 225])))
-
-        self.signal_handler.results_strings.append(out_str)
-        logging.info(out_str)

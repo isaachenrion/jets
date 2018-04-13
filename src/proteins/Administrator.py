@@ -28,17 +28,12 @@ class Administrator(_Administrator):
 
         self.training_only_monitors = MonitorCollection(**monitor_dict)
         self.training_only_monitors.initialize(self.logger.statsdir, self.logger.plotsdir)
-        #return monitor_dict
-
+        
     def setup_training_monitors(self):
 
         valid_loss = Regurgitate('valid_loss', visualizing=True)
         best_valid_loss = Best(valid_loss, track='min')
         metric_monitors = [
-            #ProteinMetrics(k=1,visualizing=True),
-            #ProteinMetrics(k=2,visualizing=True),
-            #ProteinMetrics(k=5,visualizing=True),
-            #ProteinMetrics(k=10,visualizing=True),
             ProteinMetricCollection(1,2,5,10,visualizing=True),
             valid_loss,
             best_valid_loss,
@@ -48,16 +43,16 @@ class Administrator(_Administrator):
         self.metric_monitors = metric_monitors
 
         time_monitors = [
-            Regurgitate('epoch', visualizing=False),
-            Regurgitate('iteration', visualizing=False),
+            Regurgitate('epoch', visualizing=False, printing=False),
+            Regurgitate('iteration', visualizing=False, printing=False),
             Hours(),
-            Collect('time', fn='sum', visualizing=False),
+            Collect('time', fn='sum', visualizing=False, printing=False),
             ETA(self.start_dt, self.epochs)
         ]
 
         model_file = os.path.join(self.exp_dir, 'model_state_dict.pt')
         settings_file = os.path.join(self.exp_dir, 'settings.pickle')
-        saver = Saver(best_valid_loss, model_file, settings_file, visualizing=False)
+        saver = Saver(best_valid_loss, model_file, settings_file, visualizing=False, printing=False)
 
         admin_monitors = [
             saver,

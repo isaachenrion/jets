@@ -4,24 +4,11 @@ import logging
 import numpy as np
 from .baseclasses import ScalarMonitor, Monitor
 from .meta import Collect
-from .metrics import _flatten_all_inputs
-
-import torch
-from torch.autograd import Variable
-
-def accuracy_wrt_indices(target, prediction, indices, k):
-    sorted_idx = np.argsort(prediction[:, indices])[::-1]
-    topk_predicted_indices = indices[sorted_idx[:, :k]]
-    target_topk = np.take(target, topk_predicted_indices)
-    accuracy = target_topk.sum(1) / k
-    return accuracy
 
 def compute_protein_metrics(targets, predictions, k):
     acc, acc_med, acc_long, acc_short = ([None for _ in range(len(targets))] for _ in range(4))
 
     for i, (target, prediction) in enumerate(zip(targets, predictions)):
-        #arget = np.random.randint(0,2,target.shape)
-        #import ipdb; ipdb.set_trace()
 
         M = int(float(prediction.shape[1]) / k)
 
@@ -86,7 +73,7 @@ class ProteinMetrics(ScalarMonitor):
             c.initialize(statsdir, plotsdir)
 
     @property
-    def string(self):
+    def _string(self):
         return "L/{}".format(self.k)+"\t".join([c.string for c in self.collectors])
 
     def visualize(self, **kwargs):
@@ -108,7 +95,7 @@ class ProteinMetricCollection(ScalarMonitor):
             p.initialize(*args)
 
     @property
-    def string(self):
+    def _string(self):
         return "\n".join([p.string for p in self.protein_metrics]) + "\n"
 
     def visualize(self, **kwargs):

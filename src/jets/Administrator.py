@@ -2,15 +2,32 @@ from src.admin._Administrator import _Administrator
 
 from src.monitors import *
 from collections import OrderedDict
+from src.admin.MonitorCollection import MonitorCollection
 class Administrator(_Administrator):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.setup_training_only_monitors()
+
 
     def setup_monitors(self):
         if self.train:
             return self.setup_training_monitors()
         else:
             return self.setup_testing_monitors()
+
+    def setup_training_only_monitors(self):
+        grad_monitors = [
+            GradNorm(fn='last',visualizing=True),
+            ParamNorm(fn='last', visualizing=True),
+            UpdateRatio(fn='last', visualizing=True)
+        ]
+        monitors = grad_monitors
+
+        monitor_dict = OrderedDict()
+        for m in monitors: monitor_dict[m.name] = m
+
+        self.training_only_monitors = MonitorCollection(**monitor_dict)
+        self.training_only_monitors.initialize(self.logger.statsdir, self.logger.plotsdir)
 
     def setup_training_monitors(self):
         roc_auc = ROCAUC(visualizing=True)
@@ -30,17 +47,15 @@ class Administrator(_Administrator):
         self.metric_monitors = metric_monitors
 
         time_monitors = [
-            Regurgitate('epoch', visualizing=False),
-            Regurgitate('iteration', visualizing=False),
-            Collect('logtime', fn='last', visualizing=False),
+            Regurgitate('epoch', visualizing=False, printing=False),
+            Regurgitate('iteration', visualizing=False, printing=False),
             Hours(),
-            Collect('time', fn='sum', visualizing=False),
             ETA(self.start_dt, self.epochs)
         ]
 
         model_file = os.path.join(self.exp_dir, 'model_state_dict.pt')
         settings_file = os.path.join(self.exp_dir, 'settings.pickle')
-        saver = Saver(best_inv_fpr, model_file, settings_file, visualizing=False)
+        saver = Saver(best_inv_fpr, model_file, settings_file, visualizing=False, printing=False)
 
         admin_monitors = [
             saver,

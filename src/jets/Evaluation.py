@@ -16,6 +16,7 @@ from .data_ops.load_dataset import load_test_dataset
 from .data_ops.JetLoader import JetLoader as DataLoader
 from .models import ModelBuilder
 from .Administrator import Administrator
+from .experiment import _validation
 
 class Evaluation(_Evaluation):
     '''
@@ -90,23 +91,5 @@ class Evaluation(_Evaluation):
     def loss(self, y_pred, y):
         return F.binary_cross_entropy(y_pred.squeeze(1), y)
 
-    def test_one_model(self,model, data_loader, filename):
-
-        model.eval()
-
-        valid_loss = 0.
-        yy, yy_pred = [], []
-        for i, (x, y) in enumerate(data_loader):
-            y_pred = model(x)
-            vl = self.loss(y_pred, y); valid_loss += float(unwrap(vl))
-            yv = unwrap(y); y_pred = unwrap(y_pred)
-            yy.append(yv); yy_pred.append(y_pred)
-
-        valid_loss /= len(data_loader)
-        logdict = dict(
-            yy=yy,
-            yy_pred=yy_pred,
-            test_loss=valid_loss,
-            model=filename
-        )
-        return logdict
+    def test_one_model(self,*args):
+        return _validation(*args)
