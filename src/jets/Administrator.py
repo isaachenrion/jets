@@ -30,7 +30,7 @@ class Administrator(_Administrator):
         self.training_only_monitors.initialize(self.logger.statsdir, self.logger.plotsdir)
 
     def setup_training_monitors(self):
-        roc_auc = ROCAUC(visualizing=True)
+        roc_auc = ROCAUC(visualizing=True, ndp=5)
         inv_fpr = InvFPR(visualizing=True)
         best_inv_fpr = Best(inv_fpr)
         roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
@@ -40,8 +40,8 @@ class Administrator(_Administrator):
             best_inv_fpr,
             roc_auc,
             roc_auc_at_best_inv_fpr,
-            Regurgitate('valid_loss', visualizing=True),
-            Regurgitate('train_loss', visualizing=True)
+            Regurgitate('valid_loss', ndp=3,visualizing=True),
+            Regurgitate('train_loss', ndp=3,visualizing=True)
 
         ]
         self.metric_monitors = metric_monitors
@@ -69,7 +69,7 @@ class Administrator(_Administrator):
         #        ]
 
         optim_monitors = [
-            Collect('lr', fn='last', visualizing=True),
+            Collect('lr', fn='last', ndp=8,visualizing=True),
         ]
         grad_monitors = [
             GradNorm(fn='last',visualizing=True),

@@ -40,15 +40,16 @@ class Monitor:
 
 
 class ScalarMonitor(Monitor):
-    def __init__(self, name, numerical=True,**kwargs):
+    def __init__(self, name, numerical=True, ndp=2,**kwargs):
         super().__init__(name, **kwargs)
         self.numerical = numerical
         self.scalar = True
+        self.ndp = ndp
 
     def visualize(self):
         super().visualize()
 
     @property
     def _string(self):
-        s = "\t{:>15s} = {:.2f}".format(self.name, self.value)
+        s = "\t{:>15s} = {:.{x}f}".format(self.name, self.value, x=self.ndp)
         return s
