@@ -19,15 +19,10 @@ class ProteinLoader(_DataLoader):
         super().__init__(dataset, batch_size)
         self.dropout = dropout
         self.permute_vertices = permute_vertices
-        #self.n_max = 100
         self.n_max = None
 
 
     def collate(self, data_tuples):
-        #gc.collect()
-        #logging.info('before collation')
-        #see_tensors_in_memory(3)
-
         t = time.time()
         X, X_mask = self.preprocess_x([x for x, _, _ in data_tuples])
         Y = self.preprocess_y([y for _, y, _ in data_tuples])
@@ -40,23 +35,21 @@ class ProteinLoader(_DataLoader):
             Y = Y[:, :self.n_max, :self.n_max]
             Y_mask = Y_mask[:, :self.n_max, :self.n_max]
 
-        #logging.info('after collation')
-        #see_tensors_in_memory(3)
-
         return X, X_mask, Y, Y_mask
 
     def preprocess_mask(self, mask_list):
         mask = [torch.from_numpy(mask) for mask in mask_list]
         mask, _ = pad_tensors(mask)
-        mask = 1 - torch.bmm(mask,torch.transpose(mask, 1,2))
+        mask = torch.bmm(mask,torch.transpose(mask, 1,2))
         mask = wrap(mask)
         return mask
 
     def preprocess_y(self, y_list):
         y_list = [torch.from_numpy(y) for y in y_list]
-        y,_ = pad_tensors(y_list)
+        y, mask = pad_tensors(y_list)
         y = compute_adjacency(y)
         y = contact_map(y, threshold=800)
+        y = y * mask
         y = wrap(y)
         return y
 
@@ -66,9 +59,6 @@ class ProteinLoader(_DataLoader):
             data = [torch.from_numpy(np.random.permutation(x)) for x in x_list]
         else:
             data = [torch.from_numpy(x) for x in x_list]
-
-        #if self.dropout is not None:
-        #    data = dropout(data, self.dropout)
 
         data, mask = pad_tensors_extra_channel(data)
 

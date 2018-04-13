@@ -29,6 +29,7 @@ class ProteinDataset(D):
         x = np.concatenate([self.proteins[idx].primary, self.proteins[idx].evolutionary], 1)
         y = self.proteins[idx].tertiary
         mask = self.proteins[idx].mask
+        #import ipdb; ipdb.set_trace()
         return x, y, mask
 
     def shuffle(self):

@@ -21,7 +21,6 @@ def compute_adjacency(coords):
     coords_j = coords.contiguous().view(bs, n_vertices, 1, space_dim, n_atoms).repeat(1, 1, n_vertices, 1, 1)
     dij = ((coords_i - coords_j)[:,:,:,:,1]**2)
     dij = torch.sqrt(dij.sum(-1))
-    #gc.collect()
     return dij
 
 def contact_map(adjacency, threshold):

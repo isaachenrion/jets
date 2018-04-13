@@ -15,6 +15,7 @@ def _validation(model, data_loader):
     for i, batch in enumerate(data_loader):
         (x, x_mask, y, y_mask) = batch
         y_pred = model(x, mask=x_mask)
+        #y_pred = y_pred * y_mask
         vl = loss(y_pred, y, y_mask)
         valid_loss = valid_loss + float(unwrap(vl))
 

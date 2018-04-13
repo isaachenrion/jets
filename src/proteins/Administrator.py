@@ -59,11 +59,6 @@ class Administrator(_Administrator):
             ]
         self.saver = saver
 
-        #if torch.cuda.is_available():
-        #    admin_monitors += [
-        #        Collect('gpu_load',fn='last', visualizing=True),
-        #        Collect('gpu_util',fn='last', visualizing=True),
-        #        ]
 
         optim_monitors = [
             Collect('lr', fn='last', visualizing=True, ndp=8),

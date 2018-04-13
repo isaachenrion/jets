@@ -62,20 +62,13 @@ class Administrator(_Administrator):
             ]
         self.saver = saver
 
-        #if torch.cuda.is_available():
-        #    admin_monitors += [
-        #        Collect('gpu_load',fn='last', visualizing=True),
-        #        Collect('gpu_util',fn='last', visualizing=True),
-        #        ]
 
         optim_monitors = [
             Collect('lr', fn='last', ndp=8,visualizing=True),
         ]
         grad_monitors = [
             GradNorm(fn='last',visualizing=True),
-            #GradVariance(fn='last', visualizing=True),
             ParamNorm(fn='last', visualizing=True),
-            #ParamVariance(fn='last', visualizing=True),
             UpdateRatio(fn='last', visualizing=True)
         ]
         self.grad_monitors = grad_monitors

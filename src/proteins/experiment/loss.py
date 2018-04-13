@@ -5,39 +5,14 @@ import numpy as np
 
 from src.data_ops.wrapping import wrap
 
-def __loss(y_pred, y, mask):
-    y_pred, y = y_pred * mask, y * mask
-    return my_bce_loss(y_pred, y)
-    #return F.binary_cross_entropy_with_logits(y_pred, y)
-    #return F.binary_cross_entropy(y_pred, y)
-
-def _loss(y_pred, y, y_mask):
-    n = y_pred.shape[1]
-    b_dists = distances(n)
-
-    y_pred = y_pred.view(-1, n ** 2)
-    y = y.view(-1, n ** 2)
-    #l = F.binary_cross_entropy(y_pred, y, reduce=False)
-    l = my_bce_loss(y_pred, y, reduce=False)
-
-    longidx = np.where(b_dists > 24)[0]
-    medidx = np.where((b_dists >= 12) & (b_dists <= 24))[0]
-    shortidx = np.where(b_dists < 12)[0]
-
-    l = reweight(l, longidx, 100)
-    l = reweight(l, medidx, 10)
-    l = reweight(l, shortidx, 1)
-    l = l.mean()
-    return l
-
 def loss(y_pred, y, y_mask):
     n = y_pred.shape[1]
     dists = wrap(torch.Tensor(distances(n)) ** (1./2.5))
 
     y_pred = y_pred.view(-1, n ** 2)
     y = y.view(-1, n ** 2)
-    #l = F.binary_cross_entropy(y_pred, y, reduce=False)
     l = my_bce_loss(y_pred, y, reduce=False)
+    l = l * y_mask.view(-1, n**2)
 
     n_pos = y.sum(1, keepdim=True)
     n_neg = (1 - y).sum(1, keepdim=True)
