@@ -41,6 +41,6 @@ class Logger:
             stats_dict = self.monitor_collection(**kwargs)
             self.monitor_collection.visualize()
         else:
-            #
+            # 
             stats_dict = kwargs
         self.log_scalars(stats_dict)
