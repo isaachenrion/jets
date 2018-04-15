@@ -67,6 +67,7 @@ def dense_topk():
     topk_indices, _  = torch.sort(indices[:,:,:k])
     return topk_indices
 
+
 class NearestNeighbors(nn.Module):
     def __init__(self,
         features=None,

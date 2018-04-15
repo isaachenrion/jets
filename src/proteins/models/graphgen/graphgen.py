@@ -1,5 +1,6 @@
 import os
 import logging
+from collections import OrderedDict
 
 import numpy as np
 
@@ -15,7 +16,6 @@ from src.architectures.nmp.message_passing import MP_LAYERS
 from src.architectures.nmp.adjacency import construct_adjacency
 from src.architectures.nmp.adjacency.simple.learned import NegativeNorm, NegativeSquare
 from src.architectures.nmp.adjacency.simple.matrix_activation import padded_matrix_softmax
-
 from src.architectures.readout import READOUTS
 from src.architectures.embedding import EMBEDDINGS
 from src.architectures.nmp.message_passing.vertex_update import GRUUpdate
@@ -60,6 +60,93 @@ def spatial_variable(bs, n_vertices):
         s = s.cuda()
     return s
 
+def conv_and_pad(in_planes, out_planes, kernel_size=17, stride=1):
+    # "3x3 convolution with padding"
+    padding = (kernel_size - 1) // 2
+    return nn.Conv1d(in_planes, out_planes, kernel_size=kernel_size, stride=stride, padding=padding, bias=False)
+
+class BasicBlock(nn.Module):
+    expansion = 1
+    def __init__(self, inplanes, planes, stride=1, downsample=None):
+        super(BasicBlock, self).__init__()
+        m = OrderedDict()
+        m['conv1'] = conv_and_pad(inplanes, planes, stride)
+        m['bn1'] = nn.BatchNorm1d(planes)
+        m['relu1'] = nn.ReLU(inplace=True)
+        m['conv2'] = conv_and_pad(planes, planes)
+        m['bn2'] = nn.BatchNorm1d(planes)
+        self.group1 = nn.Sequential(m)
+
+        self.relu= nn.Sequential(nn.ReLU(inplace=True))
+        self.downsample = downsample
+
+    def forward(self, x):
+
+        if self.downsample is not None:
+            residual = self.downsample(x)
+        else:
+            residual = x
+
+        out = self.group1(x) + residual
+
+        out = self.relu(out)
+
+        del residual
+
+        return out
+
+def squared_distance_matrix(x, y):
+    '''
+    Calculate the pairwise squared distances between two batches of matrices x and y.
+    Input
+        x: a tensor of shape (bs, n, d)
+        y: a tensor of shape (bs, m, d)
+    Output
+        dist: a tensor of shape (bs, n, m) where dist[i,j,k] = || x[i,j] - y[i,k] || ^ 2
+    '''
+    bs = x.size(0)
+    assert bs == y.size(0)
+
+    n = x.size(1)
+    m = y.size(1)
+
+    d = x.size(2)
+    assert d == y.size(2)
+
+    x = x.unsqueeze(2).expand(bs, n, m, d)
+    y = y.unsqueeze(1).expand(bs, n, m, d)
+
+    dist = torch.pow(x - y, 2).sum(3)
+
+    return dist
+
+class NMPBlock(nn.Module):
+    def __init__(self, dim):
+        super().__init__()
+        self.spatial_embedding = nn.Linear(dim, 3)
+
+        self.conv1d = BasicBlock(dim, dim)
+
+        self.message = nn.Sequential(
+                        nn.Linear(dim, dim),
+                        nn.ReLU(inplace=True)
+                        )
+
+        self.update = GRUUpdate(2 * dim, dim)
+
+    def forward(self, x, mask):
+        x_conv = self.conv1d(x.transpose(1,2)).transpose(1,2)
+
+        s = self.spatial_embedding(x)
+        A = torch.exp( - squared_distance_matrix(s, s) ) * mask
+        x_nmp = torch.bmm(A, self.message(x))
+
+        x_in = torch.cat([x_conv, x_nmp], -1)
+
+        x = self.update(x, x_in)
+
+        return x
+
 
 
 class GraphGen(nn.Module):
@@ -77,32 +164,22 @@ class GraphGen(nn.Module):
 
         super().__init__()
 
-        self.iters = iters
+        #self.iters = iters
         self.no_grad = no_grad
         if no_grad and not tied:
             logging.warning('no_grad set to True but tied = False. Setting tied = True')
             tied = True
 
-        emb_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
-        self.content_embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, n_layers=int(emb_init), **emb_kwargs)
-        self.spatial_embedding = EMBEDDINGS['n'](dim_in=hidden, dim_out=3, n_layers=int(emb_init), **emb_kwargs)
+        self.initial_embedding = nn.Linear(features, hidden)
 
-        mp_kwargs = {x: kwargs[x] for x in ['act', 'wn', 'update', 'message', 'matrix', 'matrix_activation']}
-        MPLayer = MP_LAYERS['m1']
         if tied:
-            mp = MPLayer(hidden=hidden,**mp_kwargs)
-            self.mp_layers = nn.ModuleList([mp] * iters)
+            nmp_block = NMPBlock(hidden)
+            self.nmp_blocks = nn.ModuleList([nmp_block] * iters)
+            self.final_spatial_embedding = nmp_block.spatial_embedding
         else:
-            self.mp_layers = nn.ModuleList([MPLayer(hidden=hidden,**mp_kwargs) for _ in range(iters)])
+            self.nmp_blocks = nn.ModuleList([NMPBlock(hidden) for _ in range(iters)])
+            self.final_spatial_embedding = nn.Linear(hidden, 3)
 
-
-        self.adj = NegativeSquare(temperature=0.01,symmetric=False, act='exp', logger=kwargs['logger'], logging_frequency=kwargs['logging_frequency'])
-
-        self.positional_update = GRUUpdate(hidden, 3)
-
-        self.pos_embedding = nn.Embedding(1000, hidden)
-        pos_enc_weight = position_encoding_init(1000, hidden)
-        self.pos_embedding.weight = Parameter(pos_enc_weight)
 
     def forward(self, x, mask=None, **kwargs):
 
@@ -112,6 +189,45 @@ class GraphGen(nn.Module):
             A = self.forward_with_grad(x, mask, **kwargs)
 
         return A
+
+    def forward_with_grad(self, x, mask, **kwargs):
+        x = self.initial_embedding(x)
+
+        for nmp in self.nmp_blocks:
+            x = nmp(x, mask)
+
+        s = self.final_spatial_embedding(x)
+        A = torch.exp( - squared_distance_matrix(s,s) ) * mask
+
+        return A
+
+
+
+'''
+    emb_kwargs = {x: kwargs[x] for x in ['act', 'wn']}
+    self.initial_embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, n_layers=int(emb_init), **emb_kwargs)
+
+    #self.spatial_embedding = EMBEDDINGS['n'](dim_in=hidden, dim_out=3, n_layers=int(emb_init), **emb_kwargs)
+    #self.conv_embedding = BasicBlock(hidden, hidden)
+
+    #mp_kwargs = {x: kwargs[x] for x in ['act', 'wn', 'update', 'message', 'matrix', 'matrix_activation']}
+    #MPLayer = MP_LAYERS['m1']
+    #if tied:
+    #    mp = MPLayer(hidden=hidden,**mp_kwargs)
+    #    self.mp_layers = nn.ModuleList([mp] * iters)
+    #else:
+    #    self.mp_layers = nn.ModuleList([MPLayer(hidden=hidden,**mp_kwargs) for _ in range(iters)])
+
+
+    #self.adj = NegativeSquare(temperature=0.01,symmetric=False, act='exp', logger=kwargs['logger'], logging_frequency=kwargs['logging_frequency'])
+
+
+
+    #self.positional_update = GRUUpdate(hidden, 3)
+
+    #self.pos_embedding = nn.Embedding(1000, hidden)
+    #pos_enc_weight = position_encoding_init(1000, hidden)
+    #self.pos_embedding.weight = Parameter(pos_enc_weight)
 
     def forward_with_grad(self, x, mask, **kwargs):
         bs = x.size()[0]
@@ -175,3 +291,4 @@ class GraphGen(nn.Module):
             pos = pos.cuda()
         pos_embedding = self.pos_embedding(pos)
         return pos_embedding
+'''
