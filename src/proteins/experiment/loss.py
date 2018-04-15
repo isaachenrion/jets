@@ -12,7 +12,9 @@ def loss(y_pred, y, y_mask):
     y_pred = y_pred.view(-1, n ** 2)
     y = y.view(-1, n ** 2)
     l = my_bce_loss(y_pred, y, reduce=False)
-    l = l * y_mask.view(-1, n**2)
+    #import ipdb; ipdb.set_trace()
+    #mask_indices = torch.nonzero(y_mask)
+    #l = l *
 
     n_pos = y.sum(1, keepdim=True)
     n_neg = (1 - y).sum(1, keepdim=True)
@@ -22,6 +24,7 @@ def loss(y_pred, y, y_mask):
 
     l = (l_pos * n_neg + l_neg * n_pos) / (n_pos + n_neg)
     l = l * dists
+    l = l.masked_select(y_mask.view(-1, n**2).byte())
     l = l.mean()
     return l
 
@@ -38,7 +41,6 @@ def distances(n):
 
 
 def my_bce_loss(input, target, weight=None, reduce=True):
-    #import ipdb; ipdb.set_trace()
     minvar = Variable(torch.Tensor([1e-20]))
     if torch.cuda.is_available():
         minvar = minvar.cuda()

@@ -49,7 +49,7 @@ class Training(_Training):
             training_args.epochs = 15
 
             data_args.n_train = 12
-            data_args.n_valid = 100
+            data_args.n_valid = 10
 
             optim_args.lr = 0.1
             optim_args.period = 2

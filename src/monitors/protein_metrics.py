@@ -74,7 +74,7 @@ class ProteinMetrics(ScalarMonitor):
 
     @property
     def _string(self):
-        return "L/{}".format(self.k)+"\t".join([c.string for c in self.collectors])
+        return "L/{}".format(self.k)+"\t".join(['\t{} = {:.1f}%'.format(c.name, 100*c.value) for c in self.collectors])
 
     def visualize(self, **kwargs):
         for c in self.collectors:
