@@ -63,7 +63,7 @@ mv $COMMAND_FILE $MODEL_OUTDIR
 
 rm -rf $MODEL_RUNDIR
 
-PYTHONARGS="-j $MODEL_OUTDIR -e"
+PYTHONARGS="-j $MODEL_OUTDIR --email $SRCDIR/email_addresses.txt"
 
 read _ _DATADIR _GPU _QOS < <(bash $SRCDIR/sh/paths.sh)
 

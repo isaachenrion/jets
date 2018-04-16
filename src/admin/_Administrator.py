@@ -159,7 +159,7 @@ class _Administrator:
         ''' SIGNAL HANDLER '''
         '''----------------------------------------------------------------------- '''
 
-        if email is not None:
+        if email is not None and not self.slurm:
             self.emailer = get_emailer(email)
         else:
             self.emailer = None
