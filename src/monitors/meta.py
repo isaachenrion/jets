@@ -144,9 +144,6 @@ class Histogram(Monitor):
         image_and_pickle(fig, os.path.join(plotname, 'histogram'), self.plotsdir, os.path.join(self.plotsdir, 'pkl'))
         plt.close(fig)
 
-        #self.visualize_count += 1
-
-
     def clear(self):
         self.value = None
 
@@ -170,17 +167,3 @@ class EachClassHistogram(Monitor):
         for val, hm in self.histogram_monitors.items():
             values = np.array([o for (t,o) in zip(targets, outputs) if t == val])
             hm(values=values)
-
-
-    #def finish(self):
-    #    for _, hm in self.histogram_monitors.items():
-    #        hm.finish()
-    #    plt.figure()
-    #    plt.ylabel('Probability density')
-    #    plt.xlabel('Positive classification probability')
-    #    for name, hm in self.histogram_monitors.items():
-    #        bins, hist = hm.bins, hm.hist
-    #        width = 0.7 * (bins[1] - bins[0])
-    #        center = (bins[:-1] + bins[1:]) / 2
-    #        bars = plt.bar(center, hist, align='center', width=width)
-    #    plt.savefig(os.path.join(self.plotsdir, self.name + '-fig'))
