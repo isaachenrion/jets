@@ -43,3 +43,4 @@ class Logger:
         else:
             stats_dict = kwargs
         self.log_scalars(stats_dict)
+        
