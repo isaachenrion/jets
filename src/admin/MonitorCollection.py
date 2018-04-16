@@ -1,8 +1,11 @@
 
 from collections import OrderedDict
 class MonitorCollection:
-    def __init__(self, **monitors):
-        self.monitors = OrderedDict(**monitors)
+    def __init__(self, *monitors):
+        self.monitor_names = [m.name for m in monitors]
+        self.monitors = OrderedDict()
+        for i, name in enumerate(self.monitor_names):
+            self.monitors[name] = monitors[i]
         self.visualized_scalar_monitor_names = [m.name for m in self.monitors.values() if m.scalar and m.visualizing]
         self.scalar_monitor_names = [m.name for m in self.monitors.values() if m.scalar]
 
@@ -13,20 +16,20 @@ class MonitorCollection:
             m.initialize(*args, **kwargs)
 
     def __call__(self, **kwargs):
-        return {name:m(**kwargs) for name, m in self.monitors.items()}
+        return {name:self.monitors[name](**kwargs) for name in self.monitor_names}
 
     def visualize(self, **kwargs):
         for m in self.monitors.values():
             m.visualize(**kwargs)
 
-    def add_monitor(self, name, monitor):
-        self.monitors[name] = monitor
+    def add_monitor(self, monitor):
+        self.monitors[monitor.name] = monitor
         monitor.initialize(*self._initialize_args, **self._initialize_kwargs)
         return monitor
 
-    def add_monitors(self, **monitors):
-        for name, monitor in monitors.items():
-            self.add_monitor(name, monitor)
+    def add_monitors(self, *monitors):
+        for monitor in monitors:
+            self.add_monitor(monitor)
 
     @property
     def string(self):

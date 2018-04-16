@@ -38,10 +38,10 @@ class Logger:
 
     def log(self, compute_monitors=True,**kwargs):
         if compute_monitors:
-            logging.info(kwargs['valid_loss'])
+            #logging.info(kwargs['valid_loss'])
             stats_dict = self.monitor_collection(**kwargs)
             self.monitor_collection.visualize()
-            logging.info(stats_dict['valid_loss'])
+            #logging.info(stats_dict['valid_loss'])
         else:
             stats_dict = kwargs
         self.log_scalars(stats_dict)
