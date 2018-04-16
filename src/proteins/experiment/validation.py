@@ -26,6 +26,7 @@ def _validation(model, data_loader):
         del y; del y_pred; del y_mask; del x; del x_mask; del batch
 
     valid_loss /= len(data_loader)
+    logging.info(valid_loss)
 
     logdict = dict(
         yy=yy,
