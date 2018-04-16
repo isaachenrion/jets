@@ -15,7 +15,7 @@ finished_models
 debug_models
 killed_models
 interrupted_models
-misc/email_addresses.txt
+email_addresses.txt
 recnn-gated-gilles.py
 .git
 *.pyc
