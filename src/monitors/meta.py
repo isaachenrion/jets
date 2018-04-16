@@ -25,6 +25,7 @@ class Best(ScalarMonitor):
 
     def call(self, **kwargs):
         value = self.monitor.value
+        logging.info('{} = {}'.format(self.monitor.name, value))
         if self.track == 'max':
             if value > self.best_value:
                 self.changed = True

@@ -38,7 +38,6 @@ class Logger:
 
     def log(self, compute_monitors=True,**kwargs):
         if compute_monitors:
-            logging.info(kwargs)
             stats_dict = self.monitor_collection(**kwargs)
             self.monitor_collection.visualize()
         else:
