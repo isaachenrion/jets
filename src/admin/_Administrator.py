@@ -184,8 +184,8 @@ class _Administrator:
                             )
 
     def setup_logger(self):
-        monitor_dict = self.setup_monitors()
-        self.logger = Logger(self.exp_dir, monitor_dict, train=self.train)
+        monitors = self.setup_monitors()
+        self.logger = Logger(self.exp_dir, monitors, train=self.train)
 
 
     def record_settings(self, passed_args):

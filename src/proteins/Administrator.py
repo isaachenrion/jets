@@ -23,10 +23,7 @@ class Administrator(_Administrator):
         ]
         monitors = grad_monitors
 
-        monitor_dict = OrderedDict()
-        for m in monitors: monitor_dict[m.name] = m
-
-        self.training_only_monitors = MonitorCollection(**monitor_dict)
+        self.training_only_monitors = MonitorCollection(*monitors)
         self.training_only_monitors.initialize(self.logger.statsdir, self.logger.plotsdir)
 
     def setup_training_monitors(self):
@@ -72,11 +69,8 @@ class Administrator(_Administrator):
 
         monitors = metric_monitors + optim_monitors + time_monitors + admin_monitors
         monitors += viz_monitors
-        monitor_dict = OrderedDict()
-        for m in monitors: monitor_dict[m.name] = m
 
-
-        return monitor_dict
+        return monitors
 
     def setup_testing_monitors(self):
         test_loss = Regurgitate('test_loss', visualizing=True)
@@ -91,8 +85,5 @@ class Administrator(_Administrator):
             #best_test_loss,
         ]
         self.metric_monitors = monitors
-        monitor_dict = OrderedDict()
-        for m in monitors:
-            monitor_dict[m.name] = m
-
-        return monitor_dict
+        
+        return monitors
