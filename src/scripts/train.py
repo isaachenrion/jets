@@ -107,6 +107,7 @@ model.add_argument("-m", "--model", type=str, default="g", help="name of the mod
 
 # NMP
 model.add_argument("-i", "--iters", type=int, default=10)
+model.add_argument("--block", type=str, default='cnmp')
 model.add_argument("--mp", type=str, default='m2', help='type of message passing layer')
 model.add_argument("-u", "--update", type=str, default='gru', help='type of vertex update')
 model.add_argument("--message", type=str, default='2', help='type of message')

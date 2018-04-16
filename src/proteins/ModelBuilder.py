@@ -34,6 +34,7 @@ class ModelBuilder(_ModelBuilder):
             'model':args.model,
 
             # NMP
+            'block': args.block,
             'iters': args.iters,
             'update': args.update,
             'message': args.message,

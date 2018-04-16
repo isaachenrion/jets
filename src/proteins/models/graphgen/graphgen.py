@@ -86,7 +86,7 @@ def squared_distance_matrix(x, y):
 
     return dist
 
-class NMPBlock(nn.Module):
+class ConvolutionalNMPBlock(nn.Module):
     def __init__(self, dim):
         super().__init__()
         self.spatial_embedding = nn.Linear(dim, 3)
@@ -113,6 +113,34 @@ class NMPBlock(nn.Module):
 
         return x
 
+class BasicNMPBlock(nn.Module):
+    def __init__(self, dim):
+        super().__init__()
+        self.spatial_embedding = nn.Linear(dim, 3)
+
+        self.message = nn.Sequential(
+                        nn.Linear(dim, dim),
+                        nn.ReLU(inplace=True)
+                        )
+
+        self.update = GRUUpdate(dim, dim)
+
+    def forward(self, x, mask):
+        s = self.spatial_embedding(x)
+        A = torch.exp( - squared_distance_matrix(s, s) ) * mask
+        x_nmp = torch.bmm(A, self.message(x))
+        x = self.update(x, x_nmp)
+
+        return x
+
+class ConvolutionOnlyBlock(nn.Module):
+    def __init__(self, dim):
+        super().__init__()
+        self.conv1d = BasicBlock(dim, dim)
+
+    def forward(self, x, mask):
+        x = self.conv1d(x.transpose(1,2)).transpose(1,2)
+        return x
 
 class GraphGen(nn.Module):
     def __init__(self,
@@ -121,25 +149,33 @@ class GraphGen(nn.Module):
         iters=None,
         no_grad=False,
         tied=False,
+        block=None,
         **kwargs
         ):
 
         super().__init__()
 
         self.no_grad = no_grad
-        if no_grad and not tied:
-            logging.warning('no_grad set to True but tied = False. Setting tied = True')
-            tied = True
-
         self.initial_embedding = nn.Linear(features, hidden)
+
+        if block == 'cnmp':
+            NMPBlock = ConvolutionalNMPBlock
+        elif block == 'nmp':
+            NMPBlock = BasicNMPBlock
+        elif block == 'conv':
+            NMPBlock = ConvolutionOnlyBlock
+        else:
+            raise ValueError
+
+        self.final_spatial_embedding = nn.Linear(hidden, 3)
 
         if tied:
             nmp_block = NMPBlock(hidden)
+            nmp_block.spatial_embedding = self.final_spatial_embedding
             self.nmp_blocks = nn.ModuleList([nmp_block] * iters)
-            self.final_spatial_embedding = nmp_block.spatial_embedding
+            #self.final_spatial_embedding = nmp_block.spatial_embedding
         else:
             self.nmp_blocks = nn.ModuleList([NMPBlock(hidden) for _ in range(iters)])
-            self.final_spatial_embedding = nn.Linear(hidden, 3)
 
         self.scale = nn.Parameter(torch.zeros(1))
 
