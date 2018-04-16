@@ -8,15 +8,11 @@ from email.mime.text import MIMEText
 from email.utils import COMMASPACE, formatdate
 from email import encoders
 
-def get_emailer():
-    try:
-        with open('misc/email_addresses.txt', 'r') as f:
-            lines = f.readlines()
-            recipient, sender, password = (l.strip() for l in lines)
-            return Emailer(sender, password, recipient)
-    except FileNotFoundError as e:
-        logging.warning(e)
-        return None
+def get_emailer(email_filename):
+    with open(email_filename, 'r') as f:
+        lines = f.readlines()
+        recipient, sender, password = (l.strip() for l in lines)
+    return Emailer(sender, password, recipient)
 
 class Emailer:
     '''

@@ -35,5 +35,7 @@ DATASETS = {
 }
 
 ''' argparse args '''
-DATA_DIR = '/Users/isaachenrion/x/research/graphs/data'
-MODELS_DIR = '/Users/isaachenrion/x/research/graphs/models'
+SRC_DIR = '/Users/isaachenrion/x/research/graphs'
+DATA_DIR = os.path.join(SRC_DIR, 'data')
+MODELS_DIR = os.path.join(SRC_DIR, 'models')
+EMAIL_FILE = os.path.join(SRC_DIR, 'email_addresses.txt')

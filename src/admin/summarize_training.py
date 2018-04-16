@@ -7,14 +7,14 @@ from src.admin.emailer import get_emailer
 def get_scalars_csv_filename(model_dir):
     return os.path.join(model_dir, 'stats', 'scalars.csv')
 
-def summarize_training(jobsdir, email=False, many_jobs=False, verbose=False):
+def summarize_training(jobsdir, email=None, many_jobs=False, verbose=False):
     if many_jobs:
         for jobdir in os.listdir(jobsdir):
             summarize_one_job_training(os.path.join(jobsdir, jobdir), email, verbose)
     else:
         summarize_one_job_training(jobsdir, email, verbose)
 
-def summarize_one_job_training(jobdir, email=False, verbose=False):
+def summarize_one_job_training(jobdir, email=None, verbose=False):
     csv_filenames = []
     for run in os.listdir(jobdir):
         csv_filename = os.path.join(jobdir, get_scalars_csv_filename(run))
@@ -25,10 +25,8 @@ def summarize_one_job_training(jobdir, email=False, verbose=False):
     # collect final lines of training stats
     for i, csv_filename in enumerate(csv_filenames):
         with open(csv_filename, 'r', newline='') as f:
-            #reader = csv.DictReader(f)
             reader = f.readlines()
 
-            #for i, row in enumerate(reader)
             if i == 0:
                 headers = reader[0].strip().split(',')
                 stats_dict = {name: [] for name in headers}
@@ -43,7 +41,6 @@ def summarize_one_job_training(jobdir, email=False, verbose=False):
             mean_stat = np.mean(arr)
             std_stat = np.std(arr)
         except (TypeError, ValueError) as e:
-            #print(e, name, stats_dict[name])
             mean_stat = None
             std_stat = None
         aggregate_stats_dict[name] = mean_stat, std_stat
@@ -74,11 +71,6 @@ def summarize_one_job_training(jobdir, email=False, verbose=False):
                 except (ValueError, TypeError):
                     out_str += '{}\n'.format(s)
 
-    try:
-        headline = aggregate_stats_dict['best_inv_fpr'][0]
-    except KeyError:
-        headline = 000
-
     # pretty print to results file
     statsfile = os.path.join(jobdir, 'stats.txt')
     with open(statsfile, 'w') as f:
@@ -87,8 +79,9 @@ def summarize_one_job_training(jobdir, email=False, verbose=False):
     # send email
     if verbose:
         print(out_str)
-    if email:
-        emailer = get_emailer()
+    if email is not None:
+        emailer = get_emailer(email)
+        headline = aggregate_stats_dict.get('save', [-123456789])[0]
         emailer.send_msg(out_str, '{:.2f} ({}: training stats)'.format(headline, jobdir.split('/')[-1]), [])
         if verbose:
             print('Emailed: {}'.format(jobdir))

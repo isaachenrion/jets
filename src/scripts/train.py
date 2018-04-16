@@ -22,7 +22,7 @@ admin.add_argument("--profile", action='store_true', default=False)
 admin.add_argument("-s", "--silent", action='store_true', default=False)
 admin.add_argument("-v", "--verbose", action='store_true', default=False)
 admin.add_argument("--visualizing", action='store_true', default=False)
-admin.add_argument("--no_email", action='store_true', default=False)
+admin.add_argument("--email",default=EMAIL_FILE)
 
 # Directory args
 admin.add_argument("--data_dir", type=str, default=DATA_DIR)

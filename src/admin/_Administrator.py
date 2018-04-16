@@ -159,8 +159,8 @@ class _Administrator:
         ''' SIGNAL HANDLER '''
         '''----------------------------------------------------------------------- '''
 
-        if email:
-            self.emailer = get_emailer()
+        if email is not None:
+            self.emailer = get_emailer(email)
         else:
             self.emailer = None
 

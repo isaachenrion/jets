@@ -42,7 +42,7 @@ class Training(_Training):
         admin_args,model_args, data_args, computing_args, training_args, optim_args, loading_args = super().set_debug_args(*args)
 
         if admin_args.debug:
-            admin_args.no_email = True
+            admin_args.email = None
             admin_args.verbose = True
 
             training_args.batch_size = 3

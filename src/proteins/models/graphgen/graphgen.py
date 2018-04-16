@@ -180,6 +180,7 @@ class GraphGen(nn.Module):
             self.nmp_blocks = nn.ModuleList([NMPBlock(hidden) for _ in range(iters)])
             self.final_spatial_embedding = nn.Linear(hidden, 3)
 
+        self.scale = nn.Parameter(torch.zeros(1))
 
     def forward(self, x, mask=None, **kwargs):
 
@@ -197,8 +198,8 @@ class GraphGen(nn.Module):
             x = nmp(x, mask)
 
         s = self.final_spatial_embedding(x)
-        A = torch.exp( - squared_distance_matrix(s,s) ) * mask
 
+        A = torch.exp( - squared_distance_matrix(s,s) * torch.exp(self.scale) * 100000) * mask
         return A
 
 
