@@ -6,6 +6,7 @@ ilya
 archive
 magic_commands.txt
 documents
+*.ipynb_checkpoints*
 reports
 inventory.txt
 paths.sh
