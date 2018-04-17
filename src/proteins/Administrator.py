@@ -64,6 +64,7 @@ class Administrator(_Administrator):
 
         viz_monitors = [
             BatchMatrixMonitor('yy', n_epochs=self.passed_args['lf'], batch_size=10, visualizing=True),
+            BatchMatrixMonitor('soft_yy', n_epochs=self.passed_args['lf'], batch_size=10, visualizing=True),
             BatchMatrixMonitor('yy_pred', n_epochs=self.passed_args['lf'], batch_size=10, visualizing=True)
         ]
 
@@ -85,5 +86,5 @@ class Administrator(_Administrator):
             #best_test_loss,
         ]
         self.metric_monitors = monitors
-        
+
         return monitors

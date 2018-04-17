@@ -173,11 +173,11 @@ class GraphGen(nn.Module):
             nmp_block = NMPBlock(hidden)
             nmp_block.spatial_embedding = self.final_spatial_embedding
             self.nmp_blocks = nn.ModuleList([nmp_block] * iters)
-            #self.final_spatial_embedding = nmp_block.spatial_embedding
         else:
             self.nmp_blocks = nn.ModuleList([NMPBlock(hidden) for _ in range(iters)])
 
-        self.scale = nn.Parameter(torch.zeros(1))
+        #self.scale = nn.Parameter(torch.zeros(1))
+        self.scale = Variable(torch.zeros(1))
 
     def forward(self, x, mask=None, **kwargs):
 
@@ -195,8 +195,15 @@ class GraphGen(nn.Module):
             x = nmp(x, mask)
 
         s = self.final_spatial_embedding(x)
+        #s = x.bmm(x.transpose(1,2))
 
-        A = torch.exp( - squared_distance_matrix(s,s) * torch.exp(self.scale) * 100000) * mask
+        #A = F.sigmoid(s) * mask
+        #import ipdb; ipdb.set_trace()
+
+        A = torch.exp( - squared_distance_matrix(s,s) * torch.exp(self.scale)) * mask
+        ##A = -squared_distance_matrix(s,s)*mask
+
+        #import ipdb; ipdb.set_trace()
         return A
 
 

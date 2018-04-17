@@ -9,7 +9,7 @@ from .loss import loss
 
 def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip):
     logger = administrator.logger
-    (x, x_mask, y, y_mask) = batch
+    (x, x_mask, soft_y, hard_y, y_mask) = batch
 
     # forward
     model.train()
@@ -17,7 +17,7 @@ def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number
     y_pred = model(x, mask=x_mask, logger=logger, epoch=epoch, iters=batch_number)
 
     #y_pred = y_pred * y_mask
-    l = loss(y_pred, y, y_mask)
+    l = loss(y_pred, soft_y, y_mask)
 
     # backward
     l.backward()
@@ -43,6 +43,6 @@ def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number
         administrator.training_only_monitors(**logdict)
         administrator.training_only_monitors.visualize()
 
-    del y; del y_pred; del y_mask; del x; del x_mask; del batch
+    del soft_y; del hard_y; del y_pred; del y_mask; del x; del x_mask; del batch
 
     return float(unwrap(l))

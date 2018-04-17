@@ -58,7 +58,7 @@ class Training(_Training):
 
             model_args.hidden = 1
             model_args.iters = 2
-            model_args.lf = 2
+            model_args.lf = 1
 
         return admin_args,model_args, data_args, computing_args, training_args, optim_args, loading_args
 

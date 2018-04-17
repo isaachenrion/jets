@@ -13,6 +13,8 @@ class WangNet(nn.Module):
         ):
         super().__init__()
 
+        kwargs.pop('block', None)
+
         self.resnet_1d = resnet_1d(features=features,hidden=hidden,**kwargs)
         self.resnet_2d = resnet_2d(features=2*hidden,hidden=hidden,**kwargs)
 
@@ -27,7 +29,8 @@ class WangNet(nn.Module):
 
         del x_r
         del x_l
-        
-        x = self.resnet_2d(x)
+
+        #import ipdb; ipdb.set_trace()
+        x = self.resnet_2d(x) * mask
 
         return x

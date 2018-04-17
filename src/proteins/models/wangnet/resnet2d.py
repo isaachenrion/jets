@@ -122,6 +122,8 @@ class ResNet2d(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
 
+        #import ipdb; ipdb.set_trace()
+
         x = F.sigmoid(torch.mean(x, 1))
 
 

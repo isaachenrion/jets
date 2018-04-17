@@ -10,10 +10,11 @@ from ..visualizing.utils import image_and_pickle
 
 class BatchMatrixMonitor(Monitor):
     ''' Collects a batch of matrices, usually for visualization'''
-    def __init__(self, value_name, n_epochs=None, batch_size=None,**kwargs):
+    def __init__(self, value_name, n_epochs=None, batch_size=None,norm=False,**kwargs):
         self.value_name = value_name
         self.n_epochs = n_epochs
         self.batch_size = batch_size
+        self.norm=norm
         self.epoch = None
         super().__init__(value_name + '_matrix', **kwargs)
 
@@ -38,6 +39,6 @@ class BatchMatrixMonitor(Monitor):
                 matrices = self.value[:self.batch_size]
             if plotname is None:
                 plotname = self.value_name
-            visualize_batch_matrix(matrices, self.plotsdir, str(self.epoch) + '/' + plotname)
+            visualize_batch_matrix(matrices, self.plotsdir, str(self.epoch) + '/' + plotname, norm=self.norm)
         else:
             pass

@@ -19,23 +19,14 @@ class ProteinLoader(_DataLoader):
         super().__init__(dataset, batch_size)
         self.dropout = dropout
         self.permute_vertices = permute_vertices
-        self.n_max = None
 
 
     def collate(self, data_tuples):
         t = time.time()
         X, X_mask = self.preprocess_x([x for x, _, _ in data_tuples])
-        Y = self.preprocess_y([y for _, y, _ in data_tuples])
+        soft_Y, hard_Y = self.preprocess_y([y for _, y, _ in data_tuples])
         Y_mask = self.preprocess_mask([mask for _, _, mask in data_tuples])
-        Y_mask *= X_mask
-
-        if self.n_max is not None:
-            X = X[:, :self.n_max]
-            X_mask = X_mask[:, :self.n_max, :self.n_max]
-            Y = Y[:, :self.n_max, :self.n_max]
-            Y_mask = Y_mask[:, :self.n_max, :self.n_max]
-
-        return X, X_mask, Y, Y_mask
+        return X, X_mask, soft_Y, hard_Y, Y_mask
 
     def preprocess_mask(self, mask_list):
         mask = [torch.from_numpy(mask) for mask in mask_list]
@@ -48,10 +39,14 @@ class ProteinLoader(_DataLoader):
         y_list = [torch.from_numpy(y) for y in y_list]
         y, mask = pad_tensors(y_list)
         y = compute_adjacency(y)
-        y = contact_map(y, threshold=800)
-        y = y * mask
-        y = wrap(y)
-        return y
+        soft_y = contact_map(y, 800) * mask
+        #soft_y = torch.exp(-y/1000) * mask
+        #soft_y = -y
+        hard_y = contact_map(y, 800) * mask
+        #y = contact_map(y, threshold=800)
+        soft_y = wrap(soft_y)
+        hard_y = wrap(hard_y)
+        return soft_y, hard_y
 
     def preprocess_x(self, x_list):
 

@@ -18,8 +18,12 @@ def unpad(matrix):
             return matrix[:n,:n]
     return matrix
 
-def visualize_batch_matrix(tensor, plotsdir, path_to_visualizations):
+def visualize_batch_matrix(tensor, plotsdir, path_to_visualizations, norm=False):
     tensor = ensure_numpy_array(tensor)
+    if norm:
+        tensor = (tensor - tensor.min())
+        if tensor.max() > 0:
+            tensor = tensor / tensor.max()
     assert tensor.max() <= 1.0
     assert tensor.min() >= 0.0
     if not os.path.exists(os.path.join(plotsdir, path_to_visualizations)):
@@ -28,7 +32,7 @@ def visualize_batch_matrix(tensor, plotsdir, path_to_visualizations):
     for i, matrix in enumerate(tensor):
         visualize_matrix(matrix, prefix=os.path.join(plotsdir, path_to_visualizations, str(i)))
 
-def visualize_matrix(matrix, prefix, cmin=0., cmax=None, log=False, clabel=r'$A_{ij}$'):
+def visualize_matrix(matrix, prefix='matrix', cmin=0., cmax=None, log=False, clabel=r'$A_{ij}$'):
     fig, ax = plt.subplots()
 
     if log:
