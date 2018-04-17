@@ -48,7 +48,8 @@ def crop(jets, pileup=False):
 
     return good_jets, bad_jets, w
 
-def crop_dataset(dataset, pileup):
+def crop_dataset(dataset):
+    pileup = dataset.subproblem == 'pileup'
     good_jets, bad_jets, w = crop(dataset.jets, pileup)
     cropped_dataset = JetDataset(bad_jets)
     new_dataset = JetDataset(good_jets, w)

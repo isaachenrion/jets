@@ -60,7 +60,7 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
 
     # crop validation set and add the excluded data to the training set
     #if 'w-vs-qcd' in data_dir:
-    valid_dataset, cropped_dataset = crop_dataset(valid_dataset, pileup=False)
+    valid_dataset, cropped_dataset = crop_dataset(valid_dataset)
     train_dataset.extend(cropped_dataset)
 
     train_dataset.shuffle()
