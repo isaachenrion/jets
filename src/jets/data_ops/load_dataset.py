@@ -3,7 +3,7 @@ import os
 import pickle
 import numpy as np
 
-from .io import load_jets_from_pickle, save_jets_to_pickle
+from .io import load_jets_from_pickle
 from .JetDataset import JetDataset
 
 def load_jets(data_dir, filename, redo=False, preprocess_fn=None):
@@ -41,7 +41,7 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
 
     problem = data_dir.split('/')[-1]
     subproblem = filename
-    
+
     logging.warning("Loading data...")
     filename = "{}-train.pickle".format(filename)
 
@@ -59,7 +59,6 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
     valid_dataset = JetDataset(valid_jets)
 
     # crop validation set and add the excluded data to the training set
-    #if 'w-vs-qcd' in data_dir:
     valid_dataset, cropped_dataset = crop_dataset(valid_dataset)
     train_dataset.extend(cropped_dataset)
 
