@@ -5,6 +5,7 @@ from ..JetDataset import JetDataset
 def crop(jets, pileup=False):
     #logging.warning("Cropping...")
     if pileup:
+        logging.warning("pileup")
         pt_min, pt_max, m_min, m_max = 300, 365, 150, 220
     else:
         pt_min, pt_max, m_min, m_max = 250, 300, 50, 110
@@ -49,7 +50,7 @@ def crop(jets, pileup=False):
     return good_jets, bad_jets, w
 
 def crop_dataset(dataset):
-    pileup = dataset.subproblem == 'pileup'
+    pileup = (dataset.subproblem == 'pileup')
     good_jets, bad_jets, w = crop(dataset.jets, pileup)
     cropped_dataset = JetDataset(bad_jets)
     new_dataset = JetDataset(good_jets, w)
