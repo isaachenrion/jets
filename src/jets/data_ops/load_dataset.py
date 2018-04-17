@@ -53,10 +53,10 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
     logging.warning("Splitting into train and validation...")
     #
     train_jets = jets[n_valid:]
-    train_dataset = JetDataset(train_jets)
+    train_dataset = JetDataset(train_jets, problem=problem,subproblem=subproblem)
     #
     valid_jets = jets[:n_valid]
-    valid_dataset = JetDataset(valid_jets)
+    valid_dataset = JetDataset(valid_jets, problem=problem,subproblem=subproblem)
 
     # crop validation set and add the excluded data to the training set
     valid_dataset, cropped_dataset = crop_dataset(valid_dataset)
