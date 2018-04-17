@@ -41,7 +41,7 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
 
     problem = data_dir.split('/')[-1]
     subproblem = filename
-
+    
     logging.warning("Loading data...")
     filename = "{}-train.pickle".format(filename)
 
@@ -94,7 +94,7 @@ def load_test_dataset(data_dir, filename, n_test, redo):
     dataset.transform(train_dataset.tf)
 
     # crop validation set and add the excluded data to the training set
-    dataset, _ = crop_dataset(dataset, pileup=False)
+    dataset, _ = crop_dataset(dataset)
 
     # add cropped indices to training data
     logging.warning("\tfinal test size = %d" % len(dataset))
