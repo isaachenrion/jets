@@ -46,8 +46,8 @@ loading.add_argument("-r", "--restart", help="restart a loaded model from where 
 '''
 # Training args
 training = parser.add_argument_group('training')
-training.add_argument("-e", "--epochs", type=int, default=64)
-training.add_argument("-b", "--batch_size", type=int, default=128)
+training.add_argument("-e", "--epochs", type=int, default=32)
+training.add_argument("-b", "--batch_size", type=int, default=64)
 training.add_argument("--experiment_time", type=int, default=1000000)
 
 '''

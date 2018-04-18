@@ -5,19 +5,44 @@ import numpy as np
 
 from src.data_ops.wrapping import wrap
 
-def loss(y_pred, y, y_mask):
-    #l = distance_loss
-    #l = vanilla_bce_loss
-    #l = cho_loss
-    l = nll
-    return l(y_pred, y, y_mask)
+def loss(y_pred, soft_y, hard_y, y_mask, weight_dict=None):
+    #soft_loss = distance_loss
+    #soft_loss = vanilla_bce_loss
+    #soft_loss = cho_loss
+
+    soft_loss = kl
+    hard_loss = nll
+
+    loss_dict = dict(
+        soft=soft_loss(y_pred, soft_y, y_mask),
+        hard=hard_loss(y_pred, hard_y, y_mask)
+    )
+
+    if weight_dict is None:
+        return sum(loss_dict.values())
+
+    return sum([weight_dict[name] * loss_dict[name] for name in weight_dict.keys()])
+
+def kl(y_pred, y, y_mask):
+    n = y_pred.shape[1]
+    dists = wrap(torch.Tensor(distances(n)) ** (1/2.5)).view(-1, n, n)
+
+    logprobs = stable_log(y_pred)
+
+    lossfn = torch.nn.KLDivLoss(reduce=False)
+
+    l = lossfn(logprobs, y)
+    l = l * dists
+    l = reweight_loss(l, y)
+    l = l.masked_select(y_mask.byte())
+    l = l.mean()
+    return l
 
 def nll(y_pred, y, y_mask):
     n = y_pred.shape[1]
     dists = wrap(torch.Tensor(distances(n)) ** (1/2.5)).view(-1, n, n)
     lossfn = torch.nn.NLLLoss(reduce=False)
     logprobs = stable_log(torch.stack([1-y_pred, y_pred], 1))
-    #y = y.long()
 
     l = (lossfn(logprobs, y.long()))
     l = l * dists

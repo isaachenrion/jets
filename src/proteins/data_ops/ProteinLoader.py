@@ -39,8 +39,8 @@ class ProteinLoader(_DataLoader):
         y_list = [torch.from_numpy(y) for y in y_list]
         y, mask = pad_tensors(y_list)
         y = compute_adjacency(y)
-        soft_y = contact_map(y, 800) * mask
-        #soft_y = torch.exp(-y/1000) * mask
+        #soft_y = contact_map(y, 800) * mask
+        soft_y = torch.exp(-y/1000) * mask
         #soft_y = -y
         hard_y = contact_map(y, 800) * mask
         #y = contact_map(y, threshold=800)

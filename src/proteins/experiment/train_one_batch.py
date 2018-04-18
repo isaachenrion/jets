@@ -17,7 +17,7 @@ def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number
     y_pred = model(x, mask=x_mask, logger=logger, epoch=epoch, iters=batch_number)
 
     #y_pred = y_pred * y_mask
-    l = loss(y_pred, soft_y, y_mask)
+    l = loss(y_pred, soft_y, hard_y, y_mask)
 
     # backward
     l.backward()

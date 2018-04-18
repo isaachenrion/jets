@@ -205,7 +205,7 @@ class _Training:
             logdict = {**train_dict, **valid_dict, **static_dict}
 
             iteration = train_dict['iteration']
-            
+
             t_log = time.time()
             administrator.log(**logdict)
             logging.info("Logging took {:.1f} seconds".format(time.time() - t_log))
