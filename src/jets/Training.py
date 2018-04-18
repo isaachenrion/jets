@@ -78,15 +78,22 @@ class Training(_Training):
 
         return admin_args,model_args, data_args, computing_args, training_args, optim_args, loading_args
 
-    def load_data(self,dataset, data_dir, n_train, n_valid, batch_size, preprocess, **kwargs):
+    def load_data(self):
+        dataset = self.data_args.dataset
+        data_dir = self.admin_args.data_dir
+        n_train = self.data_args.n_train
+        n_valid = self.data_args.n_valid
+        batch_size = self.training_args.batch_size
+        preprocess = self.data_args.pp
+
         intermediate_dir, data_filename = DATASETS[dataset]
         data_dir = os.path.join(data_dir, intermediate_dir)
         train_dataset, valid_dataset = load_train_dataset(data_dir, data_filename,n_train, n_valid, preprocess)
 
         leaves = self.model_args.model not in ['recs', 'recg']
         #import ipdb; ipdb.set_trace()
-        train_data_loader = DataLoader(train_dataset, batch_size, leaves=leaves,**kwargs)
-        valid_data_loader = DataLoader(valid_dataset, batch_size, leaves=leaves,**kwargs)
+        train_data_loader = DataLoader(train_dataset, batch_size, leaves=leaves)
+        valid_data_loader = DataLoader(valid_dataset, batch_size, leaves=leaves)
 
         return train_data_loader, valid_data_loader
 

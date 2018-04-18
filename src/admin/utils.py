@@ -79,7 +79,7 @@ def get_bytes(tensor_list):
 
 def total_size(t):
     s = t.size()
-    if len(s) > 0:
+    if s:
         return reduce(op.mul, s)
     return 1
 
@@ -115,14 +115,6 @@ class memory_snapshot:
             see_tensors_in_memory(self.ndim)
 
 
-def clear_all_tensors():
-    for obj in gc.get_objects():
-        try:
-            if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
-                del obj
-        except Exception:
-            pass
-
 def format_bytes(n):
     n = str(int(n))
     if len(n) < 4:
@@ -133,5 +125,4 @@ def format_bytes(n):
         return "{}.{} MB".format(n[:-6], n[-6:-5])
     elif len(n) < 14:
         return "{}.{} GB".format(n[:-9], n[-9:-8])
-    else:
-        return "{}.{} TB".format(n[:-12], n[-12:-11])
+    return "{}.{} TB".format(n[:-12], n[-12:-11])

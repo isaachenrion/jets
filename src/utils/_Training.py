@@ -62,7 +62,7 @@ class _Training:
             )
 
 
-        train_data_loader, valid_data_loader = self.load_data(self.data_args.dataset, self.admin_args.data_dir, self.data_args.n_train, self.data_args.n_valid, self.training_args.batch_size, self.data_args.pp)
+        train_data_loader, valid_data_loader = self.load_data()
 
         #model, settings = load_model(loading_args.load, model_args, administrator.logger, loading_args.restart)
         self.model_args.features = train_data_loader.dataset.dim
@@ -134,7 +134,7 @@ class _Training:
         return admin_args, model_args, data_args, computing_args, training_args, optim_args, loading_args
 
 
-    def load_data(self,dataset, data_dir, n_train, n_valid, batch_size, preprocess, **kwargs):
+    def load_data(self):
         raise NotImplementedError
 
 

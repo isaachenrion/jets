@@ -59,8 +59,8 @@ def pad_tensors(tensor_list):
 
     return (padded_data, mask)
     
-def pad_matrices(mask_list):
-    data = mask_list
+def pad_matrices(matrix_list):
+    data = matrix_list
     seq_lengths = [len(x) for x in data]
     max_seq_length = max(seq_lengths)
     padded_data = torch.zeros(len(data), max_seq_length, max_seq_length)

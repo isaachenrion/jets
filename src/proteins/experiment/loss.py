@@ -4,25 +4,12 @@ from torch.autograd import Variable
 import numpy as np
 
 from src.data_ops.wrapping import wrap
+from src.admin.utils import see_tensors_in_memory
 
-def loss(y_pred, soft_y, hard_y, y_mask, weight_dict=None):
-    #soft_loss = distance_loss
-    #soft_loss = vanilla_bce_loss
-    #soft_loss = cho_loss
-
-    soft_loss = kl
-    hard_loss = nll
-
-    loss_dict = dict(
-        soft=soft_loss(y_pred, soft_y, y_mask),
-        hard=hard_loss(y_pred, hard_y, y_mask)
-    )
-
-    if weight_dict is None:
-        return sum(loss_dict.values())
-
-    return sum([weight_dict[name] * loss_dict[name] for name in weight_dict.keys()])
-
+def loss(y_pred, y, y_mask):
+    l = nll
+    return l(y_pred, y, y_mask)
+    
 def kl(y_pred, y, y_mask):
     n = y_pred.shape[1]
     dists = wrap(torch.Tensor(distances(n)) ** (1/2.5)).view(-1, n, n)
@@ -98,12 +85,13 @@ def distances(n):
     b_dists = abs(rows - columns)
     return b_dists
 
-def stable_log(input):
+def stable_log(x):
     minvar = Variable(torch.Tensor([1e-20]))
     if torch.cuda.is_available():
         minvar = minvar.cuda()
-    input = torch.log(torch.max(input, minvar))
-    return input
+    x = torch.log(torch.max(x, minvar))
+
+    return x
 
 
 def my_bce_loss(input, target, weight=None, reduce=True):

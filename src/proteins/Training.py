@@ -1,6 +1,6 @@
 import logging
 
-from .data_ops.get_data_loader import get_train_data_loader
+from .data_ops import get_train_data_loader
 from .experiment import _validation, _train_one_batch
 
 from src.utils._Training import _Training
@@ -28,6 +28,7 @@ class Training(_Training):
             optim_args,
             loading_args,
             **kwargs)
+
 
     @property
     def Administrator(self):
@@ -62,8 +63,12 @@ class Training(_Training):
 
         return admin_args,model_args, data_args, computing_args, training_args, optim_args, loading_args
 
-    def load_data(self,*args,**kwargs):
-        return get_train_data_loader(*args,**kwargs)
+    def load_data(self):
+        data_dir = self.admin_args.data_dir
+        n_train = self.data_args.n_train
+        n_valid = self.data_args.n_valid
+        batch_size = self.training_args.batch_size
+        return get_train_data_loader(data_dir, n_train, n_valid, batch_size)
 
     def validation(self, *args):
         return _validation(*args)

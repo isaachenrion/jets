@@ -9,24 +9,29 @@ from .loss import loss
 
 def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip):
     logger = administrator.logger
-    (x, x_mask, soft_y, hard_y, y_mask) = batch
+    (x, y, y_mask, batch_mask) = batch
+
 
     # forward
     model.train()
     optimizer.zero_grad()
-    y_pred = model(x, mask=x_mask, logger=logger, epoch=epoch, iters=batch_number)
+    y_pred = model(x, mask=batch_mask, logger=logger, epoch=epoch, iters=batch_number)
+
 
     #y_pred = y_pred * y_mask
-    l = loss(y_pred, soft_y, hard_y, y_mask)
+    l = loss(y_pred, y, y_mask)
+
 
     # backward
     l.backward()
+    
     if clip is not None:
         torch.nn.utils.clip_grad_norm(model.parameters(), clip)
 
     if batch_number == 0:
         old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
         grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
+
 
     if batch_number == 1:
         log_gpu_usage()
@@ -43,6 +48,8 @@ def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number
         administrator.training_only_monitors(**logdict)
         administrator.training_only_monitors.visualize()
 
-    del soft_y; del hard_y; del y_pred; del y_mask; del x; del x_mask; del batch
+
+    del y; del y_pred; del y_mask; del x; del batch_mask; del batch
+
 
     return float(unwrap(l))
