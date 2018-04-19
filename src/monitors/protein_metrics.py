@@ -5,6 +5,10 @@ import numpy as np
 from .baseclasses import ScalarMonitor, Monitor
 from .meta import Collect
 
+def list_multiply(x_list, y_list):
+    return list(x * y for x, y in zip(x_list, y_list))
+
+
 def compute_protein_metrics(targets, predictions, k):
     acc, acc_med, acc_long, acc_short = ([None for _ in range(len(targets))] for _ in range(4))
 

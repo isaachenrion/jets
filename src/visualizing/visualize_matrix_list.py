@@ -18,28 +18,25 @@ def unpad(matrix):
             return matrix[:n,:n]
     return matrix
 
-def visualize_batch_matrix(tensor, plotsdir, path_to_visualizations, norm=False):
-    tensor = ensure_numpy_array(tensor)
-    if norm:
-        tensor = (tensor - tensor.min())
-        if tensor.max() > 0:
-            tensor = tensor / tensor.max()
-    assert tensor.max() <= 1.0
-    assert tensor.min() >= 0.0
+def visualize_matrix_list(matrix_list, plotsdir, path_to_visualizations):
     if not os.path.exists(os.path.join(plotsdir, path_to_visualizations)):
         os.makedirs(os.path.join(plotsdir, path_to_visualizations))
-    #tensor = 1 - tensor
-    for i, matrix in enumerate(tensor):
+    for i, matrix in enumerate(matrix_list):
         visualize_matrix(matrix, prefix=os.path.join(plotsdir, path_to_visualizations, str(i)))
 
 def visualize_matrix(matrix, prefix='matrix', cmin=0., cmax=None, log=False, clabel=r'$A_{ij}$'):
+    assert matrix.max() <= 1.0
+    assert matrix.min() >= 0.0
+
     fig, ax = plt.subplots()
 
+    #matrix = unpad(matrix)
+
     if log:
-        plt.matshow(unpad(matrix), cmap='viridis_r', norm=LogNorm(), origin='lower', fignum=False)
+        plt.matshow(matrix, cmap='viridis_r', norm=LogNorm(), origin='lower', fignum=False)
         plt.gca().xaxis.set_ticks_position('bottom')
     else:
-        plt.imshow(unpad(matrix), cmap='viridis_r', origin='lower', vmin=cmin, vmax=cmax)
+        plt.imshow(matrix, cmap='viridis_r', origin='lower', vmin=cmin, vmax=cmax)
 
     cbar = plt.colorbar()
     cbar.set_label(clabel)

@@ -5,27 +5,32 @@ import numpy as np
 from .baseclasses import ScalarMonitor, Monitor
 from ..visualizing.utils import ensure_numpy_array
 from ..visualizing.utils import ensure_numpy_float
-from ..visualizing import visualize_batch_matrix
+from ..visualizing import visualize_matrix_list
 from ..visualizing.utils import image_and_pickle
 
 class BatchMatrixMonitor(Monitor):
     ''' Collects a batch of matrices, usually for visualization'''
-    def __init__(self, value_name, n_epochs=None, batch_size=None,norm=False,**kwargs):
+    def __init__(self, value_name, n_epochs=None, batch_size=None,**kwargs):
         self.value_name = value_name
         self.n_epochs = n_epochs
         self.batch_size = batch_size
-        self.norm=norm
         self.epoch = None
         super().__init__(value_name + '_matrix', **kwargs)
 
-    def call(self, epoch=None, **kwargs):
+    def call(self, epoch=None, mask=None, **kwargs):
         if epoch is not None and (epoch-1) % self.n_epochs == 0:
             self.epoch = epoch
             v = kwargs[self.value_name]
             if isinstance(v, list):
                 v = v[0]
-            self.value = ensure_numpy_array(v)
-            assert self.value.ndim == 3
+                if mask is not None:
+                    mask = mask[0]
+
+            if mask is not None:
+                v = list(x[:n, :n] for x, n in zip(v, lengths_from_mask(mask)))
+
+            self.value = list(ensure_numpy_array(x) for x in v)
+            #assert self.value.ndim == 3
         else:
             self.value = None
         return self.value
@@ -39,6 +44,20 @@ class BatchMatrixMonitor(Monitor):
                 matrices = self.value[:self.batch_size]
             if plotname is None:
                 plotname = self.value_name
-            visualize_batch_matrix(matrices, self.plotsdir, str(self.epoch) + '/' + plotname, norm=self.norm)
+            visualize_matrix_list(matrices, self.plotsdir, str(self.epoch) + '/' + plotname)
         else:
             pass
+
+def lengths_from_mask(x):
+    '''
+    Given a mask array, return the implied sequence lengths.
+    Input: Float array of size (bs, n, n) containing only 1s and 0s
+    Output: Int array of size (bs,) whose i'th element is the
+        length of the i'th unmasked sequence
+    '''
+    xdim = len(x.shape)
+    if xdim == 2:
+        return int(x.sum(-1)[0])
+    elif xdim == 3:
+        return x.sum(-1)[:,0].astype('int32')
+    raise ValueError("Array must have 2 or 3 dimensions")

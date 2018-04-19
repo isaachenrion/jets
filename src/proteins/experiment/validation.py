@@ -20,9 +20,10 @@ def _validation(model, data_loader):
 
         valid_loss = valid_loss + float(unwrap(vl))
 
+        #y_pred = y_pred * y_mask
         yy.append(unwrap(y))
         yy_pred.append(unwrap(y_pred))
-        mask.append(unwrap(y_mask))
+        mask.append(unwrap(batch_mask))
 
         del y; del y_pred; del y_mask; del x; del batch_mask; del batch
 

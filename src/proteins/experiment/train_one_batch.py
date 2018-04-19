@@ -17,14 +17,11 @@ def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number
     optimizer.zero_grad()
     y_pred = model(x, mask=batch_mask, logger=logger, epoch=epoch, iters=batch_number)
 
-
-    #y_pred = y_pred * y_mask
     l = loss(y_pred, y, y_mask)
-
 
     # backward
     l.backward()
-    
+
     if clip is not None:
         torch.nn.utils.clip_grad_norm(model.parameters(), clip)
 
