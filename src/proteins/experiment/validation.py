@@ -20,6 +20,7 @@ def _validation(model, data_loader):
     yy, yy_pred = [], []
     half = []
     mask = []
+    hard_pred = []
     for i, batch in enumerate(data_loader):
         (x, y, y_mask, batch_mask) = batch
         y_pred = model(x, mask=batch_mask)
@@ -33,6 +34,7 @@ def _validation(model, data_loader):
         mask.append(unwrap(batch_mask))
 
         half.append(unwrap(half_and_half(y, y_pred)))
+        hard_pred.append(unwrap(half_and_half(y, (y_pred > 0.5).float())))
 
         del y; del y_pred; del y_mask; del x; del batch_mask; del batch
 
@@ -42,6 +44,7 @@ def _validation(model, data_loader):
         yy=yy,
         yy_pred=yy_pred,
         half=half,
+        hard_pred=hard_pred,
         mask=mask,
         valid_loss=valid_loss,
         model=model,

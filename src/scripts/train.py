@@ -116,7 +116,7 @@ model.add_argument("-a","--adj", type=str, nargs='+', default='dm', help='type o
 model.add_argument("--asym", action='store_true', default=False)
 model.add_argument("--readout", type=str, default='dtnn', help='type of readout layer')
 model.add_argument("--m_act", type=str, default='sigmoid', help='type of nonlinearity for matrices' )
-model.add_argument("--lf", type=int, default=20)
+model.add_argument("--lf", type=int, default=8)
 model.add_argument("--wn", action='store_true')
 model.add_argument("--no_grad", action='store_true')
 model.add_argument("--tied", action='store_true')

@@ -65,6 +65,7 @@ class Administrator(_Administrator):
         viz_monitors = [
             BatchMatrixMonitor('yy', n_epochs=self.passed_args['lf'], batch_size=10, visualizing=True),
             BatchMatrixMonitor('half', n_epochs=self.passed_args['lf'], batch_size=10, visualizing=True),
+            BatchMatrixMonitor('hard_pred', n_epochs=self.passed_args['lf'], batch_size=10, visualizing=True),
             BatchMatrixMonitor('yy_pred', n_epochs=self.passed_args['lf'], batch_size=10, visualizing=True)
         ]
 
