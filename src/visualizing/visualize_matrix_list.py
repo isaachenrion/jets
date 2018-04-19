@@ -24,7 +24,8 @@ def visualize_matrix_list(matrix_list, plotsdir, path_to_visualizations):
     for i, matrix in enumerate(matrix_list):
         visualize_matrix(matrix, prefix=os.path.join(plotsdir, path_to_visualizations, str(i)))
 
-def visualize_matrix(matrix, prefix='matrix', cmin=0., cmax=None, log=False, clabel=r'$A_{ij}$'):
+
+def visualize_matrix(matrix, prefix='matrix', cmin=0., cmax=None, log=False, clabel=r'$A_{ij}$', save=True):
     assert matrix.max() <= 1.0
     assert matrix.min() >= 0.0
 
@@ -41,5 +42,7 @@ def visualize_matrix(matrix, prefix='matrix', cmin=0., cmax=None, log=False, cla
     cbar = plt.colorbar()
     cbar.set_label(clabel)
 
-    plt.savefig(prefix + ".pdf", dpi=300)
+    if save:
+        plt.savefig(prefix + ".pdf", dpi=300)
+        
     plt.close(fig)

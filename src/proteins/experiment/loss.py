@@ -6,10 +6,10 @@ import numpy as np
 from src.data_ops.wrapping import wrap
 from src.admin.utils import see_tensors_in_memory
 
-def loss(y_pred, y, y_mask):
+def loss(y_pred, y, y_mask, bm):
     l = nll
-    return l(y_pred, y, y_mask)
-    
+    return l(y_pred, y, y_mask, bm)
+
 def kl(y_pred, y, y_mask):
     n = y_pred.shape[1]
     dists = wrap(torch.Tensor(distances(n)) ** (1/2.5)).view(-1, n, n)
@@ -25,9 +25,16 @@ def kl(y_pred, y, y_mask):
     l = l.mean()
     return l
 
-def nll(y_pred, y, y_mask):
+def nll(y_pred, y, y_mask, batch_mask):
     n = y_pred.shape[1]
-    dists = wrap(torch.Tensor(distances(n)) ** (1/2.5)).view(-1, n, n)
+    n_ = batch_mask.sum(1,keepdim=True)[:,:,0]
+
+    #x = F.sigmoid(distances(n) - n / 2)
+    dists = wrap(torch.Tensor(distances(n))).view(-1, n, n) * batch_mask
+    x = torch.exp(-(n_.unsqueeze(1) - dists - 1)*0.01)
+    #import ipdb; ipdb.set_trace()
+
+    dists = (x)
     lossfn = torch.nn.NLLLoss(reduce=False)
     logprobs = stable_log(torch.stack([1-y_pred, y_pred], 1))
 

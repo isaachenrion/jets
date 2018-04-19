@@ -12,16 +12,7 @@ from torch.autograd import Variable
 
 from src.data_ops.wrapping import wrap
 
-from src.architectures.nmp.message_passing import MP_LAYERS
-from src.architectures.nmp.adjacency import construct_adjacency
-from src.architectures.nmp.adjacency.simple.learned import NegativeNorm, NegativeSquare
-from src.architectures.nmp.adjacency.simple.matrix_activation import padded_matrix_softmax
-from src.architectures.embedding import EMBEDDINGS
 from src.architectures.nmp.message_passing.vertex_update import GRUUpdate
-
-from src.monitors import Histogram
-from src.monitors import Collect
-from src.monitors import BatchMatrixMonitor
 
 from src.admin.utils import memory_snapshot
 #from src.misc.grad_mode import no_grad
