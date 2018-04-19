@@ -16,14 +16,16 @@ class BasicBlock(nn.Module):
     def __init__(self, inplanes, planes, stride=1, downsample=None):
         super(BasicBlock, self).__init__()
         m = OrderedDict()
-        m['conv1'] = conv_and_pad(inplanes, planes, stride)
         m['bn1'] = nn.BatchNorm1d(planes)
+        m['conv1'] = conv_and_pad(inplanes, planes, stride)
         m['relu1'] = nn.ReLU(inplace=True)
-        m['conv2'] = conv_and_pad(planes, planes)
         m['bn2'] = nn.BatchNorm1d(planes)
+        m['conv2'] = conv_and_pad(planes, planes)
+        m['relu2'] = nn.ReLU(inplace=True)
+        #m['bn2'] = nn.BatchNorm1d(planes)
         self.group1 = nn.Sequential(m)
 
-        self.relu= nn.Sequential(nn.ReLU(inplace=True))
+        #self.relu= nn.Sequential(nn.ReLU(inplace=True))
         self.downsample = downsample
 
     def forward(self, x):
@@ -35,7 +37,7 @@ class BasicBlock(nn.Module):
 
         out = self.group1(x) + residual
 
-        out = self.relu(out)
+        #out = self.relu(out)
 
         del residual
 
@@ -77,16 +79,18 @@ class ResNet1d(nn.Module):
         self.inplanes = hidden
         super().__init__()
 
-        m = OrderedDict()
-        m['conv1'] = nn.Conv1d(features, hidden, kernel_size=7, stride=1, padding=3, bias=False)
-        m['bn1'] = nn.BatchNorm1d(hidden)
-        m['relu1'] = nn.ReLU(inplace=True)
-        self.group1= nn.Sequential(m)
+        #m = OrderedDict()
+        #m['conv1'] = nn.Conv1d(features, hidden, kernel_size=7, stride=1, padding=3, bias=False)
+        #m['bn1'] = nn.BatchNorm1d(hidden)
+        #m['relu1'] = nn.ReLU(inplace=True)
+        #self.group1= nn.Sequential(m)
 
-        self.layer1 = self._make_layer(block, hidden, layers[0])
-        self.layer2 = self._make_layer(block, hidden, layers[1], stride=1)
-        self.layer3 = self._make_layer(block, hidden, layers[2], stride=1)
-        self.layer4 = self._make_layer(block, hidden, layers[3], stride=1)
+        self.many_blocks = self._make_layer(block, hidden, layers)
+        #self.layer2 = self._make_layer(block, hidden, layers[1], stride=1)
+        #self.layer3 = self._make_layer(block, hidden, layers[2], stride=1)
+        #self.layer4 = self._make_layer(block, hidden, layers[3], stride=1)
+        #self.layer5 = self._make_layer(block, hidden, layers[4], stride=1)
+        #self.layer6 = self._make_layer(block, hidden, layers[5], stride=1)
 
 
         for m in self.modules():
@@ -115,15 +119,17 @@ class ResNet1d(nn.Module):
 
     def forward(self, x):
         #
-        x = self.group1(x)
+        #x = self.group1(x)
 
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
+        x = self.many_blocks(x)
+        #x = self.layer2(x)
+        #x = self.layer3(x)
+        #x = self.layer4(x)
+        #x = self.layer5(x)
+        #x = self.layer6(x)
 
         return x
 
 def resnet_1d(**kwargs):
-    model = ResNet1d(BasicBlock, [2,2,2,2], **kwargs)
+    model = ResNet1d(BasicBlock, 6, **kwargs)
     return model

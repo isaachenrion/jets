@@ -68,6 +68,57 @@ def compute_protein_metrics(targets, predictions, k_list):
     return dict(**acc, **acc_long, **acc_med, **acc_short)
 
 
+class ProteinMetricCollection(ScalarMonitor):
+    def __init__(self, *k_values, **kwargs):
+        super().__init__(name='protein_metrics_collection', **kwargs)
+        names = ['acc', 'acc_long', 'acc_med', 'acc_short']
+        self.collector_dicts = OrderedDict()
+        self.k_list = k_values
+        for k in k_values:
+            cd = OrderedDict()
+            for name in names:
+                name = name+'_L_'+str(k)
+                c = Collect(name, fn='last', plotname=name, **kwargs)
+                cd[name] = c
+            self.collector_dicts[k] = cd
+
+    def call(self, yy=None, yy_pred=None, **kwargs):
+        t = time.time()
+        stats_dict = compute_protein_metrics(yy, yy_pred, self.k_list)
+        for _, cd in self.collector_dicts.items():
+            for _, c in cd.items():
+                c(**stats_dict)
+        logging.info("Protein metric took {:.2f}s".format(time.time() - t))
+        return None
+
+    def initialize(self, *args):
+        for cd in self.collector_dicts.values():
+            for c in cd.values():
+                c.initialize(*args)
+
+    @property
+    def _string(self):
+        out_str = ""
+        for k, cd in self.collector_dicts.items():
+            out_str += "\n"
+            out_str += "L/{}".format(k)+"\t"
+            for c in cd.values():
+                shortname = c.name.split('_')[0]
+                out_str += '\t{} = {:.1f}%'.format(shortname, 100*c.value)
+        out_str += "\n"
+        return out_str
+
+    def visualize(self, **kwargs):
+        for cd in self.collector_dicts.values():
+            for c in cd.values():
+                c.visualize(**kwargs)
+
+'''
+-------------------------------------------------------------------
+DEPRECATED --------------------------------------------------------
+-------------------------------------------------------------------
+'''
+
 def compute_protein_metrics_old(targets, predictions, k):
     acc, acc_med, acc_long, acc_short = ([None for _ in range(len(targets))] for _ in range(4))
 
@@ -143,53 +194,6 @@ class ProteinMetrics(ScalarMonitor):
     def visualize(self, **kwargs):
         for c in self.collectors:
             c.visualize(**kwargs)
-
-class ProteinMetricCollection(ScalarMonitor):
-    def __init__(self, *k_values, **kwargs):
-        super().__init__(name='protein_metrics_collection', **kwargs)
-        names = ['acc', 'acc_long', 'acc_med', 'acc_short']
-        self.collector_dicts = OrderedDict()
-        self.k_list = k_values
-        for k in k_values:
-            cd = OrderedDict()
-            for name in names:
-                name = name+'_L_'+str(k)
-                c = Collect(name, fn='last', plotname=name, **kwargs)
-                cd[name] = c
-            self.collector_dicts[k] = cd
-        #self.collectors = {k: { } }
-
-    def call(self, yy=None, yy_pred=None, **kwargs):
-        t = time.time()
-        stats_dict = compute_protein_metrics(yy, yy_pred, self.k_list)
-        for _, cd in self.collector_dicts.items():
-            for _, c in cd.items():
-                c(**stats_dict)
-        logging.info("Protein metric took {:.2f}s".format(time.time() - t))
-        return None
-
-    def initialize(self, *args):
-        for cd in self.collector_dicts.values():
-            for c in cd.values():
-                c.initialize(*args)
-
-    @property
-    def _string(self):
-        out_str = ""
-        for k, cd in self.collector_dicts.items():
-            out_str += "\n"
-            out_str += "L/{}".format(k)+"\t"
-            for c in cd.values():
-                shortname = c.name.split('_')[0]
-                out_str += '\t{} = {:.1f}%'.format(shortname, 100*c.value)
-        out_str += "\n"
-        return out_str
-
-    def visualize(self, **kwargs):
-        for cd in self.collector_dicts.values():
-            for c in cd.values():
-                c.visualize(**kwargs)
-
 
 class ProteinMetricCollection_(ScalarMonitor):
     def __init__(self, *k_values, **kwargs):

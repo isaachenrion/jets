@@ -74,17 +74,17 @@ class ResNet2d(nn.Module):
         self.inplanes = hidden
         super().__init__()
 
-        m = OrderedDict()
-        m['conv1'] = nn.Conv2d(features, hidden, kernel_size=7, stride=1, padding=3, bias=False)
-        m['bn1'] = nn.BatchNorm2d(hidden)
-        m['relu1'] = nn.ReLU(inplace=True)
-        #m['maxpool'] = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.group1= nn.Sequential(m)
+        #m = OrderedDict()
+        #m['conv1'] = nn.Conv2d(features, hidden, kernel_size=7, stride=1, padding=3, bias=False)
+        #m['bn1'] = nn.BatchNorm2d(hidden)
+        #m['relu1'] = nn.ReLU(inplace=True)
+        ##m['maxpool'] = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        #self.group1= nn.Sequential(m)
 
-        self.layer1 = self._make_layer(block, hidden, layers[0])
-        self.layer2 = self._make_layer(block, hidden, layers[1], stride=1)
-        self.layer3 = self._make_layer(block, hidden, layers[2], stride=1)
-        self.layer4 = self._make_layer(block, hidden, layers[3], stride=1)
+        self.transform = self._make_layer(block, hidden, layers)
+        #self.layer2 = self._make_layer(block, hidden, layers[1], stride=1)
+        #self.layer3 = self._make_layer(block, hidden, layers[2], stride=1)
+        #self.layer4 = self._make_layer(block, hidden, layers[3], stride=1)
 
         #self.avgpool = nn.Sequential(nn.AvgPool2d(7))
 
@@ -115,12 +115,12 @@ class ResNet2d(nn.Module):
 
     def forward(self, x):
 
-        x = self.group1(x)
+        #x = self.group1(x)
 
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
+        x = self.transform(x)
+        #x = self.layer2(x)
+        #x = self.layer3(x)
+        #x = self.layer4(x)
 
         #import ipdb; ipdb.set_trace()
 
@@ -130,5 +130,5 @@ class ResNet2d(nn.Module):
         return x
 
 def resnet_2d(**kwargs):
-    model = ResNet2d(BasicBlock, [1,1,1,1], **kwargs)
+    model = ResNet2d(BasicBlock, kwargs['iters'], **kwargs)
     return model

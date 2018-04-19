@@ -1,9 +1,16 @@
 import logging
 import time
-from src.data_ops.wrapping import unwrap
 
+import torch
+
+from src.data_ops.wrapping import unwrap
 from .loss import loss
 
+
+def half_and_half(a,b):
+    a = torch.stack([torch.triu(x) for x in a], 0)
+    b = torch.stack([torch.tril(x, diagonal=-1) for x in b], 0)
+    return a + b
 
 def _validation(model, data_loader):
     t_valid = time.time()
@@ -11,6 +18,7 @@ def _validation(model, data_loader):
 
     valid_loss = 0.
     yy, yy_pred = [], []
+    half = []
     mask = []
     for i, batch in enumerate(data_loader):
         (x, y, y_mask, batch_mask) = batch
@@ -20,10 +28,11 @@ def _validation(model, data_loader):
 
         valid_loss = valid_loss + float(unwrap(vl))
 
-        #y_pred = y_pred * y_mask
         yy.append(unwrap(y))
         yy_pred.append(unwrap(y_pred))
         mask.append(unwrap(batch_mask))
+
+        half.append(unwrap(half_and_half(y, y_pred)))
 
         del y; del y_pred; del y_mask; del x; del batch_mask; del batch
 
@@ -32,6 +41,7 @@ def _validation(model, data_loader):
     logdict = dict(
         yy=yy,
         yy_pred=yy_pred,
+        half=half,
         mask=mask,
         valid_loss=valid_loss,
         model=model,
