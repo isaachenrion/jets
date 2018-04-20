@@ -1,4 +1,5 @@
 import logging
+import os
 
 from .data_ops import get_train_data_loader
 from .experiment import _validation, _train_one_batch
@@ -49,8 +50,8 @@ class Training(_Training):
             training_args.batch_size = 3
             training_args.epochs = 15
 
-            data_args.n_train = 12
-            data_args.n_valid = 10
+            #data_args.n_train = 12
+            #data_args.n_valid = 10
 
             optim_args.lr = 0.1
             optim_args.period = 2
@@ -58,13 +59,16 @@ class Training(_Training):
             computing_args.seed = 1
 
             model_args.hidden = 1
-            model_args.iters = 2
+            model_args.iters = 20
             model_args.lf = 1
 
         return admin_args,model_args, data_args, computing_args, training_args, optim_args, loading_args
 
     def load_data(self):
-        data_dir = self.admin_args.data_dir
+        data_dir = os.path.join(self.admin_args.data_dir, 'proteins', 'pdb25')
+        if self.data_args.debug:
+            data_dir = os.path.join(data_dir, 'small')
+
         n_train = self.data_args.n_train
         n_valid = self.data_args.n_valid
         batch_size = self.training_args.batch_size

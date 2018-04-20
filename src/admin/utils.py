@@ -66,15 +66,17 @@ def get_tensors_in_memory(ndim=None):
             pass
     return tensor_list
 
+def memory_footprint(x):
+    b = np.prod(x.size()) * 4
+    if hasattr(x, 'data') and x.grad is not None:
+        b = b * 2
+    return b
 
 def get_bytes(tensor_list):
-    #total_bytes = float(reduce(lambda x,y:x+y, map(lambda x: total_size(x) * x.element_size(), tensor_list))) if len(tensor_list) > 0 else 0
-    sizes = [t.size() for t in tensor_list]
-    total_sizes = [np.prod(s) for s in sizes]
-    total_bytes = sum(total_sizes) * 4 # 4 is for 32 bit numbers since 4 * 8 bits
-    #import ipdb; ipdb.set_trace()
-
-    #total_bytes = float(reduce(lambda x,y:max(x,y), map(lambda x: total_size(x) * x.element_size(), tensor_list))) if len(tensor_list) > 0 else 0
+    total_bytes = 0
+    for t in tensor_list:
+        b = memory_footprint(t)
+        total_bytes += b
     return total_bytes
 
 def total_size(t):
@@ -86,14 +88,22 @@ def total_size(t):
 def see_tensors_in_memory(ndim=None):
     tensor_list = get_tensors_in_memory(ndim)
     total_bytes = get_bytes(tensor_list)
-    logging.info('There are {} tensors in memory, consuming {} total'.format(len(tensor_list), format_bytes(total_bytes)))
+    logging.info((
+        'There are {} instantiated tensors in memory, consuming {} total.\n'
+        'This does not count internal tensors created by pytorch, only things '
+        'like variables and weights')
+        .format(len(tensor_list), format_bytes(total_bytes)))
 
 
 def see_cuda_tensors_in_memory(ndim=None):
     tensor_list = get_tensors_in_memory(ndim)
     tensor_list = list(filter(lambda x: x.is_cuda, tensor_list))
     total_bytes = get_bytes(tensor_list)
-    logging.info('There are {} CUDA tensors in memory, consuming {} total'.format(len(tensor_list), format_bytes(total_bytes)))
+    logging.info((
+        'There are {} instantiated CUDA tensors in memory, consuming {} total.\n'
+        'This does not count internal tensors created by pytorch, only things '
+        'like variables and weights')
+        .format(len(tensor_list), format_bytes(total_bytes)))
 
 class memory_snapshot:
     def __init__(self, ndim=None, cuda=False):

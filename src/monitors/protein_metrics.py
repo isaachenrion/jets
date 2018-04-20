@@ -103,7 +103,7 @@ class ProteinMetricCollection(ScalarMonitor):
             out_str += "\n"
             out_str += "L/{}".format(k)+"\t"
             for c in cd.values():
-                shortname = c.name.split('_')[0]
+                shortname = c.name.split('_')[1]
                 out_str += '\t{} = {:.1f}%'.format(shortname, 100*c.value)
         out_str += "\n"
         return out_str

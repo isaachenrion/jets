@@ -32,6 +32,7 @@ def visualize_matrix(matrix, prefix='matrix', cmin=0., cmax=None, log=False, cla
     fig, ax = plt.subplots()
 
     #matrix = unpad(matrix)
+    mpl.style.use('default')
 
     if log:
         plt.matshow(matrix, cmap='viridis_r', norm=LogNorm(), origin='lower', fignum=False)
@@ -44,5 +45,5 @@ def visualize_matrix(matrix, prefix='matrix', cmin=0., cmax=None, log=False, cla
 
     if save:
         plt.savefig(prefix + ".pdf", dpi=300)
-        
+
     plt.close(fig)

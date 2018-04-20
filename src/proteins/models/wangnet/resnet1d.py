@@ -16,7 +16,8 @@ class BasicBlock(nn.Module):
     def __init__(self, inplanes, planes, stride=1, downsample=None):
         super(BasicBlock, self).__init__()
         m = OrderedDict()
-        m['bn1'] = nn.BatchNorm1d(planes)
+        #import ipdb; ipdb.set_trace()
+        m['bn1'] = nn.BatchNorm1d(inplanes)
         m['conv1'] = conv_and_pad(inplanes, planes, stride)
         m['relu1'] = nn.ReLU(inplace=True)
         m['bn2'] = nn.BatchNorm1d(planes)
@@ -79,11 +80,11 @@ class ResNet1d(nn.Module):
         self.inplanes = hidden
         super().__init__()
 
-        #m = OrderedDict()
-        #m['conv1'] = nn.Conv1d(features, hidden, kernel_size=7, stride=1, padding=3, bias=False)
-        #m['bn1'] = nn.BatchNorm1d(hidden)
-        #m['relu1'] = nn.ReLU(inplace=True)
-        #self.group1= nn.Sequential(m)
+        m = OrderedDict()
+        m['conv1'] = nn.Conv1d(features, hidden, kernel_size=7, stride=1, padding=3, bias=False)
+        m['bn1'] = nn.BatchNorm1d(hidden)
+        m['relu1'] = nn.ReLU(inplace=True)
+        self.group1= nn.Sequential(m)
 
         self.many_blocks = self._make_layer(block, hidden, layers)
         #self.layer2 = self._make_layer(block, hidden, layers[1], stride=1)
@@ -119,7 +120,7 @@ class ResNet1d(nn.Module):
 
     def forward(self, x):
         #
-        #x = self.group1(x)
+        x = self.group1(x)
 
         x = self.many_blocks(x)
         #x = self.layer2(x)

@@ -5,6 +5,8 @@ import torch.nn.functional as F
 from collections import OrderedDict
 import math
 
+from src.admin.utils import memory_snapshot
+
 def conv_and_pad3x3(in_planes, out_planes, kernel_size=3,stride=1):
     # "3x3 convolution with padding"
     padding = (kernel_size - 1) // 2
@@ -74,12 +76,12 @@ class ResNet2d(nn.Module):
         self.inplanes = hidden
         super().__init__()
 
-        #m = OrderedDict()
-        #m['conv1'] = nn.Conv2d(features, hidden, kernel_size=7, stride=1, padding=3, bias=False)
-        #m['bn1'] = nn.BatchNorm2d(hidden)
-        #m['relu1'] = nn.ReLU(inplace=True)
-        ##m['maxpool'] = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        #self.group1= nn.Sequential(m)
+        m = OrderedDict()
+        m['conv1'] = nn.Conv2d(features, hidden, kernel_size=7, stride=1, padding=3, bias=False)
+        m['bn1'] = nn.BatchNorm2d(hidden)
+        m['relu1'] = nn.ReLU(inplace=True)
+        #m['maxpool'] = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.group1= nn.Sequential(m)
 
         self.transform = self._make_layer(block, hidden, layers)
         #self.layer2 = self._make_layer(block, hidden, layers[1], stride=1)
@@ -114,9 +116,8 @@ class ResNet2d(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-
-        #x = self.group1(x)
-
+        #with memory_snapshot():
+        x = self.group1(x)
         x = self.transform(x)
         #x = self.layer2(x)
         #x = self.layer3(x)
