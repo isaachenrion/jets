@@ -24,15 +24,19 @@ def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number
     if clip is not None:
         torch.nn.utils.clip_grad_norm(model.parameters(), clip)
 
+    #if False:
     if batch_number == 0:
         old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
         grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
-
+    else:
+        del old_params; del grads
 
     if batch_number == 1:
         log_gpu_usage()
 
     optimizer.step()
+
+    #if False:
     if batch_number == 0:
         model_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
 
@@ -43,7 +47,8 @@ def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number
         )
         administrator.training_only_monitors(**logdict)
         administrator.training_only_monitors.visualize()
-
+    else:
+        del model_params
 
     del y; del y_pred; del y_mask; del x; del batch_mask; del batch
 

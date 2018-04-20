@@ -22,7 +22,6 @@ class Training(_Training):
         **kwargs
         ):
 
-        
 
         super().__init__(admin_args,
             model_args,
@@ -62,7 +61,7 @@ class Training(_Training):
             computing_args.seed = 1
 
             model_args.hidden = 1
-            model_args.iters = 20
+            model_args.iters = 2
             model_args.lf = 1
 
         return admin_args,model_args, data_args, computing_args, training_args, optim_args, loading_args
