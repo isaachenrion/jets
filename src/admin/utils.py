@@ -79,12 +79,6 @@ def get_bytes(tensor_list):
         total_bytes += b
     return total_bytes
 
-def total_size(t):
-    s = t.size()
-    if s:
-        return reduce(op.mul, s)
-    return 1
-
 def see_tensors_in_memory(ndim=None):
     tensor_list = get_tensors_in_memory(ndim)
     total_bytes = get_bytes(tensor_list)
@@ -105,6 +99,9 @@ def see_cuda_tensors_in_memory(ndim=None):
         'like variables and weights')
         .format(len(tensor_list), format_bytes(total_bytes)))
 
+def compute_model_size(model):
+    return sum(memory_footprint(p) for p in model.parameters())
+    
 class memory_snapshot:
     def __init__(self, ndim=None, cuda=False):
         self.cuda = cuda

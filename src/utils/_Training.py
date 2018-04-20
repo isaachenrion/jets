@@ -21,6 +21,8 @@ from src.optim.build_scheduler import build_scheduler
 from src.admin.utils import see_tensors_in_memory
 
 from src.admin.utils import log_gpu_usage
+from src.admin.utils import compute_model_size
+from src.admin.utils import format_bytes
 
 
 class _Training:
@@ -67,6 +69,7 @@ class _Training:
         #model, settings = load_model(loading_args.load, model_args, administrator.logger, loading_args.restart)
         self.model_args.features = train_data_loader.dataset.dim
         model, model_kwargs = self.build_model(self.loading_args.load, self.model_args, logger=administrator.logger)
+        logging.info("Model size is {}".format(format_bytes(compute_model_size(model))))
         if loading_args.restart:
             with open(os.path.join(model_filename, 'settings.pickle'), "rb") as f:
                 settings = pickle.load(f)
