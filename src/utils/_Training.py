@@ -1,6 +1,7 @@
 import logging
 import time
 import gc
+import copy
 #from importlib import import_module
 #from memory_profiler import profile, memory_usage
 
@@ -65,6 +66,8 @@ class _Training:
 
         log_gpu_usage()
         train_data_loader, valid_data_loader = self.load_data()
+        dummy_train_data_loader = copy.deepcopy(valid_data_loader)
+        dummy_train_data_loader.dataset = copy.deepcopy(train_data_loader.dataset)
         log_gpu_usage()
 
         #model, settings = load_model(loading_args.load, model_args, administrator.logger, loading_args.restart)
@@ -102,7 +105,7 @@ class _Training:
         time_limit = self.training_args.experiment_time * 60 * 60 - 60
         epochs = self.training_args.epochs
         clip = self.optim_args.clip
-        self.train(model, settings, train_data_loader, valid_data_loader, optimizer, scheduler, administrator, epochs, time_limit,clip)
+        self.train(model, settings, train_data_loader, valid_data_loader, dummy_train_data_loader, optimizer, scheduler, administrator, epochs, time_limit,clip)
 
         administrator.finished()
 
@@ -186,7 +189,7 @@ class _Training:
 
         return train_dict
 
-    def train(self,model, settings, train_data_loader, valid_data_loader, optimizer, scheduler, administrator, epochs, time_limit, clip):
+    def train(self,model, settings, train_data_loader, valid_data_loader, dummy_train_data_loader, optimizer, scheduler, administrator, epochs, time_limit, clip):
         t_start = time.time()
         administrator = administrator
 
@@ -207,6 +210,7 @@ class _Training:
 
             train_dict = self.train_one_epoch(model, train_data_loader, optimizer, scheduler, administrator, epoch, iteration, clip)
             valid_dict = self.validation(model, valid_data_loader)
+            #valid_dict = self.validation(model, dummy_train_data_loader)
             logdict = {**train_dict, **valid_dict, **static_dict}
 
             iteration = train_dict['iteration']

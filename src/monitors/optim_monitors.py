@@ -3,7 +3,7 @@ from .meta import Collect
 
 class GradNorm(Collect):
     def __init__(self, **kwargs):
-        super().__init__('grad_norm', **kwargs)
+        super().__init__('grad_norm', fn='last', **kwargs)
 
     def call(self, grads=None, **kwargs):
         #grads = [p.grad for p in model.parameters()]
@@ -15,7 +15,7 @@ class GradNorm(Collect):
 
 class ParamNorm(Collect):
     def __init__(self, **kwargs):
-        super().__init__('param_norm', **kwargs)
+        super().__init__('param_norm', fn='last', **kwargs)
 
     def call(self, model_params=None, **kwargs):
         #model_params = list(model.parameters())
@@ -27,7 +27,7 @@ class ParamNorm(Collect):
 
 class GradVariance(Collect):
     def __init__(self, **kwargs):
-        super().__init__('grad_variance', **kwargs)
+        super().__init__('grad_variance', fn='last', **kwargs)
 
     def call(self, grads=None, **kwargs):
         #grads = [p.grad for p in model.parameters()]
@@ -39,7 +39,7 @@ class GradVariance(Collect):
 
 class ParamVariance(Collect):
     def __init__(self, **kwargs):
-        super().__init__('param_variance', **kwargs)
+        super().__init__('param_variance', fn='last', **kwargs)
 
     def call(self, model_params=None, **kwargs):
         #model_params = list(model.parameters())
@@ -50,7 +50,7 @@ class ParamVariance(Collect):
 
 class UpdateRatio(Collect):
     def __init__(self, **kwargs):
-        super().__init__('update_ratio', **kwargs)
+        super().__init__('update_ratio', fn='last', **kwargs)
 
     def call(self, model_params=None, old_params=None, **kwargs):
         #model_params = list(model.parameters())

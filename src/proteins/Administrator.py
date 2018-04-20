@@ -1,3 +1,4 @@
+import os
 from src.admin._Administrator import _Administrator
 
 from src.monitors import *
@@ -17,14 +18,20 @@ class Administrator(_Administrator):
 
     def setup_training_only_monitors(self):
         grad_monitors = [
-            GradNorm(fn='last',visualizing=True),
-            ParamNorm(fn='last', visualizing=True),
-            UpdateRatio(fn='last', visualizing=True)
+            GradNorm(visualizing=True),
+            ParamNorm(visualizing=True),
+            UpdateRatio(visualizing=True)
         ]
-        monitors = grad_monitors
+        viz_monitors = [
+            BatchMatrixMonitor('yy', n_epochs=self.passed_args['lf'], batch_size=10, visualizing=True),
+            BatchMatrixMonitor('half', n_epochs=self.passed_args['lf'], batch_size=10, visualizing=True),
+            BatchMatrixMonitor('hard_pred', n_epochs=self.passed_args['lf'], batch_size=10, visualizing=True),
+            BatchMatrixMonitor('yy_pred', n_epochs=self.passed_args['lf'], batch_size=10, visualizing=True)
+        ]
+        monitors = grad_monitors + viz_monitors
 
         self.training_only_monitors = MonitorCollection(*monitors)
-        self.training_only_monitors.initialize(self.logger.statsdir, self.logger.plotsdir)
+        self.training_only_monitors.initialize(self.logger.statsdir, os.path.join(self.logger.plotsdir, 'train') )
 
     def setup_training_monitors(self):
 
