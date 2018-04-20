@@ -81,6 +81,7 @@ def get_bytes(tensor_list):
 
 def see_tensors_in_memory(ndim=None, summary=False, cuda=False):
     tensor_list = get_tensors_in_memory(ndim)
+    tensor_list = (filter(lambda x: isinstance(x, torch.nn.Parameter), tensor_list))
     if cuda:
         tensor_list = list(filter(lambda x: x.is_cuda, tensor_list))
         cuda_or_cpu = 'CUDA'
@@ -93,8 +94,8 @@ def see_tensors_in_memory(ndim=None, summary=False, cuda=False):
 
     logging.info((
         'There are {} instantiated {} tensors in memory, consuming {} total.\n'
-        'This does not count internal tensors created by pytorch, only things '
-        'like variables and weights')
+        'This does not count internal tensors created by pytorch or weights, only things '
+        'like variables')
         .format(len(tensor_list), cuda_or_cpu, format_bytes(total_bytes)))
 
     if not summary:
