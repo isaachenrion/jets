@@ -34,9 +34,8 @@ class BasicBlock(nn.Module):
         else:
             residual = x
 
-        with memory_snapshot(ndim=4, cuda=torch.cuda.is_available(), summary=False):
-            out = self.group1(x) + residual
-            del residual
+        out = self.group1(x) + residual
+        del residual
 
         out = self.relu(out)
 
