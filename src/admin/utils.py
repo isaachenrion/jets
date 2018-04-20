@@ -68,7 +68,7 @@ def get_tensors_in_memory(ndim=None):
 
 def memory_footprint(x):
     b = np.prod(x.size()) * 4
-    if hasattr(x, 'data') and x.grad is not None:
+    if isinstance(x, torch.autograd.Variable) and x.grad is not None:
         b = b * 2
     return b
 
