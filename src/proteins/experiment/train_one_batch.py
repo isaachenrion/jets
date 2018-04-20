@@ -11,7 +11,6 @@ def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number
     logger = administrator.logger
     (x, y, y_mask, batch_mask) = batch
 
-
     # forward
     model.train()
     optimizer.zero_grad()
@@ -48,5 +47,6 @@ def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number
 
     del y; del y_pred; del y_mask; del x; del batch_mask; del batch
 
+    log_gpu_usage()
 
     return float(unwrap(l))
