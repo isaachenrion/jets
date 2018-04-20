@@ -63,8 +63,9 @@ class _Training:
             train=True,**all_args
             )
 
-
+        log_gpu_usage()
         train_data_loader, valid_data_loader = self.load_data()
+        log_gpu_usage()
 
         #model, settings = load_model(loading_args.load, model_args, administrator.logger, loading_args.restart)
         self.model_args.features = train_data_loader.dataset.dim
@@ -96,6 +97,7 @@ class _Training:
 
         ''' TRAINING '''
         '''----------------------------------------------------------------------- '''
+        log_gpu_usage()
         administrator.save(model, settings)
         time_limit = self.training_args.experiment_time * 60 * 60 - 60
         epochs = self.training_args.epochs

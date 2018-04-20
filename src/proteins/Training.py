@@ -21,6 +21,9 @@ class Training(_Training):
         loading_args=None,
         **kwargs
         ):
+
+        
+
         super().__init__(admin_args,
             model_args,
             data_args,
