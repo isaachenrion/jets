@@ -34,7 +34,9 @@ class BasicBlock(nn.Module):
         else:
             residual = x
 
-        out = self.group1(x) + residual
+        with memory_snapshot():
+            out = self.group1(x) + residual
+            del residual
 
         out = self.relu(out)
 
@@ -116,15 +118,8 @@ class ResNet2d(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        #with memory_snapshot():
         x = self.group1(x)
         x = self.transform(x)
-        #x = self.layer2(x)
-        #x = self.layer3(x)
-        #x = self.layer4(x)
-
-        #import ipdb; ipdb.set_trace()
-
         x = F.sigmoid(torch.mean(x, 1))
 
 
