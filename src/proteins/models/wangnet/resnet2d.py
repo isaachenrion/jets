@@ -34,7 +34,7 @@ class BasicBlock(nn.Module):
         else:
             residual = x
 
-        with memory_snapshot(ndim=3,cuda=True, summary=False):
+        with memory_snapshot(ndim=4,cuda=True, summary=False):
             out = self.group1(x) + residual
             del residual
 
