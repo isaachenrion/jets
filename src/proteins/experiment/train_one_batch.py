@@ -2,7 +2,7 @@
 import logging
 import torch
 
-from src.admin.utils import see_tensors_in_memory, see_cuda_tensors_in_memory, log_gpu_usage
+from src.admin.utils import see_tensors_in_memory, log_gpu_usage
 from src.data_ops.wrapping import unwrap
 
 from .loss import loss
