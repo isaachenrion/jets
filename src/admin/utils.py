@@ -98,7 +98,7 @@ def see_tensors_in_memory(ndim=None, summary=False, cuda=False):
             .format(len(tensor_list), cuda_or_cpu, format_bytes(total_bytes)))
 
     else:
-        logging.info('\n'.join([t.shape for t in tensor_list]))
+        logging.info('\n'.join([','.join(list(t.shape)) for t in tensor_list]))
 
 
 def compute_model_size(model):
