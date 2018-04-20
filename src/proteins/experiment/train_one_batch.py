@@ -29,7 +29,7 @@ def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number
         old_params = torch.cat([p.view(-1) for p in model.parameters()], 0)
         grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
     else:
-        del old_params; del grads
+        old_params = None; grads = None
 
     if batch_number == 1:
         log_gpu_usage()
@@ -48,7 +48,7 @@ def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number
         administrator.training_only_monitors(**logdict)
         administrator.training_only_monitors.visualize()
     else:
-        del model_params
+        model_params = None
 
     del y; del y_pred; del y_mask; del x; del batch_mask; del batch
 
