@@ -79,47 +79,44 @@ def get_bytes(tensor_list):
         total_bytes += b
     return total_bytes
 
-def see_tensors_in_memory(ndim=None):
+def see_tensors_in_memory(ndim=None, summary=False, cuda=False):
     tensor_list = get_tensors_in_memory(ndim)
-    total_bytes = get_bytes(tensor_list)
-    logging.info((
-        'There are {} instantiated tensors in memory, consuming {} total.\n'
-        'This does not count internal tensors created by pytorch, only things '
-        'like variables and weights')
-        .format(len(tensor_list), format_bytes(total_bytes)))
+    if cuda:
+        tensor_list = list(filter(lambda x: x.is_cuda, tensor_list))
+        cuda_or_cpu = 'CUDA'
+    else:
+        tensor_list = list(filter(lambda x: not x.is_cuda, tensor_list))
+        cuda_or_cpu = 'CPU'
 
+    if summary:
+        total_bytes = get_bytes(tensor_list)
 
-def see_cuda_tensors_in_memory(ndim=None):
-    tensor_list = get_tensors_in_memory(ndim)
-    tensor_list = list(filter(lambda x: x.is_cuda, tensor_list))
-    total_bytes = get_bytes(tensor_list)
-    logging.info((
-        'There are {} instantiated CUDA tensors in memory, consuming {} total.\n'
-        'This does not count internal tensors created by pytorch, only things '
-        'like variables and weights')
-        .format(len(tensor_list), format_bytes(total_bytes)))
+        logging.info((
+            'There are {} instantiated {} tensors in memory, consuming {} total.\n'
+            'This does not count internal tensors created by pytorch, only things '
+            'like variables and weights')
+            .format(len(tensor_list), cuda_or_cpu, format_bytes(total_bytes)))
+
+    else:
+        logging.info('\n'.join([t.shape for t in tensor_list]))
+
 
 def compute_model_size(model):
     return sum(memory_footprint(p) for p in model.parameters())
-    
+
 class memory_snapshot:
-    def __init__(self, ndim=None, cuda=False):
+    def __init__(self, ndim=None, cuda=False, summary=False):
         self.cuda = cuda
         self.ndim=ndim
+        self.summary=summary
 
     def __enter__(self):
         logging.info("BEFORE")
-        if self.cuda:
-            see_cuda_tensors_in_memory(self.ndim)
-        else:
-            see_tensors_in_memory(self.ndim)
+        see_tensors_in_memory(self.ndim, self.summary, self.cuda)
 
     def __exit__(self, type, value, traceback):
         logging.info("AFTER")
-        if self.cuda:
-            see_cuda_tensors_in_memory(self.ndim)
-        else:
-            see_tensors_in_memory(self.ndim)
+        see_tensors_in_memory(self.ndim, self.summary, self.cuda)
 
 
 def format_bytes(n):
