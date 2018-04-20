@@ -81,7 +81,7 @@ def get_bytes(tensor_list):
 
 def see_tensors_in_memory(ndim=None, summary=False, cuda=False):
     tensor_list = get_tensors_in_memory(ndim)
-    tensor_list = (filter(lambda x: isinstance(x, torch.nn.Parameter), tensor_list))
+    tensor_list = (filter(lambda x: isinstance(x, not torch.nn.Parameter), tensor_list))
     if cuda:
         tensor_list = list(filter(lambda x: x.is_cuda, tensor_list))
         cuda_or_cpu = 'CUDA'
