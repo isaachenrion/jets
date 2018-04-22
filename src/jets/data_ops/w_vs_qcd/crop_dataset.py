@@ -1,6 +1,6 @@
 import logging
 import numpy as np
-from ..JetDataset import JetDataset
+from ..Dataset import Dataset
 
 def crop(jets, pileup=False):
     #logging.warning("Cropping...")
@@ -53,6 +53,6 @@ def crop_dataset(dataset):
     logging.info(dataset.subproblem)
     pileup = (dataset.subproblem == 'pileup')
     good_jets, bad_jets, w = crop(dataset.jets, pileup)
-    cropped_dataset = JetDataset(bad_jets)
-    new_dataset = JetDataset(good_jets, w)
+    cropped_dataset = Dataset(bad_jets)
+    new_dataset = Dataset(good_jets, w)
     return new_dataset, cropped_dataset

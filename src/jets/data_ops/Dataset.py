@@ -1,10 +1,10 @@
 import logging
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset as D
 import numpy as np
 import math
 
 from sklearn.preprocessing import RobustScaler
-class JetDataset(Dataset):
+class Dataset(D):
     def __init__(self, jets, weights=None, problem=None, subproblem=None):
         super().__init__()
         self.jets = jets

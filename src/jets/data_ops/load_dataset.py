@@ -1,36 +1,10 @@
 import logging
 import os
 import pickle
-import numpy as np
 
-from .io import load_jets_from_pickle
-from .JetDataset import JetDataset
 
-def load_jets(data_dir, filename, redo=False, preprocess_fn=None):
 
-    #preprocessed_dir = os.path.join(data_dir, 'preprocessed')
-
-    raw_data_dir = os.path.join(data_dir, 'raw')
-    preprocessed_dir = os.path.join(data_dir, 'preprocessed')
-    path_to_preprocessed = os.path.join(preprocessed_dir, filename)
-
-    if not os.path.exists(path_to_preprocessed) or redo:
-        if not os.path.exists(preprocessed_dir):
-            os.makedirs(preprocessed_dir)
-
-        logging.warning("Preprocessing...")
-
-        preprocess_fn(raw_data_dir, preprocessed_dir, filename)
-
-        logging.warning("Preprocessed the data and saved it to {}".format(path_to_preprocessed))
-    else:
-        logging.warning("Data at {} and already preprocessed".format(path_to_preprocessed))
-
-    jets = load_jets_from_pickle(path_to_preprocessed)
-    logging.warning("\tSuccessfully loaded data")
-    return jets
-
-def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
+def load_train_dataset(data_dir, filename, n_train, n_valid, do_preprocessing):
     if 'w-vs-qcd' in data_dir:
         from .w_vs_qcd import preprocess, crop_dataset
     elif 'quark-gluon' in data_dir:
@@ -45,7 +19,7 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
     logging.warning("Loading data...")
     filename = "{}-train.pickle".format(filename)
 
-    jets = load_jets(data_dir, filename, redo, preprocess_fn=preprocess)
+    jets = load_jets(data_dir, filename, preprocess, preprocess_fn=preprocess)
     logging.warning("Found {} jets in total".format(len(jets)))
 
     if n_train > 0:
@@ -75,7 +49,7 @@ def load_train_dataset(data_dir, filename, n_train, n_valid, redo):
 
     return train_dataset, valid_dataset
 
-def load_test_dataset(data_dir, filename, n_test, redo):
+def load_test_dataset(data_dir, filename, n_test, do_preprocessing):
     if 'w-vs-qcd' in data_dir:
         from .w_vs_qcd import preprocess, crop_dataset
     elif 'quark-gluon' in data_dir:
@@ -86,7 +60,7 @@ def load_test_dataset(data_dir, filename, n_test, redo):
     train_dataset, _ = load_train_dataset(data_dir, filename, -1, 27000, False)
     logging.warning("Loading test data...")
     filename = "{}-test.pickle".format(filename)
-    jets = load_jets(data_dir, filename, redo)
+    jets = load_jets(data_dir, filename, preprocess)
     jets = jets[:n_test]
 
     dataset = JetDataset(jets)

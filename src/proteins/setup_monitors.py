@@ -11,8 +11,7 @@ def train_monitor_collection(logging_frequency):
         Regurgitate('train_loss', ndp=3,visualizing=True)
 
     ]
-    #self.metric_monitors = metric_monitors
-
+    
     time_monitors = [
         Regurgitate('epoch', visualizing=False,printing=False),
         Regurgitate('iteration', visualizing=False, printing=False),

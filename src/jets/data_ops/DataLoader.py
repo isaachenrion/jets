@@ -9,13 +9,20 @@ from src.data_ops.wrapping import wrap
 
 
 
-class JetLoader(_DataLoader):
+class DataLoader(_DataLoader):
     def __init__(self, dataset, batch_size, leaves=True, dropout=None, permute_particles=False, **kwargs):
         super().__init__(dataset, batch_size)
         self.dropout = dropout
         self.permute_particles = permute_particles
         self.leaves = leaves
 
+    @property
+    def dim(self):
+        if self.leaves:
+            return self.dataset.dim + 1
+        else:
+            return self.dataset.dim
+            
     def preprocess_y(self, y_list):
         y = torch.stack([torch.Tensor([int(y)]) for y in y_list], 0)
         if y.size()[1] == 1:

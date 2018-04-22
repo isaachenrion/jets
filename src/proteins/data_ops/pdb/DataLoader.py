@@ -18,7 +18,7 @@ def pad_matrices(matrix_list):
         len_x = len(x)
         padded_data[i, :len_x, :len_x] = x
     return padded_data
-    
+
 def collate(data_tuples):
     x, batch_mask = preprocess_x([x for x, _, _ in data_tuples])
     y = preprocess_y([y for _, y, _ in data_tuples])
@@ -48,4 +48,7 @@ class DataLoader(_DL):
     def __init__(self, dataset, batch_size):
         super().__init__(dataset, batch_size, collate_fn=collate)
 
-    
+    @property
+    def dim(self):
+        # account for padding
+        return self.dataset.dim + 1

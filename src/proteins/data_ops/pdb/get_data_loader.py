@@ -22,11 +22,11 @@ def get_data_loader(filename, n, batch_size):
     data_loader = DataLoader(dataset, batch_size)
     return data_loader
 
-def get_train_data_loader(data_dir, n_train, n_valid, batch_size):
+def get_train_data_loader(data_dir, n_train, n_valid, batch_size, **kwargs):
     train_data_loader = get_data_loader(os.path.join(data_dir, 'train.pkl'), n_train, batch_size)
     valid_data_loader = get_data_loader(os.path.join(data_dir, 'valid.pkl'), n_valid, batch_size)
     return train_data_loader, valid_data_loader
 
-def get_test_data_loader(data_dir, n_test, batch_size):
+def get_test_data_loader(data_dir, n_test, batch_size, **kwargs):
     test_data_loader = get_data_loader(os.path.join(data_dir, 'test.pkl'), n_test, batch_size)
     return test_data_loader

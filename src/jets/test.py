@@ -115,5 +115,6 @@ def main(sysargvlist=None):
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     arg_groups['admin_args'].cmd_line_args = (' '.join(sys.argv))
 
+    test('jets', args)
 if __name__ == "__main__":
     main()
