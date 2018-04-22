@@ -27,43 +27,6 @@ from src.admin.utils import log_gpu_usage
 from src.admin.utils import compute_model_size
 from src.admin.utils import format_bytes
 
-def set_debug_args(
-    admin_args=None,
-    model_args=None,
-    data_args=None,
-    computing_args=None,
-    training_args=None,
-    optim_args=None,
-    loading_args=None
-    ):
-
-    optim_args.debug = admin_args.debug
-    model_args.debug = admin_args.debug
-    data_args.debug = admin_args.debug
-    computing_args.debug = admin_args.debug
-    loading_args.debug = admin_args.debug
-    training_args.debug = admin_args.debug
-
-    admin_args.email = None
-    admin_args.verbose = True
-
-    training_args.batch_size = 3
-    training_args.epochs = 15
-
-    #data_args.n_train = 12
-    #data_args.n_valid = 10
-
-    optim_args.lr = 0.1
-    optim_args.period = 2
-
-    computing_args.seed = 1
-
-    model_args.hidden = 1
-    model_args.iters = 2
-    model_args.lf = 1
-
-    return admin_args, model_args, data_args, computing_args, training_args, optim_args, loading_args
-
 def do_training(
         train_one_batch,
         validation,

@@ -20,16 +20,6 @@ ALL_MODEL_DIRS = [
 
 REPORTS_DIR = "reports"
 
-w_vs_qcd = 'w-vs-qcd'
-quark_gluon = 'quark-gluon'
-DATASETS = {
-    'w':(w_vs_qcd,'antikt-kt'),
-    'wp':(w_vs_qcd + '/pileup','pileup'),
-    'pp': (quark_gluon,'pp'),
-    'pbpb': (quark_gluon,'pbpb'),
-    'protein': ('proteins', 'casp11')
-}
-
 ''' argparse args '''
 SRC_DIR = '/Users/isaachenrion/x/research/graphs'
 DATA_DIR = os.path.join(SRC_DIR, 'data')

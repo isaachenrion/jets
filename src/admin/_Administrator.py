@@ -61,10 +61,10 @@ def get_experiment_leafname(slurm_array_task_id, train):
         return str(slurm_array_task_id)
     return ''
 
-def setup_model_directory(root_dir, pid, slurm_array_job_id, slurm_array_task_id, train):
+def setup_model_directory(models_dir, pid, slurm_array_job_id, slurm_array_task_id, train):
     intermediate_dir = get_experiment_dirname(slurm_array_job_id, pid, train)
     leaf_dir = get_experiment_leafname(slurm_array_task_id, train)
-    exp_dir = os.path.join(root_dir,intermediate_dir,leaf_dir)
+    exp_dir = os.path.join(models_dir,intermediate_dir,leaf_dir)
     if not os.path.exists(exp_dir):
         os.makedirs(exp_dir)
     return exp_dir
@@ -115,10 +115,10 @@ class _Administrator:
 
         # Create all of the necessary directories for the experiment
         create_all_model_dirs(models_dir)
-        root_dir = os.path.join(models_dir, dataset, model)
-        intermediate_dir = get_experiment_dirname(slurm_array_job_id, pid, train)
+        _temp = get_experiment_dirname(slurm_array_job_id, pid, train)
+        intermediate_dir = os.path.join(dataset, model, _temp)
         leaf_dir = get_experiment_leafname(slurm_array_task_id, train)
-        exp_dir = os.path.join(root_dir,intermediate_dir,leaf_dir)
+        exp_dir = os.path.join(models_dir,RUNNING_MODELS_DIR,intermediate_dir,leaf_dir)
         if not os.path.exists(exp_dir):
             os.makedirs(exp_dir)
 
@@ -156,8 +156,8 @@ class _Administrator:
 
         logger = Logger(exp_dir, monitor_collection, train=train)
 
-        cmd_file = os.path.join(root_dir, intermediate_dir, 'command.txt')
-        record_cmd_line_args(cmd_file, cmd_line_args)
+        cmd_file = os.path.join(models_dir, RUNNING_MODELS_DIR, intermediate_dir, 'command.txt')
+        record_cmd_line_args(cmd_line_args, cmd_file)
 
         seed, gpu = cuda_and_random_seed(gpu, seed)
 

@@ -7,6 +7,25 @@ def argument_converter(args):
     training script. e.g. admin_kwargs is the set of arguments to be fed
     to the experiment Administrator.
     '''
+    if args.debug:
+        args.email = None
+        args.verbose = True
+
+        args.batch_size = 3
+        args.epochs = 15
+
+        args.n_train = 12
+        args.n_valid = 10
+
+        args.lr = 0.1
+        args.period = 2
+
+        args.seed = 1
+
+        args.hidden = 1
+        args.iters = 2
+        args.lf = 1
+        
     return dict(
         admin_kwargs=get_admin_kwargs(args),
         data_loader_kwargs=get_data_loader_kwargs(args),
