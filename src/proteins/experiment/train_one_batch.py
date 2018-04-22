@@ -7,7 +7,7 @@ from src.data_ops.wrapping import unwrap
 
 from .loss import loss
 
-def _train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip):
+def train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip):
     logger = administrator.logger
     (x, y, y_mask, batch_mask) = batch
 

@@ -22,7 +22,7 @@ class ModelBuilder(_ModelBuilder):
             'hidden': args.hidden,
 
             # logging
-            'logging_frequency': args.lf,
+            #'logging_frequency': args.lf,
 
             # activation
             'act': args.act,

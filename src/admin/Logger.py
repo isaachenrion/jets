@@ -7,7 +7,7 @@ from src.visualizing.plot_training_stats import plot_training_stats
 from src.admin.MonitorCollection import MonitorCollection
 
 class Logger:
-    def __init__(self, directory, monitors, train):
+    def __init__(self, directory, monitor_collection, train):
         self.train = train
 
         self.statsdir = os.path.join(directory, 'stats')
@@ -20,7 +20,7 @@ class Logger:
 
         self.scalar_filename = os.path.join(self.statsdir, 'scalars.csv')
 
-        self.monitor_collection = MonitorCollection(*monitors)
+        self.monitor_collection = monitor_collection
         self.monitor_collection.initialize(self.statsdir, self.plotsdir)
 
         self.headers = self.monitor_collection.scalar_monitor_names
@@ -38,10 +38,8 @@ class Logger:
 
     def log(self, compute_monitors=True,**kwargs):
         if compute_monitors:
-            #logging.info(kwargs['valid_loss'])
             stats_dict = self.monitor_collection(**kwargs)
             self.monitor_collection.visualize()
-            #logging.info(stats_dict['valid_loss'])
         else:
             stats_dict = kwargs
         self.log_scalars(stats_dict)

@@ -24,6 +24,13 @@ class Emailer:
         self.password = password
         self.recipient = recipient
 
+    @classmethod
+    def from_filename(cls, email_filename):
+        with open(email_filename, 'r') as f:
+            lines = f.readlines()
+            recipient, sender, password = (l.strip() for l in lines)
+        return cls(sender, password, recipient)
+
     def send_msg(self, text, subject, attachments=None):
           msg = MIMEMultipart()
           msg['From'] = self.sender

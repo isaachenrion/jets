@@ -12,7 +12,7 @@ def half_and_half(a,b):
     b = torch.stack([torch.tril(x, diagonal=-1) for x in b], 0)
     return a + b
 
-def _validation(model, data_loader):
+def validation(model, data_loader):
     t_valid = time.time()
     model.eval()
 

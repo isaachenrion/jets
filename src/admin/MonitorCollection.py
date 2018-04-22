@@ -8,7 +8,8 @@ class MonitorCollection:
             self.monitors[name] = monitors[i]
         self.visualized_scalar_monitor_names = [m.name for m in self.monitors.values() if m.scalar and m.visualizing]
         self.scalar_monitor_names = [m.name for m in self.monitors.values() if m.scalar]
-
+        self.track_monitor = None
+        
     def initialize(self, *args, **kwargs):
         self._initialize_args = args
         self._initialize_kwargs = kwargs
@@ -22,14 +23,15 @@ class MonitorCollection:
         for m in self.monitors.values():
             m.visualize(**kwargs)
 
-    def add_monitor(self, monitor):
+    def add_monitor(self, monitor, initialize=False):
         self.monitors[monitor.name] = monitor
-        monitor.initialize(*self._initialize_args, **self._initialize_kwargs)
+        if initialize:
+            monitor.initialize(*self._initialize_args, **self._initialize_kwargs)
         return monitor
 
-    def add_monitors(self, *monitors):
+    def add_monitors(self, *monitors, initialize=False):
         for monitor in monitors:
-            self.add_monitor(monitor)
+            self.add_monitor(monitor, initialize)
 
     @property
     def string(self):
