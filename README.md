@@ -6,8 +6,11 @@
 ### Requirements
 
 - python 3
-- pytorch
+- pytorch 0.3.1
 - scikit-learn
+- GPUtil for GPU utilization logging
+- matplotlib
+- numpy 
 
 ### Email results
 If you want email results, you must create a file called email_addresses.txt
