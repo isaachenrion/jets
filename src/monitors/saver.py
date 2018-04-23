@@ -10,11 +10,7 @@ class Saver(ScalarMonitor):
         self.save_monitor = save_monitor
         self.model_file = model_file
         self.settings_file = settings_file
-        #self._headline = Regurgitate('headline', visualizing=False)
         super().__init__('save', **kwargs)
-
-    #def initialize(self, *args, **kwargs):
-    #    self._headline.initialize(*args, **kwargs)
 
     def call(self, model=None, settings=None, **kwargs):
         if self.value is None:
