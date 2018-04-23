@@ -179,6 +179,22 @@ class _Administrator:
         #### set up public attributes
         self.logger = logger
 
+    def set_model(self, model):
+        self._signal_handler.set_model(model)
+
+    def log(self, **kwargs):
+        self.logger.log(**kwargs)
+        out_str = ''
+        out_str += self._monitor_collection.string
+        self._signal_handler.results_strings.append(out_str)
+        logging.info(out_str)
+
+    def save(self, model, settings):
+        self._saver.save(model, settings)
+
+    def finished(self):
+        self._signal_handler.completed()
+
     @classmethod
     def train(cls,
         dataset=None,
@@ -297,37 +313,3 @@ class _Administrator:
             **dirs
         )
         return cls(**init_kwargs)
-
-    def set_model(self, model):
-        self._signal_handler.set_model(model)
-
-    def log(self, **kwargs):
-        if self._train:
-            self._log_train(**kwargs)
-        else:
-            self._log_test(**kwargs)
-
-    def _log_train(self, **kwargs):
-
-        self.logger.log(**kwargs)
-        out_str = "ITERATION {:5}\n".format(
-                self._monitor_collection.monitors['iteration'].value)
-        out_str += self._monitor_collection.string
-
-        self._signal_handler.results_strings.append(out_str)
-        logging.info(out_str)
-
-    def _log_test(self,**kwargs):
-        self.logger.log(**kwargs)
-        #out_str = "{:5}\t".format(
-        #        self._monitor_collection.monitors['model'].value)
-        out_str = ''
-        out_str += self._monitor_collection.string
-        self._signal_handler.results_strings.append(out_str)
-        logging.info(out_str)
-
-    def save(self, model, settings):
-        self._saver.save(model, settings)
-
-    def finished(self):
-        self._signal_handler.completed()

@@ -92,18 +92,26 @@ def training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preproc
     return train_dataset, valid_dataset
 
 def test_dataset(data_dir, dataset, n_test, preprocess):
-    filename = DATASETS[dataset]
+    train_dataset, _ = training_and_validation_dataset(data_dir, dataset, -1, 27000, False)
 
-    train_dataset, _ = training_and_validation_dataset(data_dir, filename, -1, 27000, False)
+    intermediate_dir, filename = DATASETS[dataset]
+    data_dir = os.path.join(data_dir, intermediate_dir)
+
     logging.warning("Loading test data...")
     filename = "{}-test.pickle".format(filename)
     jets = load_jets(data_dir, filename, preprocess)
     jets = jets[:n_test]
 
-    dataset = JetDataset(jets)
+    dataset = Dataset(jets)
     dataset.transform(train_dataset.tf)
 
     # crop validation set and add the excluded data to the training set
+    if 'w-vs-qcd' in data_dir:
+        from .w_vs_qcd import crop_dataset
+    elif 'quark-gluon' in data_dir:
+        from .quark_gluon import crop_dataset
+    else:
+        raise ValueError('Unrecognized data_dir!')
     dataset, _ = crop_dataset(dataset)
 
     # add cropped indices to training data

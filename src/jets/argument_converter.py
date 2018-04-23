@@ -25,7 +25,7 @@ def argument_converter(args):
         args.hidden = 1
         args.iters = 2
         args.lf = 1
-        
+
     return dict(
         admin_kwargs=get_admin_kwargs(args),
         data_loader_kwargs=get_data_loader_kwargs(args),
@@ -47,7 +47,7 @@ def get_admin_kwargs(args):
         silent=args.silent,
         verbose=args.verbose,
         cmd_line_args=args.cmd_line_args,
-        models_dir=args.model_dir,
+        root_dir=args.root_dir,
         monitor_collection=train_monitor_collection(args.lf),
         arg_string=args.arg_string,
     )

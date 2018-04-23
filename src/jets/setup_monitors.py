@@ -46,8 +46,8 @@ def test_monitor_collection():
         inv_fpr,
         best_inv_fpr,
         roc_auc,
-        Regurgitate('test_loss', visualizing=True),
-        Collect('model', fn='last', visualizing=False, numerical=False)
+        Regurgitate('valid_loss', visualizing=True),
+        Regurgitate('model', visualizing=False, numerical=False)
         ]
     mc = MonitorCollection(*monitors)
 
