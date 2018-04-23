@@ -8,7 +8,7 @@ class MonitorCollection:
             self.monitors[name] = monitors[i]
         self.track_monitor = None
 
-    @property 
+    @property
     def visualized_scalar_monitor_names(self):
         try:
             return self._visualized_scalar_monitor_names
@@ -23,8 +23,6 @@ class MonitorCollection:
         except AttributeError:
             self._scalar_monitor_names = [m.name for m in self.monitors.values() if m.scalar]
             return self._scalar_monitor_names
-
-    self.scalar_monitor_names = [m.name for m in self.monitors.values() if m.scalar]
 
     def initialize(self, *args, **kwargs):
         self._initialize_args = args
