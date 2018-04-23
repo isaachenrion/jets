@@ -1,4 +1,5 @@
 import os
+import logging
 
 import numpy as np
 import matplotlib
@@ -25,6 +26,7 @@ class Best(ScalarMonitor):
 
     def call(self, **kwargs):
         value = self.monitor.value
+        #logging.info('{} = {}'.format(self.monitor.name, value))
         if self.track == 'max':
             if value > self.best_value:
                 self.changed = True
@@ -43,6 +45,7 @@ class LogOnImprovement(ScalarMonitor):
     def __init__(self, monitor, trigger_monitor):
         super().__init__('{}_at_{}'.format(monitor.name, trigger_monitor.name))
         self.monitor = monitor
+        assert isinstance(trigger_monitor, Best)
         self.trigger_monitor = trigger_monitor
         self.value = -99999999999
 
@@ -144,9 +147,6 @@ class Histogram(Monitor):
         image_and_pickle(fig, os.path.join(plotname, 'histogram'), self.plotsdir, os.path.join(self.plotsdir, 'pkl'))
         plt.close(fig)
 
-        #self.visualize_count += 1
-
-
     def clear(self):
         self.value = None
 
@@ -170,17 +170,3 @@ class EachClassHistogram(Monitor):
         for val, hm in self.histogram_monitors.items():
             values = np.array([o for (t,o) in zip(targets, outputs) if t == val])
             hm(values=values)
-
-
-    #def finish(self):
-    #    for _, hm in self.histogram_monitors.items():
-    #        hm.finish()
-    #    plt.figure()
-    #    plt.ylabel('Probability density')
-    #    plt.xlabel('Positive classification probability')
-    #    for name, hm in self.histogram_monitors.items():
-    #        bins, hist = hm.bins, hm.hist
-    #        width = 0.7 * (bins[1] - bins[0])
-    #        center = (bins[:-1] + bins[1:]) / 2
-    #        bars = plt.bar(center, hist, align='center', width=width)
-    #    plt.savefig(os.path.join(self.plotsdir, self.name + '-fig'))

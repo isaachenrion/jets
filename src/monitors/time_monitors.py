@@ -28,3 +28,7 @@ class ETA(Monitor):
         self.value = self.value.strftime('%c')
         #import ipdb; ipdb.set_trace()
         return self.value
+
+    @property
+    def _string(self):
+        return '{:>15s} = {}'.format(self.name, self.value)

@@ -103,7 +103,7 @@ def preprocess(raw_data_dir, preprocessed_dir, filename):
     logging.warning("Loaded raw files")
     jet_dicts = [convert_to_jet_dict(x, y) for x, y in zip(X, Y)]
     logging.warning("Converted to jet dicts")
-    save_jets_to_pickle(jets, os.path.join(preprocessed_dir, filename))
+    save_jet_dicts_to_pickle(jet_dicts, os.path.join(preprocessed_dir, filename))
 
 
     return None

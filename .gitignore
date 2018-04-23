@@ -1,3 +1,4 @@
+/slurm_out
 bash_snippets.txt
 ilya
 /data
@@ -5,6 +6,7 @@ ilya
 archive
 magic_commands.txt
 documents
+*.ipynb_checkpoints*
 reports
 inventory.txt
 paths.sh
@@ -14,7 +16,7 @@ finished_models
 debug_models
 killed_models
 interrupted_models
-misc/email_addresses.txt
+email_addresses.txt
 recnn-gated-gilles.py
 .git
 *.pyc

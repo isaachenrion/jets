@@ -11,20 +11,69 @@ import subprocess
 from collections import OrderedDict
 
 from .utils import get_logfile
-from .emailer import get_emailer
+from .emailer import Emailer
 from .signal_handler import SignalHandler
 from .Logger import Logger
 
-from src.monitors import *
 from ..misc.constants import RUNNING_MODELS_DIR, ALL_MODEL_DIRS
-
-if torch.cuda.is_available():
-    import GPUtil
+from src.monitors import ETA, Saver
 
 def get_git_revision_short_hash():
     s = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
     s = str(s).split('\'')[1]
     return s
+
+def cuda_and_random_seed(gpu, seed):
+    if gpu != "" and torch.cuda.is_available():
+        torch.cuda.device(gpu)
+
+    if seed is None:
+        seed = np.random.randint(0, 2**16 - 1)
+    np.random.seed(seed)
+
+    if gpu != "" and torch.cuda.is_available():
+        torch.cuda.device(gpu)
+        torch.cuda.manual_seed(seed)
+
+    else:
+        torch.manual_seed(seed)
+    return seed, gpu
+
+def create_all_model_dirs(root_dir):
+    for intermediate_dir in ALL_MODEL_DIRS:
+        model_dir = os.path.join(root_dir, intermediate_dir)
+        if not os.path.isdir(model_dir):
+            try:
+                os.makedirs(model_dir)
+            except FileExistsError:
+                pass
+
+def get_experiment_dirname(slurm_array_job_id, train):
+    if slurm_array_job_id is not None and train:
+        filename_exp = '{}'.format(slurm_array_job_id)
+    else:
+        dt = datetime.datetime.now()
+        filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second)
+    return filename_exp
+
+def get_experiment_leafname(slurm_array_task_id, train):
+    if slurm_array_task_id is not None and train:
+        return str(slurm_array_task_id)
+    return ''
+
+def setup_model_directory(root_dir, slurm_array_job_id, slurm_array_task_id, train):
+    intermediate_dir = get_experiment_dirname(slurm_array_job_id, train)
+    leaf_dir = get_experiment_leafname(slurm_array_task_id, train)
+    exp_dir = os.path.join(root_dir,intermediate_dir,leaf_dir)
+    if not os.path.exists(exp_dir):
+        os.makedirs(exp_dir)
+    return exp_dir
+
+def record_cmd_line_args(cmd_line_args, filename):
+    with open(filename, 'w') as f:
+        out_strs = cmd_line_args.split(' -')
+        for s in out_strs[1:]:
+            f.write('-{}\n'.format(s))
 
 class _Administrator:
     '''
@@ -42,269 +91,225 @@ class _Administrator:
     def __init__(
             self,
             train=None,
-            dataset=None,
-            model=None,
-            debug=None,
-            slurm=None,
             slurm_array_task_id=None,
             slurm_array_job_id=None,
-            gpu=None,
-            seed=None,
-            email=None,
-            epochs=None,
-            visualizing=None,
+            monitor_collection=None,
+            root_dir=None,
+            intermediate_dir=None,
+            leaf_dir=None,
+            exp_dir=None,
+            current_dir=None,
             silent=None,
             verbose=None,
+            email_filename=None,
+            debug=None,
+            gpu=None,
             cmd_line_args=None,
-            models_dir=None,
-            **kwargs
+            seed=None,
+            arg_string=None,
+            saver=None,
             ):
 
-
+        slurm = slurm_array_job_id is not None
         pid = os.getpid()
         host = socket.gethostname()
 
+        # Create all of the necessary directories for the experiment
 
-        passed_args = dict(**locals())
-        kwargs = passed_args.pop('kwargs', None)
-        passed_args.pop('self')
-        passed_args.update(kwargs)
+        logfile = get_logfile(exp_dir, silent, verbose)
 
-        self.models_dir = models_dir
-        self.debug = debug
-        self.slurm = slurm
-        self.slurm_array_task_id = slurm_array_task_id
-        self.slurm_array_job_id = slurm_array_job_id
-        self.cmd_line_args = cmd_line_args
-        self.pid = pid
-        self.host = host
-        self.train = train
-        self.epochs = epochs
-
-
-        self.cuda_and_random_seed(gpu, seed, passed_args)
-        self.create_all_model_dirs()
-        self.setup_model_directory(dataset, model)
-        self.setup_logging(silent, verbose)
-        self.setup_signal_handler(email)
-        self.setup_logger()
-        self.record_settings(passed_args)
-        self.initial_email()
-
-    def setup_monitors(*args, **kwargs):
-        raise NotImplementedError
-
-    def cuda_and_random_seed(self, gpu, seed, passed_args):
-        if gpu != "" and torch.cuda.is_available():
-            torch.cuda.device(gpu)
-
-        if seed is None:
-            seed = np.random.randint(0, 2**16 - 1)
-        np.random.seed(seed)
-
-        if gpu != "" and torch.cuda.is_available():
-            torch.cuda.device(gpu)
-            torch.cuda.manual_seed(seed)
-
+        if email_filename is not None and not slurm:
+            emailer = Emailer.from_filename(email_filename)
         else:
-            torch.manual_seed(seed)
+            emailer = None
 
-        self.seed = seed
-        self.gpu = gpu
-
-        passed_args['seed'] = self.seed
-        passed_args['gpu'] = self.gpu
-
-
-    def setup_model_directory(self, dataset, model):
-        self.current_dir = RUNNING_MODELS_DIR
-        self.root_dir = os.path.join(self.models_dir, self.current_dir)
-        dt = datetime.datetime.now()
-        self.start_dt = dt
-
-        if self.slurm and self.train:
-            filename_exp = '{}'.format(self.slurm_array_job_id)
-            self.leaf_dir = self.slurm_array_task_id
+        if slurm:
+            subject_string = '{} (Machine = {}, Logfile = {}, Slurm id = {}-{}, GPU = {})'.format("[DEBUGGING] " if debug else "", host, logfile, slurm_array_job_id, slurm_array_task_id, gpu)
         else:
+            subject_string = '{} (Machine = {}, Logfile = {}, PID = {}, GPU = {})'.format("[DEBUGGING] " if debug else "", host, logfile, pid, gpu)
 
-            filename_exp = '{}-{}-{:02d}-{:02d}-{:02d}_{}'.format(dt.strftime("%b"), dt.day, dt.hour, dt.minute, dt.second, self.pid)
-            self.leaf_dir = ''
-
-        self.intermediate_dir = os.path.join(dataset, model, filename_exp)
-        self.exp_dir = os.path.join(self.root_dir,self.intermediate_dir,self.leaf_dir)
-
-        if not os.path.exists(self.exp_dir):
-            os.makedirs(self.exp_dir)
-
-
-    def create_all_model_dirs(self):
-        for intermediate_dir in ALL_MODEL_DIRS:
-            model_dir = os.path.join(self.models_dir, intermediate_dir)
-            if not os.path.isdir(model_dir):
-                try:
-                    os.makedirs(model_dir)
-                except FileExistsError:
-                    pass
-
-    def setup_logging(self, silent, verbose):
-        ''' SET UP LOGGING '''
-        '''----------------------------------------------------------------------- '''
-        self.logfile = get_logfile(self.exp_dir, silent, verbose)
-        logging.info("running on {}".format(self.host))
-        logging.info(self.exp_dir)
-
-    def setup_signal_handler(self, email):
-        ''' SIGNAL HANDLER '''
-        '''----------------------------------------------------------------------- '''
-
-        if email:
-            self.emailer = get_emailer()
-        else:
-            self.emailer = None
-
-        if self.slurm:
-            subject_string = '{} (Machine = {}, Logfile = {}, Slurm id = {}-{}, GPU = {})'.format("[DEBUGGING] " if self.debug else "", self.host, self.logfile, self.slurm_array_job_id, self.slurm_array_task_id, self.gpu)
-        else:
-            subject_string = '{} (Machine = {}, Logfile = {}, PID = {}, GPU = {})'.format("[DEBUGGING] " if self.debug else "", self.host, self.logfile, self.pid, self.gpu)
-
-        self.signal_handler = SignalHandler(
-                                emailer=self.emailer,
-                                logfile=self.logfile,
-                                current_dir=self.current_dir,
-                                models_dir=self.models_dir,
-                                intermediate_dir=self.intermediate_dir,
-                                leaf_dir=self.leaf_dir,
+        signal_handler = SignalHandler(
+                                emailer=emailer,
+                                logfile=logfile,
+                                current_dir=current_dir,
+                                root_dir=root_dir,
+                                intermediate_dir=intermediate_dir,
+                                leaf_dir=leaf_dir,
                                 need_input=True,
                                 subject_string=subject_string,
                                 model=None,
-                                debug=self.debug,
-                                train=self.train,
+                                debug=debug,
+                                train=train,
                             )
 
-    def setup_logger(self):
-        monitor_dict = self.setup_monitors()
-        self.logger = Logger(self.exp_dir, monitor_dict, visualizing=False, train=self.train)
 
+        logger = Logger(exp_dir, monitor_collection, train=train)
 
-    def record_settings(self, passed_args):
-        with open(os.path.join(self.root_dir, self.intermediate_dir, 'command.txt'), 'w') as f:
-            #import ipdb; ipdb.set_trace()
-            out_strs = self.cmd_line_args.split(' -')
-            for s in out_strs[1:]:
-                f.write('-{}\n'.format(s))
+        cmd_file = os.path.join(root_dir, current_dir, intermediate_dir, 'command.txt')
+        record_cmd_line_args(cmd_line_args, cmd_file)
 
-        for k, v in sorted(passed_args.items()): logging.info('\t{} = {}'.format(k, v))
+        seed, gpu = cuda_and_random_seed(gpu, seed)
 
+        logging.info("running on {}".format(host))
+        logging.info(exp_dir)
+        logging.info(arg_string)
         logging.info("\n")
         logging.info("Git commit = {}".format(get_git_revision_short_hash()))
-        logging.info("\tPID = {}".format(self.pid))
+        logging.info("\tPID = {}".format(pid))
         logging.info("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
+        logging.info("Seed = {}".format(seed))
+        logging.info("GPU = {}".format(gpu))
+
+        msg = ['JOB STARTED', exp_dir, host.split('.')[0], str(pid)]
+        text = '\n'.join(msg)
+        subject = ' | '.join(msg)
+        try:
+            emailer.send_msg(text, subject)
+        except AttributeError:
+            logging.info(subject)
+
+
+        #### set up private attributes
+        self._signal_handler = signal_handler
+        self._emailer = emailer
+        self._train = train
+        self._saver = saver
+        self._monitor_collection = monitor_collection
+
+        #### set up public attributes
+        self.logger = logger
+
+    def set_model(self, model):
+        self._signal_handler.set_model(model)
 
     def log(self, **kwargs):
-        if self.train:
-            self.log_train(**kwargs)
-        else:
-            self.log_test(**kwargs)
-
-    def log_train(self, **kwargs):
-
         self.logger.log(**kwargs)
-        if kwargs['epoch'] == 1 and self.emailer is not None:
-            self.emailer.send_msg(self.logger.monitors['eta'].value, "Job {}-{} on {} ETA: {}".format(self.slurm_array_job_id, self.slurm_array_task_id, self.host.split('.')[0], self.logger.monitors['eta'].value))
-        out_str = "{:5}\t".format(
-                self.logger.monitors['iteration'].value)
-        for monitor in self.metric_monitors:
-            out_str += monitor.string
-        self.signal_handler.results_strings.append(out_str)
-        logging.info(out_str)
-
-    def log_test(self,**kwargs):
-        self.logger.log(**kwargs)
-        out_str = "{:5}\t".format(
-                self.logger.monitors['model'].value)
-        for monitor in self.metric_monitors:
-            out_str += monitor.string
-        self.signal_handler.results_strings.append(out_str)
+        out_str = ''
+        out_str += self._monitor_collection.string
+        self._signal_handler.results_strings.append(out_str)
         logging.info(out_str)
 
     def save(self, model, settings):
-        self.saver.save(model, settings)
+        self._saver.save(model, settings)
 
     def finished(self):
-        self.logger.complete_logging()
-        self.signal_handler.completed()
+        self._signal_handler.completed()
 
-    def initial_email(self):
-        text = ['JOB STARTED', self.exp_dir, self.host.split('.')[0], str(self.pid)]
-        if self.emailer is not None:
-            self.emailer.send_msg('\n'.join(text), ' | '.join(text))
+    @classmethod
+    def train(cls,
+        dataset=None,
+        model=None,
+        epochs=None,
+        debug=None,
+        slurm_array_task_id=None,
+        slurm_array_job_id=None,
+        gpu=None,
+        seed=None,
+        email_filename=None,
+        silent=None,
+        verbose=None,
+        cmd_line_args=None,
+        root_dir=None,
+        monitor_collection=None,
+        arg_string=None
+        ):
 
+        slurm = slurm_array_job_id is not None
 
-class EvaluationExperimentHandler(_Administrator):
-    def __init__(self, latex=None, **kwargs):
-        super().__init__(**kwargs)
-        self.latex = latex
+        current_dir=RUNNING_MODELS_DIR
+        create_all_model_dirs(root_dir)
+        _temp = get_experiment_dirname(slurm_array_job_id, train=True)
+        intermediate_dir = os.path.join(dataset, model, _temp)
+        leaf_dir = get_experiment_leafname(slurm_array_task_id, train=True)
+        exp_dir = os.path.join(root_dir,current_dir,intermediate_dir,leaf_dir)
+        if not os.path.exists(exp_dir):
+            os.makedirs(exp_dir)
 
-    #def model_directory(self, args):
-    #    self.root_dir = args.root_dir
-    #    self.model_type_dir = args.model_dir
-    #    self.leaf_dir = self.model_type_dir
-    #    i = 0
-    #    temp = self.leaf_dir + '/run' + str(i)
-    #    while os.path.exists(os.path.join(self.root_dir,temp)):
-    #        i += 1
-    #        temp = self.leaf_dir + '/run' + str(i)
-    #    self.leaf_dir = temp
-    #    self.exp_dir = os.path.join(self.root_dir,self.leaf_dir)
-    #    print(self.exp_dir)
-    #    os.makedirs(self.exp_dir)
+        eta = ETA(datetime.datetime.now(), epochs)
+        model_file = os.path.join(exp_dir, 'model_state_dict.pt')
+        settings_file = os.path.join(exp_dir, 'settings.pickle')
+        saver = Saver(monitor_collection.track_monitor, model_file, settings_file, visualizing=False, printing=False)
+        monitor_collection.add_monitors(saver, eta, initialize=False)
 
-    def setup_logger(self, _, visualizing):
-        ''' STATS LOGGER '''
-        '''----------------------------------------------------------------------- '''
-        roc_auc = ROCAUC()
-        inv_fpr = InvFPR()
-        roc_curve = ROCCurve()
-        #model_counter = Regurgitate('model', visualizing=False)
-        logtimer=Collect('logtime', fn='mean')
-        prediction_histogram = EachClassHistogram([0,1], 'yy', 'yy_pred', append=True)
-        monitors = [
-            #model_counter,
-            roc_auc,
-            inv_fpr,
-            roc_curve,
-            prediction_histogram,
-            logtimer
-        ]
-        monitors = {m.name: m for m in monitors}
-        self.logger = Logger(self.exp_dir, monitors, visualizing, train=False)
+        dirs = dict(
+            root_dir=root_dir,
+            intermediate_dir=intermediate_dir,
+            leaf_dir=leaf_dir,
+            exp_dir=exp_dir,
+            current_dir=current_dir
+        )
 
-    def log(self, **kwargs):
-        self.logger.log(**kwargs)
+        init_kwargs = dict(
+            train=True,
+            silent=silent,
+            verbose=verbose,
+            monitor_collection=monitor_collection,
+            slurm_array_job_id=slurm_array_job_id,
+            slurm_array_task_id=slurm_array_task_id,
+            email_filename=email_filename,
+            debug=debug,
+            gpu=gpu,
+            cmd_line_args=cmd_line_args,
+            seed=seed,
+            arg_string=arg_string,
+            saver=saver,
+            **dirs
+        )
+        return cls(**init_kwargs)
 
-        if not self.latex:
-            out_str = "\tModel = {}\t1/FPR @ TPR = 0.5={:.4f}\troc_auc={:.4f}".format(
-                    0,
-                    #kwargs['model'],
-                    self.logger.monitors['inv_fpr'].value if kwargs.get('compute_monitors', True) else kwargs['inv_fpr'],
-                    self.logger.monitors['roc_auc'].value if kwargs.get('compute_monitors', True) else kwargs['roc_auc']
-                    )
-        else:
-            if not short:
-                logging.info("%10s \t& %30s \t& %.4f $\pm$ %.4f \t& %.1f $\pm$ %.1f \\\\" %
-                      (input,
-                       label,
-                       np.mean(rocs),
-                       np.std(rocs),
-                       np.mean(inv_fprs[:, 225]),
-                       np.std(inv_fprs[:, 225])))
-            else:
-                logging.info("%30s \t& %.4f $\pm$ %.4f \t& %.1f $\pm$ %.1f \\\\" %
-                      (label,
-                       np.mean(rocs),
-                       np.std(rocs),
-                       np.mean(inv_fprs[:, 225]),
-                       np.std(inv_fprs[:, 225])))
+    @classmethod
+    def test(cls,
+        dataset=None,
+        n_models=None,
+        debug=None,
+        slurm_array_task_id=None,
+        slurm_array_job_id=None,
+        gpu=None,
+        seed=None,
+        email_filename=None,
+        silent=None,
+        verbose=None,
+        cmd_line_args=None,
+        root_dir=None,
+        monitor_collection=None,
+        arg_string=None
+        ):
 
-        self.signal_handler.results_strings.append(out_str)
-        logging.info(out_str)
+        slurm = slurm_array_job_id is not None
+
+        current_dir=RUNNING_MODELS_DIR
+        create_all_model_dirs(root_dir)
+        _temp = get_experiment_dirname(slurm_array_job_id, train=False)
+        intermediate_dir = os.path.join(dataset, _temp)
+        leaf_dir = get_experiment_leafname(slurm_array_task_id, train=False)
+        exp_dir = os.path.join(root_dir,current_dir,intermediate_dir,leaf_dir)
+        if not os.path.exists(exp_dir):
+            os.makedirs(exp_dir)
+
+        eta = ETA(datetime.datetime.now(), n_models)
+
+        dirs = dict(
+            root_dir=root_dir,
+            intermediate_dir=intermediate_dir,
+            leaf_dir=leaf_dir,
+            exp_dir=exp_dir,
+            current_dir=current_dir
+        )
+
+        init_kwargs = dict(
+            train=False,
+            silent=silent,
+            verbose=verbose,
+            monitor_collection=monitor_collection,
+            slurm_array_job_id=slurm_array_job_id,
+            slurm_array_task_id=slurm_array_task_id,
+            email_filename=email_filename,
+            debug=debug,
+            gpu=gpu,
+            cmd_line_args=cmd_line_args,
+            seed=seed,
+            arg_string=arg_string,
+            saver=None,
+            **dirs
+        )
+        return cls(**init_kwargs)

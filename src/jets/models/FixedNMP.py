@@ -21,7 +21,6 @@ from src.monitors import Histogram
 from src.monitors import Collect
 from src.monitors import BatchMatrixMonitor
 
-from src.misc.grad_mode import no_grad
 
 class FixedNMP(nn.Module):
     def __init__(self,

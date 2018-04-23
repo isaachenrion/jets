@@ -2,7 +2,7 @@ import logging
 import numpy as np
 from ..JetDataset import JetDataset
 
-def crop(jets, pileup=False):
+def crop(jets, **kwargs):
     jets = self.jets
     #logging.warning("Cropping...")
     pt_min = 50
@@ -57,7 +57,7 @@ def crop(jets, pileup=False):
     return good_jets, bad_jets, None
 
 
-def crop_dataset(dataset, pileup):
+def crop_dataset(dataset, **kwargs):
     good_jets, bad_jets, w = crop(dataset.jets, pileup)
     cropped_dataset = JetDataset(bad_jets)
     new_dataset = JetDataset(good_jets, w)

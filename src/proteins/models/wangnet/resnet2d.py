@@ -5,6 +5,8 @@ import torch.nn.functional as F
 from collections import OrderedDict
 import math
 
+from src.admin.utils import memory_snapshot
+
 def conv_and_pad3x3(in_planes, out_planes, kernel_size=3,stride=1):
     # "3x3 convolution with padding"
     padding = (kernel_size - 1) // 2
@@ -33,6 +35,7 @@ class BasicBlock(nn.Module):
             residual = x
 
         out = self.group1(x) + residual
+        del residual
 
         out = self.relu(out)
 
@@ -81,10 +84,10 @@ class ResNet2d(nn.Module):
         #m['maxpool'] = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         self.group1= nn.Sequential(m)
 
-        self.layer1 = self._make_layer(block, hidden, layers[0])
-        self.layer2 = self._make_layer(block, hidden, layers[1], stride=1)
-        self.layer3 = self._make_layer(block, hidden, layers[2], stride=1)
-        self.layer4 = self._make_layer(block, hidden, layers[3], stride=1)
+        self.transform = self._make_layer(block, hidden, layers)
+        #self.layer2 = self._make_layer(block, hidden, layers[1], stride=1)
+        #self.layer3 = self._make_layer(block, hidden, layers[2], stride=1)
+        #self.layer4 = self._make_layer(block, hidden, layers[3], stride=1)
 
         #self.avgpool = nn.Sequential(nn.AvgPool2d(7))
 
@@ -114,19 +117,13 @@ class ResNet2d(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-
         x = self.group1(x)
-
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
-
+        x = self.transform(x)
         x = F.sigmoid(torch.mean(x, 1))
 
 
         return x
 
 def resnet_2d(**kwargs):
-    model = ResNet2d(BasicBlock, [2,2,2,2], **kwargs)
+    model = ResNet2d(BasicBlock, kwargs['iters'], **kwargs)
     return model
