@@ -34,8 +34,14 @@
 RES=$1
 MODELS_DIR=$2
 END_DIR=$3
+DEBUG=$4
 
-RUNNING='running'
+if [ $DEBUG ]
+then
+    RUNNING='debugging'
+else
+    RUNNING='running'
+fi
 FINISHED='finished'
 
 MODEL_RUNDIR=$(find $MODELS_DIR/$RUNNING -depth -name $RES)

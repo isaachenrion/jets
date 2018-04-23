@@ -12,4 +12,4 @@ parser.add_argument('-e', '--email_filename', default=EMAIL_FILE)
 parser.add_argument('-v', '--verbose', action='store_true', default=False)
 args = parser.parse_args()
 
-summarize_training(args.jobdir, args.email, args.many_jobs, args.verbose)
+summarize_training(args.jobdir, args.email_filename, args.many_jobs, args.verbose)
