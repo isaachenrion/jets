@@ -135,8 +135,7 @@ def train(problem=None,args=None):
     ''' ADMINISTRATOR '''
     '''----------------------------------------------------------------------- '''
 
-    administrator = Administrator(
-        train=True,
+    administrator = Administrator.train(
         **arg_groups['admin_kwargs']
     )
 

@@ -28,5 +28,5 @@ def get_train_data_loader(data_dir, n_train, n_valid, batch_size, **kwargs):
     return train_data_loader, valid_data_loader
 
 def get_test_data_loader(data_dir, n_test, batch_size, **kwargs):
-    test_data_loader = get_data_loader(os.path.join(data_dir, 'test.pkl'), n_test, batch_size)
+    test_data_loader = get_data_loader(os.path.join(data_dir, 'valid.pkl'), n_test, batch_size)
     return test_data_loader

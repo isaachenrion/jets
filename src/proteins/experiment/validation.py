@@ -40,7 +40,7 @@ def validation(model, data_loader):
 
     valid_loss /= len(data_loader)
 
-    grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
+    #grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
 
     logdict = dict(
         yy=yy,
@@ -50,7 +50,7 @@ def validation(model, data_loader):
         mask=mask,
         valid_loss=valid_loss,
         model=model,
-        grads=grads,
+        #grads=grads,
     )
     model.train()
 

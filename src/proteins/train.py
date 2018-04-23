@@ -30,7 +30,6 @@ def main(sysargvlist=None):
 
     # Directory args
     parser.add_argument("--data_dir", type=str, default=DATA_DIR)
-    parser.add_argument("--model_dir", type=str, default=MODELS_DIR)
     parser.add_argument("--root_dir", default=MODELS_DIR)
 
     # Slurm args

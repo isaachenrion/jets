@@ -51,5 +51,9 @@ class ScalarMonitor(Monitor):
 
     @property
     def _string(self):
-        s = "\t{:>15s} = {:.{x}f}".format(self.name, self.value, x=self.ndp)
+        if self.numerical:
+            s = "\t{:>15s} = {:.{x}f}".format(self.name, self.value, x=self.ndp)
+        else:
+            s = "\t{} = {}".format(self.name, self.value)
+
         return s

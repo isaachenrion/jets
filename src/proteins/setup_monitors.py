@@ -11,7 +11,7 @@ def train_monitor_collection(logging_frequency):
         Regurgitate('train_loss', ndp=3,visualizing=True)
 
     ]
-    
+
     time_monitors = [
         Regurgitate('epoch', visualizing=False,printing=False),
         Regurgitate('iteration', visualizing=False, printing=False),
@@ -40,7 +40,7 @@ def train_monitor_collection(logging_frequency):
     return mc
 
 def test_monitor_collection():
-    test_loss = Regurgitate('test_loss', visualizing=True)
+    test_loss = Regurgitate('valid_loss', visualizing=True)
     #best_test_loss = Best(test_loss)
 
     monitors = [
@@ -48,6 +48,7 @@ def test_monitor_collection():
         ProteinMetrics(k=2,visualizing=True),
         ProteinMetrics(k=5,visualizing=True),
         ProteinMetrics(k=10,visualizing=True),
+        Regurgitate('model', numerical=False, visualizing=False,printing=True),
         test_loss,
         #best_test_loss,
     ]

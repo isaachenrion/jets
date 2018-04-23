@@ -18,10 +18,10 @@ ALL_MODEL_DIRS = [
     ARCHIVED_MODELS_DIR,
 ]
 
-REPORTS_DIR = "reports"
 
 ''' argparse args '''
 SRC_DIR = '/Users/isaachenrion/x/research/graphs'
 DATA_DIR = os.path.join(SRC_DIR, 'data')
 MODELS_DIR = os.path.join(SRC_DIR, 'models')
 EMAIL_FILE = os.path.join(SRC_DIR, 'email_addresses.txt')
+REPORTS_DIR = os.path.join(SRC_DIR, "reports")

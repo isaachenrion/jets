@@ -1,4 +1,6 @@
+import importlib
 import logging
+
 import time
 import csv
 import os
@@ -7,32 +9,12 @@ import torch
 import torch.nn.functional as F
 
 from src.data_ops.wrapping import unwrap
+from src.utils import load_model
 
-def set_debug_args(
-    admin_args=None,
-    #model_args=None,
-    data_args=None,
-    computing_args=None,
-    training_args=None,
-    optim_args=None,
-    loading_args=None
-    ):
-
-    optim_args.debug = admin_args.debug
-    #model_args.debug = admin_args.debug
-    data_args.debug = admin_args.debug
-    computing_args.debug = admin_args.debug
-    loading_args.debug = admin_args.debug
-    training_args.debug = admin_args.debug
-
-
-
-    return admin_args, data_args, computing_args, training_args, optim_args, loading_args
-
-def get_model_filenames(model=None, single_model=None, **kwargs):
+def get_model_filenames(models_dir=None, model=None, single_model=None):
     #import ipdb; ipdb.set_trace()
 
-    model_type_path = model
+    model_type_path = os.path.join(models_dir, model)
 
     if not single_model:
         model_filenames = list(map(lambda x: os.path.join(model_type_path, x), os.listdir(model_type_path)))
@@ -42,52 +24,54 @@ def get_model_filenames(model=None, single_model=None, **kwargs):
     #import ipdb; ipdb.set_trace()
     return model_filenames
 
+def test_all_models(test_one_model, model_dict, model_filenames, data_loader, administrator):
+    for i, filename in enumerate(model_filenames):
+        logging.info("\n")
+        model, _ = load_model(model_dict, filename)
+        logging.info("Loaded {}. Now testing".format(filename))
 
-def test(
-    problem=None,
-    admin_args=None,
-    #model_args=None,
-    data_args=None,
-    computing_args=None,
-    training_args=None,
-    optim_args=None,
-    loading_args=None,
-    **kwargs
-    ):
+        administrator.set_model(model)
+
+        t_valid = time.time()
+        logdict = test_one_model(model, data_loader)
+        logdict['model'] = filename
+        logging.info("Testing took {:.1f} seconds".format(time.time() - t_valid))
+
+        #t_log = time.time()
+        administrator.log(**logdict)
+
+
+def test(problem=None,args=None):
 
     import src.admin._Administrator as Administrator
     problem = importlib.import_module('src.' + problem)
     test_monitor_collection = problem.test_monitor_collection
     test_one_model = problem.validation
-    ModelBuilder = problem.ModelBuilder
+    argument_converter = problem.test_argument_converter
+    MODEL_DICT = problem.MODEL_DICT
+
+    #ModelBuilder = problem.ModelBuilder
     get_test_data_loader = problem.get_test_data_loader
 
+    '''----------------------------------------------------------------------- '''
+    ''' CONVERT ARGPARSE ARGUMENTS READY FOR TRAINING  '''
+    '''----------------------------------------------------------------------- '''
 
-    def test_all_models(model_filenames, data_loader, administrator):
-        for i, filename in enumerate(model_filenames):
-            logging.info("\n")
-            model, _ = build_model(filename, None)
-            logging.info("Loaded {}. Now testing".format(filename))
+    arg_groups = argument_converter(args)
 
-            administrator.signal_handler.set_model(model)
+    '''----------------------------------------------------------------------- '''
+    ''' ADMINISTRATOR '''
+    '''----------------------------------------------------------------------- '''
 
-            t_valid = time.time()
-            logdict = test_one_model(model, data_loader, filename)
+    model_filenames = get_model_filenames(**arg_groups['model_loading_kwargs'])
 
-            logging.info("Testing took {:.1f} seconds".format(time.time() - t_valid))
+    administrator = Administrator.test(
+        n_models=len(model_filenames),
+        **arg_groups['admin_kwargs']
 
-            #t_log = time.time()
-            administrator.log(**logdict)
-
-
-    admin_args, data_args, computing_args, training_args, optim_args, loading_args = \
-    set_debug_args(admin_args, data_args, computing_args, training_args, optim_args, loading_args)
-
-    administrator = Administrator(
-        train=False,
         )
-    model_filenames = get_model_filenames(**vars(loading_args))
 
-    data_loader = get_test_data_loader(**vars(data_args))
-    test(model_filenames, data_loader, administrator)
+
+    data_loader = get_test_data_loader(**arg_groups['data_loader_kwargs'])
+    test_all_models(test_one_model, MODEL_DICT, model_filenames, data_loader, administrator)
     administrator.finished()
