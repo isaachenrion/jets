@@ -5,7 +5,7 @@ import torch
 from src.admin.utils import see_tensors_in_memory, log_gpu_usage
 from src.data_ops.wrapping import unwrap
 
-from .loss import loss
+from ..loss import loss
 
 def train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip):
     logger = administrator.logger

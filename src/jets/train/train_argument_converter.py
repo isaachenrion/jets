@@ -1,7 +1,6 @@
 import os
-from .setup_monitors import train_monitor_collection
-
-def argument_converter(args):
+from .train_monitors import train_monitor_collection
+def train_argument_converter(args):
     '''
     Takes an argparse namespace, and converts it into argument dictionaries.
     Each argument dictionary is fed into a specific function or class in the
@@ -14,6 +13,9 @@ def argument_converter(args):
 
         args.batch_size = 3
         args.epochs = 15
+
+        args.n_train = 12
+        args.n_valid = 10
 
         args.lr = 0.1
         args.period = 2
@@ -51,16 +53,18 @@ def get_admin_kwargs(args):
     )
 
 def get_data_loader_kwargs(args):
-    data_dir = os.path.join(args.data_dir, 'proteins', 'pdb25')
-    if args.debug:
-        data_dir = os.path.join(data_dir, 'small')
+    data_dir = os.path.join(args.data_dir)
+    leaves = args.model not in ['recs', 'recg']
 
     return dict(
         debug=args.debug,
         data_dir=data_dir,
+        dataset=args.dataset,
         n_train=args.n_train,
         n_valid=args.n_valid,
-        batch_size=args.batch_size
+        batch_size=args.batch_size,
+        preprocess=args.pp,
+        leaves=leaves
     )
 
 def get_optim_args(args):
@@ -90,11 +94,11 @@ def get_training_kwargs(args):
 def get_model_kwargs(args):
     model_kwargs = {
         # model dimensions
-        #'features': args.features+1,
+        #'features': args.features+1 if args.model == 'nmp' else args.features,
         'hidden': args.hidden,
 
         # logging
-        #'logging_frequency': args.lf,
+        'logging_frequency': args.lf,
 
         # activation
         'act': args.act,
@@ -106,7 +110,6 @@ def get_model_kwargs(args):
         'model':args.model,
 
         # NMP
-        'block': args.block,
         'iters': args.iters,
         'update': args.update,
         'message': args.message,
@@ -115,10 +118,8 @@ def get_model_kwargs(args):
         'symmetric':not args.asym,
         'readout':args.readout,
         'matrix':args.adj[0] if len(args.adj) == 1 else args.adj,
-        'matrix_activation':args.m_act,
+        'm_act':args.m_act,
         'wn': args.wn,
-        'no_grad': args.no_grad,
-        'tied': args.tied,
 
         # Stacked NMP
         'scales': args.scales,
@@ -141,6 +142,7 @@ def get_model_kwargs(args):
         'dv':args.dv,
         'dropout':args.model_dropout,
 
-        'debug':args.debug,
+
+        'debug':args.debug
     }
     return model_kwargs

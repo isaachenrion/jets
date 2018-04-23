@@ -110,7 +110,7 @@ def do_training(
 
     administrator.finished()
 
-def train(problem=None,args=None):
+def generic_train_script(problem=None,args=None):
     '''----------------------------------------------------------------------- '''
     ''' IMPORT PROBLEM-SPECIFIC MODULES  '''
     '''----------------------------------------------------------------------- '''
@@ -118,7 +118,7 @@ def train(problem=None,args=None):
     import src.admin._Administrator as Administrator
     from src.utils import build_model, load_model
     problem = importlib.import_module('src.' + problem)
-    argument_converter = problem.argument_converter
+    argument_converter = problem.train_argument_converter
     train_monitor_collection = problem.train_monitor_collection
     train_one_batch = problem.train_one_batch
     validation = problem.validation

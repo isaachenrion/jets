@@ -6,7 +6,7 @@ import torch
 from src.data_ops.wrapping import unwrap
 from src.admin.utils import log_gpu_usage
 
-from .loss import loss
+from ..loss import loss
 
 def train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip):
     logger = administrator.logger

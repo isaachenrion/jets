@@ -1,7 +1,7 @@
 from torch.utils.data import Dataset as D
 import numpy as np
 
-from src.proteins.data_ops.pdb.Protein import Protein
+from .Protein import Protein
 from src.admin.utils import format_bytes
 
 class Dataset(D):

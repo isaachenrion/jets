@@ -6,7 +6,7 @@ import sys
 import cProfile
 sys.path.append('../..')
 from src.misc.constants import *
-from src.utils.train import train
+from src.utils.generic_train_script import generic_train_script
 
 def main(sysargvlist=None):
 
@@ -107,11 +107,10 @@ def main(sysargvlist=None):
     parser.add_argument("--predict", type=str, default='simple', help='type of prediction layer')
 
     # Transform
-    parser.add_argument("-m", "--model", type=str, default="g", help="name of the model you want to train")
+    parser.add_argument("-m", "--model", type=str, default="nmp", help="name of the model you want to train")
 
     # NMP
     parser.add_argument("-i", "--iters", type=int, default=10)
-    parser.add_argument("--block", type=str, default='cnmp')
     parser.add_argument("--mp", type=str, default='m2', help='type of message passing layer')
     parser.add_argument("-u", "--update", type=str, default='gru', help='type of vertex update')
     parser.add_argument("--message", type=str, default='2', help='type of message')
@@ -121,8 +120,6 @@ def main(sysargvlist=None):
     parser.add_argument("--readout", type=str, default='dtnn', help='type of readout layer')
     parser.add_argument("--m_act", type=str, default='sigmoid', help='type of nonlinearity for matrices' )
     parser.add_argument("--wn", action='store_true')
-    parser.add_argument("--no_grad", action='store_true')
-    parser.add_argument("--tied", action='store_true')
 
     # Stack NMP
     parser.add_argument("--pool_first", action='store_true', default=False)
@@ -157,7 +154,7 @@ def main(sysargvlist=None):
     args.cmd_line_args = (' '.join(sys.argv))
     args.arg_string = '\n'.join(['\t{} = {}'.format(k, v) for k, v in sorted(vars(args).items())])
 
-    train('jets', args)
+    generic_train_script('jets', args)
 
 if __name__ == "__main__":
     main()

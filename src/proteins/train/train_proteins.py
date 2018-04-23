@@ -4,9 +4,9 @@ if __name__ == '__main__':
 import argparse
 import sys
 import cProfile
-sys.path.append('../..')
+sys.path.append('../../..')
 from src.misc.constants import *
-from src.utils.train import train
+from src.utils.generic_train_script import generic_train_script
 
 def main(sysargvlist=None):
 
@@ -115,48 +115,21 @@ def main(sysargvlist=None):
     parser.add_argument("-u", "--update", type=str, default='gru', help='type of vertex update')
     parser.add_argument("--message", type=str, default='2', help='type of message')
     parser.add_argument("--emb_init", type=str, default='1', help='type of message')
-    parser.add_argument("-a","--adj", type=str, nargs='+', default='dm', help='type of matrix layer')
-    parser.add_argument("--asym", action='store_true', default=False)
-    parser.add_argument("--readout", type=str, default='dtnn', help='type of readout layer')
-    parser.add_argument("--m_act", type=str, default='sigmoid', help='type of nonlinearity for matrices' )
     parser.add_argument("--wn", action='store_true')
     parser.add_argument("--no_grad", action='store_true')
     parser.add_argument("--tied", action='store_true')
 
-    # Stack NMP
-    parser.add_argument("--pool_first", action='store_true', default=False)
-    parser.add_argument("--scales", nargs='+', type=int, default=None)
-    parser.add_argument("--pool", type=str, default='attn', help='type of pooling layer')
-
-    # Physics NMP
-    parser.add_argument("-t", "--trainable_physics", action='store_true', default=False)
-    parser.add_argument("--alpha", type=float, default=1)
-    parser.add_argument("-R", type=float, default=1)
-
-    # Physics plus learned NMP
-    parser.add_argument("--equal_weight", action='store_true', default=False)
-
-    # Transformer
-    parser.add_argument("--n_layers", type=int, default=3)
-    parser.add_argument("--n_heads", type=int, default=8)
-    parser.add_argument("--dq", type=int, default=32)
-    parser.add_argument("--dv", type=int, default=32)
 
     if sysargvlist is None:
         args = parser.parse_args()
     else:
         args = parser.parse_args(sysargvlist)
 
-    #arg_groups={}
-    #for group in parser._action_groups:
-    #    group_dict={a.dest:getattr(args,a.dest,None) for a in group._group_actions}
-    #    arg_groups[group.title + '_args']=argparse.Namespace(**group_dict)
-
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     args.cmd_line_args = (' '.join(sys.argv))
     args.arg_string = '\n'.join(['\t{} = {}'.format(k, v) for k, v in sorted(vars(args).items())])
 
-    train('proteins', args)
+    generic_train_script('proteins', args)
 
 if __name__ == "__main__":
     main()

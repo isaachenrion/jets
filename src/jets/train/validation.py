@@ -2,7 +2,7 @@ import logging
 import time
 
 from src.data_ops.wrapping import unwrap
-from .loss import loss
+from ..loss import loss
 
 def validation(model, data_loader):
     t_valid = time.time()

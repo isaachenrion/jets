@@ -2,8 +2,8 @@ import os
 import pickle
 import logging
 
-from src.proteins.data_ops.pdb.DataLoader import DataLoader
-from src.proteins.data_ops.pdb.Dataset import Dataset
+from .DataLoader import DataLoader
+from .Dataset import Dataset
 
 def load_dataset(filename, n):
     with open(filename, 'rb') as f:

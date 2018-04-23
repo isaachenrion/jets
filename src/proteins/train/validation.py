@@ -4,7 +4,7 @@ import time
 import torch
 
 from src.data_ops.wrapping import unwrap
-from .loss import loss
+from ..loss import loss
 
 
 def half_and_half(a,b):

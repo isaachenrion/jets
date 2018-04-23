@@ -41,7 +41,7 @@ def test_all_models(test_one_model, model_dict, model_filenames, data_loader, ad
         administrator.log(**logdict)
 
 
-def test(problem=None,args=None):
+def generic_test_script(problem=None,args=None):
 
     import src.admin._Administrator as Administrator
     problem = importlib.import_module('src.' + problem)

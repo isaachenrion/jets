@@ -7,7 +7,7 @@ sys.path.append('../..')
 import cProfile
 
 #from src.experiment import evaluate
-from src.utils.test import test
+from src.utils.generic_test_script import generic_test_script
 from src.misc.constants import *
 
 def main(sysargvlist=None):
@@ -98,7 +98,7 @@ def main(sysargvlist=None):
     args.cmd_line_args = (' '.join(sys.argv))
     args.arg_string = '\n'.join(['\t{} = {}'.format(k, v) for k, v in sorted(vars(args).items())])
 
-    test('jets', args)
+    generic_test_script('jets', args)
 
 if __name__ == "__main__":
     main()

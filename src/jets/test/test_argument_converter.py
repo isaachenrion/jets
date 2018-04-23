@@ -1,5 +1,5 @@
 import os
-from .setup_monitors import test_monitor_collection
+from .test_monitors import test_monitor_collection
 
 def test_argument_converter(args):
     '''
@@ -14,6 +14,7 @@ def test_argument_converter(args):
 
         args.batch_size = 3
         args.epochs = 15
+        args.n_test = 50
 
         args.lr = 0.1
         args.period = 2
@@ -48,15 +49,17 @@ def get_admin_kwargs(args):
     )
 
 def get_data_loader_kwargs(args):
-    data_dir = os.path.join(args.data_dir, 'proteins', 'pdb25')
-    if args.debug:
-        data_dir = os.path.join(data_dir, 'small')
-
+    #data_dir = os.path.join(args.data_dir)
+    #leaves = args.model not in ['recs', 'recg']
+    leaves = True
     return dict(
         debug=args.debug,
-        data_dir=data_dir,
+        data_dir=args.data_dir,
         n_test=args.n_test,
-        batch_size=args.batch_size
+        batch_size=args.batch_size,
+        dataset=args.dataset,
+        preprocess=args.pp,
+        leaves=leaves
     )
 
 
