@@ -216,6 +216,9 @@ class _Administrator:
 
         slurm = slurm_array_job_id is not None
 
+        print(slurm_array_task_id)
+        print(slurm_array_job_id)
+
         current_dir=RUNNING_MODELS_DIR
         create_all_model_dirs(root_dir)
         _temp = get_experiment_dirname(slurm_array_job_id, train=True)
