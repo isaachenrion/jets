@@ -7,7 +7,7 @@ do
     then
         N_JOBS=$arg
     else
-        if [[ $counter == 2 ]]
+        if [[ $counter == 3 ]]
         then
             DEBUG=[ "$arg" = "--debug" ]
         else

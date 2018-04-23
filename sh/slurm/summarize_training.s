@@ -45,7 +45,6 @@ fi
 FINISHED='finished'
 
 MODEL_RUNDIR=$(find $MODELS_DIR/$RUNNING -depth -name $RES)
-echo "MODEL_RUNDIR"
 
 str=$MODEL_RUNDIR
 delimiter=$RUNNING
