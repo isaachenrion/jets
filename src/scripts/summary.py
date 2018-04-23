@@ -8,7 +8,7 @@ from src.misc.constants import EMAIL_FILE
 parser = argparse.ArgumentParser(description='Jets')
 parser.add_argument('-j', '--jobdir', type=str, default=None)
 parser.add_argument('-m', '--many_jobs', action='store_true')
-parser.add_argument('-e', '--email', default=EMAIL_FILE)
+parser.add_argument('-e', '--email_filename', default=EMAIL_FILE)
 parser.add_argument('-v', '--verbose', action='store_true', default=False)
 args = parser.parse_args()
 
