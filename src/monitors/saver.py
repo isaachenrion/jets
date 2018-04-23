@@ -19,8 +19,7 @@ class Saver(ScalarMonitor):
     def call(self, model=None, settings=None, **kwargs):
         if self.save_monitor.changed:
             self.save(model, settings)
-        self.value = self.save_monitor.value
-
+            self.value = self.save_monitor.value
         return self.value
 
     def save(self, model, settings):

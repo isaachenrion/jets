@@ -6,10 +6,26 @@ class MonitorCollection:
         self.monitors = OrderedDict()
         for i, name in enumerate(self.monitor_names):
             self.monitors[name] = monitors[i]
-        self.visualized_scalar_monitor_names = [m.name for m in self.monitors.values() if m.scalar and m.visualizing]
-        self.scalar_monitor_names = [m.name for m in self.monitors.values() if m.scalar]
         self.track_monitor = None
-        
+
+    @property 
+    def visualized_scalar_monitor_names(self):
+        try:
+            return self._visualized_scalar_monitor_names
+        except AttributeError:
+            self._visualized_scalar_monitor_names = [m.name for m in self.monitors.values() if m.scalar and m.visualizing]
+            return self._visualized_scalar_monitor_names
+
+    @property
+    def scalar_monitor_names(self):
+        try:
+            return self._scalar_monitor_names
+        except AttributeError:
+            self._scalar_monitor_names = [m.name for m in self.monitors.values() if m.scalar]
+            return self._scalar_monitor_names
+
+    self.scalar_monitor_names = [m.name for m in self.monitors.values() if m.scalar]
+
     def initialize(self, *args, **kwargs):
         self._initialize_args = args
         self._initialize_kwargs = kwargs
