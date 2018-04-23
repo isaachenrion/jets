@@ -45,6 +45,7 @@ class LogOnImprovement(ScalarMonitor):
     def __init__(self, monitor, trigger_monitor):
         super().__init__('{}_at_{}'.format(monitor.name, trigger_monitor.name))
         self.monitor = monitor
+        assert isinstance(trigger_monitor, Best)
         self.trigger_monitor = trigger_monitor
         self.value = -99999999999
 

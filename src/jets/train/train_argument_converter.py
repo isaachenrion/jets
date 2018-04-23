@@ -50,6 +50,7 @@ def get_admin_kwargs(args):
         root_dir=args.root_dir,
         monitor_collection=train_monitor_collection(args.lf),
         arg_string=args.arg_string,
+        epochs=args.epochs
     )
 
 def get_data_loader_kwargs(args):

@@ -2,11 +2,14 @@
 from collections import OrderedDict
 class MonitorCollection:
     def __init__(self, *monitors):
-        self.monitor_names = [m.name for m in monitors]
         self.monitors = OrderedDict()
-        for i, name in enumerate(self.monitor_names):
-            self.monitors[name] = monitors[i]
+        for m in monitors:
+            self.monitors[m.name] = m
         self.track_monitor = None
+
+    @property
+    def monitor_names(self):
+        return list(self.monitors.keys())
 
     @property
     def visualized_scalar_monitor_names(self):
@@ -15,7 +18,7 @@ class MonitorCollection:
     @property
     def scalar_monitor_names(self):
         return [m.name for m in self.monitors.values() if m.scalar]
-        
+
     def initialize(self, *args, **kwargs):
         self._initialize_args = args
         self._initialize_kwargs = kwargs

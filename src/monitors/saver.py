@@ -1,6 +1,6 @@
 import torch
 import pickle
-
+import logging
 from .baseclasses import ScalarMonitor
 from .meta import Regurgitate
 
@@ -17,6 +17,8 @@ class Saver(ScalarMonitor):
     #    self._headline.initialize(*args, **kwargs)
 
     def call(self, model=None, settings=None, **kwargs):
+        if self.value is None:
+            self.value = self.save_monitor.value
         if self.save_monitor.changed:
             self.save(model, settings)
             self.value = self.save_monitor.value
