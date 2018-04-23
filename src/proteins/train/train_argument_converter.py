@@ -38,7 +38,7 @@ def get_admin_kwargs(args):
         model=args.model,
         debug=args.debug,
         slurm_array_task_id=args.slurm_array_task_id,
-        slurm_array_job_id=args.slurm_array_task_id,
+        slurm_array_job_id=args.slurm_array_job_id,
         gpu=args.gpu,
         seed=args.seed,
         email_filename=args.email_filename,
