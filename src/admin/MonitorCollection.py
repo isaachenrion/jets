@@ -10,20 +10,12 @@ class MonitorCollection:
 
     @property
     def visualized_scalar_monitor_names(self):
-        try:
-            return self._visualized_scalar_monitor_names
-        except AttributeError:
-            self._visualized_scalar_monitor_names = [m.name for m in self.monitors.values() if m.scalar and m.visualizing]
-            return self._visualized_scalar_monitor_names
+        return [m.name for m in self.monitors.values() if m.scalar and m.visualizing]
 
     @property
     def scalar_monitor_names(self):
-        try:
-            return self._scalar_monitor_names
-        except AttributeError:
-            self._scalar_monitor_names = [m.name for m in self.monitors.values() if m.scalar]
-            return self._scalar_monitor_names
-
+        return [m.name for m in self.monitors.values() if m.scalar]
+        
     def initialize(self, *args, **kwargs):
         self._initialize_args = args
         self._initialize_kwargs = kwargs
