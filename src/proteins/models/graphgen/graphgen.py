@@ -15,7 +15,8 @@ from src.data_ops.wrapping import wrap
 from src.architectures.nmp.message_passing.vertex_update import GRUUpdate
 
 from src.admin.utils import memory_snapshot
-#from src.misc.grad_mode import no_grad
+from ..ProteinModel import ProteinModel
+from ...loss import loss as loss_fn
 
 def conv_and_pad(in_planes, out_planes, kernel_size=17, stride=1):
     # "3x3 convolution with padding"
@@ -91,18 +92,20 @@ class ConvolutionalNMPBlock(nn.Module):
 
         self.update = GRUUpdate(2 * dim, dim)
 
-    def forward(self, x, mask):
+    def forward(self, x, batch_mask, y, y_mask):
         x_conv = self.conv1d(x.transpose(1,2)).transpose(1,2)
 
         s = self.spatial_embedding(x)
-        A = torch.exp( - squared_distance_matrix(s, s) ) * mask
+        A = torch.exp( - squared_distance_matrix(s, s) ) * batch_mask
         x_nmp = torch.bmm(A, self.message(x))
 
         x_in = torch.cat([x_conv, x_nmp], -1)
 
         x = self.update(x, x_in)
 
-        return x
+        loss = loss_fn(A, y, y_mask, batch_mask)
+
+        return x, loss
 
 class BasicNMPBlock(nn.Module):
     def __init__(self, dim):
@@ -116,24 +119,26 @@ class BasicNMPBlock(nn.Module):
 
         self.update = GRUUpdate(dim, dim)
 
-    def forward(self, x, mask):
+    def forward(self, x, batch_mask, y, y_mask):
         s = self.spatial_embedding(x)
-        A = torch.exp( - squared_distance_matrix(s, s) ) * mask
+        A = torch.exp( - squared_distance_matrix(s, s) ) * batch_mask
         x_nmp = torch.bmm(A, self.message(x))
         x = self.update(x, x_nmp)
 
-        return x
+        loss = loss_fn(A, y, y_mask, batch_mask)
+
+        return x, loss
 
 class ConvolutionOnlyBlock(nn.Module):
     def __init__(self, dim):
         super().__init__()
         self.conv1d = BasicBlock(dim, dim)
 
-    def forward(self, x, mask):
+    def forward(self, x, *args, **kwargs):
         x = self.conv1d(x.transpose(1,2)).transpose(1,2)
-        return x
+        return x, 0.
 
-class GraphGen(nn.Module):
+class GraphGen(ProteinModel):
     def __init__(self,
         features=None,
         hidden=None,
@@ -170,32 +175,17 @@ class GraphGen(nn.Module):
         #self.scale = nn.Parameter(torch.zeros(1))
         self.scale = wrap(torch.zeros(1))
 
-    def get_final_spatial_embedding(self, x, mask=None, **kwargs):
-
-        if self.no_grad:
-            s = self.get_final_spatial_embedding_no_grad(x, mask, **kwargs)
-        else:
-            s = self.get_final_spatial_embedding_with_grad(x, mask, **kwargs)
-
-        return s
-
-    def forward(self, x, mask=None, **kwargs):
-        s = self.get_final_spatial_embedding(x, mask, **kwargs)
+    def forward(self, x, mask, y, y_mask, **kwargs):
+        s, l = self.get_final_spatial_embedding(x, mask, y, y_mask, **kwargs)
         A = torch.exp( - squared_distance_matrix(s,s) * torch.exp(self.scale)) * mask
+        return A, l
 
-        return A
+    def get_final_spatial_embedding(self, x, mask, y, y_mask, **kwargs):
+        if self.no_grad:
+            return self.get_final_spatial_embedding_no_grad(x, mask, y, y_mask, **kwargs)
+        return self.get_final_spatial_embedding_with_grad(x, mask, y, y_mask, **kwargs)
 
-    def get_final_spatial_embedding_with_grad(self, x, mask, **kwargs):
-        x = self.initial_embedding(x)
-
-        for nmp in self.nmp_blocks:
-            x = nmp(x, mask)
-
-        s = self.final_spatial_embedding(x)
-        return s
-
-
-    def get_final_spatial_embedding_no_grad(self, x, mask, **kwargs):
+    def get_final_spatial_embedding_no_grad(self, x, mask, y, y_mask, **kwargs):
         n_volatile_layers = np.random.randint(0, len(self.nmp_blocks))
 
         if n_volatile_layers > 0:
@@ -210,12 +200,18 @@ class GraphGen(nn.Module):
             x = self.initial_embedding(x)
 
         s = self.final_spatial_embedding(x)
-        return s
+        return s, None
 
 
-    def get_final_spatial_embedding_with_grad(self, x, mask, **kwargs):
+    def get_final_spatial_embedding_with_grad(self, x, mask, y, y_mask, **kwargs):
+        l = 0
         x = self.initial_embedding(x)
         for nmp in self.nmp_blocks:
-            x = nmp(x, mask)
+            x, l_ = nmp(x, mask, y=y, y_mask=y_mask)
+            l = l + l_
         s = self.final_spatial_embedding(x)
-        return s
+        return s, l
+
+    def loss_and_pred(self, x, batch_mask, y, y_mask, **kwargs):
+        A, l = self(x, batch_mask, y, y_mask)
+        return l + self.loss_fn(A, y, y_mask, batch_mask), A

@@ -7,7 +7,9 @@ from .resnet2d import resnet_2d
 
 from src.admin.utils import memory_snapshot
 
-class WangNet(nn.Module):
+from ..ProteinModel import ProteinModel
+
+class WangNet(ProteinModel):
     def __init__(self,
         features=None,
         hidden=None,
