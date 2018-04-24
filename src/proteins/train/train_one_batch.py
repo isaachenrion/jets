@@ -28,6 +28,6 @@ def train_one_batch(model, batch, optimizer, administrator, epoch, batch_number,
 
     del y; del y_mask; del x; del batch_mask; del batch
 
-    log_gpu_usage()
+    #log_gpu_usage()
 
     return float(unwrap(l))
