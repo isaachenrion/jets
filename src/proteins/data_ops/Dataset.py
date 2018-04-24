@@ -9,6 +9,7 @@ class Dataset(D):
         super().__init__()
         if crop:
             proteins = self.crop(proteins)
+        self.proteins = proteins
 
         self.X = [np.concatenate([p.sequence, p.acc, p.ss3], 1) for p in proteins]
         self.Y = [p.contact_matrix * p.mask for p in proteins]

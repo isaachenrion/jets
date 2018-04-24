@@ -23,6 +23,7 @@ class Protein:
             acc=None,
             ss3=None
             ):
+        self.string_sequence = sequence
         self.sequence=process_sequence_string(sequence)
         self.contact_matrix=contact_matrix.astype('float32')
         self.acc=acc

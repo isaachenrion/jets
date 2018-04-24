@@ -85,7 +85,7 @@ def main(sysargvlist=None):
 
     #data = parser.add_argument_group('data')
     parser.add_argument("-n", "--n_train", type=int, default=-1)
-    parser.add_argument("--n_valid", type=int, default=10000)
+    parser.add_argument("--n_valid", type=int, default=27000)
     parser.add_argument("--dataset", type=str, default='w')
     parser.add_argument("--data_dropout", type=float, default=.99)
     parser.add_argument("--pp", action='store_true', default=False)

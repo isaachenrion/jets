@@ -170,27 +170,32 @@ class GraphGen(nn.Module):
         #self.scale = nn.Parameter(torch.zeros(1))
         self.scale = wrap(torch.zeros(1))
 
-    def forward(self, x, mask=None, **kwargs):
+    def get_final_spatial_embedding(self, x, mask=None, **kwargs):
 
         if self.no_grad:
-            A = self.forward_no_grad(x, mask, **kwargs)
+            s = self.get_final_spatial_embedding_no_grad(x, mask, **kwargs)
         else:
-            A = self.forward_with_grad(x, mask, **kwargs)
+            s = self.get_final_spatial_embedding_with_grad(x, mask, **kwargs)
+
+        return s
+
+    def forward(self, x, mask=None, **kwargs):
+        s = self.get_final_spatial_embedding(x, mask, **kwargs)
+        A = torch.exp( - squared_distance_matrix(s,s) * torch.exp(self.scale)) * mask
 
         return A
 
-    def forward_with_grad(self, x, mask, **kwargs):
+    def get_final_spatial_embedding_with_grad(self, x, mask, **kwargs):
         x = self.initial_embedding(x)
 
         for nmp in self.nmp_blocks:
             x = nmp(x, mask)
 
         s = self.final_spatial_embedding(x)
-        A = torch.exp( - squared_distance_matrix(s,s) * torch.exp(self.scale)) * mask
-        return A
+        return s
 
 
-    def forward_no_grad(self, x, mask, **kwargs):
+    def get_final_spatial_embedding_no_grad(self, x, mask, **kwargs):
         n_volatile_layers = np.random.randint(0, len(self.nmp_blocks))
 
         if n_volatile_layers > 0:
@@ -205,6 +210,12 @@ class GraphGen(nn.Module):
             x = self.initial_embedding(x)
 
         s = self.final_spatial_embedding(x)
-        A = torch.exp( - squared_distance_matrix(s,s) * torch.exp(self.scale)) * mask
+        return s
 
-        return A
+
+    def get_final_spatial_embedding_with_grad(self, x, mask):
+        x = self.initial_embedding(x)
+        for nmp in self.nmp_blocks:
+            x = nmp(x, mask)
+        s = self.final_spatial_embedding(x)
+        return s
