@@ -22,4 +22,3 @@ recnn-gated-gilles.py
 *.pyc
 *.pyo
 */__pycache__/*
-.ipynb
