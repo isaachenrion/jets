@@ -19,7 +19,7 @@ def visualize_spatial(spatial, string_sequence):
     lc.set_linewidth(3)
 
     print('{}'.format(string_sequence))
-    fig = plt.figure()
+    fig = plt.figure(figsize=(1,1))
     ax = fig.gca(projection='3d')
     ax.set_xlim(min(x), max(x))
     ax.set_ylim(min(y), max(y))
