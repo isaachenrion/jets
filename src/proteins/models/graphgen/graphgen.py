@@ -213,7 +213,7 @@ class GraphGen(nn.Module):
         return s
 
 
-    def get_final_spatial_embedding_with_grad(self, x, mask):
+    def get_final_spatial_embedding_with_grad(self, x, mask, **kwargs):
         x = self.initial_embedding(x)
         for nmp in self.nmp_blocks:
             x = nmp(x, mask)
