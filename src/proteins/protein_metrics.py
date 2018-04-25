@@ -18,6 +18,7 @@ def precision_wrt_indices(target, indices):
 
 def recall_wrt_indices(target, indices):
     hits = target[indices]
+    raise NotImplementedError
     #import ipdb; ipdb.set_trace()
     #accuracy = hits.sum(1) /
     return accuracy
@@ -66,7 +67,6 @@ def compute_protein_metrics(targets, predictions, k_list):
 
 
         def precision_wrt_top_indices(indices):
-
             sorted_idx = np.argsort(prediction[ indices])[ ::-1]
             top_predicted_indices = indices[sorted_idx[ :]]
             acc_dict = {k: precision_wrt_indices(target, top_predicted_indices[:M]) for k, M in zip(k_list,M_list)}

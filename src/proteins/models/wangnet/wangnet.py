@@ -23,7 +23,6 @@ class WangNet(ProteinModel):
         self.resnet_2d = resnet_2d(features=2*hidden,hidden=hidden,**kwargs)
 
     def forward(self, x, mask, **kwargs):
-        #with memory_snapshot():
         x = x.transpose(1,2)
         x = self.resnet_1d(x)
 
