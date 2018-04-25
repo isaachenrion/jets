@@ -46,24 +46,24 @@ def do_training(
 
     def train_one_epoch(epoch, iteration):
 
-        train_loss = 0.0
+        loss = 0.0
         t_train = time.time()
 
         for batch_number, batch in enumerate(train_data_loader):
             iteration += 1
-            tl = train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip)
-            train_loss += tl
+            l = train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip)
+            loss += l
 
         scheduler.step()
 
         n_batches = len(train_data_loader)
 
-        train_loss = train_loss / n_batches
+        loss = loss / n_batches
         train_time = time.time() - t_train
         logging.info("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, train_time, len(train_data_loader.dataset)/train_time))
 
         train_dict = dict(
-            train_loss=train_loss,
+            loss=loss,
             lr=scheduler.get_lr()[0],
             epoch=epoch,
             iteration=iteration,
@@ -86,14 +86,19 @@ def do_training(
 
     for epoch in range(1,epochs+1):
         logging.info("Epoch\t{}/{}".format(epoch, epochs))
-        #logging.info("lr = {:.8f}".format(scheduler.get_lr()[0]))
 
         t0 = time.time()
 
         train_dict = train_one_epoch(epoch, iteration)
         valid_dict = validation(model, valid_data_loader)
-        #valid_dict = self.validation(model, dummy_train_data_loader)
-        logdict = {**train_dict, **valid_dict, **static_dict}
+        dummy_train_dict = validation(model, dummy_train_data_loader)
+
+        logdict = dict(
+            train=train_dict,
+            valid=valid_dict,
+            static=static_dict,
+            dummy_train=dummy_train_dict
+            )
 
         iteration = train_dict['iteration']
 
@@ -119,7 +124,6 @@ def generic_train_script(problem=None,args=None):
     from src.utils import build_model, load_model
     problem = importlib.import_module('src.' + problem)
     argument_converter = problem.train_argument_converter
-    train_monitor_collection = problem.train_monitor_collection
     train_one_batch = problem.train_one_batch
     validation = problem.validation
     MODEL_DICT = problem.MODEL_DICT
@@ -144,8 +148,10 @@ def generic_train_script(problem=None,args=None):
     '''----------------------------------------------------------------------- '''
 
     train_data_loader, valid_data_loader = get_train_data_loader(**arg_groups['data_loader_kwargs'])
-    dummy_train_data_loader = copy.deepcopy(valid_data_loader)
-    dummy_train_data_loader.dataset = copy.deepcopy(train_data_loader.dataset)
+
+    dummy_train_data_loader_kwargs = arg_groups['data_loader_kwargs']
+    dummy_train_data_loader_kwargs['n_train'] = dummy_train_data_loader_kwargs['n_valid']
+    dummy_train_data_loader, _ = get_train_data_loader(**dummy_train_data_loader_kwargs)
 
     '''----------------------------------------------------------------------- '''
     ''' BUILD OR LOAD MODEL '''

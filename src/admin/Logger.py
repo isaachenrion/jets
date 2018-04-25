@@ -7,7 +7,7 @@ from src.visualizing.plot_training_stats import plot_training_stats
 from src.admin.MonitorCollection import MonitorCollection
 
 class Logger:
-    def __init__(self, directory, monitor_collection, train):
+    def __init__(self, directory, train, monitor_collections):
         self.train = train
 
         self.statsdir = os.path.join(directory, 'stats')
@@ -20,10 +20,12 @@ class Logger:
 
         self.scalar_filename = os.path.join(self.statsdir, 'scalars.csv')
 
-        self.monitor_collection = monitor_collection
-        self.monitor_collection.initialize(self.statsdir, self.plotsdir)
+        self.monitor_collections = monitor_collections.values()
+        for mc in self.monitor_collections:
+            mc.initialize(self.statsdir, os.path.join(self.plotsdir , mc.name))
 
-        self.headers = self.monitor_collection.scalar_monitor_names
+        self.headers = [mc.name + '_' + name for mc in self.monitor_collections for name in mc.scalar_monitor_names]
+        self.visualized_scalar_monitor_names = [mc.name + '_' + name for mc in self.monitor_collections for name in mc.scalar_monitor_names]
 
         with open(self.scalar_filename, 'a', newline='') as f:
             writer = csv.DictWriter(f, self.headers)
@@ -34,12 +36,17 @@ class Logger:
             writer = csv.DictWriter(f, self.headers)
             writer.writerow({k:v for k,v in stats_dict.items() if k in self.headers})
         if self.train:
-            plot_training_stats(self.scalar_filename, self.monitor_collection.visualized_scalar_monitor_names, self.plotsdir)
+            plot_training_stats(self.scalar_filename, self.visualized_scalar_monitor_names, self.plotsdir)
 
     def log(self, compute_monitors=True,**kwargs):
         if compute_monitors:
-            stats_dict = self.monitor_collection(**kwargs)
-            self.monitor_collection.visualize()
+            stats_dict = {}
+            for mc in self.monitor_collections:
+                sub_stats_dict = mc(**kwargs[mc.name])
+                sub_stats_dict = {mc.name + '_' + name: value for name, value in sub_stats_dict.items()}
+                stats_dict.update(**sub_stats_dict)
+                mc.visualize()
         else:
             stats_dict = kwargs
         self.log_scalars(stats_dict)
+        return '\n'.join(mc.string for mc in self.monitor_collections)

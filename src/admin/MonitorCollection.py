@@ -1,7 +1,8 @@
 
 from collections import OrderedDict
 class MonitorCollection:
-    def __init__(self, *monitors):
+    def __init__(self, name, *monitors):
+        self.name = name
         self.monitors = OrderedDict()
         for m in monitors:
             self.monitors[m.name] = m
@@ -44,5 +45,7 @@ class MonitorCollection:
 
     @property
     def string(self):
-        s = "\n".join([m.string for _, m in self.monitors.items() if m.string is not None])
+        s = ''
+        s += '\n{} monitors\n'.format(self.name)
+        s += "\n".join([m.string for _, m in self.monitors.items() if m.string is not None])
         return s

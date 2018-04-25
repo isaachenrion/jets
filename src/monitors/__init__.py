@@ -15,5 +15,3 @@ from .time_monitors import Hours
 from .batch_matrix_monitor import BatchMatrixMonitor
 
 from .optim_monitors import *
-
-from .protein_metrics import *

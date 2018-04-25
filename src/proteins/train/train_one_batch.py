@@ -15,7 +15,7 @@ def train_one_batch(model, batch, optimizer, administrator, epoch, batch_number,
     model.train()
     optimizer.zero_grad()
     #y_pred = model(x, mask=batch_mask, logger=logger, epoch=epoch, iters=batch_number)
-    l, _ = model.loss_and_pred(x, batch_mask,y, y_mask)
+    l, y_pred = model.loss_and_pred(x, batch_mask,y, y_mask)
     #l = loss(y_pred, y, y_mask, batch_mask)
 
     # backward
@@ -26,8 +26,6 @@ def train_one_batch(model, batch, optimizer, administrator, epoch, batch_number,
 
     optimizer.step()
 
-    del y; del y_mask; del x; del batch_mask; del batch
-
-    #log_gpu_usage()
+    del y_mask; del x; del batch_mask; del batch; del y;
 
     return float(unwrap(l))

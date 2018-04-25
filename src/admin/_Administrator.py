@@ -93,7 +93,7 @@ class _Administrator:
             train=None,
             slurm_array_task_id=None,
             slurm_array_job_id=None,
-            monitor_collection=None,
+            monitor_collections=None,
             root_dir=None,
             intermediate_dir=None,
             leaf_dir=None,
@@ -143,7 +143,7 @@ class _Administrator:
                             )
 
 
-        logger = Logger(exp_dir, monitor_collection, train=train)
+        logger = Logger(exp_dir, train, monitor_collections)
 
         cmd_file = os.path.join(root_dir, current_dir, intermediate_dir, 'command.txt')
         record_cmd_line_args(cmd_line_args, cmd_file)
@@ -174,7 +174,7 @@ class _Administrator:
         self._emailer = emailer
         self._train = train
         self._saver = saver
-        self._monitor_collection = monitor_collection
+        #self._monitor_collection = monitor_collection
 
         #### set up public attributes
         self.logger = logger
@@ -183,9 +183,7 @@ class _Administrator:
         self._signal_handler.set_model(model)
 
     def log(self, **kwargs):
-        self.logger.log(**kwargs)
-        out_str = ''
-        out_str += self._monitor_collection.string
+        out_str = self.logger.log(**kwargs)
         self._signal_handler.results_strings.append(out_str)
         logging.info(out_str)
 
@@ -210,7 +208,7 @@ class _Administrator:
         verbose=None,
         cmd_line_args=None,
         root_dir=None,
-        monitor_collection=None,
+        monitor_collections=None,
         arg_string=None
         ):
 
@@ -225,11 +223,14 @@ class _Administrator:
         if not os.path.exists(exp_dir):
             os.makedirs(exp_dir)
 
-        eta = ETA(datetime.datetime.now(), epochs)
+        valid_monitor_collection = monitor_collections['valid']
+        #valid_monitor_collection = monitor_collections['valid']
+        #eta = ETA(datetime.datetime.now(), epochs)
         model_file = os.path.join(exp_dir, 'model_state_dict.pt')
         settings_file = os.path.join(exp_dir, 'settings.pickle')
-        saver = Saver(monitor_collection.track_monitor, model_file, settings_file, visualizing=False, printing=False)
-        monitor_collection.add_monitors(saver, eta, initialize=False)
+        saver = Saver(valid_monitor_collection.track_monitor, model_file, settings_file, visualizing=False, printing=False)
+        valid_monitor_collection.add_monitors(saver, initialize=False)
+        monitor_collections['valid'] = valid_monitor_collection
 
         dirs = dict(
             root_dir=root_dir,
@@ -243,7 +244,7 @@ class _Administrator:
             train=True,
             silent=silent,
             verbose=verbose,
-            monitor_collection=monitor_collection,
+            monitor_collections=monitor_collections,
             slurm_array_job_id=slurm_array_job_id,
             slurm_array_task_id=slurm_array_task_id,
             email_filename=email_filename,
@@ -271,7 +272,7 @@ class _Administrator:
         verbose=None,
         cmd_line_args=None,
         root_dir=None,
-        monitor_collection=None,
+        monitor_collections=None,
         arg_string=None
         ):
 
@@ -300,7 +301,7 @@ class _Administrator:
             train=False,
             silent=silent,
             verbose=verbose,
-            monitor_collection=monitor_collection,
+            monitor_collections=monitor_collections,
             slurm_array_job_id=slurm_array_job_id,
             slurm_array_task_id=slurm_array_task_id,
             email_filename=email_filename,

@@ -13,47 +13,45 @@ def half_and_half(a,b):
     return a + b
 
 def validation(model, data_loader):
-    t_valid = time.time()
+    t = time.time()
     model.eval()
 
-    valid_loss = 0.
-    yy, yy_pred = [], []
+    loss = 0.
+    targets, predictions = [], []
     half = []
-    mask = []
+    batch_masks = []
     hard_pred = []
     for i, batch in enumerate(data_loader):
-        (x, y, y_mask, batch_mask) = batch
-        vl, y_pred = model.loss_and_pred(x, batch_mask, y, y_mask)
+        (x, target, target_mask, batch_mask) = batch
+        l, prediction = model.loss_and_pred(x, batch_mask, target, target_mask)
 
-        #vl = loss(y_pred, y, y_mask, batch_mask)
+        #vl = loss(prediction, y, y_mask, batch_mask)
 
-        valid_loss = valid_loss + float(unwrap(vl))
+        loss = loss + float(unwrap(l))
 
-        yy.append(unwrap(y))
-        yy_pred.append(unwrap(y_pred))
-        mask.append(unwrap(batch_mask))
+        targets.append(unwrap(target))
+        predictions.append(unwrap(prediction))
+        batch_masks.append(unwrap(batch_mask))
 
-        half.append(unwrap(half_and_half(y, y_pred)))
-        hard_pred.append(unwrap(half_and_half(y, (y_pred > 0.5).float())))
+        half.append(unwrap(half_and_half(target, prediction)))
+        hard_pred.append(unwrap(half_and_half(target, (prediction > 0.5).float())))
 
-        del y; del y_pred; del y_mask; del x; del batch_mask; del batch
+        del target; del prediction; del target_mask; del x; del batch_mask; del batch
 
-    valid_loss /= len(data_loader)
-
-    #grads = torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None], 0)
+    loss /= len(data_loader)
 
     logdict = dict(
-        yy=yy,
-        yy_pred=yy_pred,
+        targets=targets,
+        predictions=predictions,
         half=half,
         hard_pred=hard_pred,
-        mask=mask,
-        valid_loss=valid_loss,
+        masks=batch_masks,
+        loss=loss,
         model=model,
         #grads=grads,
     )
     model.train()
 
     t1=time.time()
-    logging.info("Validation took {:.1f} seconds".format(time.time() - t_valid))
+    logging.info("Validation took {:.1f} seconds".format(time.time() - t))
     return logdict
