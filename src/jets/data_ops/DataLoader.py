@@ -10,7 +10,7 @@ from src.data_ops.wrapping import wrap
 
 
 class DataLoader(_DataLoader):
-    def __init__(self, dataset, batch_size, leaves=True, dropout=None, permute_particles=False, weight_batches=True,**kwargs):
+    def __init__(self, dataset, batch_size, leaves=True, dropout=None, permute_particles=False, weight_batches=False,**kwargs):
         super().__init__(dataset, batch_size)
         self.dropout = dropout
         self.permute_particles = permute_particles
