@@ -30,7 +30,6 @@ def crop(jets, pileup=False):
     indices = np.searchsorted(edges, pts) - 1
     inv_w = 1. / pdf[indices]
     inv_w /= inv_w.sum()
-    #w[y_==0] = inv_w
     for i, (iw, jet) in enumerate(zip(inv_w, good_jets)):
         if jet.y == 0:
             w[i] = iw

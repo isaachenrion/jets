@@ -50,6 +50,8 @@ def load_jets(data_dir, filename, do_preprocessing=False):
     logging.warning("\tSuccessfully loaded data")
     logging.warning("\tFound {} jets in total".format(len(jets)))
 
+    perm = np.random.permutation(len(jets))
+    jets = [jets[i] for i in perm]
     return jets
 
 def training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preprocess):

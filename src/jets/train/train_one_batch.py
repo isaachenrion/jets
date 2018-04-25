@@ -23,9 +23,6 @@ def train_one_batch(model, batch, optimizer, administrator, epoch, batch_number,
     if clip is not None:
         torch.nn.utils.clip_grad_norm(model.parameters(), clip)
 
-    if batch_number == 1:
-        log_gpu_usage()
-
     optimizer.step()
 
     return float(unwrap(l))
