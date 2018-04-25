@@ -45,6 +45,7 @@ def do_training(
         ):
 
     def train_one_epoch(epoch, iteration):
+        log_gpu_usage()
 
         loss = 0.0
         t_train = time.time()
@@ -77,7 +78,6 @@ def do_training(
 
     logging.info("Training...")
     iteration=1
-    #log_gpu_usage()
 
     static_dict = dict(
         model=model,
