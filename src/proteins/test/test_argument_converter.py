@@ -1,5 +1,5 @@
 import os
-from .test_monitors import test_monitor_collection
+from .test_monitors import get_monitor_collections
 
 def test_argument_converter(args):
     '''
@@ -42,7 +42,7 @@ def get_admin_kwargs(args):
         silent=args.silent,
         verbose=args.verbose,
         cmd_line_args=args.cmd_line_args,
-        monitor_collection=test_monitor_collection(),
+        monitor_collections=get_monitor_collections(),
         arg_string=args.arg_string,
         root_dir=args.root_dir,
     )
