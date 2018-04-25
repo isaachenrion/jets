@@ -11,14 +11,14 @@ def get_monitor_collections(logging_frequency):
 
 def train_monitor_collection(logging_frequency):
     time_monitors = [
-        Regurgitate('epoch', visualizing=False, printing=False),
-        Regurgitate('iteration', visualizing=False, printing=False),
+        Collect('epoch', visualizing=False, printing=False),
+        Collect('iteration', visualizing=False, printing=False),
         Hours(),
     ]
     optim_monitors = [
         Collect('lr', fn='last', ndp=8,visualizing=True),
     ]
-    monitors = time_monitors + optim_monitors + [Regurgitate('loss', ndp=3,visualizing=True)]
+    monitors = time_monitors + optim_monitors + [Collect('loss', ndp=3,visualizing=True)]
     mc = MonitorCollection('train',*monitors)
     return mc
 
@@ -33,7 +33,7 @@ def valid_monitor_collection(logging_frequency):
         best_inv_fpr,
         roc_auc,
         roc_auc_at_best_inv_fpr,
-        Regurgitate('loss', ndp=3,visualizing=True),
+        Collect('loss', ndp=3,visualizing=True),
     ]
 
     #grad_monitors = [
@@ -61,7 +61,7 @@ def dummy_train_monitor_collection(logging_frequency):
         best_inv_fpr,
         roc_auc,
         roc_auc_at_best_inv_fpr,
-        Regurgitate('loss', ndp=3,visualizing=True),
+        Collect('loss', ndp=3,visualizing=True),
 
     ]
 

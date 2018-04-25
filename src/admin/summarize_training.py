@@ -81,7 +81,7 @@ def summarize_one_job_training(jobdir, email=None, verbose=False):
         print(out_str)
     if email is not None:
         emailer = get_emailer(email)
-        headline = aggregate_stats_dict.get('save', [-123456789])[0]
+        headline = aggregate_stats_dict.get('valid_save', [-123456789])[0]
         emailer.send_msg(out_str, '{:.2f} ({}: training stats)'.format(headline, jobdir.split('/')[-1]), [])
         if verbose:
             print('Emailed: {}'.format(jobdir))

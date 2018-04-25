@@ -11,7 +11,7 @@ def get_monitor_collections(logging_frequency):
         )
 
 def valid_monitor_collection(logging_frequency):
-    valid_loss = Regurgitate('loss', ndp=3,visualizing=True)
+    valid_loss = Collect('loss', ndp=3,visualizing=True)
     best_valid_loss = Best(valid_loss, track='min',ndp=3)
     metric_monitors = [
         ProteinMetricCollection(
@@ -40,8 +40,8 @@ def valid_monitor_collection(logging_frequency):
 
 def train_monitor_collection():
     time_monitors = [
-        Regurgitate('epoch', visualizing=False,printing=False),
-        Regurgitate('iteration', visualizing=False, printing=False),
+        Collect('epoch', visualizing=False,printing=False),
+        Collect('iteration', visualizing=False, printing=False),
         Hours(),
         Collect('time', fn='sum', visualizing=False, printing=False),
 
@@ -53,7 +53,7 @@ def train_monitor_collection():
 
 
 
-    monitors = optim_monitors + time_monitors + [Regurgitate('loss', ndp=3,visualizing=True)]
+    monitors = optim_monitors + time_monitors + [Collect('loss', ndp=3,visualizing=True)]
 
     mc = MonitorCollection('train', *monitors)
     return mc

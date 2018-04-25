@@ -4,7 +4,8 @@ from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 from scipy import interp
 
-from .baseclasses import ScalarMonitor, Monitor
+from .baseclasses import Monitor
+from .meta import Collect
 
 def inv_fpr_at_tpr_equals_half(tpr, fpr):
     base_tpr = np.linspace(0.05, 1, 476)
@@ -36,7 +37,7 @@ def _flatten_all_inputs(targets, predictions, mask):
     return targets, predictions
 
 
-class ROCAUC(ScalarMonitor):
+class ROCAUC(Collect):
     def __init__(self, **kwargs):
         super().__init__('roc_auc', **kwargs)
 
@@ -56,7 +57,7 @@ class ROCCurve(Monitor):
         self.fpr, self.tpr, _ = roc_curve(targets, predictions, sample_weight=w_valid)
         return (self.fpr, self.tpr)
 
-class InvFPR(ScalarMonitor):
+class InvFPR(Collect):
     def __init__(self, **kwargs):
         super().__init__('inv_fpr', **kwargs)
 
@@ -65,7 +66,7 @@ class InvFPR(ScalarMonitor):
         fpr, tpr, _ = roc_curve(targets, predictions, sample_weight=w_valid)
         return inv_fpr_at_tpr_equals_half(tpr, fpr)
 
-class Precision(ScalarMonitor):
+class Precision(Collect):
     def __init__(self, **kwargs):
         super().__init__('prec', **kwargs)
 
@@ -80,7 +81,7 @@ class Precision(ScalarMonitor):
             prec = 'NaN'
         return float(prec)
 
-class Recall(ScalarMonitor):
+class Recall(Collect):
     def __init__(self, **kwargs):
         super().__init__('recall', **kwargs)
 
@@ -93,7 +94,7 @@ class Recall(ScalarMonitor):
         recall = (predicted_hits * real_hits).sum() / real_hits.sum()
         return float(recall)
 
-class TopLK(ScalarMonitor):
+class TopLK(Collect):
     def __init__(self, k,**kwargs):
         super().__init__('top_l_over_k', **kwargs)
 

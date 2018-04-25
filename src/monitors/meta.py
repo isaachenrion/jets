@@ -67,7 +67,7 @@ class Regurgitate(ScalarMonitor):
         return self.value
 
 class Collect(ScalarMonitor):
-    def __init__(self, value_name, fn=None, plotname=None,**kwargs):
+    def __init__(self, value_name, fn='last', plotname=None,**kwargs):
         super().__init__(value_name, **kwargs)
         self.value_name = value_name
         self.plotname = value_name if plotname is None else plotname
@@ -85,7 +85,10 @@ class Collect(ScalarMonitor):
         v = kwargs[self.value_name]
         if self.numerical:
             v = ensure_numpy_float(v)
-        value = v
+        return v
+
+    def __call__(self, **kwargs):
+        value = self.call(**kwargs)
         self.collection.append(value)
         self.value = self.fn(self.collection)
         return self.value
