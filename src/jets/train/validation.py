@@ -5,31 +5,32 @@ from src.data_ops.wrapping import unwrap
 from ..loss import loss
 
 def validation(model, data_loader):
-    t_valid = time.time()
+    t = time.time()
     model.eval()
 
-    valid_loss = 0.
-    yy, yy_pred = [], []
-    for i, (x, y) in enumerate(data_loader):
-        y_pred = model(x)
-        vl = loss(y_pred, y); valid_loss += float(unwrap(vl))
-        yv = unwrap(y); y_pred = unwrap(y_pred)
-        yy.append(yv); yy_pred.append(y_pred)
+    l = 0.
+    targets, predictions = [], []
+    for i, (x, target) in enumerate(data_loader):
+        prediction = model(x)
+        l_batch = loss(prediction, target)
+        l += float(unwrap(l_batch))
+        target = unwrap(target); prediction = unwrap(prediction)
+        targets.append(target); predictions.append(prediction)
 
-    valid_loss /= len(data_loader)
+    l /= len(data_loader)
 
     t1=time.time()
 
     logdict = dict(
-        yy=yy,
-        yy_pred=yy_pred,
+        targets=targets,
+        predictions=predictions,
         #mask=mask,
         w_valid=data_loader.dataset.weights,
-        valid_loss=valid_loss,
+        loss=l,
         model=model,
         logtime=0,
     )
     #logdict.update(train_dict)
     model.train()
-    logging.info("Validation took {:.1f} seconds".format(time.time() - t_valid))
+    logging.info("Validation took {:.1f} seconds".format(time.time() - t))
     return logdict

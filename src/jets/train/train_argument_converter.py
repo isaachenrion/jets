@@ -1,5 +1,5 @@
 import os
-from .train_monitors import train_monitor_collection
+from .train_monitors import get_monitor_collections
 def train_argument_converter(args):
     '''
     Takes an argparse namespace, and converts it into argument dictionaries.
@@ -48,7 +48,7 @@ def get_admin_kwargs(args):
         verbose=args.verbose,
         cmd_line_args=args.cmd_line_args,
         root_dir=args.root_dir,
-        monitor_collection=train_monitor_collection(args.lf),
+        monitor_collections=get_monitor_collections(args.lf),
         arg_string=args.arg_string,
         epochs=args.epochs
     )

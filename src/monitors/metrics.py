@@ -24,26 +24,26 @@ def ensure_flat_numpy_array(x):
     assert len(x.shape) == 1
     return x
 
-def _flatten_all_inputs(yy, yy_pred, mask):
-    yy = ensure_flat_numpy_array(yy)
-    yy_pred = ensure_flat_numpy_array(yy_pred)
+def _flatten_all_inputs(targets, predictions, mask):
+    targets = ensure_flat_numpy_array(targets)
+    predictions = ensure_flat_numpy_array(predictions)
 
     if mask is not None:
         mask = ensure_flat_numpy_array(mask)
-        yy *= mask
-        yy_pred *= mask
+        targets *= mask
+        predictions *= mask
 
-    return yy, yy_pred
+    return targets, predictions
 
 
 class ROCAUC(ScalarMonitor):
     def __init__(self, **kwargs):
         super().__init__('roc_auc', **kwargs)
 
-    def call(self, yy=None, yy_pred=None, mask=None, w_valid=None, **kwargs):
-        yy, yy_pred = _flatten_all_inputs(yy, yy_pred, mask)
+    def call(self, targets=None, predictions=None, mask=None, w_valid=None, **kwargs):
+        targets, predictions = _flatten_all_inputs(targets, predictions, mask)
 
-        return roc_auc_score(yy, yy_pred, sample_weight=w_valid)
+        return roc_auc_score(targets, predictions, sample_weight=w_valid)
 
 class ROCCurve(Monitor):
     def __init__(self, **kwargs):
@@ -51,29 +51,29 @@ class ROCCurve(Monitor):
         self.scalar = False
         self.fpr, self.tpr = None, None
 
-    def call(self, yy=None, yy_pred=None, mask=None, w_valid=None, **kwargs):
-        yy, yy_pred = _flatten_all_inputs(yy, yy_pred, mask)
-        self.fpr, self.tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
+    def call(self, targets=None, predictions=None, mask=None, w_valid=None, **kwargs):
+        targets, predictions = _flatten_all_inputs(targets, predictions, mask)
+        self.fpr, self.tpr, _ = roc_curve(targets, predictions, sample_weight=w_valid)
         return (self.fpr, self.tpr)
 
 class InvFPR(ScalarMonitor):
     def __init__(self, **kwargs):
         super().__init__('inv_fpr', **kwargs)
 
-    def call(self, yy=None, yy_pred=None, mask=None, w_valid=None, **kwargs):
-        yy, yy_pred = _flatten_all_inputs(yy, yy_pred, mask)
-        fpr, tpr, _ = roc_curve(yy, yy_pred, sample_weight=w_valid)
+    def call(self, targets=None, predictions=None, mask=None, w_valid=None, **kwargs):
+        targets, predictions = _flatten_all_inputs(targets, predictions, mask)
+        fpr, tpr, _ = roc_curve(targets, predictions, sample_weight=w_valid)
         return inv_fpr_at_tpr_equals_half(tpr, fpr)
 
 class Precision(ScalarMonitor):
     def __init__(self, **kwargs):
         super().__init__('prec', **kwargs)
 
-    def call(self, yy=None, yy_pred=None, mask=None, **kwargs):
-        yy, yy_pred = _flatten_all_inputs(yy, yy_pred, mask)
+    def call(self, targets=None, predictions=None, mask=None, **kwargs):
+        targets, predictions = _flatten_all_inputs(targets, predictions, mask)
 
-        predicted_hits = (yy_pred > 0.5)
-        real_hits = (yy == 1)
+        predicted_hits = (predictions > 0.5)
+        real_hits = (targets == 1)
         try:
             prec = (predicted_hits * real_hits).sum() / predicted_hits.sum()
         except ZeroDivisionError:
@@ -84,11 +84,11 @@ class Recall(ScalarMonitor):
     def __init__(self, **kwargs):
         super().__init__('recall', **kwargs)
 
-    def call(self, yy=None, yy_pred=None,  mask=None,**kwargs):
-        yy, yy_pred = _flatten_all_inputs(yy, yy_pred, mask)
+    def call(self, targets=None, predictions=None,  mask=None,**kwargs):
+        targets, predictions = _flatten_all_inputs(targets, predictions, mask)
 
-        predicted_hits = (yy_pred > 0.5)
-        real_hits = (yy == 1)
+        predicted_hits = (predictions > 0.5)
+        real_hits = (targets == 1)
 
         recall = (predicted_hits * real_hits).sum() / real_hits.sum()
         return float(recall)
@@ -97,9 +97,9 @@ class TopLK(ScalarMonitor):
     def __init__(self, k,**kwargs):
         super().__init__('top_l_over_k', **kwargs)
 
-    def call(self, yy=None, yy_pred=None, mask=None, **kwargs):
+    def call(self, targets=None, predictions=None, mask=None, **kwargs):
         lengths = torch.sum(mask,1)[:,0]
-        predicted_hits, predicted_indices = torch.topk(yy_pred,2 )
-        real = yy[predicted_hits]
+        predicted_hits, predicted_indices = torch.topk(predictions,2 )
+        real = targets[predicted_hits]
         recall = real.sum() / len(real)
         return float(recall)
