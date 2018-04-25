@@ -1,12 +1,14 @@
 
 from collections import OrderedDict
 class MonitorCollection:
-    def __init__(self, name, *monitors):
+    def __init__(self, name, *monitors, plotting_frequency=1):
         self.name = name
         self.monitors = OrderedDict()
         for m in monitors:
             self.monitors[m.name] = m
         self.track_monitor = None
+        self.visualize_calls = 0
+        self.plotting_frequency = plotting_frequency
 
     @property
     def monitor_names(self):
@@ -30,8 +32,11 @@ class MonitorCollection:
         return {name:self.monitors[name](**kwargs) for name in self.monitor_names}
 
     def visualize(self, **kwargs):
-        for m in self.monitors.values():
-            m.visualize(**kwargs)
+        if self.visualize_calls % self.plotting_frequency == 0:
+            for m in self.monitors.values():
+                m.visualize(**kwargs)
+        self.visualize_calls += 1
+
 
     def add_monitor(self, monitor, initialize=False):
         self.monitors[monitor.name] = monitor

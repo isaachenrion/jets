@@ -22,7 +22,7 @@ def train_argument_converter(args):
 
         args.hidden = 1
         args.iters = 2
-        args.lf = 1
+        args.plotting_frequency = 1
 
     return dict(
         admin_kwargs=get_admin_kwargs(args),
@@ -46,7 +46,7 @@ def get_admin_kwargs(args):
         verbose=args.verbose,
         cmd_line_args=args.cmd_line_args,
         root_dir=args.root_dir,
-        monitor_collections=get_monitor_collections(args.lf),
+        monitor_collections=get_monitor_collections(args.plotting_frequency),
         arg_string=args.arg_string,
         epochs=args.epochs
     )

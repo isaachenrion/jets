@@ -25,7 +25,7 @@ def main(sysargvlist=None):
     parser.add_argument("-s", "--silent", action='store_true', default=False)
     parser.add_argument("-v", "--verbose", action='store_true', default=False)
     parser.add_argument("--visualizing", action='store_true', default=False)
-    parser.add_argument("--lf", type=int, default=8)
+    parser.add_argument("--plotting_frequency", type=int, default=8)
     parser.add_argument("--email_filename",default=EMAIL_FILE)
 
     # Directory args
