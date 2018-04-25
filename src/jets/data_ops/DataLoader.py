@@ -28,7 +28,7 @@ class DataLoader(_DataLoader):
         x_list, y_list, weight_list = list(map(list, zip(*data_tuples)))
         x, mask = self.preprocess_x(x_list)
         y = self.preprocess_y(y_list)
-        weight = torch.Tensor(weight_list) if self.weight_batches else None
+        weight = wrap(torch.Tensor(weight_list)) if self.weight_batches else None
 
         return (x, mask), y, weight
 
