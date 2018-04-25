@@ -2,14 +2,14 @@ from src.monitors import *
 from src.admin.MonitorCollection import MonitorCollection
 
 
-def get_monitor_collections(logging_frequency):
+def get_monitor_collections(plotting_frequency):
     return dict(
-        train=train_monitor_collection(logging_frequency),
-        valid=valid_monitor_collection(logging_frequency),
-        dummy_train=dummy_train_monitor_collection(logging_frequency)
+        train=train_monitor_collection(plotting_frequency),
+        valid=valid_monitor_collection(plotting_frequency),
+        dummy_train=dummy_train_monitor_collection(plotting_frequency)
         )
 
-def train_monitor_collection(logging_frequency):
+def train_monitor_collection(plotting_frequency):
     time_monitors = [
         Collect('epoch', visualizing=False, printing=False),
         Collect('iteration', visualizing=False, printing=False),
@@ -19,10 +19,10 @@ def train_monitor_collection(logging_frequency):
         Collect('lr', fn='last', ndp=8,visualizing=True),
     ]
     monitors = time_monitors + optim_monitors + [Collect('loss', ndp=3,visualizing=True)]
-    mc = MonitorCollection('train',*monitors)
+    mc = MonitorCollection('train',*monitors, plotting_frequency=plotting_frequency)
     return mc
 
-def valid_monitor_collection(logging_frequency):
+def valid_monitor_collection(plotting_frequency):
     roc_auc = ROCAUC(visualizing=True, ndp=5)
     inv_fpr = InvFPR(visualizing=True)
     best_inv_fpr = Best(inv_fpr)
@@ -45,12 +45,12 @@ def valid_monitor_collection(logging_frequency):
     monitors = metric_monitors  #+ grad_monitors
     #monitors += viz_monitors
 
-    mc = MonitorCollection('valid',*monitors)
+    mc = MonitorCollection('valid',*monitors, plotting_frequency=plotting_frequency)
     mc.track_monitor = best_inv_fpr
     return mc
 
 
-def dummy_train_monitor_collection(logging_frequency):
+def dummy_train_monitor_collection(plotting_frequency):
     roc_auc = ROCAUC(visualizing=True, ndp=5)
     inv_fpr = InvFPR(visualizing=True)
     best_inv_fpr = Best(inv_fpr)
@@ -68,5 +68,5 @@ def dummy_train_monitor_collection(logging_frequency):
 
     monitors = metric_monitors  #
 
-    mc = MonitorCollection('dummy_train',*monitors)
+    mc = MonitorCollection('dummy_train',*monitors, plotting_frequency=plotting_frequency)
     return mc

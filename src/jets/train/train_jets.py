@@ -25,7 +25,7 @@ def main(sysargvlist=None):
     parser.add_argument("-s", "--silent", action='store_true', default=False)
     parser.add_argument("-v", "--verbose", action='store_true', default=False)
     parser.add_argument("--visualizing", action='store_true', default=False)
-    parser.add_argument("--lf", type=int, default=8)
+    parser.add_argument("--plotting_frequency", type=int, default=8)
     parser.add_argument("--email_filename",default=EMAIL_FILE)
 
     # Directory args
@@ -53,7 +53,7 @@ def main(sysargvlist=None):
     parser.add_argument("-e", "--epochs", type=int, default=32)
     parser.add_argument("-b", "--batch_size", type=int, default=64)
     parser.add_argument("--experiment_time", type=int, default=1000000)
-
+    parser.add_argument("--weight_batches", action='store_true')
     '''
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     '''

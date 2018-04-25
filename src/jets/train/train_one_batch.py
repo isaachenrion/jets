@@ -10,13 +10,13 @@ from ..loss import loss
 
 def train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip):
     logger = administrator.logger
-    (x, target) = batch
+    (x, target, weight) = batch
 
     # forward
     model.train()
     optimizer.zero_grad()
     prediction = model(x, logger=logger, epoch=epoch, iters=batch_number)
-    l = loss(prediction, target)
+    l = loss(prediction, target, weight)
 
     # backward
     l.backward()

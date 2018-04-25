@@ -63,12 +63,6 @@ def training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preproc
     problem = data_dir.split('/')[-1]
     subproblem = filename
 
-    train_jets = jets[n_valid:n_valid + n_train] if n_train > 0 else jets[n_valid:]
-    train_dataset = Dataset(train_jets, problem=problem,subproblem=subproblem)
-    #
-    valid_jets = jets[:n_valid]
-    valid_dataset = Dataset(valid_jets, problem=problem,subproblem=subproblem)
-
     if 'w-vs-qcd' in data_dir:
         from .w_vs_qcd import crop_dataset
     elif 'quark-gluon' in data_dir:
@@ -76,11 +70,16 @@ def training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preproc
     else:
         raise ValueError('Unrecognized data_dir!')
 
-    valid_dataset, cropped_dataset = crop_dataset(valid_dataset)
+    train_jets = jets[n_valid:n_valid + n_train] if n_train > 0 else jets[n_valid:]
+    #
+    valid_jets = jets[:n_valid]
+    valid_dataset = Dataset(valid_jets, problem=problem,subproblem=subproblem)
 
-    train_dataset.extend(cropped_dataset)
+    good_jets, bad_jets = crop_dataset(valid_dataset)
 
+    train_dataset = Dataset(bad_jets + train_jets, problem=problem,subproblem=subproblem)
     train_dataset.shuffle()
+
     ##
     logging.warning("Building normalizing transform from training set...")
     train_dataset.transform()

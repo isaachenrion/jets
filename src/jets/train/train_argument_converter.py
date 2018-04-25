@@ -24,7 +24,7 @@ def train_argument_converter(args):
 
         args.hidden = 1
         args.iters = 2
-        args.lf = 1
+        args.plotting_frequency = 1
 
     return dict(
         admin_kwargs=get_admin_kwargs(args),
@@ -48,7 +48,7 @@ def get_admin_kwargs(args):
         verbose=args.verbose,
         cmd_line_args=args.cmd_line_args,
         root_dir=args.root_dir,
-        monitor_collections=get_monitor_collections(args.lf),
+        monitor_collections=get_monitor_collections(args.plotting_frequency),
         arg_string=args.arg_string,
         epochs=args.epochs
     )
@@ -65,7 +65,8 @@ def get_data_loader_kwargs(args):
         n_valid=args.n_valid,
         batch_size=args.batch_size,
         preprocess=args.pp,
-        leaves=leaves
+        leaves=leaves,
+        weight_batches=args.weight_batches
     )
 
 def get_optim_args(args):
@@ -89,7 +90,6 @@ def get_training_kwargs(args):
         time_limit = args.experiment_time * 60 * 60 - 60,
         epochs = args.epochs,
         clip = args.clip,
-
     )
 
 def get_model_kwargs(args):
@@ -99,7 +99,7 @@ def get_model_kwargs(args):
         'hidden': args.hidden,
 
         # logging
-        'logging_frequency': args.lf,
+        'logging_frequency': args.plotting_frequency,
 
         # activation
         'act': args.act,

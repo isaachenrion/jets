@@ -4,11 +4,14 @@ import numpy as np
 import math
 
 from sklearn.preprocessing import RobustScaler
+
+from .flatten_in_pt_weights import flatten_in_pt_weights
+
 class Dataset(D):
     def __init__(self, jets, weights=None, problem=None, subproblem=None):
         super().__init__()
         self.jets = jets
-        self.weights = weights
+        self.weights = flatten_in_pt_weights(jets) * len(self) / 2.0
         self.problem = problem
         self.subproblem = subproblem
 
@@ -16,21 +19,17 @@ class Dataset(D):
         return len(self.jets)
 
     def __getitem__(self, idx):
-        return self.jets[idx], self.jets[idx].y
+        return self.jets[idx], self.jets[idx].y, self.weights[idx]
 
     def shuffle(self):
         perm = np.random.permutation(len(self.jets))
         self.jets = [self.jets[i] for i in perm]
-        #self.y = [self.y[i] for i in perm]
         if self.weights is not None:
             self.weights = [self.weights[i] for i in perm]
 
     @property
     def dim(self):
         return self.jets[0].constituents.shape[1]
-
-    def extend(self, dataset):
-        self.jets = self.jets + dataset.jets
 
     @classmethod
     def concatenate(cls, dataset1, dataset2):

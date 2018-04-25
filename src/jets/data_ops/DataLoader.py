@@ -10,11 +10,12 @@ from src.data_ops.wrapping import wrap
 
 
 class DataLoader(_DataLoader):
-    def __init__(self, dataset, batch_size, leaves=True, dropout=None, permute_particles=False, **kwargs):
+    def __init__(self, dataset, batch_size, leaves=True, dropout=None, permute_particles=False, weight_batches=True,**kwargs):
         super().__init__(dataset, batch_size)
         self.dropout = dropout
         self.permute_particles = permute_particles
         self.leaves = leaves
+        self.weight_batches = weight_batches
 
     @property
     def dim(self):
@@ -22,7 +23,15 @@ class DataLoader(_DataLoader):
             return self.dataset.dim + 1
         else:
             return self.dataset.dim
-            
+
+    def collate(self, data_tuples):
+        x_list, y_list, weight_list = list(map(list, zip(*data_tuples)))
+        x, mask = self.preprocess_x(x_list)
+        y = self.preprocess_y(y_list)
+        weight = torch.Tensor(weight_list) if self.weight_batches else None
+
+        return (x, mask), y, weight
+
     def preprocess_y(self, y_list):
         y = torch.stack([torch.Tensor([int(y)]) for y in y_list], 0)
         if y.size()[1] == 1:
