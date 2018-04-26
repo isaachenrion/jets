@@ -106,7 +106,7 @@ def main(sysargvlist=None):
     # NMP
     parser.add_argument("-i", "--iters", type=int, default=4)
     parser.add_argument("--block", type=str, default='cnmp')
-    parser.add_argument("--mp", type=str, default='m2', help='type of message passing layer')
+    #parser.add_argument("--mp", type=str, default='m2', help='type of message passing layer')
     parser.add_argument("-u", "--update", type=str, default='gru', help='type of vertex update')
     parser.add_argument("--message", type=str, default='2', help='type of message')
     parser.add_argument("--emb_init", type=str, default='1', help='type of message')

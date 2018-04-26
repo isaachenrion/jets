@@ -9,6 +9,8 @@ from src.admin.utils import log_gpu_usage
 from ..loss import loss
 
 def train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip):
+    if batch_number % 20 == 0:
+        log_gpu_usage()
     logger = administrator.logger
     (x, target, weight) = batch
 

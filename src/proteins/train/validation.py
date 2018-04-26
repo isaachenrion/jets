@@ -48,7 +48,6 @@ def validation(model, data_loader):
         masks=batch_masks,
         loss=loss,
         model=model,
-        #grads=grads,
     )
     model.train()
 
