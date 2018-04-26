@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 import torch
 from torch.autograd import Variable
@@ -16,6 +17,10 @@ class DataLoader(_DataLoader):
         self.permute_particles = permute_particles
         self.leaves = leaves
         self.weight_batches = weight_batches
+        if weight_batches:
+            logging.info("Using weights to flatten samples with respect to pt")
+        else:
+            logging.info("Unweighted samples")
 
     @property
     def dim(self):
@@ -29,7 +34,6 @@ class DataLoader(_DataLoader):
         x, mask = self.preprocess_x(x_list)
         y = self.preprocess_y(y_list)
         weight = wrap(torch.Tensor(weight_list)) if self.weight_batches else None
-
         return (x, mask), y, weight
 
     def preprocess_y(self, y_list):

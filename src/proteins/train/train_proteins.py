@@ -96,20 +96,15 @@ def main(sysargvlist=None):
     '''
     # Dimension and activation args
 
-    #model = parser.add_argument_group('model')
-    #model.add_argument("--features", type=int, default=41)
-    parser.add_argument("--hidden", type=int, default=64)
+    parser.add_argument("--hidden", type=int, default=32)
     parser.add_argument("--act", type=str, default='leakyrelu')
     parser.add_argument("--model_dropout", type=float, default=1.)
-
-    # Classifier
-    parser.add_argument("--predict", type=str, default='simple', help='type of prediction layer')
 
     # Transform
     parser.add_argument("-m", "--model", type=str, default="g", help="name of the model you want to train")
 
     # NMP
-    parser.add_argument("-i", "--iters", type=int, default=10)
+    parser.add_argument("-i", "--iters", type=int, default=4)
     parser.add_argument("--block", type=str, default='cnmp')
     parser.add_argument("--mp", type=str, default='m2', help='type of message passing layer')
     parser.add_argument("-u", "--update", type=str, default='gru', help='type of vertex update')
@@ -128,6 +123,7 @@ def main(sysargvlist=None):
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     args.cmd_line_args = (' '.join(sys.argv))
     args.arg_string = '\n'.join(['\t{} = {}'.format(k, v) for k, v in sorted(vars(args).items())])
+
 
     generic_train_script('proteins', args)
 

@@ -8,7 +8,7 @@ from sklearn.preprocessing import RobustScaler
 from .flatten_in_pt_weights import flatten_in_pt_weights
 
 class Dataset(D):
-    def __init__(self, jets, weights=None, problem=None, subproblem=None):
+    def __init__(self, jets, problem=None, subproblem=None):
         super().__init__()
         self.jets = jets
         self.weights = flatten_in_pt_weights(jets) * len(self) / 2.0
@@ -24,8 +24,7 @@ class Dataset(D):
     def shuffle(self):
         perm = np.random.permutation(len(self.jets))
         self.jets = [self.jets[i] for i in perm]
-        if self.weights is not None:
-            self.weights = [self.weights[i] for i in perm]
+        self.weights = [self.weights[i] for i in perm]
 
     @property
     def dim(self):

@@ -41,7 +41,6 @@ def main(sysargvlist=None):
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     '''
     # Loading previous models args
-    #loading = parser.add_argument_group('loading')
     parser.add_argument("-l", "--load", help="model directory from which we load a state_dict", type=str, default=None)
     parser.add_argument("-r", "--restart", help="restart a loaded model from where it left off", action='store_true', default=False)
 
