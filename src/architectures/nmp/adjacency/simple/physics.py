@@ -54,8 +54,8 @@ class FixedPhysicsAdjacency(_PhysicsAdjacency):
     def __init__(self, alpha=None, R=None,index='',**kwargs):
         name='phy'+index
         super().__init__(name=name, **kwargs)
-        self.register_buffer('_alpha',torch.tensor(alpha))
-        self.register_buffer('_R',torch.tensor(R))
+        self.register_buffer('_alpha',torch.tensor(alpha).float())
+        self.register_buffer('_R',torch.tensor(R).float())
 
     @property
     def alpha(self):
