@@ -79,6 +79,7 @@ def training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preproc
 
     train_dataset = Dataset(bad_jets + train_jets, problem=problem,subproblem=subproblem)
     train_dataset.shuffle()
+    valid_dataset = Dataset(good_jets, problem=problem,subproblem=subproblem)
 
     ##
     logging.warning("Building normalizing transform from training set...")
