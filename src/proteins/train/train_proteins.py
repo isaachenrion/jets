@@ -124,7 +124,6 @@ def main(sysargvlist=None):
     args.cmd_line_args = (' '.join(sys.argv))
     args.arg_string = '\n'.join(['\t{} = {}'.format(k, v) for k, v in sorted(vars(args).items())])
 
-
     generic_train_script('proteins', args)
 
 if __name__ == "__main__":

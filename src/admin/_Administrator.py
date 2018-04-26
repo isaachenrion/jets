@@ -23,15 +23,15 @@ def get_git_revision_short_hash():
     s = str(s).split('\'')[1]
     return s
 
-def cuda_and_random_seed(gpu, seed):
-    if gpu != "" and torch.cuda.is_available():
+def cuda_and_random_seed(gpu, seed, use_cuda):
+    if gpu != "" and use_cuda:
         torch.cuda.device(gpu)
 
     if seed is None:
         seed = np.random.randint(0, 2**16 - 1)
     np.random.seed(seed)
 
-    if gpu != "" and torch.cuda.is_available():
+    if gpu != "" and use_cuda:
         torch.cuda.device(gpu)
         torch.cuda.manual_seed(seed)
 
@@ -109,7 +109,7 @@ class _Administrator:
             arg_string=None,
             saver=None,
             ):
-
+        use_cuda = torch.cuda.is_available()
         slurm = slurm_array_job_id is not None
         pid = os.getpid()
         host = socket.gethostname()
@@ -148,7 +148,7 @@ class _Administrator:
         cmd_file = os.path.join(root_dir, current_dir, intermediate_dir, 'command.txt')
         record_cmd_line_args(cmd_line_args, cmd_file)
 
-        seed, gpu = cuda_and_random_seed(gpu, seed)
+        seed, gpu = cuda_and_random_seed(gpu, seed, use_cuda)
 
         logging.info("running on {}".format(host))
         logging.info(exp_dir)
@@ -156,9 +156,9 @@ class _Administrator:
         logging.info("\n")
         logging.info("Git commit = {}".format(get_git_revision_short_hash()))
         logging.info("\tPID = {}".format(pid))
-        logging.info("\t{}unning on GPU".format("R" if torch.cuda.is_available() else "Not r"))
+        logging.info("\t{}unning on GPU".format("R" if use_cuda else "Not r"))
         logging.info("Seed = {}".format(seed))
-        logging.info("GPU = {}".format(gpu))
+        logging.info("GPU = {}".format(gpu if use_cuda else "None"))
 
         msg = ['JOB STARTED', exp_dir, host.split('.')[0], str(pid)]
         text = '\n'.join(msg)
