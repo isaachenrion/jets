@@ -11,7 +11,7 @@ class Dataset(D):
     def __init__(self, jets, problem=None, subproblem=None):
         super().__init__()
         self.jets = jets
-        self.weights = flatten_in_pt_weights(jets) * len(self) / 2.0
+        self.weights = flatten_in_pt_weights(jets) #* len(self) / 2.0
         self.problem = problem
         self.subproblem = subproblem
 

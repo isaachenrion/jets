@@ -12,7 +12,7 @@ def validation(model, data_loader):
     targets, predictions, weights = [], [], []
     for i, (x, target, weight) in enumerate(data_loader):
         prediction = model(x)
-        l_batch = loss(prediction, target, weight)
+        l_batch = loss(prediction, target)
         l += float(unwrap(l_batch))
 
         targets.append(unwrap(target))

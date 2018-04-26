@@ -16,7 +16,7 @@ def train_one_batch(model, batch, optimizer, administrator, epoch, batch_number,
     model.train()
     optimizer.zero_grad()
     prediction = model(x, logger=logger, epoch=epoch, iters=batch_number)
-    l = loss(prediction, target, weight)
+    l = loss(prediction, target)
 
     # backward
     l.backward()
