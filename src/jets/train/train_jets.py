@@ -49,7 +49,7 @@ def main(sysargvlist=None):
     '''
     # Training args
     #training = parser.add_argument_group('training')
-    parser.add_argument("-e", "--epochs", type=int, default=32)
+    parser.add_argument("-e", "--epochs", type=int, default=64)
     parser.add_argument("-b", "--batch_size", type=int, default=64)
     parser.add_argument("--experiment_time", type=int, default=1000000)
     parser.add_argument("--weight_batches", action='store_true')
