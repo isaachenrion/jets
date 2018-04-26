@@ -33,9 +33,14 @@ class DataLoader(DL):
         x, mask = self.preprocess_x(x_list)
         y = self.preprocess_y(y_list)
         weight = torch.tensor(weight_list) if self.weight_batches else None
-        batch = ((x, mask), y, weight)
+
         if torch.cuda.is_available():
-            batch = [t.to('cuda') for t in batch]
+            x = x.to('cuda')
+            y = y.to('cuda')
+            mask = mask.to('cuda')
+            weight = weight.to('cuda')
+
+        batch = ((x, mask), y, weight)
         return batch
 
     def preprocess_y(self, y_list):
