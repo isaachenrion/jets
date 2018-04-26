@@ -9,18 +9,23 @@ from collections import OrderedDict
 def list_multiply(x_list, y_list):
     return list(x * y for x, y in zip(x_list, y_list))
 
+def max_prec_recall(target, indices):
+    #import ipdb; ipdb.set_trace()
+
+    hits = target[indices]
+    accuracy = sum(hits) / np.minimum(len(indices),len(target))
+    return accuracy
+
 def precision_wrt_indices(target, indices):
     #import ipdb; ipdb.set_trace()
 
     hits = target[indices]
-    accuracy = hits.mean()
+    accuracy = sum(hits) / len(indices)
     return accuracy
 
 def recall_wrt_indices(target, indices):
     hits = target[indices]
-    raise NotImplementedError
-    #import ipdb; ipdb.set_trace()
-    #accuracy = hits.sum(1) /
+    accuracy = sum(hits) / len(target)
     return accuracy
 
 def convert_list_of_dicts_to_summary_dict(dict_list, name=None):
@@ -72,25 +77,28 @@ def compute_protein_metrics(targets, predictions, k_list):
             acc_dict = {k: precision_wrt_indices(target, top_predicted_indices[:M]) for k, M in zip(k_list,M_list)}
             return acc_dict
 
+        def max_pr_wrt_top_indices(indices):
+            sorted_idx = np.argsort(prediction[ indices])[ ::-1]
+            top_predicted_indices = indices[sorted_idx[ :]]
+            acc_dict = {k: max_prec_recall(target, top_predicted_indices[:M]) for k, M in zip(k_list,M_list)}
+            return acc_dict
+
         def recall_wrt_top_indices(indices):
             sorted_idx = np.argsort(prediction[indices])[ ::-1]
             top_predicted_indices = indices[sorted_idx[ :]]
             acc_dict = {k: recall_wrt_indices(target, top_predicted_indices[:M]) for k, M in zip(k_list,M_list)}
             return acc_dict
 
-        #acc[i] = precision_wrt_top_indices(allidx)
-        prec = True
+        prec = False
         if prec:
             acc_long[i] = precision_wrt_top_indices(longidx)
             acc_med[i] = precision_wrt_top_indices(medidx)
             acc_short[i] = precision_wrt_top_indices(shortidx)
         else:
-            acc_long[i] = recall_wrt_top_indices(longidx)
-            acc_med[i] = recall_wrt_top_indices(medidx)
-            acc_short[i] = recall_wrt_top_indices(shortidx)
+            acc_long[i] = max_pr_wrt_top_indices(longidx)
+            acc_med[i] = max_pr_wrt_top_indices(medidx)
+            acc_short[i] = max_pr_wrt_top_indices(shortidx)
 
-
-    #acc = convert_list_of_dicts_to_summary_dict(acc, 'acc_L')
     acc_short = convert_list_of_dicts_to_summary_dict(acc_short, 'acc_short_L')
     acc_long = convert_list_of_dicts_to_summary_dict(acc_long, 'acc_long_L')
     acc_med = convert_list_of_dicts_to_summary_dict(acc_med, 'acc_med_L')
