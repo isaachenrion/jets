@@ -1,6 +1,7 @@
 import torch
 import pickle
 import logging
+import copy
 from .baseclasses import ScalarMonitor
 from .meta import Regurgitate
 
@@ -22,10 +23,7 @@ class Saver(ScalarMonitor):
 
     def save(self, model, settings):
         with open(self.model_file, 'wb') as f:
-            torch.save(model.cpu().state_dict(), f)
-
-        if torch.cuda.is_available():
-            model.cuda()
+            torch.save(copy.deepcopy(model).to('cpu').state_dict(), f)
 
         with open(self.settings_file, "wb") as f:
             pickle.dump(settings, f)

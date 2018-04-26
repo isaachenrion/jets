@@ -67,9 +67,7 @@ class Attention(nn.Module):
         #import ipdb; ipdb.set_trace()
         s = dot(query, key)
         if dimensions is None:
-            dimensions  = Variable(torch.FloatTensor([key.size()[1]]).view(1, 1, 1).expand_as(s))
-        if torch.cuda.is_available():
-            dimensions = dimensions.cuda()
+            dimensions  = torch.FloatTensor([key.size()[1]], device=query.device).view(1, 1, 1).expand_as(s)
         scaling_factor = torch.sqrt(1 / dimensions)
         alpha = F.softmax(s / scaling_factor, dim=2)
         #alpha = alpha.transpose(0,2)

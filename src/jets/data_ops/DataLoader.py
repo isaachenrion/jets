@@ -2,17 +2,16 @@ import logging
 import numpy as np
 import torch
 from torch.autograd import Variable
+from torch.utils.data import DataLoader as DL
 
-from src.data_ops._DataLoader import _DataLoader
 from src.data_ops.pad_tensors import pad_tensors_extra_channel
 from src.data_ops.dropout import dropout
-from src.data_ops.wrapping import wrap
 
 
 
-class DataLoader(_DataLoader):
-    def __init__(self, dataset, batch_size, leaves=True, dropout=None, permute_particles=False, weight_batches=False,**kwargs):
-        super().__init__(dataset, batch_size)
+class DataLoader(DL):
+    def __init__(self, dataset, batch_size,leaves=True, dropout=None, permute_particles=False, weight_batches=False,**kwargs):
+        super().__init__(dataset, batch_size, collate_fn=self.collate)
         self.dropout = dropout
         self.permute_particles = permute_particles
         self.leaves = leaves
@@ -33,14 +32,14 @@ class DataLoader(_DataLoader):
         x_list, y_list, weight_list = list(map(list, zip(*data_tuples)))
         x, mask = self.preprocess_x(x_list)
         y = self.preprocess_y(y_list)
-        weight = wrap(torch.Tensor(weight_list)) if self.weight_batches else None
-        return (x, mask), y, weight
+        weight = torch.tensor(weight_list) if self.weight_batches else None
+        batch = ((x, mask), y, weight)
+        if torch.cuda.is_available():
+            batch = [t.to('cuda') for t in batch]
+        return batch
 
     def preprocess_y(self, y_list):
-        y = torch.stack([torch.Tensor([int(y)]) for y in y_list], 0)
-        if y.size()[1] == 1:
-            y = y.squeeze(1)
-        y = wrap(y)
+        y = torch.tensor(y_list).float()
         return y
 
     def preprocess_x(self, x_list):
@@ -52,21 +51,18 @@ class DataLoader(_DataLoader):
     def batch_leaves(self,x_list):
         x_list = [x.constituents for x in x_list]
         if self.permute_particles:
-            data = [torch.from_numpy(np.random.permutation(x)) for x in x_list]
+            data = [torch.tensor(np.random.permutation(x)) for x in x_list]
         else:
-            data = [torch.from_numpy(x) for x in x_list]
+            data = [torch.tensor(x) for x in x_list]
 
         if self.dropout is not None:
             data = dropout(data, self.dropout)
 
         data, mask = pad_tensors_extra_channel(data)
 
-        data = wrap(data)
-        mask = wrap(mask)
         return data, mask
 
-    @staticmethod
-    def batch_trees(jets):
+    def batch_trees(self, jets):
         # Batch the recursive activations across all nodes of a same level
         # !!! Assume that jets have at least one inner node.
         #     Leads to off-by-one errors otherwise :(
@@ -91,9 +87,7 @@ class DataLoader(_DataLoader):
             offset += len(tree)
 
         jet_children = np.vstack(jet_children)
-        jet_contents = torch.cat([Variable(torch.from_numpy(jet.tree_content).float()) for jet in jets], 0)
-        if torch.cuda.is_available():
-            jet_contents = jet_contents.cuda()
+        jet_contents = torch.cat([torch.tensor(jet.tree_content).float() for jet in jets], 0)
         #import ipdb; ipdb.set_trace()
         n_nodes = offset
 
@@ -154,8 +148,7 @@ class DataLoader(_DataLoader):
             inner = np.array(inner, dtype=int)
             outer = np.array(outer, dtype=int)
             level = np.concatenate((inner, outer))
-            level = torch.from_numpy(level)
-            if torch.cuda.is_available(): level = level.cuda()
+            level = torch.tensor(level)
             levels.append(level)
 
             left = prev_inner[level_children[prev_inner, 1] == 1]
@@ -186,10 +179,7 @@ class DataLoader(_DataLoader):
         #     contents[sum(len(l) for l in layers[:i]) + j] is the feature vector
         #     or node layers[i][j]
 
-        level_children = torch.from_numpy(level_children).long()
-        n_inners = torch.from_numpy(np.array(n_inners)).long()
-        if torch.cuda.is_available():
-            level_children = level_children.cuda()
-            n_inners = n_inners.cuda()
+        level_children = torch.tensor(level_children).long()
+        n_inners = torch.tensor(np.array(n_inners)).long()
 
         return (levels, level_children[:, [0, 2]], n_inners, contents, n_jets)

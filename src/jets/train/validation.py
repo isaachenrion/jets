@@ -1,7 +1,6 @@
 import logging
 import time
 
-from src.data_ops.wrapping import unwrap
 from ..loss import loss
 
 def validation(model, data_loader):
@@ -12,12 +11,11 @@ def validation(model, data_loader):
     targets, predictions, weights = [], [], []
     for i, (x, target, weight) in enumerate(data_loader):
         prediction = model(x)
-        l_batch = loss(prediction, target)
-        l += float(unwrap(l_batch))
+        l += loss(prediction, target).item()
 
-        targets.append(unwrap(target))
-        predictions.append(unwrap(prediction))
-        weights.append(unwrap(weight))
+        targets.append(target.numpy())
+        predictions.append(prediction.detach().numpy())
+        weights.append(weight.numpy())
 
     l /= len(data_loader)
 

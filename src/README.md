@@ -6,7 +6,6 @@ This library is written in PyTorch.
 
 ## Directory Structure
 - admin contains useful experiment administrator code for logging, emailing, saving, organizing
-- analysis contains code for analyzing a finished experiment. Mostly deprecated
 - architectures contains all the basic neural network components used for building models
 - data_ops contains basic preprocessing code like padding, wrapping etc.
 - experiment contains some wrapper code, providing access to the proteins and jets scripts
@@ -20,7 +19,5 @@ This library is written in PyTorch.
 
 ## How to add your own problem
 - create a directory for your problem "/problem"
-- inside it, you need to implement problem/Training, problem/Evaluation, problem/ModelBuilder and problem/Administrator
-- these subclass the basic versions provided in /admin and /utils (see these classes for details)
-- you can also add your own preprocessing logic in a folder called problem/data_ops
+- you can add your own preprocessing logic in a folder called problem/data_ops
 - any models you build should go in problem/models

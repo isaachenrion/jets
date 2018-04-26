@@ -8,9 +8,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.parameter import Parameter
-from torch.autograd import Variable
-
-from src.data_ops.wrapping import wrap
 
 from src.architectures.nmp.message_passing.vertex_update import GRUUpdate
 
@@ -173,11 +170,11 @@ class GraphGen(ProteinModel):
             self.nmp_blocks = nn.ModuleList([NMPBlock(hidden) for _ in range(iters)])
 
         #self.scale = nn.Parameter(torch.zeros(1))
-        self.scale = wrap(torch.zeros(1))
+        #self.scale = torch.zeros(1)
 
     def forward(self, x, mask, y, y_mask, **kwargs):
         s, l = self.get_final_spatial_embedding(x, mask, y, y_mask, **kwargs)
-        A = torch.exp( - squared_distance_matrix(s,s) * torch.exp(self.scale)) * mask
+        A = torch.exp( - squared_distance_matrix(s,s)) * mask
         return A, l
 
     def get_final_spatial_embedding(self, x, mask, y, y_mask, **kwargs):

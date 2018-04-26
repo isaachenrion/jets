@@ -54,11 +54,8 @@ class FixedPhysicsAdjacency(_PhysicsAdjacency):
     def __init__(self, alpha=None, R=None,index='',**kwargs):
         name='phy'+index
         super().__init__(name=name, **kwargs)
-        self._alpha = Variable(torch.FloatTensor([alpha]))
-        self._R = Variable(torch.FloatTensor([R]))
-        if torch.cuda.is_available():
-            self._alpha = self._alpha.cuda()
-            self._R = self._R.cuda()
+        self.register_buffer('_alpha',torch.tensor(alpha))
+        self.register_buffer('_R',torch.tensor(R))
 
     @property
     def alpha(self):
@@ -76,16 +73,9 @@ class TrainablePhysicsAdjacency(_PhysicsAdjacency):
         base_alpha_init = 0
         base_R_init = 0
 
-        #def artanh(x):
-        #    assert torch.abs(x) < 1
-        #    return 0.5 * torch.log((1 + x) / 1 - x)
-        #alpha_init = artanh(alpha_init)
-
         self._base_alpha = nn.Parameter(torch.Tensor([base_alpha_init]))
         self._base_R = nn.Parameter(torch.Tensor([base_R_init]))
-        #self._R = Variable(torch.FloatTensor([R]))
-        #if torch.cuda.is_available():
-        #    self._R = self._R.cuda()
+
 
     @property
     def alpha(self):

@@ -30,7 +30,7 @@ def build_model(model_dict, model_kwargs, **kwargs):
     logging.info(out_str)
     if torch.cuda.is_available():
         logging.info("Moving model to GPU")
-        model.cuda()
+        model.to('cuda')
         logging.info("Moved model to GPU")
     return model
 

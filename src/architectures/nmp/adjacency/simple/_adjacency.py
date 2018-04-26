@@ -31,12 +31,12 @@ class _Adjacency(nn.Module):
         for m in self.monitors: m.initialize(None, logger.plotsdir)
         self.logging_frequency = logging_frequency
 
-    def raw_matrix(self, h):
-        pass
+    def raw_matrix(self, h, device=None):
+        raise NotImplementedError
 
     def forward(self, h, mask, **kwargs):
         #import ipdb; ipdb.set_trace()
-        M = self.raw_matrix(h)
+        M = self.raw_matrix(h, device=h.device)
 
         if self.symmetric:
             M = 0.5 * (M + M.transpose(1, 2))

@@ -35,19 +35,10 @@ class ComboAdjacency(_Adjacency):
         self.monitors.extend(self.component_monitors)
 
     def forward(self, h, mask, **kwargs):
-        # raw matrix
-        combo = Variable(torch.zeros(h.size()[0], h.size()[1], h.size()[1]))
-        if torch.cuda.is_available():
-            combo = combo.cuda()
+        combo = 0.0
         for adj, weight in zip(self.adjs, self.weights):
             M = adj(h, mask, **kwargs)
             combo += M * weight
-
-        #if self.symmetric:
-        #    M = 0.5 * (M + M.transpose(1, 2))
-
-        #if self.activation is not None:
-        #    M = self.activation(M, mask)
 
         if self.monitoring:
             self.logging(dij=combo, mask=mask, **kwargs)

@@ -1,9 +1,7 @@
 import torch.nn.functional as F
 import torch
-from torch.autograd import Variable
 import numpy as np
 
-from src.data_ops.wrapping import wrap
 from src.admin.utils import see_tensors_in_memory
 
 def loss(y_pred, y, y_mask, bm):
@@ -12,7 +10,7 @@ def loss(y_pred, y, y_mask, bm):
 
 def kl(y_pred, y, y_mask):
     n = y_pred.shape[1]
-    dists = wrap(torch.Tensor(distances(n)) ** (1/2.5)).view(-1, n, n)
+    dists = torch.tensor(distances(n), device=y_pred.device) ** (1/2.5).view(-1, n, n)
 
     logprobs = stable_log(y_pred)
 
@@ -30,7 +28,7 @@ def nll(y_pred, y, y_mask, batch_mask):
     n_ = batch_mask.sum(1,keepdim=True)[:,:,0]
 
     #x = F.sigmoid(distances(n) - n / 2)
-    dists = wrap(torch.Tensor(distances(n))).view(-1, n, n) * batch_mask
+    dists = torch.tensor(distances(n), device=y.device).view(-1, n, n) * batch_mask
     x = torch.exp(-(n_.unsqueeze(1) - dists - 1)*0.01)
     #import ipdb; ipdb.set_trace()
 
@@ -47,7 +45,7 @@ def nll(y_pred, y, y_mask, batch_mask):
 
 def cho_loss(y_pred, y, y_mask):
     n = y_pred.shape[1]
-    dists = wrap(torch.Tensor(distances(n)) ** (1./2.5))
+    dists = torch.tensor(distances(n), device=y.device) ** (1./2.5)
 
     y_pred = y_pred.view(-1, n ** 2)
     y = y.view(-1, n ** 2)
@@ -90,12 +88,10 @@ def distances(n):
     rows = indices // n
     columns = indices % n
     b_dists = abs(rows - columns)
-    return b_dists
+    return b_dists.astype('float32')
 
 def stable_log(x):
-    minvar = Variable(torch.Tensor([1e-20]))
-    if torch.cuda.is_available():
-        minvar = minvar.cuda()
+    minvar = torch.tensor([1e-20], device=x.device)
     x = torch.log(torch.max(x, minvar))
 
     return x

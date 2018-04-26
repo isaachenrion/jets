@@ -80,8 +80,9 @@ def do_training(
         t0 = time.time()
 
         train_dict = train_one_epoch(epoch, iteration)
-        valid_dict = validation(model, valid_data_loader)
-        dummy_train_dict = validation(model, dummy_train_data_loader)
+        with torch.no_grad():
+            valid_dict = validation(model, valid_data_loader)
+            dummy_train_dict = validation(model, dummy_train_data_loader)
 
         logdict = dict(
             train=train_dict,

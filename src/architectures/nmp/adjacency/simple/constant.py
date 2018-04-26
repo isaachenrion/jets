@@ -10,16 +10,10 @@ class Ones(_Adjacency):
         name='one'+index
         super().__init__(symmetric=False, activation='mask',name=name, **kwargs)
 
-    def raw_matrix(self, vertices):
+    def raw_matrix(self, vertices, device=None):
         bs, sz, _ = vertices.size()
-        matrix = Variable(torch.ones(bs, sz, sz))
-        if torch.cuda.is_available():
-            matrix = matrix.cuda()
-        #print('one')
+        matrix = torch.ones(bs, sz, sz, device=device)
         return matrix
-        #if mask is None:
-        #    return matrix
-        #return mask * matrix
 
 class Eye(_Adjacency):
     def __init__(self, index='',**kwargs):
@@ -28,15 +22,10 @@ class Eye(_Adjacency):
         name='eye'+index
         super().__init__(symmetric=False, activation='mask',name=name, **kwargs)
 
-    def raw_matrix(self, vertices):
+    def raw_matrix(self, vertices, device=None):
         bs, sz, _ = vertices.size()
-        matrix = Variable(torch.eye(sz).unsqueeze(0).repeat(bs, 1, 1))
-        if torch.cuda.is_available():
-            matrix = matrix.cuda()
+        matrix = torch.eye(sz, device=device).unsqueeze(0).repeat(bs, 1, 1)
         return matrix
-        #if mask is None:
-        #    return matrix
-        #return mask * matrix
 
 CONSTANT_ADJACENCIES = dict(
     one=Ones,

@@ -8,7 +8,7 @@ def ensure_numpy_array(tensor):
     if isinstance(tensor, torch.autograd.Variable):
         tensor = tensor.data
     if torch.cuda.is_available() and isinstance(tensor, torch.cuda.FloatTensor):
-        tensor = tensor.cpu()
+        tensor = tensor.to('cpu')
     if isinstance(tensor, torch.Tensor):
         tensor = tensor.numpy()
     assert isinstance(tensor, np.ndarray)
@@ -19,7 +19,7 @@ def ensure_numpy_float(one_d_tensor):
     if isinstance(tensor, torch.autograd.Variable):
         tensor = tensor.data
     if torch.cuda.is_available() and isinstance(tensor, torch.cuda.FloatTensor):
-        tensor = tensor.cpu()
+        tensor = tensor.to('cpu')
         tensor = tensor.float()
     if isinstance(tensor, torch.Tensor):
         assert np.prod([s for s in tensor.size()]) == 1

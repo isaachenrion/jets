@@ -3,7 +3,6 @@ import time
 
 import torch
 
-from src.data_ops.wrapping import unwrap
 from src.admin.utils import log_gpu_usage
 
 from ..loss import loss
@@ -21,8 +20,8 @@ def train_one_batch(model, batch, optimizer, administrator, epoch, batch_number,
     # backward
     l.backward()
     if clip is not None:
-        torch.nn.utils.clip_grad_norm(model.parameters(), clip)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
 
     optimizer.step()
 
-    return float(unwrap(l))
+    return l.item()

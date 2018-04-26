@@ -50,6 +50,7 @@ def log_gpu_usage():
         gpu_util = float(gpus[0].memoryUsed)
         gpu_total = float(gpus[0].memoryTotal)
         logging.info("GPU: {}/{}MiB\t{:.1f}% used".format(int(gpu_util), int(gpu_total), 100*gpu_util/gpu_total))
+        logging.info("Pytorch says: {}".format(format_bytes(torch.cuda.max_memory_cached())))
     else:
         pass
 

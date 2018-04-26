@@ -114,7 +114,7 @@ def main(sysargvlist=None):
     parser.add_argument("-u", "--update", type=str, default='gru', help='type of vertex update')
     parser.add_argument("--message", type=str, default='2', help='type of message')
     parser.add_argument("--emb_init", type=str, default='1', help='type of message')
-    parser.add_argument("-a","--adj", type=str, nargs='+', default='dm', help='type of matrix layer')
+    parser.add_argument("-a","--adj", type=str, nargs='+', default='phy', help='type of matrix layer')
     parser.add_argument("--asym", action='store_true', default=False)
     parser.add_argument("--readout", type=str, default='dtnn', help='type of readout layer')
     parser.add_argument("--m_act", type=str, default='sigmoid', help='type of nonlinearity for matrices' )

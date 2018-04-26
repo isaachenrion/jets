@@ -6,8 +6,14 @@
 ### Requirements
 
 - python 3
-- pytorch
+- pytorch 0.4
 - scikit-learn
+- scipy
+- matplotlib
+- gputil
+
+conda install scipy scikit-learn matplotlib
+pip install gputil
 
 ### Email results
 If you want email results, you must create a file called email_addresses.txt
