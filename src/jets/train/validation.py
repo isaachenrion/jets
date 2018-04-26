@@ -26,7 +26,7 @@ def validation(model, data_loader):
     logdict = dict(
         targets=targets,
         predictions=predictions,
-        weights=weights,
+        weights=data_loader.dataset.weights,
         loss=l,
         model=model,
         logtime=0,

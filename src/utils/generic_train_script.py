@@ -4,25 +4,13 @@ import time
 import gc
 import os
 import copy
-#from importlib import import_module
-#from memory_profiler import profile, memory_usage
 
 import torch
-#import torch.optim
-#from torch.optim import lr_scheduler
 import torch.nn.functional as F
 
-#import numpy as np
-
-#from ..data_ops.load_dataset import load_train_dataset
-#from ..data_ops.proteins.ProteinLoader import ProteinLoader as DataLoader
-from src.data_ops.wrapping import unwrap
-
-#from ..misc.constants import *
 from src.optim.build_optimizer import build_optimizer
 from src.optim.build_scheduler import build_scheduler
 from src.admin.utils import see_tensors_in_memory
-
 from src.admin.utils import log_gpu_usage
 from src.admin.utils import compute_model_size
 from src.admin.utils import format_bytes
@@ -45,12 +33,14 @@ def do_training(
         ):
 
     def train_one_epoch(epoch, iteration):
-        log_gpu_usage()
+        #log_gpu_usage()
 
         loss = 0.0
         t_train = time.time()
 
         for batch_number, batch in enumerate(train_data_loader):
+            if batch_number % 20 == 0:
+                log_gpu_usage()
             iteration += 1
             l = train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip)
             loss += l

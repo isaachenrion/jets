@@ -17,7 +17,6 @@ def crop(jets, pileup=False):
 
     return good_jets, bad_jets
 
-
 def crop_dataset(dataset):
     logging.info(dataset.subproblem)
     pileup = (dataset.subproblem == 'pileup')
