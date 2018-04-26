@@ -50,7 +50,7 @@ def main(sysargvlist=None):
     # Training args
     #training = parser.add_argument_group('training')
     parser.add_argument("-e", "--epochs", type=int, default=64)
-    parser.add_argument("-b", "--batch_size", type=int, default=64)
+    parser.add_argument("-b", "--batch_size", type=int, default=128)
     parser.add_argument("--experiment_time", type=int, default=1000000)
     parser.add_argument("--weight_batches", action='store_true')
     '''
@@ -58,13 +58,13 @@ def main(sysargvlist=None):
     '''
     # Optimization args
     #optim = parser.add_argument_group('optim')
-    parser.add_argument("--lr", type=float, default=.001)
+    parser.add_argument("--lr", type=float, default=.002)
     parser.add_argument("--lr_min", type=float, default=.0000005)
     parser.add_argument("--decay", type=float, default=.7)
     parser.add_argument("--clip", type=float, default=1.0)
     parser.add_argument("--reg", type=float, default=.00001)
     parser.add_argument("--sched", type=str, default='m1')
-    parser.add_argument("--period", type=int, default=16)
+    parser.add_argument("--period", type=int, default=8)
     parser.add_argument("--momentum", type=float, default=0.0)
     parser.add_argument("--optim", type=str, default='adam')
 
