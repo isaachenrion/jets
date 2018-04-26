@@ -14,8 +14,8 @@ def train_argument_converter(args):
         args.batch_size = 3
         args.epochs = 15
 
-        args.n_train = 12
-        args.n_valid = 10
+        args.n_train = 100
+        args.n_valid = 100
 
         args.lr = 0.1
         args.period = 2

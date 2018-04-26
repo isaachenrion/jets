@@ -81,17 +81,22 @@ def training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preproc
     train_dataset.shuffle()
     valid_dataset = Dataset(good_jets, problem=problem,subproblem=subproblem)
 
+    # create dummy train dataset to compute validation metrics on
+    dummy_train_jets, _ = crop_dataset(train_dataset)
+    dummy_train_dataset = Dataset(dummy_train_jets, problem=problem,subproblem=subproblem)
+
     ##
     logging.warning("Building normalizing transform from training set...")
     train_dataset.transform()
-
     valid_dataset.transform(train_dataset.tf)
+    dummy_train_dataset.transform(train_dataset.tf)
 
     # add cropped indices to training data
     logging.warning("\tfinal train size = %d" % len(train_dataset))
     logging.warning("\tfinal valid size = %d" % len(valid_dataset))
+    logging.warning("\tfinal dummy train size = %d" % len(dummy_train_dataset))
 
-    return train_dataset, valid_dataset
+    return train_dataset, valid_dataset, dummy_train_dataset
 
 def test_dataset(data_dir, dataset, n_test, preprocess):
     train_dataset, _ = training_and_validation_dataset(data_dir, dataset, -1, 27000, False)
@@ -122,10 +127,12 @@ def test_dataset(data_dir, dataset, n_test, preprocess):
     return dataset
 
 def get_train_data_loader(data_dir, dataset, n_train, n_valid, batch_size, leaves=None,preprocess=None,**kwargs):
-    train_dataset, valid_dataset = training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preprocess)
+    train_dataset, valid_dataset, dummy_train_dataset = training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preprocess)
     train_data_loader = DataLoader(train_dataset, batch_size, leaves=leaves, weight_batches=kwargs['weight_batches'])
     valid_data_loader = DataLoader(valid_dataset, batch_size, leaves=leaves, weight_batches=True)
-    return train_data_loader, valid_data_loader
+    dummy_train_data_loader = DataLoader(dummy_train_dataset, batch_size, leaves=leaves, weight_batches=True)
+
+    return train_data_loader, valid_data_loader, dummy_train_data_loader
 
 def get_test_data_loader(data_dir, dataset, n_test, batch_size, leaves=None,preprocess=None,**kwargs):
     dataset = test_dataset(data_dir, dataset, n_test, preprocess)

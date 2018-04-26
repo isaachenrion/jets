@@ -9,13 +9,15 @@ def validation(model, data_loader):
     model.eval()
 
     l = 0.
-    targets, predictions = [], []
+    targets, predictions, weights = [], [], []
     for i, (x, target, weight) in enumerate(data_loader):
         prediction = model(x)
         l_batch = loss(prediction, target, weight)
         l += float(unwrap(l_batch))
-        target = unwrap(target); prediction = unwrap(prediction)
-        targets.append(target); predictions.append(prediction)
+
+        targets.append(unwrap(target))
+        predictions.append(unwrap(prediction))
+        weights.append(unwrap(weight))
 
     l /= len(data_loader)
 
@@ -24,13 +26,12 @@ def validation(model, data_loader):
     logdict = dict(
         targets=targets,
         predictions=predictions,
-        #mask=mask,
-        w_valid=data_loader.dataset.weights,
+        weights=weights,
         loss=l,
         model=model,
         logtime=0,
     )
-    #logdict.update(train_dict)
+
     model.train()
     logging.info("Validation took {:.1f} seconds".format(time.time() - t))
     return logdict

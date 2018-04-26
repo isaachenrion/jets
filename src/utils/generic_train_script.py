@@ -147,11 +147,7 @@ def generic_train_script(problem=None,args=None):
     ''' DATA '''
     '''----------------------------------------------------------------------- '''
 
-    train_data_loader, valid_data_loader = get_train_data_loader(**arg_groups['data_loader_kwargs'])
-
-    dummy_train_data_loader_kwargs = arg_groups['data_loader_kwargs']
-    dummy_train_data_loader_kwargs['n_train'] = dummy_train_data_loader_kwargs['n_valid']
-    dummy_train_data_loader, _ = get_train_data_loader(**dummy_train_data_loader_kwargs)
+    train_data_loader, valid_data_loader, dummy_train_data_loader = get_train_data_loader(**arg_groups['data_loader_kwargs'])
 
     '''----------------------------------------------------------------------- '''
     ''' BUILD OR LOAD MODEL '''

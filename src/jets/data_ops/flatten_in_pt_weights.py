@@ -1,8 +1,10 @@
 import numpy as np
 
-def flatten_in_pt_weights(jets):
-    pt_min = min(j.pt for j in jets)
-    pt_max = max(j.pt for j in jets)
+def flatten_in_pt_weights(jets, pt_min=None, pt_max=None):
+    if pt_min is None:
+        pt_min = min(j.pt for j in jets)
+    if pt_max is None:
+        pt_max = max(j.pt for j in jets)
 
     w = np.zeros(len(jets))
     y = np.array([jet.y for jet in jets])

@@ -41,10 +41,10 @@ class ROCAUC(Collect):
     def __init__(self, **kwargs):
         super().__init__('roc_auc', **kwargs)
 
-    def call(self, targets=None, predictions=None, mask=None, w_valid=None, **kwargs):
+    def call(self, targets=None, predictions=None, mask=None, weights=None, **kwargs):
         targets, predictions = _flatten_all_inputs(targets, predictions, mask)
-
-        return roc_auc_score(targets, predictions, sample_weight=w_valid)
+        weights = ensure_flat_numpy_array(weights)
+        return roc_auc_score(targets, predictions, sample_weight=weights)
 
 class ROCCurve(Monitor):
     def __init__(self, **kwargs):
@@ -52,18 +52,20 @@ class ROCCurve(Monitor):
         self.scalar = False
         self.fpr, self.tpr = None, None
 
-    def call(self, targets=None, predictions=None, mask=None, w_valid=None, **kwargs):
+    def call(self, targets=None, predictions=None, mask=None, weights=None, **kwargs):
         targets, predictions = _flatten_all_inputs(targets, predictions, mask)
-        self.fpr, self.tpr, _ = roc_curve(targets, predictions, sample_weight=w_valid)
+        weights = ensure_flat_numpy_array(weights)
+        self.fpr, self.tpr, _ = roc_curve(targets, predictions, sample_weight=weights)
         return (self.fpr, self.tpr)
 
 class InvFPR(Collect):
     def __init__(self, **kwargs):
         super().__init__('inv_fpr', **kwargs)
 
-    def call(self, targets=None, predictions=None, mask=None, w_valid=None, **kwargs):
+    def call(self, targets=None, predictions=None, mask=None, weights=None, **kwargs):
         targets, predictions = _flatten_all_inputs(targets, predictions, mask)
-        fpr, tpr, _ = roc_curve(targets, predictions, sample_weight=w_valid)
+        weights = ensure_flat_numpy_array(weights)
+        fpr, tpr, _ = roc_curve(targets, predictions, sample_weight=weights)
         return inv_fpr_at_tpr_equals_half(tpr, fpr)
 
 class Precision(Collect):
@@ -92,15 +94,4 @@ class Recall(Collect):
         real_hits = (targets == 1)
 
         recall = (predicted_hits * real_hits).sum() / real_hits.sum()
-        return float(recall)
-
-class TopLK(Collect):
-    def __init__(self, k,**kwargs):
-        super().__init__('top_l_over_k', **kwargs)
-
-    def call(self, targets=None, predictions=None, mask=None, **kwargs):
-        lengths = torch.sum(mask,1)[:,0]
-        predicted_hits, predicted_indices = torch.topk(predictions,2 )
-        real = targets[predicted_hits]
-        recall = real.sum() / len(real)
         return float(recall)
