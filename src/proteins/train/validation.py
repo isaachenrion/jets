@@ -21,7 +21,7 @@ def validation(model, data_loader):
     batch_masks = []
     hard_pred = []
     for i, batch in enumerate(data_loader):
-        
+
         (x, target, target_mask, batch_mask) = batch
         l, prediction = model.loss_and_pred(x, batch_mask, target, target_mask)
 
@@ -48,6 +48,8 @@ def validation(model, data_loader):
         model=model,
     )
     model.train()
+
+    del targets; del predictions; del masks; del half; del hard_pred; del loss
 
     t1=time.time()
     logging.info("Validation took {:.1f} seconds".format(time.time() - t))
