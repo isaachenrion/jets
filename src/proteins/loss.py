@@ -30,7 +30,7 @@ def nll(y_pred, y, y_mask, batch_mask):
     print(y.device)
     print(y_mask.device)
     print(batch_mask.device)
-    dists = torch.tensor(distances(n), device=y.device).view(-1, n, n)
+    dists = torch.tensor(distances(n), device=y.device)
     print(dists.device)
     dists = dists * batch_mask
     x = torch.exp(-(n_.unsqueeze(1) - dists - 1)*0.01)
@@ -61,6 +61,7 @@ def distances(n):
     rows = indices // n
     columns = indices % n
     b_dists = abs(rows - columns)
+    b_dists = np.reshape(b_dists, (1, n, n))
     return b_dists.astype('float32')
 
 def stable_log(x):
