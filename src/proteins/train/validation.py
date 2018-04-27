@@ -27,12 +27,12 @@ def validation(model, data_loader):
 
         loss += l.item()
 
-        targets.append(target.numpy())
-        predictions.append(prediction.detach().numpy())
-        batch_masks.append(batch_mask.numpy())
+        targets.append(target.cpu().numpy())
+        predictions.append(prediction.detach().cpu().numpy())
+        batch_masks.append(batch_mask.cpu().numpy())
 
-        half.append(half_and_half(target, prediction).numpy())
-        hard_pred.append(half_and_half(target, (prediction > 0.5).float()).numpy())
+        half.append(half_and_half(target, prediction).cpu().numpy())
+        hard_pred.append(half_and_half(target, (prediction > 0.5).float()).cpu().numpy())
 
         del target; del prediction; del target_mask; del x; del batch_mask; del batch
 

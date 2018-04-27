@@ -13,9 +13,9 @@ def validation(model, data_loader):
         prediction = model(x)
         l += loss(prediction, target).item()
 
-        targets.append(target.numpy())
-        predictions.append(prediction.detach().numpy())
-        weights.append(weight.numpy())
+        targets.append(target.cpu().numpy())
+        predictions.append(prediction.cpu().detach().numpy())
+        weights.append(weight.cpu().numpy())
 
     l /= len(data_loader)
 
