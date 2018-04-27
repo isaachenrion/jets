@@ -27,6 +27,9 @@ def nll(y_pred, y, y_mask, batch_mask):
     n = y_pred.shape[1]
     n_ = batch_mask.sum(1,keepdim=True)[:,:,0]
 
+    print(y.device)
+    print(y_mask.device)
+    print(batch_mask.device)
     dists = torch.tensor(distances(n), device=y.device).view(-1, n, n) * batch_mask
     x = torch.exp(-(n_.unsqueeze(1) - dists - 1)*0.01)
 
