@@ -49,7 +49,7 @@ def validation(model, data_loader):
     )
     model.train()
 
-    del targets; del predictions; del masks; del half; del hard_pred; del loss
+    del targets; del predictions; del batch_masks; del half; del hard_pred; del loss
 
     t1=time.time()
     logging.info("Validation took {:.1f} seconds".format(time.time() - t))
