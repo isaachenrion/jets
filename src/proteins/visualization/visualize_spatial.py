@@ -25,3 +25,23 @@ def visualize_spatial(spatial, string_sequence):
     ax.set_ylim(min(y), max(y))
     ax.set_zlim(min(z), max(z))
     ax.add_collection3d(lc, zs=z, zdir='z')
+
+def visualize_coords(coords):
+
+    x = coords[:,0]
+    y = coords[:,1]
+    z = coords[:,2]
+
+    points = np.array([x, y, z]).T.reshape(-1, 1, 3)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+
+    color_sequence = ['red' for _ in range(x.shape[0])]
+    lc = Line3DCollection(segments, colors=color_sequence)
+    lc.set_linewidth(3)
+
+    fig = plt.figure(figsize=(6,6))
+    ax = fig.gca(projection='3d')
+    ax.set_xlim(min(x), max(x))
+    ax.set_ylim(min(y), max(y))
+    ax.set_zlim(min(z), max(z))
+    ax.add_collection3d(lc, zs=z, zdir='z')
