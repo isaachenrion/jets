@@ -33,13 +33,14 @@ def do_training(
         ):
 
     def train_one_epoch(epoch, iteration):
-        #log_gpu_usage()
+        log_gpu_usage()
 
         loss = 0.0
         t_train = time.time()
 
         for batch_number, batch in enumerate(train_data_loader):
-            if batch_number % 20 == 0:
+            if epoch == 0 and batch_number % 20 == 0:
+                logging.info("Batch {}".format(batch_number))
                 log_gpu_usage()
             iteration += 1
             l = train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip)

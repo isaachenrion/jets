@@ -2,7 +2,7 @@ import pickle
 
 def save_objects_to_pickle(objs, filename):
     obj_dicts = [vars(obj) for obj in objs]
-    save_jet_dicts_to_pickle(obj_dicts, filename)
+    save_dicts_to_pickle(obj_dicts, filename)
 
 def save_dicts_to_pickle(jet_dicts, filename):
     with open(filename, 'wb') as f:
