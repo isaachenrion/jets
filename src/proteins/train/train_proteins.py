@@ -106,7 +106,6 @@ def main(sysargvlist=None):
     # NMP
     parser.add_argument("-i", "--iters", type=int, default=4)
     parser.add_argument("--block", type=str, default='cnmp')
-    #parser.add_argument("--mp", type=str, default='m2', help='type of message passing layer')
     parser.add_argument("-u", "--update", type=str, default='gru', help='type of vertex update')
     parser.add_argument("--message", type=str, default='2', help='type of message')
     parser.add_argument("--emb_init", type=str, default='1', help='type of message')
@@ -120,7 +119,7 @@ def main(sysargvlist=None):
     else:
         args = parser.parse_args(sysargvlist)
 
-    #os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     args.cmd_line_args = (' '.join(sys.argv))
     args.arg_string = '\n'.join(['\t{} = {}'.format(k, v) for k, v in sorted(vars(args).items())])
 

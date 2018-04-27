@@ -38,7 +38,8 @@ class DataLoader(DL):
             x = x.to('cuda')
             y = y.to('cuda')
             mask = mask.to('cuda')
-            weight = weight.to('cuda')
+            if weight is not None:
+                weight = weight.to('cuda')
 
         batch = ((x, mask), y, weight)
         return batch
