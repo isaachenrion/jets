@@ -1,5 +1,6 @@
 import os
 import logging
+import math
 from collections import OrderedDict
 
 import numpy as np
@@ -12,13 +13,21 @@ from torch.nn.parameter import Parameter
 from src.architectures.nmp.message_passing.vertex_update import GRUUpdate
 
 from src.admin.utils import memory_snapshot
+
 from ..ProteinModel import ProteinModel
+from .polar import joint_angles_to_cartesian
 from ...loss import loss as loss_fn
 
 def conv_and_pad(in_planes, out_planes, kernel_size=17, stride=1):
     # "3x3 convolution with padding"
     padding = (kernel_size - 1) // 2
     return nn.Conv1d(in_planes, out_planes, kernel_size=kernel_size, stride=stride, padding=padding, bias=False)
+
+def convert_to_polar(s):
+    R = torch.exp(s[:, :, 0])
+    theta = F.sigmoid(s[:, :, 1]) * math.pi
+    phi = F.sigmoid(s[:, :, 2]) * 2 * math.pi
+    return torch.stack([R, theta, phi], -1)
 
 class BasicBlock(nn.Module):
     expansion = 1
@@ -76,8 +85,9 @@ def squared_distance_matrix(x, y):
     return dist
 
 class ConvolutionalNMPBlock(nn.Module):
-    def __init__(self, dim):
+    def __init__(self, dim, polar):
         super().__init__()
+        self.polar = polar
         self.spatial_embedding = nn.Linear(dim, 3)
 
         self.conv1d = BasicBlock(dim, dim)
@@ -93,6 +103,10 @@ class ConvolutionalNMPBlock(nn.Module):
         x_conv = self.conv1d(x.transpose(1,2)).transpose(1,2)
 
         s = self.spatial_embedding(x)
+        s = self.spatial_embedding(x)
+        if self.polar:
+            polar = convert_to_polar(s)
+            s = joint_angles_to_cartesian(polar)
         A = torch.exp( - squared_distance_matrix(s, s) ) * batch_mask
         x_nmp = torch.bmm(A, self.message(x))
 
@@ -105,9 +119,10 @@ class ConvolutionalNMPBlock(nn.Module):
         return x, loss
 
 class BasicNMPBlock(nn.Module):
-    def __init__(self, dim):
+    def __init__(self, dim, polar):
         super().__init__()
         self.spatial_embedding = nn.Linear(dim, 3)
+        self.polar = polar
 
         self.message = nn.Sequential(
                         nn.Linear(dim, dim),
@@ -118,6 +133,9 @@ class BasicNMPBlock(nn.Module):
 
     def forward(self, x, batch_mask, y, y_mask):
         s = self.spatial_embedding(x)
+        if self.polar:
+            polar = convert_to_polar(s)
+            s = joint_angles_to_cartesian(polar)
         A = torch.exp( - squared_distance_matrix(s, s) ) * batch_mask
         x_nmp = torch.bmm(A, self.message(x))
         x = self.update(x, x_nmp)
@@ -127,7 +145,7 @@ class BasicNMPBlock(nn.Module):
         return x, loss
 
 class ConvolutionOnlyBlock(nn.Module):
-    def __init__(self, dim):
+    def __init__(self, dim, *args):
         super().__init__()
         self.conv1d = BasicBlock(dim, dim)
 
@@ -166,17 +184,17 @@ class GraphGen(ProteinModel):
         self.final_spatial_embedding = nn.Linear(hidden, 3)
 
         if tied:
-            nmp_block = NMPBlock(hidden)
+            nmp_block = NMPBlock(hidden, polar)
             nmp_block.spatial_embedding = self.final_spatial_embedding
             self.nmp_blocks = nn.ModuleList([nmp_block] * iters)
         else:
-            self.nmp_blocks = nn.ModuleList([NMPBlock(hidden) for _ in range(iters)])
-
-        #self.scale = nn.Parameter(torch.zeros(1))
-        #self.scale = torch.zeros(1)
+            self.nmp_blocks = nn.ModuleList([NMPBlock(hidden, polar) for _ in range(iters)])
 
     def forward(self, x, mask, y, y_mask, **kwargs):
         s, l = self.get_final_spatial_embedding(x, mask, y, y_mask, **kwargs)
+        if self.polar:
+            polar = convert_to_polar(s)
+            s = joint_angles_to_cartesian(polar)
         A = torch.exp( - squared_distance_matrix(s,s)) * mask
         return A, l
 
@@ -186,21 +204,22 @@ class GraphGen(ProteinModel):
         return self.get_final_spatial_embedding_with_grad(x, mask, y, y_mask, **kwargs)
 
     def get_final_spatial_embedding_no_grad(self, x, mask, y, y_mask, **kwargs):
+        loss = 0
         n_volatile_layers = np.random.randint(0, len(self.nmp_blocks))
-
         if n_volatile_layers > 0:
-            x = Variable(x.data, volatile=True)
-            x = self.initial_embedding(x)
-            for i in range(n_volatile_layers):
-                nmp = self.nmp_blocks[i]
-                x = nmp(x, mask)
-            x = Variable(x.data)
-            x = self.nmp_blocks[n_volatile_layers](x, mask)
+            with torch.no_grad():
+                x = self.initial_embedding(x)
+                for i in range(n_volatile_layers):
+                    nmp = self.nmp_blocks[i]
+                    x, l = nmp(x, mask, y, y_mask)
+                    loss = loss + l
+            x, l = self.nmp_blocks[n_volatile_layers](x, mask, y, y_mask)
+            loss = loss + l
         else:
             x = self.initial_embedding(x)
 
         s = self.final_spatial_embedding(x)
-        return s, None
+        return s, loss
 
 
     def get_final_spatial_embedding_with_grad(self, x, mask, y, y_mask, **kwargs):

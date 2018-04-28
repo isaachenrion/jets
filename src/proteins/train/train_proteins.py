@@ -112,6 +112,7 @@ def main(sysargvlist=None):
     parser.add_argument("--wn", action='store_true')
     parser.add_argument("--no_grad", action='store_true')
     parser.add_argument("--tied", action='store_true')
+    parser.add_argument("--polar", action='store_true')
 
 
     if sysargvlist is None:

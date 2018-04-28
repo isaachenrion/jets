@@ -145,7 +145,6 @@ class ProteinMetricCollection(ScalarMonitor):
         targets = [target[:seq_length,:seq_length] for target, seq_length in zip(targets, seq_lengths)]
         predictions = [prediction[:seq_length,:seq_length] for prediction, seq_length in zip(predictions, seq_lengths)]
 
-        #import ipdb; ipdb.set_trace()
         stats_dict = compute_protein_metrics(targets, predictions, self.k_list)
         for _, cd in self.collector_dicts.items():
             for _, c in cd.items():

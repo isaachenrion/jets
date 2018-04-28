@@ -103,6 +103,7 @@ def get_model_kwargs(args):
         'wn': args.wn,
         'no_grad': args.no_grad,
         'tied': args.tied,
+        'polar': args.polar,
 
         'debug':args.debug,
     }
