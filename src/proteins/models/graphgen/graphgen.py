@@ -143,13 +143,16 @@ class GraphGen(ProteinModel):
         no_grad=False,
         tied=False,
         block=None,
+        polar=False,
         **kwargs
         ):
 
         super().__init__()
 
         self.no_grad = no_grad
+        self.polar = polar
         self.initial_embedding = nn.Linear(features, hidden)
+
 
         if block == 'cnmp':
             NMPBlock = ConvolutionalNMPBlock

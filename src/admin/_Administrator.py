@@ -228,6 +228,7 @@ class _Administrator:
         #eta = ETA(datetime.datetime.now(), epochs)
         model_file = os.path.join(exp_dir, 'model_state_dict.pt')
         settings_file = os.path.join(exp_dir, 'settings.pickle')
+        #import ipdb; ipdb.set_trace()
         saver = Saver(valid_monitor_collection.track_monitor, model_file, settings_file, visualizing=False, printing=False)
         valid_monitor_collection.add_monitors(saver, initialize=False)
         monitor_collections['valid'] = valid_monitor_collection

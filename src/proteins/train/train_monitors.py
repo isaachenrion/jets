@@ -13,14 +13,17 @@ def get_monitor_collections(plotting_frequency):
 def valid_monitor_collection(plotting_frequency):
     valid_loss = Collect('loss', ndp=3,visualizing=True)
     best_valid_loss = Best(valid_loss, track='min',ndp=3)
+    protein_metrics = ProteinMetricCollection(
+        'targets',
+        'predictions',
+        'masks',
+        1,2,5,10,
+        tracked_k=10,
+        tracked_range='long',
+        ndp=3,
+        visualizing=True)
     metric_monitors = [
-        ProteinMetricCollection(
-            'targets',
-            'predictions',
-            'masks',
-            1,2,5,10,
-            ndp=3,
-            visualizing=True),
+        protein_metrics,
         valid_loss,
         best_valid_loss,
 
@@ -35,7 +38,7 @@ def valid_monitor_collection(plotting_frequency):
 
     mc= MonitorCollection('valid', *monitors, plotting_frequency=plotting_frequency)
 
-    mc.track_monitor = best_valid_loss
+    mc.track_monitor = protein_metrics.track_monitor
     return mc
 
 def train_monitor_collection(plotting_frequency):
