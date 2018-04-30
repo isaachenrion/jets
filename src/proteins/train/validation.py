@@ -3,6 +3,7 @@ import time
 
 import torch
 
+from src.data_ops import unwrap
 from ..loss import loss
 
 
@@ -27,14 +28,14 @@ def validation(model, data_loader):
 
         loss += l.item()
 
-        targets.append(target.cpu().numpy())
-        predictions.append(prediction.detach().cpu().numpy())
-        batch_masks.append(batch_mask.cpu().numpy())
+        targets.append(unwrap(target))
+        predictions.append(unwrap(prediction))
+        batch_masks.append(unwrap(batch_mask))
 
-        half.append(half_and_half(target, prediction).cpu().numpy())
-        hard_pred.append(half_and_half(target, (prediction > 0.5).float()).cpu().numpy())
+        half.append(unwrap(half_and_half(target, prediction)))
+        hard_pred.append(unwrap(half_and_half(target, (prediction > 0.5).float())))
 
-        del target; del prediction; del target_mask; del x; del batch_mask; del batch
+        del target; del prediction; del target_mask; del x; del batch_mask; del batch; del l
 
     loss /= len(data_loader)
 
