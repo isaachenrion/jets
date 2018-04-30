@@ -27,7 +27,7 @@ def nll(y_pred, y, y_mask, batch_mask):
     n = y_pred.shape[1]
     n_ = batch_mask.sum(1,keepdim=True)[:,:,0]
 
-    dists = torch.tensor(distances(n))
+    dists = torch.tensor(distances(n)).float()
     dists = dists * batch_mask
     dists = torch.exp(-(n_.unsqueeze(1) - dists - 1)*0.01)
 
@@ -57,7 +57,7 @@ def distances(n):
     columns = indices % n
     b_dists = abs(rows - columns)
     b_dists = np.reshape(b_dists, (1, n, n))
-    return b_dists.astype('float32')
+    return b_dists
 
 def stable_log(x):
     minvar = torch.tensor([1e-20])
