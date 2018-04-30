@@ -63,26 +63,28 @@ def training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preproc
     problem = data_dir.split('/')[-1]
     subproblem = filename
 
-    if 'w-vs-qcd' in data_dir:
-        from .w_vs_qcd import crop_dataset
-    elif 'quark-gluon' in data_dir:
-        from .quark_gluon import crop_dataset
-    else:
-        raise ValueError('Unrecognized data_dir!')
+    #if 'w-vs-qcd' in data_dir:
+    #    from .w_vs_qcd import crop_dataset
+    #elif 'quark-gluon' in data_dir:
+    #    from .quark_gluon import crop_dataset
+    #else:
+    #    raise ValueError('Unrecognized data_dir!')
 
     train_jets = jets[n_valid:n_valid + n_train] if n_train > 0 else jets[n_valid:]
     #
     valid_jets = jets[:n_valid]
     valid_dataset = Dataset(valid_jets, problem=problem,subproblem=subproblem)
 
-    good_jets, bad_jets = crop_dataset(valid_dataset)
+    #good_jets, bad_jets = crop_dataset(valid_dataset)
+    good_jets, bad_jets = valid_dataset.crop()
 
     train_dataset = Dataset(bad_jets + train_jets, problem=problem,subproblem=subproblem)
     train_dataset.shuffle()
     valid_dataset = Dataset(good_jets, problem=problem,subproblem=subproblem)
 
     # create dummy train dataset to compute validation metrics on
-    dummy_train_jets, _ = crop_dataset(train_dataset)
+    dummy_train_jets, _ = train_dataset.crop()
+    #dummy_train_jets, _ = crop_dataset(train_dataset)
     dummy_train_dataset = Dataset(dummy_train_jets, problem=problem,subproblem=subproblem)
 
     ##
