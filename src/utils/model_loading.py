@@ -4,6 +4,7 @@ import torch
 import logging
 import numpy as np
 
+from src.data_ops import unwrap
 
 def load_settings(filename):
     with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
@@ -26,7 +27,7 @@ def build_model(model_dict, model_kwargs, **kwargs):
     logging.info("Initializing model...")
     model = build_model_from_kwargs(model_dict, model_kwargs, **kwargs)
     logging.info(model)
-    out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))
+    out_str = 'Number of parameters: {}'.format(sum(np.prod(unwrap(p).shape) for p in model.parameters()))
     logging.info(out_str)
     #if torch.cuda.is_available():
     #    logging.info("Moving model to GPU")
