@@ -27,7 +27,7 @@ def nll(y_pred, y, y_mask, batch_mask):
     n = y_pred.shape[1]
     n_ = batch_mask.sum(1,keepdim=True)[:,:,0]
 
-    dists = torch.tensor(distances(n)).float()
+    dists = batch_mask.new_tensor(distances(n)).float()
     dists = dists * batch_mask
     dists = torch.exp(-(n_.unsqueeze(1) - dists - 1)*0.01)
 
