@@ -10,7 +10,7 @@ def loss(y_pred, y, y_mask, bm):
 
 def kl(y_pred, y, y_mask):
     n = y_pred.shape[1]
-    dists = torch.tensor(distances(n), device=y_pred.device) ** (1/2.5).view(-1, n, n)
+    dists = torch.tensor(distances(n)) ** (1/2.5).view(-1, n, n)
 
     logprobs = stable_log(y_pred)
 
@@ -27,7 +27,7 @@ def nll(y_pred, y, y_mask, batch_mask):
     n = y_pred.shape[1]
     n_ = batch_mask.sum(1,keepdim=True)[:,:,0]
 
-    dists = torch.tensor(distances(n)).to(y.device)
+    dists = torch.tensor(distances(n))
     dists = dists * batch_mask
     dists = torch.exp(-(n_.unsqueeze(1) - dists - 1)*0.01)
 
@@ -60,6 +60,6 @@ def distances(n):
     return b_dists.astype('float32')
 
 def stable_log(x):
-    minvar = torch.tensor([1e-20], device=x.device)
+    minvar = torch.tensor([1e-20])
     x = torch.log(torch.max(x, minvar))
     return x

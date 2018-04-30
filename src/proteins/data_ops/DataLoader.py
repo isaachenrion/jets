@@ -24,8 +24,8 @@ def collate(data_tuples):
     y_mask = preprocess_mask([mask for _, _, mask in data_tuples])
 
     batch = (x, y, y_mask, batch_mask)
-    if torch.cuda.is_available():
-        batch = [t.to('cuda') for t in batch]
+    #if torch.cuda.is_available():
+    #    batch = [t.to('cuda') for t in batch]
     return batch
 
 def preprocess_mask(mask_list):
@@ -44,8 +44,7 @@ def preprocess_x(x_list):
     return data, mask
 
 class DataLoader(_DL):
-    def __init__(self, dataset, batch_size, device='cpu'):
-        self.device = device
+    def __init__(self, dataset, batch_size):
         super().__init__(dataset, batch_size, collate_fn=collate)
 
 

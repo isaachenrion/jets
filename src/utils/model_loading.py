@@ -28,10 +28,10 @@ def build_model(model_dict, model_kwargs, **kwargs):
     logging.info(model)
     out_str = 'Number of parameters: {}'.format(sum(np.prod(p.data.numpy().shape) for p in model.parameters()))
     logging.info(out_str)
-    if torch.cuda.is_available():
-        logging.info("Moving model to GPU")
-        model.to('cuda')
-        logging.info("Moved model to GPU")
+    #if torch.cuda.is_available():
+    #    logging.info("Moving model to GPU")
+    #    model.to('cuda')
+    #    logging.info("Moved model to GPU")
     return model
 
 def load_model(model_dict, filename, **kwargs):

@@ -17,7 +17,7 @@ class Set2Vec(nn.Module):
         # embed each element of sequence into a memory vector
         m = self.embedding(x) # m has shape (bs, L, mem_dim)
         # process the memories with content-based attention
-        q = torch.zeros(m.size()[0], 2 * m.size()[2], device=x.device)
+        q = torch.zeros(m.size()[0], 2 * m.size()[2])
         for t in range(x.size()[1]):
             q = self.process(q, m)
         # readout from the final hidden state

@@ -23,21 +23,12 @@ def get_git_revision_short_hash():
     s = str(s).split('\'')[1]
     return s
 
-def cuda_and_random_seed(gpu, seed, use_cuda):
-    if gpu != "" and use_cuda:
-        torch.cuda.device(gpu)
-
+def random_seed(seed=None):
     if seed is None:
         seed = np.random.randint(0, 2**16 - 1)
     np.random.seed(seed)
-
-    if gpu != "" and use_cuda:
-        torch.cuda.device(gpu)
-        torch.cuda.manual_seed(seed)
-
-    else:
-        torch.manual_seed(seed)
-    return seed, gpu
+    torch.manual_seed(seed)
+    return seed
 
 def create_all_model_dirs(root_dir):
     for intermediate_dir in ALL_MODEL_DIRS:
@@ -109,7 +100,6 @@ class _Administrator:
             arg_string=None,
             saver=None,
             ):
-        use_cuda = torch.cuda.is_available()
         slurm = slurm_array_job_id is not None
         pid = os.getpid()
         host = socket.gethostname()
@@ -148,7 +138,13 @@ class _Administrator:
         cmd_file = os.path.join(root_dir, current_dir, intermediate_dir, 'command.txt')
         record_cmd_line_args(cmd_line_args, cmd_file)
 
-        seed, gpu = cuda_and_random_seed(gpu, seed, use_cuda)
+        seed = random_seed(seed)
+        if (gpu is not None) and torch.cuda.is_available()
+            torch.cuda.device(gpu)
+            torch.set_default_tensor_type(torch.cuda.FloatTensor)
+        else:
+            torch.set_default_tensor_type(torch.FloatTensor)
+
         logging.info("Experiment started: {}".format(timestring()))
         logging.info("running on {}".format(host))
         logging.info(exp_dir)

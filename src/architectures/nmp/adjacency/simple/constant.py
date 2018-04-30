@@ -10,9 +10,9 @@ class Ones(_Adjacency):
         name='one'+index
         super().__init__(symmetric=False, activation='mask',name=name, **kwargs)
 
-    def raw_matrix(self, vertices, device=None):
+    def raw_matrix(self, vertices):
         bs, sz, _ = vertices.size()
-        matrix = torch.ones(bs, sz, sz, device=device)
+        matrix = torch.ones(bs, sz, sz)
         return matrix
 
 class Eye(_Adjacency):
@@ -22,9 +22,9 @@ class Eye(_Adjacency):
         name='eye'+index
         super().__init__(symmetric=False, activation='mask',name=name, **kwargs)
 
-    def raw_matrix(self, vertices, device=None):
+    def raw_matrix(self, vertices):
         bs, sz, _ = vertices.size()
-        matrix = torch.eye(sz, device=device).unsqueeze(0).repeat(bs, 1, 1)
+        matrix = torch.eye(sz).unsqueeze(0).repeat(bs, 1, 1)
         return matrix
 
 CONSTANT_ADJACENCIES = dict(
