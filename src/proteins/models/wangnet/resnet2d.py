@@ -10,7 +10,6 @@ from torch.utils.checkpoint import checkpoint_sequential
 from src.admin.utils import memory_snapshot
 
 def conv_and_pad3x3(in_planes, out_planes, kernel_size=3,stride=1):
-    # "3x3 convolution with padding"
     padding = (kernel_size - 1) // 2
     return nn.Conv2d(in_planes, out_planes, kernel_size=kernel_size, stride=stride, padding=padding, bias=False)
 
@@ -77,23 +76,16 @@ class Bottleneck(nn.Module):
 class ResNet2d(nn.Module):
     def __init__(self, block, layers, features=None, hidden=None, checkpoint_chunks=None,**kwargs):
         self.inplanes = hidden
-        self.checkpoint_chunks = checkpoint_chunks
+        self.checkpoint_chunks = layers // checkpoint_chunks
         super().__init__()
 
         m = OrderedDict()
         m['conv1'] = nn.Conv2d(features, hidden, kernel_size=7, stride=1, padding=3, bias=False)
         m['bn1'] = nn.BatchNorm2d(hidden)
         m['relu1'] = nn.ReLU(inplace=True)
-        #m['maxpool'] = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         self.group1= nn.Sequential(m)
 
         self.transform = self._make_layer(block, hidden, layers)
-        #self.layer2 = self._make_layer(block, hidden, layers[1], stride=1)
-        #self.layer3 = self._make_layer(block, hidden, layers[2], stride=1)
-        #self.layer4 = self._make_layer(block, hidden, layers[3], stride=1)
-
-        #self.avgpool = nn.Sequential(nn.AvgPool2d(7))
-
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):

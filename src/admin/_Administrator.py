@@ -10,7 +10,7 @@ import subprocess
 
 from collections import OrderedDict
 
-from .utils import get_logfile
+from .utils import get_logfile, timestring
 from .emailer import Emailer
 from .signal_handler import SignalHandler
 from .Logger import Logger
@@ -149,7 +149,7 @@ class _Administrator:
         record_cmd_line_args(cmd_line_args, cmd_file)
 
         seed, gpu = cuda_and_random_seed(gpu, seed, use_cuda)
-
+        logging.info("Experiment started: {}".format(timestring()))
         logging.info("running on {}".format(host))
         logging.info(exp_dir)
         logging.info(arg_string)
