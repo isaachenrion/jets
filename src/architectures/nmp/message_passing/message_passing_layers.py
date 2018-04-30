@@ -7,17 +7,19 @@ from src.architectures.embedding import EMBEDDINGS
 from src.architectures.embedding import ACTIVATIONS
 
 class MessagePassingLayer(nn.Module):
-    def __init__(self, hidden=None, update=None, message=None, act=None, **kwargs):
+    def __init__(self, hidden, update, message, act, dropout=None, **kwargs):
         super().__init__()
         self.activation = ACTIVATIONS[act]()
-        #self.activation = F.tanh
         self.vertex_update = VERTEX_UPDATES[update](hidden, hidden)
 
         message_kwargs = {x: kwargs[x] for x in ['wn']}
         self.message = EMBEDDINGS['n'](dim_in=hidden, dim_out=hidden, n_layers=int(message), act=act, **message_kwargs)
-
+        #import ipdb; ipdb.set_trace()
+        self.dropout = nn.Dropout(p=dropout) if dropout is not None else None
 
     def forward(self, h=None, A=None):
+        if self.dropout is not None:
+            h = self.dropout(h)
         message = self.activation(torch.matmul(A, self.message(h)))
         h = self.vertex_update(h, message)
         del message

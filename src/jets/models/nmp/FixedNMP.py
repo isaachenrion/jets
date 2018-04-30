@@ -41,7 +41,7 @@ class FixedNMP(nn.Module):
         emb_kwargs = {x: kwargs.get(x, None) for x in ['act', 'wn']}
         self.embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, n_layers=int(emb_init), **emb_kwargs)
 
-        mp_kwargs = {x: kwargs.get(x, None) for x in ['act', 'wn', 'update', 'message']}
+        mp_kwargs = {x: kwargs.get(x, None) for x in ['act', 'wn', 'update', 'message', 'dropout']}
         MPLayer = MP_LAYERS['m1']
         if tied:
             mp = MPLayer(hidden=hidden,**mp_kwargs)
