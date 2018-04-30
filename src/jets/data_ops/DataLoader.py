@@ -1,7 +1,6 @@
 import logging
 import numpy as np
 import torch
-from torch.autograd import Variable
 from torch.utils.data import DataLoader as DL
 
 from src.data_ops.pad_tensors import pad_tensors_extra_channel

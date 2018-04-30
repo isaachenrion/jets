@@ -98,7 +98,7 @@ class BiDirectionalTreeGRU(nn.Module):
             down_L = self.down_gru(up_L, down_parent)
             down_R = self.down_gru(up_R, down_parent)
 
-            h = Variable(torch.zeros(down_L.size()[0] * 2, down_L.size()[1]))
+            h = torch.zeros(down_L.size()[0] * 2, down_L.size()[1])
             h[children[nodes, zero]] = down_L
             h[children[nodes, one]] = down_R
             down_embeddings[j] = h

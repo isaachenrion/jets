@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
 
 class Set2Vec(nn.Module):
     def __init__(self, input_dim, output_dim, memory_dim):

@@ -3,7 +3,6 @@ import logging
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
 
 from .....architectures.readout import READOUTS
 from .....architectures.embedding import EMBEDDINGS

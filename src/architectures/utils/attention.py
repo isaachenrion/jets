@@ -1,19 +1,18 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
 
 def dot(a, b):
-    """Compute the dot product between pairs of vectors in 3D Variables.
+    """Compute the dot product between pairs of vectors in 3D tensors.
 
     Args
     ----
-    a: Variable of size (B, M, D)
-    b: Variable of size (B, N, D)
+    a: tensor of size (B, M, D)
+    b: tensor of size (B, N, D)
 
     Returns
     -------
-    c: Variable of size (B, M, N)
+    c: tensor of size (B, M, N)
         c[i,j,k] = dot(a[i,j], b[i,k])
     """
     return a.bmm(b.transpose(1, 2))
@@ -67,7 +66,7 @@ class Attention(nn.Module):
         #import ipdb; ipdb.set_trace()
         s = dot(query, key)
         if dimensions is None:
-            dimensions  = torch.FloatTensor([key.size()[1]]).view(1, 1, 1).expand_as(s)
+            dimensions  = torch.tensor([key.size()[1]]).view(1, 1, 1).expand_as(s)
         scaling_factor = torch.sqrt(1 / dimensions)
         alpha = F.softmax(s / scaling_factor, dim=2)
         #alpha = alpha.transpose(0,2)

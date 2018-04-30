@@ -5,8 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def ensure_numpy_array(tensor):
-    if isinstance(tensor, torch.autograd.Variable):
-        tensor = tensor.data
     if torch.cuda.is_available() and isinstance(tensor, torch.cuda.FloatTensor):
         tensor = tensor.to('cpu')
     if isinstance(tensor, torch.Tensor):
@@ -16,8 +14,6 @@ def ensure_numpy_array(tensor):
 
 def ensure_numpy_float(one_d_tensor):
     tensor = one_d_tensor
-    if isinstance(tensor, torch.autograd.Variable):
-        tensor = tensor.data
     if torch.cuda.is_available() and isinstance(tensor, torch.cuda.FloatTensor):
         tensor = tensor.to('cpu')
         tensor = tensor.float()

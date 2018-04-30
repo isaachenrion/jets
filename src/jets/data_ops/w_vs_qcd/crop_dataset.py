@@ -5,7 +5,6 @@ from ..Dataset import Dataset
 def crop(jets, pileup=False):
     def filter_jet(jet):
         if pileup:
-            logging.warning("pileup")
             pt_min, pt_max, m_min, m_max = 300, 365, 150, 220
         else:
             pt_min, pt_max, m_min, m_max = 250, 300, 50, 110
