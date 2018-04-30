@@ -21,7 +21,7 @@ def train_argument_converter(args):
         args.seed = 1
 
         args.hidden = 1
-        args.iters = 2
+        args.iters = 16
         args.plotting_frequency = 1
 
     return dict(
@@ -104,6 +104,9 @@ def get_model_kwargs(args):
         'no_grad': args.no_grad,
         'tied': args.tied,
         'polar': args.polar,
+
+        # ResNet
+        'checkpoint_chunks': args.chunks,
 
         'debug':args.debug,
     }

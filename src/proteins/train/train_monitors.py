@@ -29,10 +29,10 @@ def valid_monitor_collection(plotting_frequency):
 
     ]
     viz_monitors = [
-        BatchMatrixMonitor('targets', n_epochs=plotting_frequency, batch_size=10, visualizing=True),
-        BatchMatrixMonitor('half', n_epochs=plotting_frequency, batch_size=10, visualizing=True),
-        BatchMatrixMonitor('hard_pred', n_epochs=plotting_frequency, batch_size=10, visualizing=True),
-        BatchMatrixMonitor('predictions', n_epochs=plotting_frequency, batch_size=10, visualizing=True)
+        BatchMatrixMonitor('targets', plotting_frequency=plotting_frequency, batch_size=10, visualizing=True),
+        BatchMatrixMonitor('half', plotting_frequency=plotting_frequency, batch_size=10, visualizing=True),
+        BatchMatrixMonitor('hard_pred', plotting_frequency=plotting_frequency, batch_size=10, visualizing=True),
+        BatchMatrixMonitor('predictions', plotting_frequency=plotting_frequency, batch_size=10, visualizing=True)
     ]
     monitors = metric_monitors + viz_monitors
 

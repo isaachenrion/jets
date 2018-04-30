@@ -9,6 +9,7 @@ class Monitor:
         self.visualizing = visualizing
         self.printing = printing
         self.visualize_count = 0
+        self.call_count = 0
 
     def initialize(self, statsdir, plotsdir):
         #print("INIT, {}, {}".format(savedir, self.name))
@@ -16,6 +17,7 @@ class Monitor:
         self.statsdir = statsdir
 
     def __call__(self, **kwargs):
+        self.call_count += 1
         self.value = self.call(**kwargs)
         return self.value
 

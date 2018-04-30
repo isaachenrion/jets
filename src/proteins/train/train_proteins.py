@@ -114,6 +114,9 @@ def main(sysargvlist=None):
     parser.add_argument("--tied", action='store_true')
     parser.add_argument("--polar", action='store_true')
 
+    # ResNet
+    parser.add_argument("-c", "--chunks", type=int, default=None)
+
 
     if sysargvlist is None:
         args = parser.parse_args()

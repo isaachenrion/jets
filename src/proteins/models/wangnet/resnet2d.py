@@ -1,9 +1,11 @@
+from collections import OrderedDict
+import math
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.checkpoint import checkpoint_sequential
 
-from collections import OrderedDict
-import math
 
 from src.admin.utils import memory_snapshot
 
@@ -73,8 +75,9 @@ class Bottleneck(nn.Module):
 
 
 class ResNet2d(nn.Module):
-    def __init__(self, block, layers, features=None, hidden=None, **kwargs):
+    def __init__(self, block, layers, features=None, hidden=None, checkpoint_chunks=None,**kwargs):
         self.inplanes = hidden
+        self.checkpoint_chunks = checkpoint_chunks
         super().__init__()
 
         m = OrderedDict()
@@ -118,7 +121,11 @@ class ResNet2d(nn.Module):
 
     def forward(self, x):
         x = self.group1(x)
-        x = self.transform(x)
+        if self.checkpoint_chunks is None:
+            x = self.transform(x)
+        else:
+            x = checkpoint_sequential(self.transform, self.checkpoint_chunks, x)
+
         x = F.sigmoid(torch.mean(x, 1))
 
 
