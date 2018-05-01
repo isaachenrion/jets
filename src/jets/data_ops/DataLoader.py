@@ -29,18 +29,10 @@ class DataLoader(DL):
 
     def collate(self, data_tuples):
         x_list, y_list, weight_list = list(map(list, zip(*data_tuples)))
-        x, mask = self.preprocess_x(x_list)
+        inputs = self.preprocess_x(x_list)
         y = self.preprocess_y(y_list)
         weight = torch.tensor(weight_list) if self.weight_batches else None
-
-        #if torch.cuda.is_available():
-            #x = x.to('cuda')
-            #y = y.to('cuda')
-            #mask = mask.to('cuda')
-            #if weight is not None:
-            #    weight = weight.to('cuda')
-
-        batch = ((x, mask), y, weight)
+        batch = (inputs, y, weight)
         return batch
 
     def preprocess_y(self, y_list):

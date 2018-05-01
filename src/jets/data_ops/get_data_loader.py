@@ -52,6 +52,7 @@ def load_jets(data_dir, filename, do_preprocessing=False):
 
     #perm = np.random.permutation(len(jets))
     #jets = [jets[i] for i in perm]
+    jets = np.random.permutation(jets)
     return jets
 
 def training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preprocess):
@@ -63,13 +64,25 @@ def training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preproc
     problem = data_dir.split('/')[-1]
     subproblem = filename
 
-    #if 'w-vs-qcd' in data_dir:
-    #    from .w_vs_qcd import crop_dataset
-    #elif 'quark-gluon' in data_dir:
-    #    from .quark_gluon import crop_dataset
-    #else:
-    #    raise ValueError('Unrecognized data_dir!')
+    good_jets, bad_jets = Dataset(jets, problem=problem,subproblem=subproblem).crop()
 
+    #perm = np.random.permutation(len(jets))
+    #good_jets = np.random.permutation(good_jets)
+    #bad_jets = np.random.permutation(bad_jets)
+
+    valid_jets = good_jets[:n_valid]
+    train_jets = (good_jets[n_valid:] + bad_jets)
+    #import ipdb; ipdb.set_trace()
+    if n_train >= 0:
+        train_jets = train_jets[:n_train]
+    dummy_train_jets = good_jets[n_valid:2*n_valid]
+
+    train_dataset = Dataset(train_jets, problem=problem,subproblem=subproblem)
+    valid_dataset = Dataset(valid_jets, problem=problem,subproblem=subproblem)
+    dummy_train_dataset = Dataset(dummy_train_jets, problem=problem,subproblem=subproblem)
+
+    train_dataset.shuffle()
+    '''
     train_jets = jets[n_valid:n_valid + n_train] if n_train > 0 else jets[n_valid:]
     #
     valid_jets = jets[:n_valid]
@@ -86,7 +99,7 @@ def training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preproc
     dummy_train_jets, _ = train_dataset.crop()
     #dummy_train_jets, _ = crop_dataset(train_dataset)
     dummy_train_dataset = Dataset(dummy_train_jets, problem=problem,subproblem=subproblem)
-
+    '''
     ##
     logging.warning("Building normalizing transform from training set...")
     train_dataset.transform()
@@ -109,20 +122,13 @@ def test_dataset(data_dir, dataset, n_test, preprocess):
     logging.warning("Loading test data...")
     filename = "{}-test.pickle".format(filename)
     jets = load_jets(data_dir, filename, preprocess)
-    jets = jets[:n_test]
 
     dataset = Dataset(jets)
+
+    good_jets, _ = dataset.crop()
+    jets = good_jets[:n_test]
+    dataset = Dataset(jets)
     dataset.transform(train_dataset.tf)
-
-    # crop validation set and add the excluded data to the training set
-    if 'w-vs-qcd' in data_dir:
-        from .w_vs_qcd import crop_dataset
-    elif 'quark-gluon' in data_dir:
-        from .quark_gluon import crop_dataset
-    else:
-        raise ValueError('Unrecognized data_dir!')
-    dataset, _ = crop_dataset(dataset)
-
     # add cropped indices to training data
     logging.warning("\tfinal test size = %d" % len(dataset))
 

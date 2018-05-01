@@ -10,29 +10,21 @@ from .flatten_in_pt_weights import flatten_in_pt_weights
 class Dataset(D):
     def __init__(self, jets, problem=None, subproblem=None):
         super().__init__()
+        if 'w-vs-qcd' == problem:
+            if 'pileup' == subproblem:
+                from .w_vs_qcd import filter_pileup_jet as filter_jet
+            elif 'antikt-kt' == subproblem:
+                from .w_vs_qcd import filter_original_jet as filter_jet
+        elif 'quark-gluon' == problem:
+            from .quark_gluon import filter_qg_jet as filter_jet
+        else:
+            raise ValueError('Unrecognized problem!')
+        self.filter_jet = filter_jet
+
         self.jets = jets
         self.weights = flatten_in_pt_weights(jets) #* len(self) / 2.0
         self.problem = problem
         self.subproblem = subproblem
-        #import ipdb; ipdb.set_trace()
-        if self.problem == 'w-vs-qcd':
-            if self.subproblem == 'pileup':
-                self.pt_min, self.pt_max, self.m_min, self.m_max = 300, 365, 150, 220
-            elif self.subproblem == 'antikt-kt':
-                self.pt_min, self.pt_max, self.m_min, self.m_max = 250, 300, 50, 110
-            else:
-                raise ValueError("Unrecognized subproblem! (Got {})".format(subproblem))
-        elif self.problem == 'quark-gluon':
-            raise NotImplementedError
-            if self.subproblem == 'pp':
-                self.pt_min, self.pt_max, self.m_min, self.m_max = 300, 365, 150, 220
-            elif self.subproblem == 'pbpb':
-                self.pt_min, self.pt_max, self.m_min, self.m_max = 250, 300, 50, 110
-            else:
-                raise ValueError("Unrecognized subproblem! (Got {})".format(subproblem))
-
-    def filter_jet(self, jet):
-        return self.pt_min < jet.pt < self.pt_max and self.m_min < jet.mass < self.m_max
 
     def crop(self):
         good_jets = list(filter(lambda jet: self.filter_jet(jet), self.jets))

@@ -86,7 +86,7 @@ def main(sysargvlist=None):
     parser.add_argument("-n", "--n_train", type=int, default=-1)
     parser.add_argument("--n_valid", type=int, default=27000)
     parser.add_argument("--dataset", type=str, default='w')
-    parser.add_argument("--data_dropout", type=float, default=.99)
+    parser.add_argument("--data_dropout", type=float, default=1.0)
     parser.add_argument("--pp", action='store_true', default=False)
     parser.add_argument("--permute_vertices", action='store_true')
     parser.add_argument("--no_cropped", action='store_true')
@@ -109,7 +109,7 @@ def main(sysargvlist=None):
     parser.add_argument("-m", "--model", type=str, default="nmp", help="name of the model you want to train")
 
     # NMP
-    parser.add_argument("-i", "--iters", type=int, default=10)
+    parser.add_argument("-i", "--iters", type=int, default=8)
     parser.add_argument("--mp", type=str, default='m2', help='type of message passing layer')
     parser.add_argument("-u", "--update", type=str, default='gru', help='type of vertex update')
     parser.add_argument("--message", type=str, default='2', help='type of message')

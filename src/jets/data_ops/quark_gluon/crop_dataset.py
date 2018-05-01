@@ -2,6 +2,9 @@ import logging
 import numpy as np
 from ..JetDataset import JetDataset
 
+def filter_qg_jet(jet):
+    raise NotImplementedError
+    
 def crop(jets, **kwargs):
     jets = self.jets
     #logging.warning("Cropping...")

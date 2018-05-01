@@ -2,10 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from ..utils import AnyBatchGRUCell
-from ..utils import BiDirectionalTreeGRU
+from src.architectures.utils import AnyBatchGRUCell
 
-class GRNNTransformSimple(nn.Module):
+class RecursiveSimple(nn.Module):
     def __init__(self, features=None, hidden=None,**kwargs):
         super().__init__()
 
@@ -91,26 +90,14 @@ class GRNNTransformGated(nn.Module):
 
 
     def forward(self, jets, return_states=False, **kwargs):
-
-        #n_jets = len(conte)
         levels, children, n_inners, contents, n_jets = jets
-        #n_jets = len(contents)
-        #parents= batch_parents(jets)
 
         up_embeddings = [None for _ in range(len(levels))]
-        down_embeddings = [None for _ in range(len(levels))]
 
         self.recursive_embedding(up_embeddings, levels, children, n_inners, contents)
 
-        if True:# or self.iters == 0:
-            return up_embeddings[0].view((n_jets, -1))
-        else:
-            return torch.cat(
-                        (
-                        up_embeddings[0].view((n_jets, -1)),
-                        down_embeddings[0].view((n_jets, -1))
-                        ),
-                    1)
+        return up_embeddings[0].view((n_jets, -1))
+
 
     def recursive_embedding(self, up_embeddings, levels, children, n_inners, contents):
         n_levels = len(levels)
