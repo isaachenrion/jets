@@ -98,7 +98,7 @@ def main(sysargvlist=None):
 
     parser.add_argument("--hidden", type=int, default=32)
     parser.add_argument("--act", type=str, default='leakyrelu')
-    parser.add_argument("--model_dropout", type=float, default=1.)
+    parser.add_argument("--dropout", type=float, default=1.)
 
     # Transform
     parser.add_argument("-m", "--model", type=str, default="g", help="name of the model you want to train")

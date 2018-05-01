@@ -29,7 +29,7 @@ def valid_monitor_collection(plotting_frequency):
     #roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
 
     valid_loss = Collect('loss', ndp=3,visualizing=True)
-    best_valid_loss = Best(valid_loss)
+    best_valid_loss = Best(valid_loss, track='min')
     inv_fpr_at_best_valid_loss = LogOnImprovement(inv_fpr, best_valid_loss)
     roc_auc_at_best_valid_loss = LogOnImprovement(roc_auc, best_valid_loss)
 
@@ -66,7 +66,7 @@ def dummy_train_monitor_collection(plotting_frequency):
     #roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
 
     valid_loss = Collect('loss', ndp=3,visualizing=True)
-    best_valid_loss = Best(valid_loss)
+    best_valid_loss = Best(valid_loss, track='min')
     inv_fpr_at_best_valid_loss = LogOnImprovement(inv_fpr, best_valid_loss)
     roc_auc_at_best_valid_loss = LogOnImprovement(roc_auc, best_valid_loss)
 

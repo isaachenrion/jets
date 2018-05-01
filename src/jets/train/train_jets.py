@@ -100,7 +100,7 @@ def main(sysargvlist=None):
     #model.add_argument("--features", type=int, default=41)
     parser.add_argument("--hidden", type=int, default=64)
     parser.add_argument("--act", type=str, default='leakyrelu')
-    parser.add_argument("--model_dropout", type=float, default=0.)
+    parser.add_argument("--dropout", type=float, default=0.)
 
     # Classifier
     parser.add_argument("--predict", type=str, default='simple', help='type of prediction layer')

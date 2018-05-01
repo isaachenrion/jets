@@ -141,7 +141,7 @@ def get_model_kwargs(args):
         'n_layers':args.n_layers,
         'dq':args.dq,
         'dv':args.dv,
-        'dropout':args.model_dropout,
+        'dropout':args.dropout,
 
 
         'debug':args.debug
