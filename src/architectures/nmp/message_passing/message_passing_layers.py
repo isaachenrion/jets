@@ -14,7 +14,6 @@ class MessagePassingLayer(nn.Module):
 
         message_kwargs = {x: kwargs[x] for x in ['wn']}
         self.message = EMBEDDINGS['n'](dim_in=hidden, dim_out=hidden, n_layers=int(message), act=act, **message_kwargs)
-        #import ipdb; ipdb.set_trace()
         self.dropout = nn.Dropout(p=dropout) if dropout is not None else None
 
     def forward(self, h=None, A=None):

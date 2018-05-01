@@ -15,14 +15,14 @@ class Readout(nn.Module):
         pass
 
 class Constant(Readout):
-    def __init__(self, hidden_dim, target_dim):
+    def __init__(self, hidden_dim, target_dim, **kwargs):
         super().__init__(hidden_dim, target_dim)
 
     def forward(self, h):
         return h
 
 class DTNNReadout(Readout):
-    def __init__(self, hidden_dim, target_dim):
+    def __init__(self, hidden_dim, target_dim, **kwargs):
         super().__init__(hidden_dim, target_dim)
         self.fc1 = nn.Linear(hidden_dim, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, target_dim)
@@ -36,7 +36,7 @@ class DTNNReadout(Readout):
         return x
 
 class SimpleReadout(Readout):
-    def __init__(self, hidden_dim, target_dim):
+    def __init__(self, hidden_dim, target_dim, **kwargs):
         super().__init__(hidden_dim, target_dim)
         self.fc = nn.Linear(hidden_dim, target_dim)
 
@@ -47,7 +47,7 @@ class SimpleReadout(Readout):
         return x
 
 class ClassificationReadout(Readout):
-    def __init__(self, hidden_dim, *args):
+    def __init__(self, hidden_dim, *args, **kwargs):
         super().__init__(hidden_dim, 1)
         self.fc = nn.Linear(hidden_dim, 1)
 
