@@ -15,7 +15,7 @@ class RecursiveSimple(nn.Module):
         self.fc_h = nn.Linear(3 * hidden, hidden)
 
         gain = nn.init.calculate_gain(activation_string)
-        nn.init.xavier_uniform(self.fc_u.weight, gain=gain)
+        nn.init.xavier_uniform_(self.fc_u.weight, gain=gain)
         nn.init.orthogonal(self.fc_h.weight, gain=gain)
 
 
@@ -79,10 +79,10 @@ class GRNNTransformGated(nn.Module):
         self.fc_r = nn.Linear(3 * hidden, 3 * hidden)
 
         gain = nn.init.calculate_gain(activation_string)
-        nn.init.xavier_uniform(self.fc_u.weight, gain=gain)
+        nn.init.xavier_uniform_(self.fc_u.weight, gain=gain)
         nn.init.orthogonal(self.fc_h.weight, gain=gain)
-        nn.init.xavier_uniform(self.fc_z.weight, gain=gain)
-        nn.init.xavier_uniform(self.fc_r.weight, gain=gain)
+        nn.init.xavier_uniform_(self.fc_z.weight, gain=gain)
+        nn.init.xavier_uniform_(self.fc_r.weight, gain=gain)
 
         if self.iters > 0:
             self.down_root = nn.Linear(hidden, hidden)

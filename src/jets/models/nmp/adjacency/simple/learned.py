@@ -26,7 +26,7 @@ class DistMult(_Adjacency):
         name='dm'+index
         super().__init__(name=name,**kwargs)
         self.matrix = nn.Parameter(torch.zeros(dim_in,dim_in))
-        nn.init.xavier_uniform(self.matrix)
+        nn.init.xavier_uniform_(self.matrix)
         if kwargs['wn']:
             self = nn.utils.weight_norm(self, name='matrix')
 

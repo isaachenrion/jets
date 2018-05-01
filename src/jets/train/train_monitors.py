@@ -25,15 +25,24 @@ def train_monitor_collection(plotting_frequency):
 def valid_monitor_collection(plotting_frequency):
     roc_auc = ROCAUC(visualizing=True, ndp=5)
     inv_fpr = InvFPR(visualizing=True)
-    best_inv_fpr = Best(inv_fpr)
-    roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
+    #best_inv_fpr = Best(inv_fpr)
+    #roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
+
+    valid_loss = Collect('loss', ndp=3,visualizing=True)
+    best_valid_loss = Best(valid_loss)
+    inv_fpr_at_best_valid_loss = LogOnImprovement(inv_fpr, best_valid_loss)
+    roc_auc_at_best_valid_loss = LogOnImprovement(roc_auc, best_valid_loss)
 
     metric_monitors = [
         inv_fpr,
-        best_inv_fpr,
+        #best_inv_fpr,
         roc_auc,
-        roc_auc_at_best_inv_fpr,
-        Collect('loss', ndp=3,visualizing=True),
+        #roc_auc_at_best_inv_fpr,
+        valid_loss,
+        best_valid_loss,
+        inv_fpr_at_best_valid_loss,
+        roc_auc_at_best_valid_loss
+
     ]
 
     #grad_monitors = [
@@ -46,22 +55,30 @@ def valid_monitor_collection(plotting_frequency):
     #monitors += viz_monitors
 
     mc = MonitorCollection('valid',*monitors, plotting_frequency=plotting_frequency)
-    mc.track_monitor = best_inv_fpr
+    mc.track_monitor = best_valid_loss
     return mc
 
 
 def dummy_train_monitor_collection(plotting_frequency):
     roc_auc = ROCAUC(visualizing=True, ndp=5)
     inv_fpr = InvFPR(visualizing=True)
-    best_inv_fpr = Best(inv_fpr)
-    roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
+    #best_inv_fpr = Best(inv_fpr)
+    #roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
+
+    valid_loss = Collect('loss', ndp=3,visualizing=True)
+    best_valid_loss = Best(valid_loss)
+    inv_fpr_at_best_valid_loss = LogOnImprovement(inv_fpr, best_valid_loss)
+    roc_auc_at_best_valid_loss = LogOnImprovement(roc_auc, best_valid_loss)
 
     metric_monitors = [
         inv_fpr,
-        best_inv_fpr,
+        #best_inv_fpr,
         roc_auc,
-        roc_auc_at_best_inv_fpr,
-        Collect('loss', ndp=3,visualizing=True),
+        #roc_auc_at_best_inv_fpr,
+        valid_loss,
+        best_valid_loss,
+        inv_fpr_at_best_valid_loss,
+        roc_auc_at_best_valid_loss
 
     ]
 
