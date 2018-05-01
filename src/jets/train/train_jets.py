@@ -82,9 +82,8 @@ def main(sysargvlist=None):
     '''
     # Data args
 
-    #data = parser.add_argument_group('data')
     parser.add_argument("-n", "--n_train", type=int, default=-1)
-    parser.add_argument("--n_valid", type=int, default=27000)
+    parser.add_argument("--n_valid", type=int, default=10000)
     parser.add_argument("--dataset", type=str, default='w')
     parser.add_argument("--data_dropout", type=float, default=1.0)
     parser.add_argument("--pp", action='store_true', default=False)
@@ -95,9 +94,6 @@ def main(sysargvlist=None):
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     '''
     # Dimension and activation args
-
-    #model = parser.add_argument_group('model')
-    #model.add_argument("--features", type=int, default=41)
     parser.add_argument("--hidden", type=int, default=64)
     parser.add_argument("--act", type=str, default='leakyrelu')
     parser.add_argument("--dropout", type=float, default=0.)

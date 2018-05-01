@@ -5,20 +5,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-#from .adjacency import construct_physics_based_adjacency_matrix
-
-
-#from ..stacked_nmp.attention_pooling import construct_pooling_layer
 from src.architectures.nmp.message_passing.vertex_update import VERTEX_UPDATES
-#from ..message_passing.adjacency import construct_adjacency_matrix_layer
-
-from .adjacency import construct_adjacency
-from src.architectures.readout import READOUTS
 from src.architectures.embedding import EMBEDDINGS
 
-from src.monitors import Histogram
-from src.monitors import Collect
-from src.monitors import BatchMatrixMonitor
+from .adjacency import construct_adjacency
 
 class MessagePassingBlock(nn.Module):
     def __init__(self, hidden, update, dropout=0.0):

@@ -18,6 +18,11 @@ DATASETS = {
     #'protein': ('proteins', 'casp11')
 }
 
+def crop(jets, filter_jet):
+    good_jets = list(filter(lambda jet: filter_jet(jet), jets))
+    bad_jets = list(filter(lambda jet: not filter_jet(jet), jets))
+    return good_jets, bad_jets
+
 def load_jets(data_dir, filename, do_preprocessing=False):
 
     if 'w-vs-qcd' in data_dir:
@@ -64,42 +69,34 @@ def training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preproc
     problem = data_dir.split('/')[-1]
     subproblem = filename
 
-    good_jets, bad_jets = Dataset(jets, problem=problem,subproblem=subproblem).crop()
+    if 'w-vs-qcd' == problem:
+        if 'pileup' == subproblem:
+            from .w_vs_qcd import filter_pileup_jet as filter_jet
+            from .w_vs_qcd import flatten_pileup_jets as flatten_jets
+        elif 'antikt-kt' == subproblem:
+            from .w_vs_qcd import filter_original_jet as filter_jet
+            from .w_vs_qcd import flatten_original_jets as flatten_jets
+    elif 'quark-gluon' == problem:
+        from .quark_gluon import filter_qg_jet as filter_jet
+    else:
+        raise ValueError('Unrecognized problem!')
 
-    #perm = np.random.permutation(len(jets))
-    #good_jets = np.random.permutation(good_jets)
-    #bad_jets = np.random.permutation(bad_jets)
+    #good_jets, bad_jets = Dataset(jets, problem=problem,subproblem=subproblem).crop()
+    good_jets, bad_jets = crop(jets, filter_jet)
 
     valid_jets = good_jets[:n_valid]
     train_jets = (good_jets[n_valid:] + bad_jets)
-    #import ipdb; ipdb.set_trace()
+
     if n_train >= 0:
         train_jets = train_jets[:n_train]
     dummy_train_jets = good_jets[n_valid:2*n_valid]
 
-    train_dataset = Dataset(train_jets, problem=problem,subproblem=subproblem)
-    valid_dataset = Dataset(valid_jets, problem=problem,subproblem=subproblem)
-    dummy_train_dataset = Dataset(dummy_train_jets, problem=problem,subproblem=subproblem)
+    train_dataset = Dataset(train_jets)
+    valid_dataset = Dataset(valid_jets, weights=flatten_jets(valid_jets))
+    dummy_train_dataset = Dataset(dummy_train_jets, weights=flatten_jets(dummy_train_jets))
 
     train_dataset.shuffle()
-    '''
-    train_jets = jets[n_valid:n_valid + n_train] if n_train > 0 else jets[n_valid:]
-    #
-    valid_jets = jets[:n_valid]
-    valid_dataset = Dataset(valid_jets, problem=problem,subproblem=subproblem)
 
-    #good_jets, bad_jets = crop_dataset(valid_dataset)
-    good_jets, bad_jets = valid_dataset.crop()
-
-    train_dataset = Dataset(bad_jets + train_jets, problem=problem,subproblem=subproblem)
-    train_dataset.shuffle()
-    valid_dataset = Dataset(good_jets, problem=problem,subproblem=subproblem)
-
-    # create dummy train dataset to compute validation metrics on
-    dummy_train_jets, _ = train_dataset.crop()
-    #dummy_train_jets, _ = crop_dataset(train_dataset)
-    dummy_train_dataset = Dataset(dummy_train_jets, problem=problem,subproblem=subproblem)
-    '''
     ##
     logging.warning("Building normalizing transform from training set...")
     train_dataset.transform()

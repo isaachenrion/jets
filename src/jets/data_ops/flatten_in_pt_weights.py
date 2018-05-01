@@ -1,6 +1,14 @@
 import numpy as np
 
+def get_weights_for_flatness_in_pt(pts, pt_min, pt_max, bins):
+    pdf, edges = np.histogram(pts, density=True, range=[pt_min, pt_max], bins=bins)
+    indices = np.searchsorted(edges, pts) - 1
+    inv_w = 1. / pdf[indices]
+    inv_w /= inv_w.sum()
+    return inv_w
+
 def flatten_in_pt_weights(jets, pt_min=None, pt_max=None):
+    bins = 50
     if pt_min is None:
         pt_min = min(j.pt for j in jets) - 1
     if pt_max is None:
@@ -9,21 +17,10 @@ def flatten_in_pt_weights(jets, pt_min=None, pt_max=None):
     w = np.zeros(len(jets))
     y = np.array([jet.y for jet in jets])
 
-    bins = 50
-    jets_0 = [jet for jet in jets if jet.y == 0]
-    pdf, edges = np.histogram([j.pt for j in jets_0], density=True, range=[pt_min, pt_max], bins=bins)
-    pts = [j.pt for j in jets_0]
-    indices = np.searchsorted(edges, pts) - 1
-    inv_w = 1. / pdf[indices]
-    inv_w /= inv_w.sum()
-    w[y==0] = inv_w
+    pts_0 = [jet.pt for jet in jets if jet.y == 0]
+    pts_1 = [jet.pt for jet in jets if jet.y == 1]
 
-    jets_1 = [jet for jet in jets if jet.y == 1]
-    pdf, edges = np.histogram([j.pt for j in jets_1], density=True, range=[pt_min, pt_max], bins=bins)
-    pts = [j.pt for j in jets_1]
-    indices = np.searchsorted(edges, pts) - 1
-    inv_w = 1. / pdf[indices]
-    inv_w /= inv_w.sum()
-    w[y==1] = inv_w
+    w[y==0] = get_weights_for_flatness_in_pt(pts_0, pt_min, pt_max, bins)
+    w[y==1] = get_weights_for_flatness_in_pt(pts_1, pt_min, pt_max, bins)
 
     return w

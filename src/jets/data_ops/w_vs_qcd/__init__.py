@@ -1,2 +1,3 @@
 from .preprocessing import preprocess
-from .filtering import filter_pileup_jet, filter_original_jet
+from .utils import filter_pileup_jet, filter_original_jet
+from .utils import flatten_pileup_jets, flatten_original_jets

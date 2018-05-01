@@ -5,31 +5,15 @@ import math
 
 from sklearn.preprocessing import RobustScaler
 
-from .flatten_in_pt_weights import flatten_in_pt_weights
 
 class Dataset(D):
-    def __init__(self, jets, problem=None, subproblem=None):
+    def __init__(self, jets, weights=None,problem=None, subproblem=None):
         super().__init__()
-        if 'w-vs-qcd' == problem:
-            if 'pileup' == subproblem:
-                from .w_vs_qcd import filter_pileup_jet as filter_jet
-            elif 'antikt-kt' == subproblem:
-                from .w_vs_qcd import filter_original_jet as filter_jet
-        elif 'quark-gluon' == problem:
-            from .quark_gluon import filter_qg_jet as filter_jet
-        else:
-            raise ValueError('Unrecognized problem!')
-        self.filter_jet = filter_jet
 
         self.jets = jets
-        self.weights = flatten_in_pt_weights(jets) #* len(self) / 2.0
+        self.weights = [None for _ in range(len(jets))] if weights is None else weights
         self.problem = problem
         self.subproblem = subproblem
-
-    def crop(self):
-        good_jets = list(filter(lambda jet: self.filter_jet(jet), self.jets))
-        bad_jets = list(filter(lambda jet: not self.filter_jet(jet), self.jets))
-        return good_jets, bad_jets
 
     def __len__(self):
         return len(self.jets)
