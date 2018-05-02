@@ -132,7 +132,10 @@ class BinaryTree:
         return self._depth
 
     def to_tensor(self):
-        tree = BinaryTree(torch.tensor(self.data).unsqueeze(0).float())
+        t = torch.tensor(self.data).unsqueeze(0).float()
+        if torch.cuda.is_available():
+            t = t.to('cuda')
+        tree = BinaryTree(t)
         if self.left is not None:
             tree.add_left(self.left.to_tensor())
         if self.right is not None:
