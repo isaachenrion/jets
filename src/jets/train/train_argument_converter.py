@@ -97,12 +97,14 @@ def get_model_kwargs(args):
         # model dimensions
         #'features': args.features+1 if args.model == 'nmp' else args.features,
         'hidden': args.hidden,
+        'activation': args.act,
+        'ln': args.ln,
+        'dropout':args.dropout,
 
         # logging
         'logging_frequency': args.plotting_frequency,
 
         # activation
-        'activation': args.act,
 
         # classifier on top
         #'predict':args.predict,
@@ -114,13 +116,12 @@ def get_model_kwargs(args):
         'iters': args.iters,
         'update': args.update,
         #'message': args.message,
-        'emb_init':args.emb_init,
+        #'emb_init':args.emb_init,
         #'mp_layer':args.mp,
         'symmetric':not args.asym,
         #'readout':args.readout,
         'matrix':args.adj[0] if len(args.adj) == 1 else args.adj,
         'm_act':args.m_act,
-        'ln': args.ln,
 
         # Stacked NMP
         'scales': args.scales,
@@ -141,7 +142,6 @@ def get_model_kwargs(args):
         'n_layers':args.n_layers,
         'dq':args.dq,
         'dv':args.dv,
-        'dropout':args.dropout,
 
 
         'debug':args.debug
