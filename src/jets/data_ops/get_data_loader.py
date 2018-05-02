@@ -42,7 +42,7 @@ def load_jets(data_dir, filename, do_preprocessing=False):
 
         logging.warning("Preprocessing...")
 
-        preprocess_fn(raw_data_dir, preprocessed_dir, filename)
+        preprocess(raw_data_dir, preprocessed_dir, filename)
 
         logging.warning("Preprocessed the data and saved it to {}".format(path_to_preprocessed))
     else:
