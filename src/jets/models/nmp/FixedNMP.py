@@ -45,11 +45,6 @@ class ResidualFullyConnected(FullyConnected):
 class MessagePassingBlock(nn.Module):
     def __init__(self, hidden, update, activation, dropout=0.0, ln=False):
         super().__init__()
-        #m = OrderedDict()
-        #m['d1'] = nn.Dropout(dropout)
-        #m['fc1'] = nn.Linear(hidden, hidden)
-        #m['relu1'] = nn.ReLU(inplace=True)
-        #if ln: m['ln1'] = nn.LayerNorm(hidden)
         self.message = ResidualFullyConnected(hidden, activation, dropout=dropout, ln=ln)
         self.activation = ACTIVATIONS[activation]()
         self.vertex_update = VERTEX_UPDATES[update](hidden, hidden)
@@ -79,8 +74,6 @@ class FixedNMP(nn.Module):
         super().__init__()
 
         self.iters = iters
-        #emb_kwargs = {x: kwargs.get(x, None) for x in ['act']}
-        #self.embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, n_layers=int(emb_init), **emb_kwargs)
         m_emb = OrderedDict()
         m_emb['proj'] = FullyConnected(features, hidden, activation, dropout, ln)
         m_emb['res2'] = ResidualFullyConnected(hidden, activation, dropout, ln)

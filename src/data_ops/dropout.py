@@ -18,5 +18,5 @@ def get_dropout_masks(tensor_list, p):
             if dm.sum() > 0:
                 break
         dropout_masks[i] = dm
-    print(dm.device)
+    #print(dm.device)
     return dropout_masks
