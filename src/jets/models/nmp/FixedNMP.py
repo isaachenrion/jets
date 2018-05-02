@@ -43,7 +43,7 @@ class ResidualFullyConnected(FullyConnected):
         return x + self.block(x)
 
 class MessagePassingBlock(nn.Module):
-    def __init__(self, hidden, update, activation, dropout=0.0, ln=False):
+    def __init__(self, hidden, update, activation, dropout=None, ln=False):
         super().__init__()
         self.message = ResidualFullyConnected(hidden, activation, dropout=dropout, ln=ln)
         self.activation = ACTIVATIONS[activation]()
@@ -64,7 +64,7 @@ class FixedNMP(nn.Module):
         emb_init=None,
         mp_layer=None,
         tied=False,
-        dropout=0.0,
+        dropout=None,
         update=None,
         ln=False,
         activation=None,
