@@ -98,11 +98,11 @@ def test_dataset(data_dir, dataset, n_test, preprocess):
     data_dir = os.path.join(data_dir, intermediate_dir)
 
     logging.warning("Loading test data...")
-    filename = "{}-test.pickle".format(filename)
+    filename = "{}-train.pickle".format(filename)
     jets = load_jets(data_dir, filename, preprocess)
     jets = jets[:n_test]
 
-    dataset = Dataset(jets)
+    dataset = Dataset(jets, problem=problem,subproblem=subproblem)
     dataset.transform(train_dataset.tf)
 
     # crop validation set and add the excluded data to the training set
