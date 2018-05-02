@@ -31,9 +31,6 @@ def load_jets(data_dir, filename, do_preprocessing=False):
         from .quark_gluon import preprocess
     else:
         raise ValueError('Unrecognized data_dir!')
-    #from problem_module import preprocess, crop_dataset
-
-    #preprocessed_dir = os.path.join(data_dir, 'preprocessed')
 
     raw_data_dir = os.path.join(data_dir, 'raw')
     preprocessed_dir = os.path.join(data_dir, 'preprocessed')
@@ -57,7 +54,7 @@ def load_jets(data_dir, filename, do_preprocessing=False):
 
     #perm = np.random.permutation(len(jets))
     #jets = [jets[i] for i in perm]
-    jets = np.random.permutation(jets)
+    #jets = np.random.permutation(jets)
     return jets
 
 def training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preprocess):
