@@ -8,7 +8,7 @@ import numpy as np
 def load_settings(filename):
     with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
         settings = pickle.load(f)
-        #model_kwargs = settings["model_kwargs"]
+        print(settings)
     return settings
 
 def load_model_state_dict(model, path_to_state_dict):
