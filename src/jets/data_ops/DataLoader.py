@@ -4,21 +4,16 @@ import torch
 from torch.utils.data import DataLoader as DL
 
 from src.data_ops.pad_tensors import pad_tensors_extra_channel
-from src.data_ops.dropout import dropout
+from src.data_ops.dropout import get_dropout_masks
 
 
 
 class DataLoader(DL):
-    def __init__(self, dataset, batch_size,leaves=True, dropout=None, permute_particles=False, weight_batches=False,**kwargs):
+    def __init__(self, dataset, batch_size,leaves=True, dropout=None, permute_particles=False,**kwargs):
         super().__init__(dataset, batch_size, collate_fn=self.collate)
         self.dropout = dropout
         self.permute_particles = permute_particles
         self.leaves = leaves
-        self.weight_batches = weight_batches
-        if weight_batches:
-            logging.info("Using weights to flatten samples with respect to pt")
-        else:
-            logging.info("Unweighted samples")
 
     @property
     def dim(self):
@@ -31,7 +26,11 @@ class DataLoader(DL):
         x_list, y_list, weight_list = list(map(list, zip(*data_tuples)))
         inputs = self.preprocess_x(x_list)
         y = self.preprocess_y(y_list)
-        weight = torch.tensor(weight_list) if self.weight_batches else None
+
+        if weight_list[0] is not None:
+            weight = torch.tensor(weight_list)
+        else:
+            weight = None
         batch = (inputs, y, weight)
         return batch
 
@@ -46,16 +45,14 @@ class DataLoader(DL):
             return self.batch_trees(x_list)
 
     def batch_leaves(self,x_list):
-        x_list = [x.constituents for x in x_list]
+        x_list = list(map(lambda x: torch.tensor(x.constituents), x_list))
+        dropout_masks = get_dropout_masks(x_list, self.dropout)
+        x_list = [x.masked_select(dm.unsqueeze(1)).view(-1, x.shape[1]) for x, dm in zip(x_list, dropout_masks)]
+
         if self.permute_particles:
-            data = [torch.tensor(np.random.permutation(x)) for x in x_list]
-        else:
-            data = [torch.tensor(x) for x in x_list]
+            x_list = list(map(np.random.permutation, x_list))
 
-        if self.dropout is not None:
-            data = dropout(data, self.dropout)
-
-        data, mask = pad_tensors_extra_channel(data)
+        data, mask = pad_tensors_extra_channel(x_list)
 
         return data, mask
 

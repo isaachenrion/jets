@@ -66,7 +66,7 @@ def get_data_loader_kwargs(args):
         batch_size=args.batch_size,
         preprocess=args.pp,
         leaves=leaves,
-        weight_batches=args.weight_batches
+        dropout=args.data_dropout
     )
 
 def get_optim_args(args):

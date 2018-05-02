@@ -130,13 +130,13 @@ def test_dataset(data_dir, dataset, n_test, preprocess):
 
 def get_train_data_loader(data_dir, dataset, n_train, n_valid, batch_size, leaves=None,preprocess=None,**kwargs):
     train_dataset, valid_dataset, dummy_train_dataset = training_and_validation_dataset(data_dir, dataset, n_train, n_valid, preprocess)
-    train_data_loader = DataLoader(train_dataset, batch_size, leaves=leaves, weight_batches=kwargs['weight_batches'])
-    valid_data_loader = DataLoader(valid_dataset, batch_size, leaves=leaves, weight_batches=True)
-    dummy_train_data_loader = DataLoader(dummy_train_dataset, batch_size, leaves=leaves, weight_batches=True)
+    train_data_loader = DataLoader(train_dataset, batch_size, leaves=leaves, **kwargs)
+    valid_data_loader = DataLoader(valid_dataset, batch_size, leaves=leaves, **kwargs)
+    dummy_train_data_loader = DataLoader(dummy_train_dataset, batch_size, leaves=leaves, **kwargs)
 
     return train_data_loader, valid_data_loader, dummy_train_data_loader
 
 def get_test_data_loader(data_dir, dataset, n_test, batch_size, leaves=None,preprocess=None,**kwargs):
     dataset = test_dataset(data_dir, dataset, n_test, preprocess)
-    test_data_loader = DataLoader(dataset, batch_size, leaves=leaves)
+    test_data_loader = DataLoader(dataset, batch_size, leaves=leaves, **kwargs)
     return test_data_loader

@@ -52,7 +52,6 @@ def main(sysargvlist=None):
     parser.add_argument("-e", "--epochs", type=int, default=64)
     parser.add_argument("-b", "--batch_size", type=int, default=128)
     parser.add_argument("--experiment_time", type=int, default=1000000)
-    parser.add_argument("--weight_batches", action='store_true')
     '''
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     '''
@@ -85,7 +84,7 @@ def main(sysargvlist=None):
     parser.add_argument("-n", "--n_train", type=int, default=-1)
     parser.add_argument("--n_valid", type=int, default=10000)
     parser.add_argument("--dataset", type=str, default='w')
-    parser.add_argument("--data_dropout", type=float, default=1.0)
+    parser.add_argument("--data_dropout", type=float, default=0.0)
     parser.add_argument("--pp", action='store_true', default=False)
     parser.add_argument("--permute_vertices", action='store_true')
     parser.add_argument("--no_cropped", action='store_true')
@@ -139,11 +138,6 @@ def main(sysargvlist=None):
         args = parser.parse_args()
     else:
         args = parser.parse_args(sysargvlist)
-
-    #arg_groups={}
-    #for group in parser._action_groups:
-    #    group_dict={a.dest:getattr(args,a.dest,None) for a in group._group_actions}
-    #    arg_groups[group.title + '_args']=argparse.Namespace(**group_dict)
 
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     args.cmd_line_args = (' '.join(sys.argv))
