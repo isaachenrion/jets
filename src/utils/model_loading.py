@@ -9,7 +9,6 @@ from src.data_ops import unwrap
 def load_settings(filename):
     with open(os.path.join(filename, 'settings.pickle'), "rb") as f:
         settings = pickle.load(f)
-        #model_kwargs = settings["model_kwargs"]
     return settings
 
 def load_model_state_dict(model, path_to_state_dict):
