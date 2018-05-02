@@ -1,0 +1,2248 @@
+COMPLETED on Apr-15 at 15:20:01
+running on gpu-34
+./models/running/protein/g/5526070/1
+	R = 1
+	act = leakyrelu
+	adj = dm
+	alpha = 1
+	asym = False
+	batch_size = 64
+	clip = 1.0
+	cmd_line_args = train.py --lr .01 --hidden 32 -n 2000 --batch_size 64 --iters 4 --data_dir /scratch/ih692/data --experiment_time 8 --models_dir ./models --slurm --gpu 0 --slurm_array_job_id 5526070 --slurm_array_task_id 1
+	data_dir = /scratch/ih692/data
+	data_dropout = 0.99
+	dataset = protein
+	debug = False
+	decay = 0.7
+	dq = 32
+	dv = 32
+	email = None
+	emb_init = 1
+	epochs = 64
+	equal_weight = False
+	experiment_time = 8
+	gpu = 0
+	hidden = 32
+	host = gpu-34
+	iters = 4
+	lf = 20
+	load = None
+	lr = 0.01
+	lr_min = 5e-07
+	m_act = sigmoid
+	message = 2
+	model = g
+	model_dropout = 1.0
+	models_dir = ./models
+	momentum = 0.0
+	mp = m2
+	n_heads = 8
+	n_layers = 3
+	n_train = 2000
+	n_valid = 10000
+	no_cropped = False
+	no_email = False
+	no_grad = False
+	optim = adam
+	period = 16
+	permute_vertices = False
+	pid = 136544
+	pool = attn
+	pool_first = False
+	pp = False
+	predict = simple
+	profile = False
+	readout = dtnn
+	reg = 1e-05
+	restart = False
+	root_dir = /Users/isaachenrion/x/research/graphs/models
+	scales = None
+	sched = m1
+	seed = 65278
+	silent = False
+	slurm = True
+	slurm_array_job_id = 5526070
+	slurm_array_task_id = 1
+	tied = False
+	train = True
+	trainable_physics = False
+	update = gru
+	verbose = False
+	visualizing = False
+	wn = False
+
+
+Git commit = 1de8b96
+	PID = 136544
+	Running on GPU
+Loading data...
+	Data already preprocessed
+	Data loaded in 13.4 seconds
+	Data already preprocessed
+	Data loaded in 0.1 seconds
+	final train size = 1899
+	final valid size = 217
+Initializing model...
+GraphGen(
+  (initial_embedding): Linear(in_features=42, out_features=32, bias=True)
+  (nmp_blocks): ModuleList(
+    (0): NMPBlock(
+      (spatial_embedding): Linear(in_features=32, out_features=3, bias=True)
+      (conv1d): BasicBlock(
+        (group1): Sequential(
+          (conv1): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+          (bn1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True)
+          (relu1): ReLU(inplace)
+          (conv2): Conv1d(32, 32, kernel_size=(17,), stride=(1,), padding=(8,), bias=False)
+          (bn2): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True)
+        )
+        (relu): Sequential(
+          (0): ReLU(inplace)
+        )
+      )
+      (message): Sequential(
+        (0): Linear(in_features=32, out_features=32, bias=True)
+        (1): ReLU(inplace)
+      )
+      (update): GRUUpdate(
+        (gru): AnyBatchGRUCell(
+          (linear_ih): Linear(in_features=64, out_features=96, bias=True)
+          (linear_hh): Linear(in_features=32, out_features=96, bias=True)
+        )
+      )
+    )
+    (1): NMPBlock(
+      (spatial_embedding): Linear(in_features=32, out_features=3, bias=True)
+      (conv1d): BasicBlock(
+        (group1): Sequential(
+          (conv1): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+          (bn1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True)
+          (relu1): ReLU(inplace)
+          (conv2): Conv1d(32, 32, kernel_size=(17,), stride=(1,), padding=(8,), bias=False)
+          (bn2): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True)
+        )
+        (relu): Sequential(
+          (0): ReLU(inplace)
+        )
+      )
+      (message): Sequential(
+        (0): Linear(in_features=32, out_features=32, bias=True)
+        (1): ReLU(inplace)
+      )
+      (update): GRUUpdate(
+        (gru): AnyBatchGRUCell(
+          (linear_ih): Linear(in_features=64, out_features=96, bias=True)
+          (linear_hh): Linear(in_features=32, out_features=96, bias=True)
+        )
+      )
+    )
+    (2): NMPBlock(
+      (spatial_embedding): Linear(in_features=32, out_features=3, bias=True)
+      (conv1d): BasicBlock(
+        (group1): Sequential(
+          (conv1): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+          (bn1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True)
+          (relu1): ReLU(inplace)
+          (conv2): Conv1d(32, 32, kernel_size=(17,), stride=(1,), padding=(8,), bias=False)
+          (bn2): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True)
+        )
+        (relu): Sequential(
+          (0): ReLU(inplace)
+        )
+      )
+      (message): Sequential(
+        (0): Linear(in_features=32, out_features=32, bias=True)
+        (1): ReLU(inplace)
+      )
+      (update): GRUUpdate(
+        (gru): AnyBatchGRUCell(
+          (linear_ih): Linear(in_features=64, out_features=96, bias=True)
+          (linear_hh): Linear(in_features=32, out_features=96, bias=True)
+        )
+      )
+    )
+    (3): NMPBlock(
+      (spatial_embedding): Linear(in_features=32, out_features=3, bias=True)
+      (conv1d): BasicBlock(
+        (group1): Sequential(
+          (conv1): Conv1d(32, 32, kernel_size=(1,), stride=(1,), bias=False)
+          (bn1): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True)
+          (relu1): ReLU(inplace)
+          (conv2): Conv1d(32, 32, kernel_size=(17,), stride=(1,), padding=(8,), bias=False)
+          (bn2): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True)
+        )
+        (relu): Sequential(
+          (0): ReLU(inplace)
+        )
+      )
+      (message): Sequential(
+        (0): Linear(in_features=32, out_features=32, bias=True)
+        (1): ReLU(inplace)
+      )
+      (update): GRUUpdate(
+        (gru): AnyBatchGRUCell(
+          (linear_ih): Linear(in_features=64, out_features=96, bias=True)
+          (linear_hh): Linear(in_features=32, out_features=96, bias=True)
+        )
+      )
+    )
+  )
+  (final_spatial_embedding): Linear(in_features=32, out_features=3, bias=True)
+)
+Number of parameters: 117967
+Moving model to GPU
+Moved model to GPU
+***********
+Building optimizer and scheduler...
+Optimizer is adam
+weight_decay: 1e-05
+lr: 0.01
+***********
+Scheduler is m1
+gamma: 0.7
+milestones: [16, 32, 48]
+***********
+Training...
+Epoch	1/64
+lr = 0.01000000
+findfont: Matching :family=sans-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to DejaVu Sans ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf') with score of 0.050000
+GPU: 4963/22919MiB	21.7% used
+Training 30 batches took 107.3 seconds at 17.7 examples per second
+Validation took 13.5 seconds
+Protein metric 1 took 4.31s
+Protein metric 2 took 4.25s
+Protein metric 5 took 4.23s
+Protein metric 10 took 4.31s
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+findfont: Matching :family=STIXGeneral:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to STIXGeneral ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneral.ttf') with score of 0.050000
+findfont: Matching :family=STIXSizeOneSym:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to STIXSizeOneSym ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizOneSymReg.ttf') with score of 0.050000
+findfont: Matching :family=STIXSizeTwoSym:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to STIXSizeTwoSym ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizTwoSymReg.ttf') with score of 0.050000
+findfont: Matching :family=STIXSizeThreeSym:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to STIXSizeThreeSym ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizThreeSymReg.ttf') with score of 0.050000
+findfont: Matching :family=STIXSizeFourSym:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to STIXSizeFourSym ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizFourSymReg.ttf') with score of 0.050000
+findfont: Matching :family=STIXSizeFiveSym:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to STIXSizeFiveSym ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizFiveSymReg.ttf') with score of 0.050000
+findfont: Matching :family=STIXGeneral:style=italic:variant=normal:weight=normal:stretch=normal:size=10.0 to STIXGeneral ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneralItalic.ttf') with score of 0.050000
+findfont: Matching :family=STIXNonUnicode:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to STIXNonUnicode ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUni.ttf') with score of 0.050000
+findfont: Matching :family=STIXNonUnicode:style=normal:variant=normal:weight=bold:stretch=normal:size=10.0 to STIXNonUnicode ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUniBol.ttf') with score of 0.000000
+findfont: Matching :family=STIXNonUnicode:style=italic:variant=normal:weight=normal:stretch=normal:size=10.0 to STIXNonUnicode ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUniIta.ttf') with score of 0.050000
+findfont: Matching :family=STIXGeneral:style=normal:variant=normal:weight=bold:stretch=normal:size=10.0 to STIXGeneral ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneralBol.ttf') with score of 0.000000
+findfont: Matching :family=cmb10:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to cmb10 ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/cmb10.ttf') with score of 0.050000
+findfont: Matching :family=cmtt10:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to cmtt10 ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/cmtt10.ttf') with score of 0.050000
+findfont: Matching :family=cmss10:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to cmss10 ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/cmss10.ttf') with score of 0.050000
+findfont: Matching :family=cmmi10:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to cmmi10 ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/cmmi10.ttf') with score of 0.050000
+findfont: Matching :family=cmex10:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to cmex10 ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/cmex10.ttf') with score of 0.050000
+findfont: Matching :family=cmsy10:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to cmsy10 ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/cmsy10.ttf') with score of 0.050000
+findfont: Matching :family=cmr10:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to cmr10 ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/cmr10.ttf') with score of 0.050000
+findfont: Matching :family=DejaVu Sans:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to DejaVu Sans ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf') with score of 0.050000
+findfont: Matching :family=DejaVu Sans Display:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to DejaVu Sans Display ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansDisplay.ttf') with score of 0.050000
+findfont: Matching :family=DejaVu Sans:style=italic:variant=normal:weight=normal:stretch=normal:size=10.0 to DejaVu Sans ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf') with score of 0.150000
+findfont: Matching :family=DejaVu Sans:style=normal:variant=normal:weight=bold:stretch=normal:size=10.0 to DejaVu Sans ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Bold.ttf') with score of 0.000000
+findfont: Matching :family=DejaVu Sans Mono:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to DejaVu Sans Mono ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono.ttf') with score of 0.050000
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+findfont: Matching :family=sans-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=12.0 to DejaVu Sans ('/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf') with score of 0.050000
+ITERATION  31.0
+	     train_loss = 0.132
+L/1	acc = 9.7%		acc_long = 2.2%		acc_med = 4.1%		acc_short = 35.6%
+L/2	acc = 10.2%		acc_long = 2.3%		acc_med = 4.3%		acc_short = 36.3%
+L/5	acc = 11.7%		acc_long = 2.4%		acc_med = 4.4%		acc_short = 37.8%
+L/10	acc = 12.6%		acc_long = 2.5%		acc_med = 4.4%		acc_short = 38.3%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.133
+	             lr = 0.01000000
+            eta = Sun Apr 15 14:45:18 2018
+Logging took 24.3 seconds
+Epoch took 145.1 seconds
+********************************************************************************
+Epoch	2/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 104.2 seconds at 18.2 examples per second
+Validation took 13.5 seconds
+Protein metric 1 took 5.89s
+Protein metric 2 took 5.77s
+Protein metric 5 took 5.84s
+Protein metric 10 took 5.86s
+ITERATION  61.0
+	     train_loss = 0.132
+L/1	acc = 19.7%		acc_long = 2.2%		acc_med = 4.7%		acc_short = 57.8%
+L/2	acc = 21.3%		acc_long = 2.3%		acc_med = 4.9%		acc_short = 66.0%
+L/5	acc = 22.5%		acc_long = 2.4%		acc_med = 4.9%		acc_short = 69.3%
+L/10	acc = 24.1%		acc_long = 2.4%		acc_med = 5.2%		acc_short = 69.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.133
+	             lr = 0.01000000
+            eta = Sun Apr 15 13:46:25 2018
+Logging took 25.2 seconds
+Epoch took 143.0 seconds
+********************************************************************************
+Epoch	3/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.2 seconds at 18.1 examples per second
+Validation took 13.7 seconds
+Protein metric 1 took 5.73s
+Protein metric 2 took 5.69s
+Protein metric 5 took 5.75s
+Protein metric 10 took 5.80s
+ITERATION  91.0
+	     train_loss = 0.132
+L/1	acc = 19.6%		acc_long = 2.5%		acc_med = 4.9%		acc_short = 57.1%
+L/2	acc = 21.4%		acc_long = 2.5%		acc_med = 5.1%		acc_short = 65.1%
+L/5	acc = 23.2%		acc_long = 2.7%		acc_med = 5.2%		acc_short = 69.6%
+L/10	acc = 24.4%		acc_long = 2.8%		acc_med = 5.2%		acc_short = 70.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.133
+	             lr = 0.01000000
+            eta = Sun Apr 15 13:28:13 2018
+Logging took 24.9 seconds
+Epoch took 143.8 seconds
+********************************************************************************
+Epoch	4/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 104.9 seconds at 18.1 examples per second
+Validation took 13.6 seconds
+Protein metric 1 took 5.20s
+Protein metric 2 took 5.10s
+Protein metric 5 took 5.11s
+Protein metric 10 took 5.26s
+ITERATION 121.0
+	     train_loss = 0.132
+L/1	acc = 12.3%		acc_long = 2.4%		acc_med = 4.6%		acc_short = 46.0%
+L/2	acc = 12.8%		acc_long = 2.5%		acc_med = 4.9%		acc_short = 46.0%
+L/5	acc = 14.0%		acc_long = 2.4%		acc_med = 5.0%		acc_short = 46.9%
+L/10	acc = 15.0%		acc_long = 2.5%		acc_med = 5.2%		acc_short = 47.7%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.133
+	             lr = 0.01000000
+            eta = Sun Apr 15 13:18:48 2018
+Logging took 22.5 seconds
+Epoch took 141.1 seconds
+********************************************************************************
+Epoch	5/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 104.6 seconds at 18.2 examples per second
+Validation took 13.3 seconds
+Protein metric 1 took 6.17s
+Protein metric 2 took 6.08s
+Protein metric 5 took 6.06s
+Protein metric 10 took 6.22s
+ITERATION 151.0
+	     train_loss = 0.132
+L/1	acc = 40.6%		acc_long = 2.6%		acc_med = 5.1%		acc_short = 60.8%
+L/2	acc = 54.6%		acc_long = 2.7%		acc_med = 5.0%		acc_short = 77.3%
+L/5	acc = 66.8%		acc_long = 3.0%		acc_med = 4.6%		acc_short = 90.9%
+L/10	acc = 70.6%		acc_long = 3.4%		acc_med = 4.6%		acc_short = 94.6%
+
+	          hours = 0.03
+	     valid_loss = 0.132
+	best_valid_loss = 0.132
+	             lr = 0.01000000
+            eta = Sun Apr 15 13:13:08 2018
+Logging took 26.5 seconds
+Epoch took 144.5 seconds
+********************************************************************************
+Epoch	6/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.1 seconds at 17.9 examples per second
+Validation took 13.9 seconds
+Protein metric 1 took 4.46s
+Protein metric 2 took 4.34s
+Protein metric 5 took 4.36s
+Protein metric 10 took 4.41s
+ITERATION 181.0
+	     train_loss = 0.132
+L/1	acc = 10.7%		acc_long = 2.1%		acc_med = 4.4%		acc_short = 37.4%
+L/2	acc = 11.1%		acc_long = 2.0%		acc_med = 4.6%		acc_short = 37.9%
+L/5	acc = 12.0%		acc_long = 2.1%		acc_med = 4.6%		acc_short = 39.1%
+L/10	acc = 12.2%		acc_long = 2.1%		acc_med = 4.7%		acc_short = 40.1%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.01000000
+            eta = Sun Apr 15 13:09:41 2018
+Logging took 19.4 seconds
+Epoch took 139.4 seconds
+********************************************************************************
+Epoch	7/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.1 seconds at 18.1 examples per second
+Validation took 13.6 seconds
+Protein metric 1 took 4.92s
+Protein metric 2 took 4.85s
+Protein metric 5 took 4.77s
+Protein metric 10 took 4.77s
+ITERATION 211.0
+	     train_loss = 0.132
+L/1	acc = 10.6%		acc_long = 2.3%		acc_med = 4.7%		acc_short = 38.7%
+L/2	acc = 11.0%		acc_long = 2.5%		acc_med = 4.9%		acc_short = 38.9%
+L/5	acc = 12.1%		acc_long = 2.5%		acc_med = 4.8%		acc_short = 39.9%
+L/10	acc = 14.0%		acc_long = 2.5%		acc_med = 5.0%		acc_short = 40.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.01000000
+            eta = Sun Apr 15 13:06:50 2018
+Logging took 21.1 seconds
+Epoch took 139.9 seconds
+********************************************************************************
+Epoch	8/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.8 seconds at 17.9 examples per second
+Validation took 13.0 seconds
+Protein metric 1 took 4.39s
+Protein metric 2 took 4.33s
+Protein metric 5 took 4.35s
+Protein metric 10 took 4.24s
+ITERATION 241.0
+	     train_loss = 0.132
+L/1	acc = 9.4%		acc_long = 2.1%		acc_med = 4.2%		acc_short = 35.4%
+L/2	acc = 9.9%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.3%
+L/5	acc = 11.4%		acc_long = 2.2%		acc_med = 4.6%		acc_short = 37.4%
+L/10	acc = 12.2%		acc_long = 2.5%		acc_med = 4.7%		acc_short = 38.1%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.01000000
+            eta = Sun Apr 15 13:04:56 2018
+Logging took 19.2 seconds
+Epoch took 138.1 seconds
+********************************************************************************
+Epoch	9/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.7 seconds at 18.0 examples per second
+Validation took 13.1 seconds
+Protein metric 1 took 4.41s
+Protein metric 2 took 4.40s
+Protein metric 5 took 4.33s
+Protein metric 10 took 4.36s
+ITERATION 271.0
+	     train_loss = 0.132
+L/1	acc = 9.6%		acc_long = 2.1%		acc_med = 4.2%		acc_short = 36.0%
+L/2	acc = 10.3%		acc_long = 2.3%		acc_med = 4.3%		acc_short = 36.7%
+L/5	acc = 11.9%		acc_long = 2.4%		acc_med = 4.4%		acc_short = 38.2%
+L/10	acc = 12.8%		acc_long = 2.6%		acc_med = 4.5%		acc_short = 39.1%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.01000000
+            eta = Sun Apr 15 13:03:21 2018
+Logging took 19.4 seconds
+Epoch took 138.2 seconds
+********************************************************************************
+Epoch	10/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.8 seconds at 17.8 examples per second
+Validation took 13.1 seconds
+Protein metric 1 took 4.40s
+Protein metric 2 took 4.41s
+Protein metric 5 took 4.44s
+Protein metric 10 took 4.41s
+ITERATION 301.0
+	     train_loss = 0.132
+L/1	acc = 10.3%		acc_long = 2.3%		acc_med = 4.3%		acc_short = 36.3%
+L/2	acc = 11.3%		acc_long = 2.2%		acc_med = 4.4%		acc_short = 37.6%
+L/5	acc = 12.9%		acc_long = 2.5%		acc_med = 4.1%		acc_short = 40.0%
+L/10	acc = 13.8%		acc_long = 2.5%		acc_med = 4.0%		acc_short = 41.3%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.01000000
+            eta = Sun Apr 15 13:02:13 2018
+Logging took 19.4 seconds
+Epoch took 139.4 seconds
+********************************************************************************
+Epoch	11/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.3 seconds at 17.9 examples per second
+Validation took 13.3 seconds
+Protein metric 1 took 4.26s
+Protein metric 2 took 4.25s
+Protein metric 5 took 4.29s
+Protein metric 10 took 4.41s
+ITERATION 331.0
+	     train_loss = 0.132
+L/1	acc = 9.2%		acc_long = 2.1%		acc_med = 4.2%		acc_short = 35.4%
+L/2	acc = 9.9%		acc_long = 2.1%		acc_med = 4.4%		acc_short = 36.3%
+L/5	acc = 11.1%		acc_long = 2.2%		acc_med = 4.4%		acc_short = 37.4%
+L/10	acc = 11.7%		acc_long = 2.4%		acc_med = 4.5%		acc_short = 38.0%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.01000000
+            eta = Sun Apr 15 13:01:08 2018
+Logging took 19.0 seconds
+Epoch took 138.7 seconds
+********************************************************************************
+Epoch	12/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.3 seconds at 18.0 examples per second
+Validation took 13.6 seconds
+Protein metric 1 took 4.36s
+Protein metric 2 took 4.26s
+Protein metric 5 took 4.26s
+Protein metric 10 took 4.26s
+ITERATION 361.0
+	     train_loss = 0.132
+L/1	acc = 9.8%		acc_long = 2.2%		acc_med = 4.3%		acc_short = 35.9%
+L/2	acc = 10.5%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 37.0%
+L/5	acc = 11.5%		acc_long = 2.5%		acc_med = 4.5%		acc_short = 38.2%
+L/10	acc = 12.1%		acc_long = 2.6%		acc_med = 4.7%		acc_short = 38.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.01000000
+            eta = Sun Apr 15 13:00:11 2018
+Logging took 19.0 seconds
+Epoch took 137.9 seconds
+********************************************************************************
+Epoch	13/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.4 seconds at 17.8 examples per second
+Validation took 13.5 seconds
+Protein metric 1 took 4.37s
+Protein metric 2 took 4.35s
+Protein metric 5 took 4.24s
+Protein metric 10 took 4.24s
+ITERATION 391.0
+	     train_loss = 0.132
+L/1	acc = 9.3%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.4%
+L/2	acc = 10.0%		acc_long = 2.1%		acc_med = 4.4%		acc_short = 36.3%
+L/5	acc = 11.3%		acc_long = 2.1%		acc_med = 4.4%		acc_short = 37.0%
+L/10	acc = 11.5%		acc_long = 2.3%		acc_med = 4.4%		acc_short = 37.3%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.01000000
+            eta = Sun Apr 15 12:59:33 2018
+Logging took 19.0 seconds
+Epoch took 139.0 seconds
+********************************************************************************
+Epoch	14/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.1 seconds at 18.1 examples per second
+Validation took 12.9 seconds
+Protein metric 1 took 4.44s
+Protein metric 2 took 4.36s
+Protein metric 5 took 4.34s
+Protein metric 10 took 4.30s
+ITERATION 421.0
+	     train_loss = 0.132
+L/1	acc = 9.4%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.4%
+L/2	acc = 9.9%		acc_long = 2.1%		acc_med = 4.4%		acc_short = 36.5%
+L/5	acc = 11.1%		acc_long = 2.2%		acc_med = 4.4%		acc_short = 37.5%
+L/10	acc = 11.4%		acc_long = 2.4%		acc_med = 4.5%		acc_short = 37.8%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.01000000
+            eta = Sun Apr 15 12:58:50 2018
+Logging took 19.2 seconds
+Epoch took 137.3 seconds
+********************************************************************************
+Epoch	15/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.9 seconds at 17.9 examples per second
+Validation took 13.1 seconds
+Protein metric 1 took 4.36s
+Protein metric 2 took 4.43s
+Protein metric 5 took 4.35s
+Protein metric 10 took 4.35s
+ITERATION 451.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.3%
+L/2	acc = 9.6%		acc_long = 2.0%		acc_med = 4.3%		acc_short = 35.9%
+L/5	acc = 10.6%		acc_long = 2.1%		acc_med = 4.4%		acc_short = 36.4%
+L/10	acc = 11.0%		acc_long = 2.3%		acc_med = 4.4%		acc_short = 37.1%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.01000000
+            eta = Sun Apr 15 12:58:21 2018
+Logging took 19.4 seconds
+Epoch took 138.4 seconds
+********************************************************************************
+Epoch	16/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.1 seconds at 18.1 examples per second
+Validation took 13.2 seconds
+Protein metric 1 took 4.34s
+Protein metric 2 took 4.30s
+Protein metric 5 took 4.36s
+Protein metric 10 took 4.37s
+ITERATION 481.0
+	     train_loss = 0.132
+L/1	acc = 9.5%		acc_long = 2.1%		acc_med = 4.2%		acc_short = 35.6%
+L/2	acc = 10.1%		acc_long = 2.1%		acc_med = 4.4%		acc_short = 36.9%
+L/5	acc = 11.3%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 38.2%
+L/10	acc = 11.4%		acc_long = 2.3%		acc_med = 4.4%		acc_short = 38.7%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.01000000
+            eta = Sun Apr 15 12:57:50 2018
+Logging took 19.2 seconds
+Epoch took 137.6 seconds
+********************************************************************************
+Epoch	17/64
+lr = 0.01000000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.0 seconds at 17.9 examples per second
+Validation took 13.7 seconds
+Protein metric 1 took 4.32s
+Protein metric 2 took 4.23s
+Protein metric 5 took 4.21s
+Protein metric 10 took 4.31s
+ITERATION 511.0
+	     train_loss = 0.132
+L/1	acc = 9.2%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.3%
+L/2	acc = 9.8%		acc_long = 2.1%		acc_med = 4.4%		acc_short = 36.2%
+L/5	acc = 10.7%		acc_long = 2.1%		acc_med = 4.4%		acc_short = 36.7%
+L/10	acc = 11.4%		acc_long = 2.3%		acc_med = 4.4%		acc_short = 37.2%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:57:28 2018
+Logging took 19.0 seconds
+Epoch took 138.8 seconds
+********************************************************************************
+Epoch	18/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 104.5 seconds at 18.2 examples per second
+Validation took 13.2 seconds
+Protein metric 1 took 4.38s
+Protein metric 2 took 4.33s
+Protein metric 5 took 4.25s
+Protein metric 10 took 4.23s
+ITERATION 541.0
+	     train_loss = 0.132
+L/1	acc = 9.3%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.5%
+L/2	acc = 9.7%		acc_long = 2.1%		acc_med = 4.4%		acc_short = 36.5%
+L/5	acc = 10.6%		acc_long = 2.1%		acc_med = 4.4%		acc_short = 36.9%
+L/10	acc = 11.0%		acc_long = 2.4%		acc_med = 4.4%		acc_short = 37.5%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:57:01 2018
+Logging took 19.1 seconds
+Epoch took 136.8 seconds
+********************************************************************************
+Epoch	19/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 104.8 seconds at 18.1 examples per second
+Validation took 12.9 seconds
+Protein metric 1 took 4.45s
+Protein metric 2 took 4.38s
+Protein metric 5 took 4.36s
+Protein metric 10 took 4.30s
+ITERATION 571.0
+	     train_loss = 0.132
+L/1	acc = 9.7%		acc_long = 2.1%		acc_med = 4.2%		acc_short = 35.8%
+L/2	acc = 10.0%		acc_long = 2.2%		acc_med = 4.5%		acc_short = 36.8%
+L/5	acc = 10.9%		acc_long = 2.3%		acc_med = 4.4%		acc_short = 37.5%
+L/10	acc = 11.1%		acc_long = 2.5%		acc_med = 4.5%		acc_short = 37.7%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:56:42 2018
+Logging took 19.4 seconds
+Epoch took 137.2 seconds
+********************************************************************************
+Epoch	20/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.6 seconds at 17.8 examples per second
+Validation took 13.1 seconds
+Protein metric 1 took 4.35s
+Protein metric 2 took 4.41s
+Protein metric 5 took 4.37s
+Protein metric 10 took 4.34s
+ITERATION 601.0
+	     train_loss = 0.132
+L/1	acc = 10.0%		acc_long = 2.2%		acc_med = 4.3%		acc_short = 36.4%
+L/2	acc = 10.4%		acc_long = 2.4%		acc_med = 4.5%		acc_short = 37.2%
+L/5	acc = 11.4%		acc_long = 2.4%		acc_med = 4.6%		acc_short = 37.6%
+L/10	acc = 11.9%		acc_long = 2.6%		acc_med = 5.0%		acc_short = 37.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:56:30 2018
+Logging took 19.4 seconds
+Epoch took 139.1 seconds
+********************************************************************************
+Epoch	21/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 104.4 seconds at 18.2 examples per second
+Validation took 13.1 seconds
+Protein metric 1 took 4.43s
+Protein metric 2 took 4.39s
+Protein metric 5 took 4.43s
+Protein metric 10 took 4.39s
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+ITERATION 631.0
+	     train_loss = 0.132
+L/1	acc = 10.4%		acc_long = 2.2%		acc_med = 4.5%		acc_short = 37.3%
+L/2	acc = 10.7%		acc_long = 2.3%		acc_med = 4.7%		acc_short = 38.2%
+L/5	acc = 11.7%		acc_long = 2.4%		acc_med = 4.9%		acc_short = 38.5%
+L/10	acc = 12.2%		acc_long = 2.5%		acc_med = 5.0%		acc_short = 39.5%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:56:07 2018
+Logging took 25.0 seconds
+Epoch took 142.5 seconds
+********************************************************************************
+Epoch	22/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.1 seconds at 18.1 examples per second
+Validation took 13.3 seconds
+Protein metric 1 took 4.28s
+Protein metric 2 took 4.26s
+Protein metric 5 took 4.34s
+Protein metric 10 took 4.38s
+ITERATION 661.0
+	     train_loss = 0.132
+L/1	acc = 9.4%		acc_long = 2.1%		acc_med = 4.2%		acc_short = 35.6%
+L/2	acc = 9.8%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.5%
+L/5	acc = 10.7%		acc_long = 2.2%		acc_med = 4.6%		acc_short = 37.0%
+L/10	acc = 11.0%		acc_long = 2.4%		acc_med = 4.6%		acc_short = 37.4%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:55:55 2018
+Logging took 19.0 seconds
+Epoch took 137.5 seconds
+********************************************************************************
+Epoch	23/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 104.4 seconds at 18.2 examples per second
+Validation took 13.5 seconds
+Protein metric 1 took 4.35s
+Protein metric 2 took 4.25s
+Protein metric 5 took 4.27s
+Protein metric 10 took 4.27s
+ITERATION 691.0
+	     train_loss = 0.132
+L/1	acc = 9.4%		acc_long = 2.1%		acc_med = 4.2%		acc_short = 35.6%
+L/2	acc = 9.7%		acc_long = 2.2%		acc_med = 4.4%		acc_short = 36.4%
+L/5	acc = 10.8%		acc_long = 2.2%		acc_med = 4.5%		acc_short = 37.0%
+L/10	acc = 11.0%		acc_long = 2.5%		acc_med = 4.7%		acc_short = 37.4%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:55:40 2018
+Logging took 18.9 seconds
+Epoch took 136.8 seconds
+********************************************************************************
+Epoch	24/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.6 seconds at 18.0 examples per second
+Validation took 13.7 seconds
+Protein metric 1 took 4.40s
+Protein metric 2 took 4.38s
+Protein metric 5 took 4.30s
+Protein metric 10 took 4.28s
+ITERATION 721.0
+	     train_loss = 0.132
+L/1	acc = 9.6%		acc_long = 2.2%		acc_med = 4.2%		acc_short = 35.9%
+L/2	acc = 10.1%		acc_long = 2.3%		acc_med = 4.2%		acc_short = 36.4%
+L/5	acc = 10.8%		acc_long = 2.4%		acc_med = 4.2%		acc_short = 36.7%
+L/10	acc = 11.1%		acc_long = 2.6%		acc_med = 4.4%		acc_short = 37.3%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:55:31 2018
+Logging took 19.1 seconds
+Epoch took 138.4 seconds
+********************************************************************************
+Epoch	25/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.6 seconds at 18.0 examples per second
+Validation took 13.1 seconds
+Protein metric 1 took 4.44s
+Protein metric 2 took 4.35s
+Protein metric 5 took 4.35s
+Protein metric 10 took 4.33s
+ITERATION 751.0
+	     train_loss = 0.132
+L/1	acc = 9.5%		acc_long = 2.2%		acc_med = 4.2%		acc_short = 36.0%
+L/2	acc = 9.7%		acc_long = 2.3%		acc_med = 4.4%		acc_short = 36.2%
+L/5	acc = 10.7%		acc_long = 2.3%		acc_med = 4.2%		acc_short = 36.8%
+L/10	acc = 11.4%		acc_long = 2.5%		acc_med = 4.1%		acc_short = 36.8%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:55:20 2018
+Logging took 19.3 seconds
+Epoch took 138.1 seconds
+********************************************************************************
+Epoch	26/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.3 seconds at 17.9 examples per second
+Validation took 13.1 seconds
+Protein metric 1 took 4.39s
+Protein metric 2 took 4.44s
+Protein metric 5 took 4.37s
+Protein metric 10 took 4.36s
+ITERATION 781.0
+	     train_loss = 0.132
+L/1	acc = 9.5%		acc_long = 2.3%		acc_med = 4.3%		acc_short = 36.2%
+L/2	acc = 9.8%		acc_long = 2.5%		acc_med = 4.4%		acc_short = 36.4%
+L/5	acc = 10.6%		acc_long = 2.6%		acc_med = 4.6%		acc_short = 36.6%
+L/10	acc = 10.9%		acc_long = 2.9%		acc_med = 4.8%		acc_short = 37.4%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:55:11 2018
+Logging took 19.4 seconds
+Epoch took 138.9 seconds
+********************************************************************************
+Epoch	27/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 104.3 seconds at 18.2 examples per second
+Validation took 13.3 seconds
+Protein metric 1 took 4.43s
+Protein metric 2 took 4.40s
+Protein metric 5 took 4.46s
+Protein metric 10 took 4.37s
+ITERATION 811.0
+	     train_loss = 0.132
+L/1	acc = 9.7%		acc_long = 2.3%		acc_med = 4.3%		acc_short = 36.3%
+L/2	acc = 9.8%		acc_long = 2.4%		acc_med = 4.4%		acc_short = 36.8%
+L/5	acc = 10.5%		acc_long = 2.5%		acc_med = 4.6%		acc_short = 37.0%
+L/10	acc = 11.6%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 37.6%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:54:56 2018
+Logging took 19.4 seconds
+Epoch took 137.1 seconds
+********************************************************************************
+Epoch	28/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.9 seconds at 17.9 examples per second
+Validation took 13.8 seconds
+Protein metric 1 took 4.33s
+Protein metric 2 took 4.24s
+Protein metric 5 took 4.20s
+Protein metric 10 took 4.31s
+ITERATION 841.0
+	     train_loss = 0.132
+L/1	acc = 9.3%		acc_long = 2.0%		acc_med = 4.2%		acc_short = 35.3%
+L/2	acc = 9.5%		acc_long = 2.1%		acc_med = 4.4%		acc_short = 35.9%
+L/5	acc = 10.3%		acc_long = 2.0%		acc_med = 4.6%		acc_short = 36.6%
+L/10	acc = 10.6%		acc_long = 2.3%		acc_med = 4.7%		acc_short = 37.0%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:54:51 2018
+Logging took 18.9 seconds
+Epoch took 138.6 seconds
+********************************************************************************
+Epoch	29/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.4 seconds at 18.0 examples per second
+Validation took 13.3 seconds
+Protein metric 1 took 4.45s
+Protein metric 2 took 4.38s
+Protein metric 5 took 4.24s
+Protein metric 10 took 4.25s
+ITERATION 871.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.8%		acc_long = 2.3%		acc_med = 4.6%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:54:42 2018
+Logging took 19.1 seconds
+Epoch took 137.8 seconds
+********************************************************************************
+Epoch	30/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.6 seconds at 17.8 examples per second
+Validation took 13.2 seconds
+Protein metric 1 took 4.43s
+Protein metric 2 took 4.39s
+Protein metric 5 took 4.39s
+Protein metric 10 took 4.23s
+ITERATION 901.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.6%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:54:37 2018
+Logging took 19.3 seconds
+Epoch took 139.2 seconds
+********************************************************************************
+Epoch	31/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 107.2 seconds at 17.7 examples per second
+Validation took 13.2 seconds
+Protein metric 1 took 4.52s
+Protein metric 2 took 4.38s
+Protein metric 5 took 4.40s
+Protein metric 10 took 4.31s
+ITERATION 931.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.1%
+L/10	acc = 11.0%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:54:31 2018
+Logging took 19.4 seconds
+Epoch took 139.9 seconds
+********************************************************************************
+Epoch	32/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.3 seconds at 17.9 examples per second
+Validation took 13.3 seconds
+Protein metric 1 took 4.43s
+Protein metric 2 took 4.44s
+Protein metric 5 took 4.39s
+Protein metric 10 took 4.39s
+ITERATION 961.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.6%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00700000
+            eta = Sun Apr 15 12:54:22 2018
+Logging took 19.5 seconds
+Epoch took 139.1 seconds
+********************************************************************************
+Epoch	33/64
+lr = 0.00700000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 107.9 seconds at 17.6 examples per second
+Validation took 13.3 seconds
+Protein metric 1 took 4.40s
+Protein metric 2 took 4.42s
+Protein metric 5 took 4.39s
+Protein metric 10 took 4.40s
+ITERATION 991.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:54:19 2018
+Logging took 19.4 seconds
+Epoch took 140.7 seconds
+********************************************************************************
+Epoch	34/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 107.3 seconds at 17.7 examples per second
+Validation took 13.2 seconds
+Protein metric 1 took 4.43s
+Protein metric 2 took 4.40s
+Protein metric 5 took 4.44s
+Protein metric 10 took 4.37s
+ITERATION 1021.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.6%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:54:11 2018
+Logging took 19.5 seconds
+Epoch took 140.1 seconds
+********************************************************************************
+Epoch	35/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.8 seconds at 17.8 examples per second
+Validation took 13.7 seconds
+Protein metric 1 took 4.31s
+Protein metric 2 took 4.25s
+Protein metric 5 took 4.25s
+Protein metric 10 took 4.35s
+ITERATION 1051.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:54:05 2018
+Logging took 19.1 seconds
+Epoch took 139.7 seconds
+********************************************************************************
+Epoch	36/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.5 seconds at 17.8 examples per second
+Validation took 13.5 seconds
+Protein metric 1 took 4.43s
+Protein metric 2 took 4.27s
+Protein metric 5 took 4.26s
+Protein metric 10 took 4.28s
+ITERATION 1081.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:53:59 2018
+Logging took 19.2 seconds
+Epoch took 139.2 seconds
+********************************************************************************
+Epoch	37/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 107.2 seconds at 17.7 examples per second
+Validation took 13.6 seconds
+Protein metric 1 took 4.44s
+Protein metric 2 took 4.35s
+Protein metric 5 took 4.25s
+Protein metric 10 took 4.22s
+ITERATION 1111.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:53:55 2018
+Logging took 19.1 seconds
+Epoch took 140.0 seconds
+********************************************************************************
+Epoch	38/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.8 seconds at 17.8 examples per second
+Validation took 13.2 seconds
+Protein metric 1 took 4.44s
+Protein metric 2 took 4.40s
+Protein metric 5 took 4.41s
+Protein metric 10 took 4.26s
+ITERATION 1141.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:53:49 2018
+Logging took 19.4 seconds
+Epoch took 139.5 seconds
+********************************************************************************
+Epoch	39/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.4 seconds at 17.9 examples per second
+Validation took 13.2 seconds
+Protein metric 1 took 4.41s
+Protein metric 2 took 4.45s
+Protein metric 5 took 4.39s
+Protein metric 10 took 4.39s
+ITERATION 1171.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:53:44 2018
+Logging took 19.5 seconds
+Epoch took 139.1 seconds
+********************************************************************************
+Epoch	40/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 108.1 seconds at 17.6 examples per second
+Validation took 13.1 seconds
+Protein metric 1 took 4.40s
+Protein metric 2 took 4.34s
+Protein metric 5 took 4.42s
+Protein metric 10 took 4.39s
+ITERATION 1201.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:53:42 2018
+Logging took 19.5 seconds
+Epoch took 140.8 seconds
+********************************************************************************
+Epoch	41/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 107.3 seconds at 17.7 examples per second
+Validation took 13.4 seconds
+Protein metric 1 took 4.42s
+Protein metric 2 took 4.39s
+Protein metric 5 took 4.45s
+Protein metric 10 took 4.37s
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+ITERATION 1231.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:53:37 2018
+Logging took 25.1 seconds
+Epoch took 145.9 seconds
+********************************************************************************
+Epoch	42/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.3 seconds at 18.0 examples per second
+Validation took 13.3 seconds
+Protein metric 1 took 4.37s
+Protein metric 2 took 4.33s
+Protein metric 5 took 4.39s
+Protein metric 10 took 4.41s
+ITERATION 1261.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:53:30 2018
+Logging took 19.3 seconds
+Epoch took 137.9 seconds
+********************************************************************************
+Epoch	43/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.9 seconds at 17.8 examples per second
+Validation took 13.8 seconds
+Protein metric 1 took 4.34s
+Protein metric 2 took 4.29s
+Protein metric 5 took 4.26s
+Protein metric 10 took 4.38s
+ITERATION 1291.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:53:28 2018
+Logging took 19.0 seconds
+Epoch took 139.7 seconds
+********************************************************************************
+Epoch	44/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.3 seconds at 17.9 examples per second
+Validation took 13.6 seconds
+Protein metric 1 took 4.45s
+Protein metric 2 took 4.31s
+Protein metric 5 took 4.24s
+Protein metric 10 took 4.23s
+ITERATION 1321.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:53:24 2018
+Logging took 18.9 seconds
+Epoch took 138.8 seconds
+********************************************************************************
+Epoch	45/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.7 seconds at 18.0 examples per second
+Validation took 13.6 seconds
+Protein metric 1 took 4.44s
+Protein metric 2 took 4.42s
+Protein metric 5 took 4.30s
+Protein metric 10 took 4.22s
+ITERATION 1351.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:53:20 2018
+Logging took 19.6 seconds
+Epoch took 139.0 seconds
+********************************************************************************
+Epoch	46/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.7 seconds at 17.8 examples per second
+Validation took 13.2 seconds
+Protein metric 1 took 4.48s
+Protein metric 2 took 4.42s
+Protein metric 5 took 4.38s
+Protein metric 10 took 4.31s
+ITERATION 1381.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:53:18 2018
+Logging took 19.4 seconds
+Epoch took 139.3 seconds
+********************************************************************************
+Epoch	47/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 107.1 seconds at 17.7 examples per second
+Validation took 13.1 seconds
+Protein metric 1 took 4.42s
+Protein metric 2 took 4.46s
+Protein metric 5 took 4.39s
+Protein metric 10 took 4.39s
+ITERATION 1411.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:53:15 2018
+Logging took 21.6 seconds
+Epoch took 141.8 seconds
+********************************************************************************
+Epoch	48/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.7 seconds at 18.0 examples per second
+Validation took 13.1 seconds
+Protein metric 1 took 4.35s
+Protein metric 2 took 4.34s
+Protein metric 5 took 4.37s
+Protein metric 10 took 4.38s
+ITERATION 1441.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00490000
+            eta = Sun Apr 15 12:53:10 2018
+Logging took 19.2 seconds
+Epoch took 138.0 seconds
+********************************************************************************
+Epoch	49/64
+lr = 0.00490000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.9 seconds at 17.8 examples per second
+Validation took 13.2 seconds
+Protein metric 1 took 4.44s
+Protein metric 2 took 4.37s
+Protein metric 5 took 4.47s
+Protein metric 10 took 4.40s
+ITERATION 1471.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:53:09 2018
+Logging took 19.5 seconds
+Epoch took 139.7 seconds
+********************************************************************************
+Epoch	50/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.9 seconds at 17.8 examples per second
+Validation took 13.7 seconds
+Protein metric 1 took 4.34s
+Protein metric 2 took 4.21s
+Protein metric 5 took 4.23s
+Protein metric 10 took 4.38s
+ITERATION 1501.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:53:06 2018
+Logging took 19.0 seconds
+Epoch took 139.6 seconds
+********************************************************************************
+Epoch	51/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 107.1 seconds at 17.7 examples per second
+Validation took 13.5 seconds
+Protein metric 1 took 4.42s
+Protein metric 2 took 4.27s
+Protein metric 5 took 4.21s
+Protein metric 10 took 4.23s
+ITERATION 1531.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:53:04 2018
+Logging took 19.0 seconds
+Epoch took 139.6 seconds
+********************************************************************************
+Epoch	52/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 107.2 seconds at 17.7 examples per second
+Validation took 13.6 seconds
+Protein metric 1 took 4.44s
+Protein metric 2 took 4.41s
+Protein metric 5 took 4.25s
+Protein metric 10 took 4.25s
+ITERATION 1561.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:53:01 2018
+Logging took 19.2 seconds
+Epoch took 140.1 seconds
+********************************************************************************
+Epoch	53/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 107.6 seconds at 17.6 examples per second
+Validation took 13.4 seconds
+Protein metric 1 took 4.42s
+Protein metric 2 took 4.40s
+Protein metric 5 took 4.38s
+Protein metric 10 took 4.21s
+ITERATION 1591.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:52:59 2018
+Logging took 19.2 seconds
+Epoch took 140.2 seconds
+********************************************************************************
+Epoch	54/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 107.3 seconds at 17.7 examples per second
+Validation took 13.2 seconds
+Protein metric 1 took 4.47s
+Protein metric 2 took 4.40s
+Protein metric 5 took 4.40s
+Protein metric 10 took 4.32s
+ITERATION 1621.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:52:56 2018
+Logging took 19.4 seconds
+Epoch took 139.9 seconds
+********************************************************************************
+Epoch	55/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.5 seconds at 17.8 examples per second
+Validation took 13.3 seconds
+Protein metric 1 took 4.42s
+Protein metric 2 took 4.44s
+Protein metric 5 took 4.40s
+Protein metric 10 took 4.38s
+ITERATION 1651.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:52:53 2018
+Logging took 19.4 seconds
+Epoch took 139.4 seconds
+********************************************************************************
+Epoch	56/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 107.8 seconds at 17.6 examples per second
+Validation took 13.2 seconds
+Protein metric 1 took 4.41s
+Protein metric 2 took 4.43s
+Protein metric 5 took 4.42s
+Protein metric 10 took 4.38s
+ITERATION 1681.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:52:52 2018
+Logging took 19.6 seconds
+Epoch took 140.6 seconds
+********************************************************************************
+Epoch	57/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.8 seconds at 17.8 examples per second
+Validation took 13.2 seconds
+Protein metric 1 took 4.44s
+Protein metric 2 took 4.41s
+Protein metric 5 took 4.45s
+Protein metric 10 took 4.37s
+ITERATION 1711.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:52:49 2018
+Logging took 19.5 seconds
+Epoch took 139.6 seconds
+********************************************************************************
+Epoch	58/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.9 seconds at 17.8 examples per second
+Validation took 13.8 seconds
+Protein metric 1 took 4.32s
+Protein metric 2 took 4.26s
+Protein metric 5 took 4.25s
+Protein metric 10 took 4.37s
+ITERATION 1741.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:52:47 2018
+Logging took 19.0 seconds
+Epoch took 139.7 seconds
+********************************************************************************
+Epoch	59/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.7 seconds at 17.8 examples per second
+Validation took 13.6 seconds
+Protein metric 1 took 4.45s
+Protein metric 2 took 4.27s
+Protein metric 5 took 4.23s
+Protein metric 10 took 4.23s
+ITERATION 1771.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:52:45 2018
+Logging took 19.1 seconds
+Epoch took 139.5 seconds
+********************************************************************************
+Epoch	60/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 106.3 seconds at 17.9 examples per second
+Validation took 13.6 seconds
+Protein metric 1 took 4.46s
+Protein metric 2 took 4.41s
+Protein metric 5 took 4.33s
+Protein metric 10 took 4.25s
+ITERATION 1801.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:52:43 2018
+Logging took 19.3 seconds
+Epoch took 139.2 seconds
+********************************************************************************
+Epoch	61/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.9 seconds at 17.9 examples per second
+Validation took 13.1 seconds
+Protein metric 1 took 4.48s
+Protein metric 2 took 4.42s
+Protein metric 5 took 4.41s
+Protein metric 10 took 4.30s
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+Assigning font /b'F1' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+Assigning font /b'F2' = '/home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf'
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf.
+Writing TrueType font.
+Embedding font /home/ih692/anaconda3/envs/jets/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf.
+Writing TrueType font.
+ITERATION 1831.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:52:40 2018
+Logging took 25.0 seconds
+Epoch took 144.0 seconds
+********************************************************************************
+Epoch	62/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 105.5 seconds at 18.0 examples per second
+Validation took 12.9 seconds
+Protein metric 1 took 4.46s
+Protein metric 2 took 4.41s
+Protein metric 5 took 4.38s
+Protein metric 10 took 4.33s
+ITERATION 1861.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:52:38 2018
+Logging took 19.4 seconds
+Epoch took 137.9 seconds
+********************************************************************************
+Epoch	63/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 107.4 seconds at 17.7 examples per second
+Validation took 13.2 seconds
+Protein metric 1 took 4.33s
+Protein metric 2 took 4.46s
+Protein metric 5 took 4.42s
+Protein metric 10 took 4.40s
+ITERATION 1891.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:52:38 2018
+Logging took 19.5 seconds
+Epoch took 140.1 seconds
+********************************************************************************
+Epoch	64/64
+lr = 0.00343000
+GPU: 12523/22919MiB	54.6% used
+Training 30 batches took 107.3 seconds at 17.7 examples per second
+Validation took 13.2 seconds
+Protein metric 1 took 4.32s
+Protein metric 2 took 4.35s
+Protein metric 5 took 4.40s
+Protein metric 10 took 4.38s
+ITERATION 1921.0
+	     train_loss = 0.132
+L/1	acc = 9.1%		acc_long = 2.0%		acc_med = 4.1%		acc_short = 35.2%
+L/2	acc = 9.4%		acc_long = 2.0%		acc_med = 4.4%		acc_short = 35.7%
+L/5	acc = 10.5%		acc_long = 2.1%		acc_med = 4.5%		acc_short = 36.2%
+L/10	acc = 10.9%		acc_long = 2.3%		acc_med = 4.5%		acc_short = 36.9%
+
+	          hours = 0.03
+	     valid_loss = 0.133
+	best_valid_loss = 0.132
+	             lr = 0.00343000
+            eta = Sun Apr 15 12:52:37 2018
+Logging took 19.3 seconds
+Epoch took 139.9 seconds
+********************************************************************************
+COMPLETED on Apr-15 at 15:20:01
+Moved model directory to ./models/finished/protein/g/5526070/1

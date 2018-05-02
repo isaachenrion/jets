@@ -40,7 +40,7 @@ def load_jets(data_dir, filename, do_preprocessing=False):
 
         logging.warning("Preprocessing...")
 
-        preprocess_fn(raw_data_dir, preprocessed_dir, filename)
+        preprocess(raw_data_dir, preprocessed_dir, filename)
 
         logging.warning("Preprocessed the data and saved it to {}".format(path_to_preprocessed))
     else:
@@ -98,7 +98,7 @@ def test_dataset(data_dir, dataset, n_test, preprocess):
     data_dir = os.path.join(data_dir, intermediate_dir)
 
     logging.warning("Loading test data...")
-    filename = "{}-test.pickle".format(filename)
+    filename = "{}-train.pickle".format(filename)
     jets = load_jets(data_dir, filename, preprocess)
     jets = jets[:n_test]
 

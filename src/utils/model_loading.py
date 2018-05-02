@@ -39,4 +39,8 @@ def load_model(model_dict, filename, **kwargs):
     settings = load_settings(filename)
     model = build_model_from_kwargs(model_dict, settings['model_kwargs'], **kwargs)
     load_model_state_dict(model, filename)
+    if torch.cuda.is_available():
+        logging.info("Moving model to GPU")
+        model.cuda()
+        logging.info("Moved model to GPU")
     return model, settings

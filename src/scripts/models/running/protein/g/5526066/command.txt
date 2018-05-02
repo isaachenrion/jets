@@ -1,0 +1,12 @@
+--iters 2
+--hidden 32
+--lr .001
+--batch_size 64
+-n 2000
+--data_dir /scratch/ih692/data
+--experiment_time 8
+--models_dir ./models
+--slurm
+--gpu 0
+--slurm_array_job_id 5526066
+--slurm_array_task_id 1
