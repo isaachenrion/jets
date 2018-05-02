@@ -46,6 +46,7 @@ class DataLoader(DL):
 
     def batch_leaves(self,x_list):
         x_list = list(map(lambda x: torch.tensor(x.constituents, device='cuda' if torch.cuda.is_available() else 'cpu'), x_list))
+        print(x_list[0].device)
         dropout_masks = get_dropout_masks(x_list, self.dropout)
         x_list = [x.masked_select(dm.unsqueeze(1)).view(-1, x.shape[1]) for x, dm in zip(x_list, dropout_masks)]
 
