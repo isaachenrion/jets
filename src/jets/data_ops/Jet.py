@@ -28,7 +28,7 @@ class Jet:
         self.progenitor = progenitor
         self.tree = tree
         self.root_id = root_id
-        self.tree_content = tree_content
+        self.tree_content = tree_content.astype('float32')
         #self.tree_content = extract_four_vectors(tree_content).astype(np.float32)
         self.binary_tree = binary_tree
         #import ipdb; ipdb.set_trace()
@@ -132,7 +132,7 @@ class BinaryTree:
         return self._depth
 
     def to_tensor(self):
-        tree = BinaryTree(torch.tensor(self.data).unsqueeze(0))
+        tree = BinaryTree(torch.tensor(self.data).unsqueeze(0)).float()
         if self.left is not None:
             tree.add_left(self.left.to_tensor())
         if self.right is not None:
