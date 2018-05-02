@@ -96,9 +96,12 @@ def test_dataset(data_dir, dataset, n_test, preprocess):
 
     intermediate_dir, filename = DATASETS[dataset]
     data_dir = os.path.join(data_dir, intermediate_dir)
+    problem = data_dir.split('/')[-1]
+    subproblem = filename
+
 
     logging.warning("Loading test data...")
-    filename = "{}-train.pickle".format(filename)
+    filename = "{}-test.pickle".format(filename)
     jets = load_jets(data_dir, filename, preprocess)
     jets = jets[:n_test]
 
