@@ -98,22 +98,22 @@ def main(sysargvlist=None):
     parser.add_argument("--dropout", type=float, default=0.)
 
     # Classifier
-    parser.add_argument("--predict", type=str, default='simple', help='type of prediction layer')
+    #parser.add_argument("--predict", type=str, default='simple', help='type of prediction layer')
 
     # Transform
     parser.add_argument("-m", "--model", type=str, default="nmp", help="name of the model you want to train")
 
     # NMP
     parser.add_argument("-i", "--iters", type=int, default=8)
-    parser.add_argument("--mp", type=str, default='m2', help='type of message passing layer')
+    #parser.add_argument("--mp", type=str, default='m2', help='type of message passing layer')
     parser.add_argument("-u", "--update", type=str, default='gru', help='type of vertex update')
-    parser.add_argument("--message", type=str, default='2', help='type of message')
+    #parser.add_argument("--message", type=str, default='2', help='type of message')
     parser.add_argument("--emb_init", type=str, default='1', help='type of message')
     parser.add_argument("-a","--adj", type=str, nargs='+', default='phy', help='type of matrix layer')
     parser.add_argument("--asym", action='store_true', default=False)
-    parser.add_argument("--readout", type=str, default='dtnn', help='type of readout layer')
-    parser.add_argument("--m_act", type=str, default='sigmoid', help='type of nonlinearity for matrices' )
-    parser.add_argument("--wn", action='store_true')
+    #parser.add_argument("--readout", type=str, default='dtnn', help='type of readout layer')
+    parser.add_argument("--m_act", type=str, default='soft', help='type of nonlinearity for matrices' )
+    parser.add_argument("--ln", action='store_true')
 
     # Stack NMP
     parser.add_argument("--pool_first", action='store_true', default=False)

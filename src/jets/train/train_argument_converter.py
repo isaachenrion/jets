@@ -105,7 +105,7 @@ def get_model_kwargs(args):
         'act': args.act,
 
         # classifier on top
-        'predict':args.predict,
+        #'predict':args.predict,
 
         # jet transform
         'model':args.model,
@@ -113,14 +113,14 @@ def get_model_kwargs(args):
         # NMP
         'iters': args.iters,
         'update': args.update,
-        'message': args.message,
+        #'message': args.message,
         'emb_init':args.emb_init,
-        'mp_layer':args.mp,
+        #'mp_layer':args.mp,
         'symmetric':not args.asym,
-        'readout':args.readout,
+        #'readout':args.readout,
         'matrix':args.adj[0] if len(args.adj) == 1 else args.adj,
         'm_act':args.m_act,
-        'wn': args.wn,
+        'ln': args.ln,
 
         # Stacked NMP
         'scales': args.scales,

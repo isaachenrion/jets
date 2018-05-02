@@ -17,7 +17,7 @@ class MessagePassingBlock(nn.Module):
         m['d1'] = nn.Dropout(dropout)
         m['fc1'] = nn.Linear(hidden, hidden)
         m['relu1'] = nn.ReLU(inplace=True)
-        m['ln1'] = nn.LayerNorm(hidden)
+        #m['ln1'] = nn.LayerNorm(hidden)
         self.message = nn.Sequential(m)
 
         self.vertex_update = VERTEX_UPDATES[update](hidden, hidden)
@@ -48,14 +48,6 @@ class FixedNMP(nn.Module):
         emb_kwargs = {x: kwargs.get(x, None) for x in ['act', 'wn']}
         self.embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, n_layers=int(emb_init), **emb_kwargs)
 
-        #mp_kwargs = {x: kwargs.get(x, None) for x in ['act', 'wn', 'update', 'message', 'dropout']}
-        #MPLayer = MP_LAYERS['m1']
-        #if tied:
-        #    mp = MPLayer(hidden=hidden,**mp_kwargs)
-        #    self.mp_blocks = nn.ModuleList([mp for _ in range(iters)])
-        #else:
-        #    self.mp_blocks = nn.ModuleList([MPLayer(hidden=hidden,**mp_kwargs) for _ in range(iters)])
-
         if tied:
             mp_block = MessagePassingBlock(hidden, update, dropout)
             self.mp_blocks = nn.ModuleList([mp_block for _ in range(iters)])
@@ -70,11 +62,11 @@ class FixedNMP(nn.Module):
         m['d1'] = nn.Dropout(kwargs.get('dropout', 0))
         m['fc1'] = nn.Linear(hidden, hidden)
         m['relu1'] = nn.ReLU(inplace=True)
-        m['ln1'] = nn.LayerNorm(hidden)
+        #m['ln1'] = nn.LayerNorm(hidden)
         m['d2'] = nn.Dropout(kwargs.get('dropout', 0))
         m['fc2'] = nn.Linear(hidden, hidden)
         m['relu2'] = nn.ReLU(inplace=True)
-        m['ln2'] = nn.LayerNorm(hidden)
+        #m['ln2'] = nn.LayerNorm(hidden)
         m['fc3'] = nn.Linear(hidden, 1)
         self.readout = nn.Sequential(m)
 
