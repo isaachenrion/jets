@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader as DL
 from src.data_ops.pad_tensors import pad_tensors_extra_channel
 from src.data_ops.dropout import get_dropout_masks
 
-
+from .extract_four_vectors import extract_four_vectors
 
 class DataLoader(DL):
     def __init__(self, dataset, batch_size,leaves=True, dropout=None, permute_particles=False,**kwargs):
@@ -72,6 +72,7 @@ class DataLoader(DL):
         #
         # jet_contents: array of shape [n_nodes, n_features]
         #     jet_contents[node_id] is the feature vector of node_id
+
         jet_children = []
         n_jets = len(jets)
         offset = 0
@@ -84,7 +85,8 @@ class DataLoader(DL):
             offset += len(tree)
 
         jet_children = np.vstack(jet_children)
-        jet_contents = torch.cat([torch.tensor(jet.tree_content).float() for jet in jets], 0)
+        jet_contents = torch.cat([torch.tensor(extract_four_vectors(jet.tree_content), dtype=torch.float32) for jet in jets], 0)
+        #jet_contents = torch.cat([torch.tensor(jet.tree_content).float() for jet in jets], 0)
         #import ipdb; ipdb.set_trace()
         n_nodes = offset
 

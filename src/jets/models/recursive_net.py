@@ -13,10 +13,11 @@ class RecursiveSimple(nn.Module):
 
         self.fc_u = nn.Linear(features, hidden)
         self.fc_h = nn.Linear(3 * hidden, hidden)
+        self.fc_predict = nn.Linear(hidden, 1)
 
         gain = nn.init.calculate_gain(activation_string)
         nn.init.xavier_uniform_(self.fc_u.weight, gain=gain)
-        nn.init.orthogonal(self.fc_h.weight, gain=gain)
+        nn.init.orthogonal_(self.fc_h.weight, gain=gain)
 
 
     def forward(self, jets, **kwargs):
@@ -45,7 +46,7 @@ class RecursiveSimple(nn.Module):
 
             if len(inner) > 0:
                 zero = torch.zeros(1).long(); one = torch.ones(1).long()
-                if torch.cuda.is_available(): zero = zero.cuda(); one = one.cuda()
+                #if torch.cuda.is_available(): zero = zero.cuda(); one = one.cuda()
                 h_L = embeddings[-1][children[inner, zero]]
                 h_R = embeddings[-1][children[inner, one]]
 
@@ -61,7 +62,9 @@ class RecursiveSimple(nn.Module):
             else:
                 embeddings.append(u_k)
 
-        return embeddings[-1].view((n_jets, -1))
+        #import ipdb; ipdb.set_trace()
+        tree_embedding = embeddings[-1].view((n_jets, -1))
+        return self.fc_predict(tree_embedding).squeeze(-1)
 
 
 class GRNNTransformGated(nn.Module):
@@ -96,6 +99,7 @@ class GRNNTransformGated(nn.Module):
 
         self.recursive_embedding(up_embeddings, levels, children, n_inners, contents)
 
+        #import ipdb; ipdb.set_trace()
         return up_embeddings[0].view((n_jets, -1))
 
 
