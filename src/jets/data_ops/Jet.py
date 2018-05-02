@@ -1,4 +1,7 @@
 
+import numpy as np
+import torch
+from .extract_four_vectors import extract_four_vectors
 class Jet:
     def __init__(
             self,
@@ -12,6 +15,7 @@ class Jet:
             tree=None,
             root_id=None,
             tree_content=None,
+            binary_tree=None,
             **kwargs
             ):
 
@@ -25,11 +29,129 @@ class Jet:
         self.tree = tree
         self.root_id = root_id
         self.tree_content = tree_content
-
+        #self.tree_content = extract_four_vectors(tree_content).astype(np.float32)
+        self.binary_tree = binary_tree
+        #import ipdb; ipdb.set_trace()
 
     def __len__(self):
         return len(self.constituents)
 
+
+def dfs(v, node_ids, tree_content):
+    #marked[v] = True
+    left, right = node_ids[v]
+    if left != -1:
+        assert right != -1
+        tree = Tree(tree_content[v])
+        tree.add_child(dfs(left,node_ids, tree_content))
+        tree.add_child(dfs(right,node_ids, tree_content))
+        return tree
+    leaf = Tree(tree_content[v])
+    return leaf
+
+class Tree:
+    def __init__(self, data):
+
+        self.parent = None
+        self.num_children = 0
+        self.children = list()
+        self.data = data
+
+    def add_child(self, child):
+        child.parent = self
+        self.num_children += 1
+        self.children.append(child)
+
+    def size(self):
+        if getattr(self, '_size'):
+            return self._size
+        count = 1
+        for i in range(self.num_children):
+            count += self.children[i].size()
+        self._size = count
+        return self._size
+
+    def depth(self):
+        if getattr(self, '_depth'):
+            return self._depth
+        count = 0
+        if self.num_children > 0:
+            for i in range(self.num_children):
+                child_depth = self.children[i].depth()
+                if child_depth > count:
+                    count = child_depth
+            count += 1
+        self._depth = count
+        return self._depth
+
+class BinaryTree:
+    def __init__(self, data):
+
+        self.parent = None
+        self.left = None
+        self.right = None
+        self.is_leaf = self.left is None and self.right is None
+        self.data = data
+
+    def add_left(self, child):
+        child.parent = self
+        self.left = child
+
+    def add_right(self, child):
+        child.parent = self
+        self.right = child
+
+    def size(self):
+        if getattr(self, '_size'):
+            return self._size
+        count = 1
+        #for i in range(self.num_children):
+        if self.left is not None:
+            count += self.left.size()
+        if self.right is not None:
+            count += self.right.size()
+        self._size = count
+        return self._size
+
+    def depth(self):
+        if getattr(self, '_depth'):
+            return self._depth
+        count = 0
+        if self.left is not None:
+            #for i in range(self.num_children):
+            left_depth = self.left.depth()
+            if left_depth > count:
+                count = left_depth
+        if self.right is not None:
+            right_depth = self.right.depth()
+            if right_depth > count:
+                count = right_depth
+        if self.right is not None or self.left is not None:
+            count += 1
+        self._depth = count
+        return self._depth
+
+    def to_tensor(self):
+        tree = BinaryTree(torch.tensor(self.data).unsqueeze(0))
+        if self.left is not None:
+            tree.add_left(self.left.to_tensor())
+        if self.right is not None:
+            tree.add_right(self.right.to_tensor())
+        #self._tensor = tree
+        return tree
+
+
+def binary_dfs(v, node_ids, tree_content):
+    #marked[v] = True
+    left, right = node_ids[v]
+    if left != -1:
+        assert right != -1
+        tree = BinaryTree(tree_content[v])
+        tree.add_left(binary_dfs(left,node_ids, tree_content))
+        tree.add_right(binary_dfs(right,node_ids, tree_content))
+        return tree
+    leaf = BinaryTree(tree_content[v])
+    return leaf
 
 class QuarkGluonJet(Jet):
     def __init__(self,

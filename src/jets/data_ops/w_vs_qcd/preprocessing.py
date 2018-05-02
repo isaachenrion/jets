@@ -6,6 +6,7 @@ import numpy as np
 from ..extract_four_vectors import extract_four_vectors
 from ..io import save_jet_dicts_to_pickle
 
+from ..Jet import binary_dfs
 
 def _pt(v):
     pz = v[2]
@@ -74,10 +75,9 @@ def convert_to_jet_dict(x, y):
 
     outers = [node for node in range(len(x['content'])) if x['tree'][node,0] == -1]
     constituents = extract_four_vectors(np.stack([tree_content[i] for i in outers], 0))
-    #constituents = const
-    #tree_content = extract_four_vectors(tree_content)
-    #constituents = np.stack([tree_content[i] for i in outers], 0)
-    #import ipdb; ipdb.set_trace()
+    tree_content = extract_four_vectors(tree_content)
+
+    binary_tree = binary_dfs(root_id, tree, tree_content)
     progenitor = 'w' if y == 1 else 'qcd'
 
     jet_dict = dict(
@@ -90,7 +90,8 @@ def convert_to_jet_dict(x, y):
         y=y,
         tree=tree,
         root_id=root_id,
-        tree_content=tree_content
+        tree_content=tree_content,
+        binary_tree=binary_tree
     )
 
     return jet_dict

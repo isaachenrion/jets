@@ -100,7 +100,9 @@ class GRNNTransformGated(nn.Module):
         self.recursive_embedding(up_embeddings, levels, children, n_inners, contents)
 
         #import ipdb; ipdb.set_trace()
-        return up_embeddings[0].view((n_jets, -1))
+        #return up_embeddings[0].view((n_jets, -1))
+        tree_embedding = up_embeddings[0].view((n_jets, -1))
+        return self.fc_predict(tree_embedding).squeeze(-1)
 
 
     def recursive_embedding(self, up_embeddings, levels, children, n_inners, contents):

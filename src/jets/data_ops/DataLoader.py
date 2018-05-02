@@ -6,7 +6,6 @@ from torch.utils.data import DataLoader as DL
 from src.data_ops.pad_tensors import pad_tensors_extra_channel
 from src.data_ops.dropout import get_dropout_masks
 
-from .extract_four_vectors import extract_four_vectors
 
 class DataLoader(DL):
     def __init__(self, dataset, batch_size,leaves=True, dropout=None, permute_particles=False,**kwargs):
@@ -59,7 +58,11 @@ class DataLoader(DL):
 
         return data, mask
 
-    def batch_trees(self, jets):
+    def batch_trees(self,jets):
+        out = [jet.binary_tree.to_tensor() for jet in jets]
+        return out
+
+    def batch_trees_OLD(self, jets):
         # Batch the recursive activations across all nodes of a same level
         # !!! Assume that jets have at least one inner node.
         #     Leads to off-by-one errors otherwise :(
@@ -85,7 +88,7 @@ class DataLoader(DL):
             offset += len(tree)
 
         jet_children = np.vstack(jet_children)
-        jet_contents = torch.cat([torch.tensor(extract_four_vectors(jet.tree_content), dtype=torch.float32) for jet in jets], 0)
+        jet_contents = torch.cat([torch.tensor(jet.tree_content, dtype=torch.float32) for jet in jets], 0)
         #jet_contents = torch.cat([torch.tensor(jet.tree_content).float() for jet in jets], 0)
         #import ipdb; ipdb.set_trace()
         n_nodes = offset

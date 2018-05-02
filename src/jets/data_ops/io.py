@@ -14,9 +14,10 @@ def load_jet_dicts_from_pickle(filename):
         jet_dicts = pickle.load(f, encoding='latin-1')
 
     return jet_dicts
-    
+
 def load_jets_from_pickle(filename):
     jet_dicts = load_jet_dicts_from_pickle(filename)
+    #jet_dicts = jet_dicts[:1000]
     if 'quark-gluon' in filename:
         JetClass = QuarkGluonJet
     elif 'w-vs-qcd' in filename:
