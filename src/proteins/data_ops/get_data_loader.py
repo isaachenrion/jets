@@ -17,17 +17,17 @@ def load_dataset(filename, n):
     del data
     return dataset
 
-def get_data_loader(filename, n, batch_size):
+def get_data_loader(filename, n, batch_size, **kwargs):
     dataset = load_dataset(filename, n)
-    data_loader = DataLoader(dataset, batch_size)
+    data_loader = DataLoader(dataset, batch_size, **kwargs)
     return data_loader
 
 def get_train_data_loader(data_dir, n_train, n_valid, batch_size, **kwargs):
-    train_data_loader = get_data_loader(os.path.join(data_dir, 'train.pkl'), n_train, batch_size)
-    valid_data_loader = get_data_loader(os.path.join(data_dir, 'valid.pkl'), n_valid, batch_size)
-    dummy_train_data_loader = get_data_loader(os.path.join(data_dir, 'train.pkl'), len(valid_data_loader.dataset), batch_size)
+    train_data_loader = get_data_loader(os.path.join(data_dir, 'train.pkl'), n_train, batch_size, **kwargs)
+    valid_data_loader = get_data_loader(os.path.join(data_dir, 'valid.pkl'), n_valid, batch_size, **kwargs)
+    dummy_train_data_loader = get_data_loader(os.path.join(data_dir, 'train.pkl'), len(valid_data_loader.dataset), batch_size, **kwargs)
     return train_data_loader, valid_data_loader, dummy_train_data_loader
 
 def get_test_data_loader(data_dir, n_test, batch_size, **kwargs):
-    test_data_loader = get_data_loader(os.path.join(data_dir, 'valid.pkl'), n_test, batch_size)
+    test_data_loader = get_data_loader(os.path.join(data_dir, 'valid.pkl'), n_test, batch_size, **kwargs)
     return test_data_loader

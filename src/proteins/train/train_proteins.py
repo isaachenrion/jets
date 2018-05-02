@@ -86,7 +86,7 @@ def main(sysargvlist=None):
     parser.add_argument("-n", "--n_train", type=int, default=-1)
     parser.add_argument("--n_valid", type=int, default=10000)
     parser.add_argument("--dataset", type=str, default='protein')
-    parser.add_argument("--data_dropout", type=float, default=.99)
+    parser.add_argument("--data_dropout", type=float, default=0.0)
     parser.add_argument("--pp", action='store_true', default=False)
     parser.add_argument("--permute_vertices", action='store_true')
     parser.add_argument("--no_cropped", action='store_true')

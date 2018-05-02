@@ -61,7 +61,8 @@ def get_data_loader_kwargs(args):
         data_dir=data_dir,
         n_train=args.n_train,
         n_valid=args.n_valid,
-        batch_size=args.batch_size
+        batch_size=args.batch_size,
+        dropout=args.data_dropout
     )
 
 def get_optim_args(args):
