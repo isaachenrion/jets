@@ -101,7 +101,7 @@ def test_dataset(data_dir, dataset, n_test, preprocess):
 
 
     logging.warning("Loading test data...")
-    filename = "{}-test.pickle".format(filename)
+    filename = "{}-train.pickle".format(filename)
     jets = load_jets(data_dir, filename, preprocess)
     jets = jets[:n_test]
 
