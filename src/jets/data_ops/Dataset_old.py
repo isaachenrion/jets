@@ -4,14 +4,11 @@ import numpy as np
 import math
 
 from sklearn.preprocessing import RobustScaler
-
-
 class Dataset(D):
-    def __init__(self, jets, weights=None,problem=None, subproblem=None):
+    def __init__(self, jets, weights=None, problem=None, subproblem=None):
         super().__init__()
-
         self.jets = jets
-        self.weights = [None for _ in range(len(jets))] if weights is None else weights
+        self.weights = weights
         self.problem = problem
         self.subproblem = subproblem
 
@@ -19,16 +16,21 @@ class Dataset(D):
         return len(self.jets)
 
     def __getitem__(self, idx):
-        return self.jets[idx], self.jets[idx].y, self.weights[idx]
+        return self.jets[idx], self.jets[idx].y
 
     def shuffle(self):
         perm = np.random.permutation(len(self.jets))
         self.jets = [self.jets[i] for i in perm]
-        self.weights = [self.weights[i] for i in perm]
+        #self.y = [self.y[i] for i in perm]
+        if self.weights is not None:
+            self.weights = [self.weights[i] for i in perm]
 
     @property
     def dim(self):
         return self.jets[0].constituents.shape[1]
+
+    def extend(self, dataset):
+        self.jets = self.jets + dataset.jets
 
     @classmethod
     def concatenate(cls, dataset1, dataset2):
@@ -54,6 +56,3 @@ class Dataset(D):
         for i, jet in enumerate(self.jets):
             jet.constituents = tf(jet.constituents)
             self.jets[i] = jet
-
-    def extend(self, dataset):
-        self.jets = self.jets + dataset.jets

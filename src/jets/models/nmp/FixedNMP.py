@@ -76,7 +76,7 @@ class FixedNMP(nn.Module):
         self.iters = iters
         m_emb = OrderedDict()
         m_emb['proj'] = FullyConnected(features, hidden, activation, dropout, ln)
-        m_emb['res2'] = ResidualFullyConnected(hidden, activation, dropout, ln)
+        m_emb['res'] = ResidualFullyConnected(hidden, activation, dropout, ln)
         self.embedding = nn.Sequential(m_emb)
 
         if tied:

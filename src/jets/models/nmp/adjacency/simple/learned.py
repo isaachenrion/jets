@@ -10,9 +10,7 @@ class Sum(_Adjacency):
         super().__init__(name=name,**kwargs)
         #self.softmax = PaddedMatrixSoftmax()
         self.edge_embedding = nn.Linear(dim_in, 1)
-        if kwargs['wn']:
-            self.edge_embedding = nn.utils.weight_norm(self.edge_embedding, name='weight')
-
+        
     def raw_matrix(self, h):
         shp = h.size()
         h_l = h.view(shp[0], shp[1], 1, shp[2])
