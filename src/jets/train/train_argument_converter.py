@@ -102,7 +102,7 @@ def get_model_kwargs(args):
         'logging_frequency': args.plotting_frequency,
 
         # activation
-        'act': args.act,
+        'activation': args.act,
 
         # classifier on top
         #'predict':args.predict,

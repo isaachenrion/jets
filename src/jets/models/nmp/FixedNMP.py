@@ -6,24 +6,56 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from src.architectures.nmp.message_passing.vertex_update import VERTEX_UPDATES
-from src.architectures.embedding import EMBEDDINGS
 
 from .adjacency import construct_adjacency
 
-class MessagePassingBlock(nn.Module):
-    def __init__(self, hidden, update, dropout=0.0):
+ACTIVATIONS = dict(
+    relu=nn.ReLU,
+    leakyrelu=nn.LeakyReLU,
+    tanh=nn.Tanh,
+    sigmoid=nn.Sigmoid,
+    elu=nn.ELU,
+    selu=nn.SELU,
+)
+
+
+class FullyConnected(nn.Module):
+    def __init__(self, dim_in, dim_out, activation, dropout=None, ln=False):
         super().__init__()
         m = OrderedDict()
-        m['d1'] = nn.Dropout(dropout)
-        m['fc1'] = nn.Linear(hidden, hidden)
-        m['relu1'] = nn.ReLU(inplace=True)
-        #m['ln1'] = nn.LayerNorm(hidden)
-        self.message = nn.Sequential(m)
+        m = OrderedDict()
+        if dropout is not None:
+            m['dropout'] = nn.Dropout(dropout)
+        m['fc'] = nn.Linear(dim_in, dim_out)
+        m['act'] = ACTIVATIONS[activation]()
+        if ln:
+            m['layer_norm'] = nn.LayerNorm(dim_out)
+        self.block = nn.Sequential(m)
 
+    def forward(self, x):
+        return self.block(x)
+
+class ResidualFullyConnected(FullyConnected):
+    def __init__(self, dim, activation, dropout=None, ln=False):
+        super().__init__(dim, dim, activation, dropout, ln)
+
+    def forward(self, x):
+        return x + self.block(x)
+
+class MessagePassingBlock(nn.Module):
+    def __init__(self, hidden, update, activation, dropout=0.0, ln=False):
+        super().__init__()
+        #m = OrderedDict()
+        #m['d1'] = nn.Dropout(dropout)
+        #m['fc1'] = nn.Linear(hidden, hidden)
+        #m['relu1'] = nn.ReLU(inplace=True)
+        #if ln: m['ln1'] = nn.LayerNorm(hidden)
+        self.message = ResidualFullyConnected(hidden, activation, dropout=dropout, ln=ln)
+        self.activation = ACTIVATIONS[activation]()
         self.vertex_update = VERTEX_UPDATES[update](hidden, hidden)
 
     def forward(self, h, A):
-        h_new = F.relu(torch.bmm(A, self.message(h)))
+        h_new = self.activation(torch.bmm(A, self.message(h)))
         h = self.vertex_update(h, h_new)
         del h_new
         return h
@@ -39,35 +71,34 @@ class FixedNMP(nn.Module):
         tied=False,
         dropout=0.0,
         update=None,
+        ln=False,
+        activation=None,
         **kwargs
         ):
 
         super().__init__()
 
         self.iters = iters
-        emb_kwargs = {x: kwargs.get(x, None) for x in ['act', 'wn']}
-        self.embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, n_layers=int(emb_init), **emb_kwargs)
+        #emb_kwargs = {x: kwargs.get(x, None) for x in ['act']}
+        #self.embedding = EMBEDDINGS['n'](dim_in=features, dim_out=hidden, n_layers=int(emb_init), **emb_kwargs)
+        m_emb = OrderedDict()
+        m_emb['proj'] = FullyConnected(features, hidden, activation, dropout, ln)
+        m_emb['res2'] = ResidualFullyConnected(hidden, activation, dropout, ln)
+        self.embedding = nn.Sequential(m_emb)
 
         if tied:
-            mp_block = MessagePassingBlock(hidden, update, dropout)
+            mp_block = MessagePassingBlock(hidden, update, activation, dropout, ln)
             self.mp_blocks = nn.ModuleList([mp_block for _ in range(iters)])
         else:
-            self.mp_blocks = nn.ModuleList([MessagePassingBlock(hidden, update, dropout) for _ in range(iters)])
+            self.mp_blocks = nn.ModuleList([MessagePassingBlock(hidden, update, activation, dropout, ln) for _ in range(iters)])
 
-        adj_kwargs = {x: kwargs.get(x, None) for x in ['symmetric', 'logger', 'logging_frequency', 'wn', 'alpha', 'R']}
+        adj_kwargs = {x: kwargs.get(x, None) for x in ['symmetric', 'logger', 'logging_frequency', 'alpha', 'R']}
         adj_kwargs['act'] = kwargs['m_act']
         self.adjacency_matrix = construct_adjacency(matrix=matrix, dim_in=features, dim_out=hidden, **adj_kwargs)
 
         m = OrderedDict()
-        m['d1'] = nn.Dropout(kwargs.get('dropout', 0))
-        m['fc1'] = nn.Linear(hidden, hidden)
-        m['relu1'] = nn.ReLU(inplace=True)
-        #m['ln1'] = nn.LayerNorm(hidden)
-        m['d2'] = nn.Dropout(kwargs.get('dropout', 0))
-        m['fc2'] = nn.Linear(hidden, hidden)
-        m['relu2'] = nn.ReLU(inplace=True)
-        #m['ln2'] = nn.LayerNorm(hidden)
-        m['fc3'] = nn.Linear(hidden, 1)
+        m['res1'] = ResidualFullyConnected(hidden, activation, dropout, ln)
+        m['res2'] = FullyConnected(hidden, 1, activation, dropout, ln)
         self.readout = nn.Sequential(m)
 
 
