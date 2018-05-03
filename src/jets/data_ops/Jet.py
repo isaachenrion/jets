@@ -84,6 +84,22 @@ class Tree:
         self._depth = count
         return self._depth
 
+def random_binary_tree(data_shape, n_nodes):
+    root = BinaryTree(np.random.rand(*data_shape))
+    childless = [root]
+    created_nodes = 1
+    while created_nodes < n_nodes:
+        np.random.shuffle(childless)
+        node = childless.pop()
+        node.add_left(BinaryTree(np.random.rand(*data_shape)))
+        node.add_right(BinaryTree(np.random.rand(*data_shape)))
+        childless += [node.left, node.right]
+        created_nodes += 2
+    return root
+
+
+
+
 class BinaryTree:
     def __init__(self, data):
 
@@ -102,37 +118,39 @@ class BinaryTree:
         self.right = child
 
     def size(self):
-        if getattr(self, '_size'):
+        try:
             return self._size
-        count = 1
-        #for i in range(self.num_children):
-        if self.left is not None:
-            count += self.left.size()
-        if self.right is not None:
-            count += self.right.size()
-        self._size = count
-        return self._size
+        except AttributeError:
+            count = 1
+            #for i in range(self.num_children):
+            if self.left is not None:
+                count += self.left.size()
+            if self.right is not None:
+                count += self.right.size()
+            self._size = count
+            return self._size
 
     def depth(self):
-        if getattr(self, '_depth'):
+        try:
             return self._depth
-        count = 0
-        if self.left is not None:
-            #for i in range(self.num_children):
-            left_depth = self.left.depth()
-            if left_depth > count:
-                count = left_depth
-        if self.right is not None:
-            right_depth = self.right.depth()
-            if right_depth > count:
-                count = right_depth
-        if self.right is not None or self.left is not None:
-            count += 1
-        self._depth = count
-        return self._depth
+        except AttributeError:
+            count = 0
+            if self.left is not None:
+                #for i in range(self.num_children):
+                left_depth = self.left.depth()
+                if left_depth > count:
+                    count = left_depth
+            if self.right is not None:
+                right_depth = self.right.depth()
+                if right_depth > count:
+                    count = right_depth
+            if self.right is not None or self.left is not None:
+                count += 1
+            self._depth = count
+            return self._depth
 
     def to_tensor(self):
-        t = torch.tensor(self.data).unsqueeze(0).float()
+        t = torch.tensor(self.data, requires_grad=True).unsqueeze(0).float()
         if torch.cuda.is_available():
             t = t.to('cuda')
         tree = BinaryTree(t)
@@ -140,7 +158,6 @@ class BinaryTree:
             tree.add_left(self.left.to_tensor())
         if self.right is not None:
             tree.add_right(self.right.to_tensor())
-        #self._tensor = tree
         return tree
 
 
