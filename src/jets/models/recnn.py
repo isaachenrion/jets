@@ -99,7 +99,7 @@ class RecursiveGated(nn.Module):
         h_new = self.activation(self.fc_h(r * hhu))
 
         hhhu = torch.cat((h_new, hhu), 1)
-        z = F.softmax(self.fc_z(hhhu).view(1, 4, -1))
+        z = F.softmax(self.fc_z(hhhu).view(1, 4, -1), dim=-1)
         h = (z * hhhu.view(1, 4, -1)).sum(1)
 
         return h
