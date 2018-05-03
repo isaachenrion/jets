@@ -25,7 +25,7 @@ def train_monitor_collection(plotting_frequency):
 def valid_monitor_collection(plotting_frequency):
     roc_auc = ROCAUC(visualizing=True, ndp=5)
     inv_fpr = InvFPR(visualizing=True)
-    #best_inv_fpr = Best(inv_fpr)
+    best_inv_fpr = Best(inv_fpr)
     #roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
 
     valid_loss = Collect('loss', ndp=3,visualizing=True)
@@ -35,7 +35,7 @@ def valid_monitor_collection(plotting_frequency):
 
     metric_monitors = [
         inv_fpr,
-        #best_inv_fpr,
+        best_inv_fpr,
         roc_auc,
         #roc_auc_at_best_inv_fpr,
         valid_loss,
