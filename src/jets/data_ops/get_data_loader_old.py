@@ -26,9 +26,6 @@ def load_jets(data_dir, filename, do_preprocessing=False):
         from .quark_gluon import preprocess
     else:
         raise ValueError('Unrecognized data_dir!')
-    #from problem_module import preprocess, crop_dataset
-
-    #preprocessed_dir = os.path.join(data_dir, 'preprocessed')
 
     raw_data_dir = os.path.join(data_dir, 'raw')
     preprocessed_dir = os.path.join(data_dir, 'preprocessed')
@@ -40,7 +37,7 @@ def load_jets(data_dir, filename, do_preprocessing=False):
 
         logging.warning("Preprocessing...")
 
-        preprocess_fn(raw_data_dir, preprocessed_dir, filename)
+        preprocess(raw_data_dir, preprocessed_dir, filename)
 
         logging.warning("Preprocessed the data and saved it to {}".format(path_to_preprocessed))
     else:
