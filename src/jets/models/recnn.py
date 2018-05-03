@@ -98,9 +98,9 @@ class RecursiveGated(nn.Module):
         r = F.sigmoid(self.fc_r(hhu))
         h_new = self.activation(self.fc_h(r * hhu))
 
-        hhhu = torch.stack((h_new, hhu), 1)
+        hhhu = torch.cat((h_new, hhu), 1)
         z = F.softmax(self.fc_z(hhhu))
-        h = (z * hhhu).sum(1)
+        h = (z * hhhu).view(1, 4, -1).sum(1)
 
         return h
 
