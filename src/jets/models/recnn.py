@@ -29,9 +29,14 @@ class RecursiveSimple(nn.Module):
         self.fc_h = nn.Linear(3 * hidden, hidden)
         self.fc_predict = nn.Linear(hidden, 1)
 
-        gain = nn.init.calculate_gain(activation_string)
-        nn.init.xavier_uniform_(self.fc_u.weight, gain=gain)
-        nn.init.orthogonal_(self.fc_h.weight, gain=gain)
+        try:
+            gain = nn.init.calculate_gain(activation_string)
+            nn.init.xavier_uniform_(self.fc_u.weight, gain=gain)
+            nn.init.orthogonal_(self.fc_h.weight, gain=gain)
+        except AttributeError:
+            gain = nn.init.calculate_gain(activation_string)
+            nn.init.xavier_uniform(self.fc_u.weight, gain=gain)
+            nn.init.orthogonal(self.fc_h.weight, gain=gain)
 
 
     def leaf(self, x):
@@ -73,10 +78,17 @@ class RecursiveGated(nn.Module):
         self.fc_predict = nn.Linear(hidden, 1)
 
         gain = nn.init.calculate_gain(activation_string)
-        nn.init.xavier_uniform_(self.fc_u.weight, gain=gain)
-        nn.init.orthogonal_(self.fc_h.weight, gain=gain)
-        nn.init.xavier_uniform_(self.fc_z.weight, gain=gain)
-        nn.init.xavier_uniform_(self.fc_r.weight, gain=gain)
+        try:
+            nn.init.xavier_uniform_(self.fc_u.weight, gain=gain)
+            nn.init.orthogonal_(self.fc_h.weight, gain=gain)
+            nn.init.xavier_uniform_(self.fc_z.weight, gain=gain)
+            nn.init.xavier_uniform_(self.fc_r.weight, gain=gain)
+        except AttributeError: # backwards compatibility for pytorch
+            nn.init.xavier_uniform(self.fc_u.weight, gain=gain)
+            nn.init.orthogonal(self.fc_h.weight, gain=gain)
+            nn.init.xavier_uniform(self.fc_z.weight, gain=gain)
+            nn.init.xavier_uniform(self.fc_r.weight, gain=gain)
+
 
     def leaf(self, x):
         return self.fc_u(x)

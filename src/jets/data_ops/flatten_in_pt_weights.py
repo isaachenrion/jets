@@ -20,16 +20,22 @@ def flatten_in_pt_weights(jets, pt_min=None, pt_max=None):
     pts_0 = [jet.pt for jet in jets if jet.y == 0]
     pts_1 = [jet.pt for jet in jets if jet.y == 1]
 
-    #w[y==0] = get_weights_for_flatness_in_pt(pts_0, pt_min, pt_max, bins)
-    #w[y==1] = get_weights_for_flatness_in_pt(pts_1, pt_min, pt_max, bins)
-
     w_0 = get_weights_for_flatness_in_pt(pts_0, pt_min, pt_max, bins)
     w_1 = get_weights_for_flatness_in_pt(pts_1, pt_min, pt_max, bins)
 
-    for i, (iw, jet) in enumerate(zip(w_0, jets)):
-        if jet.y == 0:
-            w[i] = iw
-    for i, (iw, jet) in enumerate(zip(w_1, jets)):
-        if jet.y == 1:
-            w[i] = iw
+    #w[y==0] = w_0
+    #w[y==1] = w_1
+
     return w
+
+''' THIS IS WRONG BUT WHAT I USED TO GET THE GOOD RESULTS
+w_0 = get_weights_for_flatness_in_pt(pts_0, pt_min, pt_max, bins)
+w_1 = get_weights_for_flatness_in_pt(pts_1, pt_min, pt_max, bins)
+
+for i, (iw, jet) in enumerate(zip(w_0, jets)):
+    if jet.y == 0:
+        w[i] = iw
+for i, (iw, jet) in enumerate(zip(w_1, jets)):
+    if jet.y == 1:
+        w[i] = iw
+'''
