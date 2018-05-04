@@ -9,10 +9,16 @@ from src.data_ops.dropout import get_dropout_masks
 
 class DataLoader(DL):
     def __init__(self, dataset, batch_size,leaves=True, dropout=None, permute_particles=False,**kwargs):
+        if not leaves:
+            for i, jet in enumerate(dataset.jets):
+                jet.binary_tree = jet.binary_tree.to_tensor()
+                dataset.jets[i] = jet
+
         super().__init__(dataset, batch_size, collate_fn=self.collate)
         self.dropout = dropout
         self.permute_particles = permute_particles
         self.leaves = leaves
+
 
     @property
     def dim(self):
@@ -59,8 +65,7 @@ class DataLoader(DL):
         return data, mask
 
     def batch_trees(self,jets):
-        out = [jet.binary_tree.to_tensor() for jet in jets]
-        return out
+        return [j.binary_tree for j in jets]
 
     def batch_trees_OLD(self, jets):
         # Batch the recursive activations across all nodes of a same level

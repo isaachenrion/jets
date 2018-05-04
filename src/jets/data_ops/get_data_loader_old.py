@@ -15,6 +15,7 @@ DATASETS = {
     'wp':(w_vs_qcd + '/pileup','pileup'),
     'pp': (quark_gluon,'pp'),
     'pbpb': (quark_gluon,'pbpb'),
+    'wd':(w_vs_qcd, 'medium')
     #'protein': ('proteins', 'casp11')
 }
 

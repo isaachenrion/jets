@@ -106,8 +106,19 @@ class BinaryTree:
         self.parent = None
         self.left = None
         self.right = None
-        self.is_leaf = self.left is None and self.right is None
         self.data = data
+
+    @property
+    def is_tensor(self):
+        return isinstance(self.data, torch.Tensor)
+
+    @property
+    def is_numpy(self):
+        return isinstance(self.data, np.ndarray)
+
+    @property
+    def is_leaf(self):
+        return self.left is None and self.right is None
 
     def add_left(self, child):
         child.parent = self
@@ -118,59 +129,96 @@ class BinaryTree:
         self.right = child
 
     def size(self):
-        try:
-            return self._size
-        except AttributeError:
-            count = 1
-            #for i in range(self.num_children):
-            if self.left is not None:
-                count += self.left.size()
-            if self.right is not None:
-                count += self.right.size()
-            self._size = count
-            return self._size
+        count = 1
+        #for i in range(self.num_children):
+        if self.left is not None:
+            count += self.left.size()
+        if self.right is not None:
+            count += self.right.size()
+        self._size = count
+        return self._size
 
     def depth(self):
-        try:
-            return self._depth
-        except AttributeError:
+        if self.is_leaf:
             count = 0
-            if self.left is not None:
-                #for i in range(self.num_children):
-                left_depth = self.left.depth()
-                if left_depth > count:
-                    count = left_depth
-            if self.right is not None:
-                right_depth = self.right.depth()
-                if right_depth > count:
-                    count = right_depth
-            if self.right is not None or self.left is not None:
-                count += 1
-            self._depth = count
-            return self._depth
+        else:
+            count = max(self.right.depth(), self.left.depth()) + 1
+        self._depth = count
+        return self._depth
 
     def to_tensor(self):
-        t = torch.tensor(self.data, requires_grad=True).unsqueeze(0).float()
-        if torch.cuda.is_available():
-            t = t.to('cuda')
-        tree = BinaryTree(t)
+        assert not self.is_tensor
+        self.data = torch.tensor(self.data, requires_grad=True).float()
         if self.left is not None:
-            tree.add_left(self.left.to_tensor())
+            self.left.to_tensor()
         if self.right is not None:
-            tree.add_right(self.right.to_tensor())
-        return tree
+            self.right.to_tensor()
+        return self
+
+    def numpy(self):
+        assert not self.is_numpy
+        self.data = self.data.to('cpu').numpy()
+        if self.left is not None:
+            self.left.numpy()
+        if self.right is not None:
+            self.right.numpy()
+        return self
+
+    def to(self, device):
+        assert self.is_tensor
+        self.data = self.data.to(device)
+        if self.left is not None:
+            self.left.to(device)
+        if self.right is not None:
+            self.right.to(device)
+
+    def flatten(self, data_list=None):
+        # UNTESTED
+        raise NotImplementedError
+        
+        if data_list is None:
+            data_list = []
+        data_list.append(self.data)
+        if self.left is not None:
+            data_list += self.left.flatten(data_list)
+        if self.right is not None:
+            data_list += self.right.flatten(data_list)
+        return data_list
+
+    def leaves(self, data_list=None):
+        # UNTESTED
+        raise NotImplementedError
+
+        if data_list is None:
+            data_list = []
+        if self.is_leaf:
+            return self.data
+        if self.left is not None:
+            data_list += self.left.leaves(data_list)
+        if self.right is not None:
+            data_list += self.right.leaves(data_list)
+        return data_list
 
 
-def binary_dfs(v, node_ids, tree_content):
+
+
+
+def binary_dfs(v, node_ids, tree_content, tensor=False):
     #marked[v] = True
     left, right = node_ids[v]
     if left != -1:
         assert right != -1
-        tree = BinaryTree(tree_content[v])
-        tree.add_left(binary_dfs(left,node_ids, tree_content))
-        tree.add_right(binary_dfs(right,node_ids, tree_content))
+        data = tree_content[v]
+        if tensor:
+            data = torch.tensor(data)
+        tree = BinaryTree(data)
+        tree.add_left(binary_dfs(left,node_ids, tree_content, tensor))
+        tree.add_right(binary_dfs(right,node_ids, tree_content, tensor))
         return tree
-    leaf = BinaryTree(tree_content[v])
+    data = tree_content[v]
+    if tensor:
+        data = torch.tensor(data)
+    leaf = BinaryTree(data)
     return leaf
 
 class QuarkGluonJet(Jet):
