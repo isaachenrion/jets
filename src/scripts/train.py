@@ -10,5 +10,8 @@ if __name__ == "__main__":
     elif problem == 'j':
         from src.jets.train.train_jets import main
     else:
-        raise NotImplementedError("Training scripts only implemented for jets and proteins")
+        raise NotImplementedError(
+            ("Training scripts only implemented for jets and proteins.\n",
+            "You probably missed the indicator letter after train.py")
+        )
     main(sys.argv[2:])
