@@ -9,10 +9,10 @@ from src.data_ops.dropout import get_dropout_masks
 
 class TreeDataLoader(_DataLoader):
     def __init__(self, dataset, batch_size,**kwargs):
-        for i, tree in enumerate(dataset.x):
-            if not tree.is_tensor:
-                tree.to_tensor()
-            dataset.x[i] = tree
+        #for i, tree in enumerate(dataset.x):
+        #    if not tree.is_tensor:
+        #        tree.to_tensor()
+        #    dataset.x[i] = tree
 
         super().__init__(dataset, batch_size)
 
