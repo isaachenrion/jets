@@ -58,7 +58,6 @@ def valid_monitor_collection(plotting_frequency):
     mc.track_monitor = best_valid_loss
     return mc
 
-
 def dummy_train_monitor_collection(plotting_frequency):
     roc_auc = ROCAUC(visualizing=True, ndp=5)
     inv_fpr = InvFPR(visualizing=True)

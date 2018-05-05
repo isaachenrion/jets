@@ -10,7 +10,8 @@ def train_argument_converter(args):
     if args.debug:
         args.email = None
         args.verbose = True
-
+        args.dataset = 'wd'
+        
         args.batch_size = 3
         args.epochs = 15
 

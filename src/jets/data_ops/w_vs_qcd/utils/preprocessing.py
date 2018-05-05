@@ -3,10 +3,7 @@ import logging
 import pickle
 import numpy as np
 
-from ..extract_four_vectors import extract_four_vectors
-from ..io import save_jet_dicts_to_pickle
-
-from ..Jet import binary_dfs
+from .extract_four_vectors import extract_four_vectors
 
 def _pt(v):
     pz = v[2]
@@ -77,7 +74,7 @@ def convert_to_jet_dict(x, y):
     constituents = extract_four_vectors(np.stack([tree_content[i] for i in outers], 0)).astype('float32')
     tree_content = extract_four_vectors(tree_content).astype('float32')
 
-    binary_tree = binary_dfs(root_id, tree, tree_content)
+    #binary_tree = binary_dfs(root_id, tree, tree_content)
     progenitor = 'w' if y == 1 else 'qcd'
 
     jet_dict = dict(
@@ -91,7 +88,7 @@ def convert_to_jet_dict(x, y):
         tree=tree,
         root_id=root_id,
         tree_content=tree_content,
-        binary_tree=binary_tree
+        #binary_tree=binary_tree
     )
 
     return jet_dict
@@ -104,7 +101,8 @@ def preprocess(raw_data_dir, preprocessed_dir, filename):
     logging.warning("Loaded raw files")
     jet_dicts = [convert_to_jet_dict(x, y) for x, y in zip(X, Y)]
     logging.warning("Converted to jet dicts")
-    save_jet_dicts_to_pickle(jet_dicts, os.path.join(preprocessed_dir, filename))
+    with open(os.path.join(preprocessed_dir, filename), 'wb') as f:
+        pickle.dump(jet_dicts, f)
 
 
     return None

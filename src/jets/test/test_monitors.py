@@ -13,9 +13,9 @@ def test_monitor_collection():
         inv_fpr,
         best_inv_fpr,
         roc_auc,
-        Collect('valid_loss', visualizing=True),
+        Collect('loss', visualizing=True),
         Collect('model', visualizing=False, numerical=False)
         ]
-    mc = MonitorCollection(*monitors)
+    mc = MonitorCollection('test', *monitors)
 
     return mc

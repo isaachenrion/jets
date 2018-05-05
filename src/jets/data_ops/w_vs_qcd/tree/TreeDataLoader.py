@@ -1,73 +1,29 @@
 import logging
 import numpy as np
 import torch
-from torch.utils.data import DataLoader as DL
+from ..utils import _DataLoader
 
 from src.data_ops.pad_tensors import pad_tensors_extra_channel
 from src.data_ops.dropout import get_dropout_masks
 
 
-class DataLoader(DL):
-    def __init__(self, dataset, batch_size,leaves=True, dropout=None, permute_particles=False,**kwargs):
-        if not leaves:
-            for i, jet in enumerate(dataset.jets):
-                jet.binary_tree = jet.binary_tree.to_tensor()
-                dataset.jets[i] = jet
+class TreeDataLoader(_DataLoader):
+    def __init__(self, dataset, batch_size,**kwargs):
+        for i, tree in enumerate(dataset.x):
+            if not tree.is_tensor:
+                tree.to_tensor()
+            dataset.x[i] = tree
 
-        super().__init__(dataset, batch_size, collate_fn=self.collate)
-        self.dropout = dropout
-        self.permute_particles = permute_particles
-        self.leaves = leaves
-
+        super().__init__(dataset, batch_size)
 
     @property
     def dim(self):
-        if self.leaves:
-            return self.dataset.dim + 1
-        else:
-            return self.dataset.dim
+        return self.dataset.dim
 
-    def collate(self, data_tuples):
-        x_list, y_list, weight_list = list(map(list, zip(*data_tuples)))
-        inputs = self.preprocess_x(x_list)
-        y = self.preprocess_y(y_list)
+    def preprocess_x(self,x_list):
+        return x_list
 
-        if weight_list[0] is not None:
-            weight = torch.tensor(weight_list)
-        else:
-            weight = None
-        batch = (inputs, y, weight)
-        return batch
-
-    def preprocess_y(self, y_list):
-        y = torch.tensor(y_list).float()
-        return y
-
-    def preprocess_x(self, x_list):
-        if self.leaves:
-            return self.batch_leaves(x_list)
-        else:
-            return self.batch_trees(x_list)
-
-    def batch_leaves(self,x_list):
-        x_list = [torch.tensor(x.constituents, device='cuda' if torch.cuda.is_available() else 'cpu') for x in x_list]
-        #print(torch.cuda.is_available())
-        #x_list = list(map(lambda x: torch.tensor(x.constituents, device='cuda' if torch.cuda.is_available() else 'cpu'), x_list))
-        #print(x_list[0].device)
-        #dropout_masks = get_dropout_masks(x_list, self.dropout)
-        #x_list = [x.masked_select(dm.unsqueeze(1)).view(-1, x.shape[1]) for x, dm in zip(x_list, dropout_masks)]
-
-        if self.permute_particles:
-            x_list = list(map(np.random.permutation, x_list))
-
-        data, mask = pad_tensors_extra_channel(x_list)
-
-        return data, mask
-
-    def batch_trees(self,jets):
-        return [j.binary_tree for j in jets]
-
-    def batch_trees_OLD(self, jets):
+    def preprocess_x_OLD(self, jets):
         # Batch the recursive activations across all nodes of a same level
         # !!! Assume that jets have at least one inner node.
         #     Leads to off-by-one errors otherwise :(

@@ -85,10 +85,11 @@ def do_training(
             valid_dict = validation(model, valid_data_loader)
             dummy_train_dict = validation(model, dummy_train_data_loader)
 
+        valid_dict.update(static_dict)
         logdict = dict(
             train=train_dict,
             valid=valid_dict,
-            static=static_dict,
+            #static=static_dict,
             dummy_train=dummy_train_dict
             )
 

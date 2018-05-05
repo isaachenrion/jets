@@ -37,7 +37,7 @@ def test_all_models(test_one_model, model_dict, model_filenames, data_loader, ad
         logging.info("Testing took {:.1f} seconds".format(time.time() - t_valid))
 
         #t_log = time.time()
-        administrator.log(**logdict)
+        administrator.log(test=logdict)
 
 
 def generic_test_script(problem=None,args=None):

@@ -12,18 +12,14 @@ def test_argument_converter(args):
     if args.debug:
         args.email = None
         args.verbose = True
+        args.dataset = 'wd'
 
         args.batch_size = 3
-        args.epochs = 15
         args.n_test = 50
 
-        args.lr = 0.1
-        args.period = 2
 
         args.seed = 1
 
-        args.hidden = 1
-        args.iters = 2
         args.lf = 1
 
     return dict(
@@ -52,7 +48,7 @@ def get_admin_kwargs(args):
 def get_data_loader_kwargs(args):
     #data_dir = os.path.join(args.data_dir)
     #leaves = args.model not in ['recs', 'recg']
-    leaves = True
+    #leaves = True
     return dict(
         debug=args.debug,
         data_dir=args.data_dir,
@@ -60,7 +56,8 @@ def get_data_loader_kwargs(args):
         batch_size=args.batch_size,
         dataset=args.dataset,
         preprocess=args.pp,
-        leaves=leaves
+        leaves=args.leaves
+
     )
 
 

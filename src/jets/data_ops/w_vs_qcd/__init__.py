@@ -1,4 +1,16 @@
-from .preprocessing import preprocess
-from .utils import filter_pileup_jet, filter_original_jet
-from .utils import flatten_pileup_jets, flatten_original_jets
-from .crop_dataset import crop_dataset
+from .leaf import LeafDataOps
+from .tree import TreeDataOps
+
+def get_train_data_loader(leaves=None,**kwargs):
+    if leaves is None:
+        raise ValueError
+    if leaves:
+        return LeafDataOps.get_train_data_loader(**kwargs)
+    return TreeDataOps.get_train_data_loader(**kwargs)
+
+def get_test_data_loader(leaves=None,**kwargs):
+    if leaves is None:
+        raise ValueError
+    if leaves:
+        return LeafDataOps.get_test_data_loader(**kwargs)
+    return TreeDataOps.get_test_data_loader(**kwargs)
