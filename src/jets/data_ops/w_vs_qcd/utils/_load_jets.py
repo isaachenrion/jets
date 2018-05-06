@@ -19,10 +19,3 @@ def _load_jet_dicts(data_dir, filename, preprocess_fn, do_preprocessing=False):
         jet_dicts = pickle.load(f, encoding='latin-1')
 
     return jet_dicts
-
-def _load_jets(data_dir, filename, jetclass, preprocess_fn, do_preprocessing=False):
-    jet_dicts = _load_jet_dicts(data_dir, filename, preprocess_fn, do_preprocessing)
-    jets = [jetclass(**jd) for jd in jet_dicts]
-    logging.warning("\tSuccessfully loaded data")
-    logging.warning("\tFound {} jets in total".format(len(jets)))
-    return jets

@@ -11,7 +11,7 @@ def train_argument_converter(args):
         args.email = None
         args.verbose = True
         args.dataset = 'wd'
-        
+
         args.batch_size = 3
         args.epochs = 15
 
@@ -65,7 +65,7 @@ def get_data_loader_kwargs(args):
         n_train=args.n_train,
         n_valid=args.n_valid,
         batch_size=args.batch_size,
-        preprocess=args.pp,
+        do_preprocessing=args.pp,
         leaves=leaves,
         dropout=args.data_dropout
     )

@@ -55,7 +55,7 @@ def get_data_loader_kwargs(args):
         n_test=args.n_test,
         batch_size=args.batch_size,
         dataset=args.dataset,
-        preprocess=args.pp,
+        do_preprocessing=args.pp,
         leaves=args.leaves
 
     )
