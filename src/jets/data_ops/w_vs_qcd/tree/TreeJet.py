@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from .trees import BinaryTree
 
 def from_tree_content_and_node_ids(v, node_ids, tree_content):
@@ -16,7 +17,7 @@ def from_tree_content_and_node_ids(v, node_ids, tree_content):
 
 class TreeJet(BinaryTree):
     def __init__(self, root_id, tree, tree_content, mass, pt, y, **kwargs):
-        tree_content = torch.tensor(tree_content, device='cuda' if torch.cuda.is_available() else 'cpu').unsqueeze(1)
+        tree_content = torch.tensor(tree_content.astype(np.float32), device='cuda' if torch.cuda.is_available() else 'cpu').unsqueeze(1)
         self.tree = from_tree_content_and_node_ids(root_id, tree, tree_content)
         self.mass = mass
         self.pt = pt
