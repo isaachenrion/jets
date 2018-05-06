@@ -6,7 +6,7 @@ class LeafJet:
     def __init__(
             self,
             progenitor=None,
-            constituents=None,
+            #constituents=None,
             mass=None,
             pt=None,
             eta=None,
@@ -14,10 +14,14 @@ class LeafJet:
             y=None,
             tree=None,
             root_id=None,
-            #tree_content=None,
+            tree_content=None,
             #binary_tree=None,
             **kwargs
             ):
+
+        tree_content = tree_content.astype('float32')
+        outers = [node for node in range(len(tree_content)) if tree[node,0] == -1]
+        constituents = np.stack([tree_content[i] for i in outers], 0))
 
         self.constituents = constituents
         self.mass = mass
