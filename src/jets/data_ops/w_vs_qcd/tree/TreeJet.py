@@ -9,6 +9,7 @@ class TreeJet(BinaryTree):
         tree_content = torch.tensor(tree_content.astype(np.float32), device='cuda' if torch.cuda.is_available() else 'cpu').unsqueeze(1)
         #assert tree_content
         self.tree = BinaryTree.from_tree_content_and_node_ids(root_id, tree, tree_content)
+        print(self.tree.data.dtype)
         self.mass = mass
         self.pt = pt
         self.y = y
