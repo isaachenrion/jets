@@ -140,6 +140,7 @@ class _Administrator:
 
         seed = random_seed(seed)
         use_cuda = (gpu is not None) and torch.cuda.is_available()
+        print(use_cuda)
         if use_cuda:
             torch.cuda.device(gpu)
             torch.set_default_tensor_type(torch.cuda.FloatTensor)
