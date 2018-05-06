@@ -89,6 +89,20 @@ class BinaryTree:
         if self.right is not None:
             self.right.to(device)
 
+    @classmethod
+    def from_tree_content_and_node_ids(cls, v, node_ids, tree_content):
+        left, right = node_ids[v]
+        if left != -1:
+            assert right != -1
+            data = tree_content[v]
+            tree = cls(data)
+            tree.add_left(cls.from_tree_content_and_node_ids(left,node_ids, tree_content))
+            tree.add_right(cls.from_tree_content_and_node_ids(right,node_ids, tree_content))
+            return tree
+        data = tree_content[v]
+        node = cls(data)
+        return node
+
     def flatten(self, data_list=None):
         # UNTESTED
         raise NotImplementedError
