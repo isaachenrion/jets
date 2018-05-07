@@ -32,6 +32,7 @@ def get_admin_kwargs(args):
     return dict(
         dataset=args.dataset,
         debug=args.debug,
+        model_filename=args.model,
         slurm_array_task_id=args.slurm_array_task_id,
         slurm_array_job_id=args.slurm_array_job_id,
         gpu=args.gpu,

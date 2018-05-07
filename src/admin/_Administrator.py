@@ -257,6 +257,7 @@ class _Administrator:
     @classmethod
     def test(cls,
         dataset=None,
+        model_filename=None,
         n_models=None,
         debug=None,
         slurm_array_task_id=None,
@@ -276,7 +277,9 @@ class _Administrator:
 
         current_dir=RUNNING_MODELS_DIR
         create_all_model_dirs(root_dir)
-        _temp = get_experiment_dirname(slurm_array_job_id, train=False)
+        #_temp = get_experiment_dirname(slurm_array_job_id, train=False)
+        _temp = model_filename if model_filename is not None else get_experiment_dirname(slurm_array_job_id, train=False)
+        #_temp = model_filename if model_filename is not None else
         intermediate_dir = os.path.join(dataset, _temp)
         leaf_dir = get_experiment_leafname(slurm_array_task_id, train=False)
         exp_dir = os.path.join(root_dir,current_dir,intermediate_dir,leaf_dir)
