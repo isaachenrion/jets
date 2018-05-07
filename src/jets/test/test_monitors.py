@@ -23,25 +23,30 @@ def ODLtest_monitor_collection():
     return mc
 
 def test_monitor_collection():
+
     roc_auc = ROCAUC(visualizing=False, ndp=5)
+    mean_roc_auc = Mean(roc_auc)
+    std_roc_auc = Std(roc_auc)
+
     inv_fpr = InvFPR(visualizing=False)
-    best_inv_fpr = Best(inv_fpr)
+    mean_inv_fpr = Mean(inv_fpr)
+    std_inv_fpr = Std(inv_fpr)
     #roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
 
     valid_loss = Collect('loss', ndp=3,visualizing=False)
-    best_valid_loss = Best(valid_loss, track='min')
-    inv_fpr_at_best_valid_loss = LogOnImprovement(inv_fpr, best_valid_loss)
-    roc_auc_at_best_valid_loss = LogOnImprovement(roc_auc, best_valid_loss)
+    mean_valid_loss = Mean(valid_loss)
+    std_valid_loss = Std(valid_loss)
 
     metric_monitors = [
         inv_fpr,
-        best_inv_fpr,
+        mean_inv_fpr,
+        std_inv_fpr,
         roc_auc,
-        #roc_auc_at_best_inv_fpr,
+        mean_roc_auc,
+        std_roc_auc,
         valid_loss,
-        best_valid_loss,
-        inv_fpr_at_best_valid_loss,
-        roc_auc_at_best_valid_loss,
+        mean_valid_loss,
+        std_valid_loss,
         Collect('model_name', visualizing=False, numerical=False)
     ]
 

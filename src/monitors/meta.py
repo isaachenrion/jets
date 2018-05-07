@@ -103,7 +103,25 @@ class Collect(ScalarMonitor):
             **kwargs
             )
 
+class Mean(ScalarMonitor):
+    def __init__(self, monitor):
+        assert isinstance(monitor, Collect)
+        assert monitor.numerical
+        self.monitor = monitor
 
+    def call(self, **kwargs):
+        self.monitor(**kwargs)
+        return np.mean(self.monitor.collection)
+
+class Std(ScalarMonitor):
+    def __init__(self, monitor):
+        assert isinstance(monitor, Collect)
+        assert monitor.numerical
+        self.monitor = monitor
+
+    def call(self, **kwargs):
+        self.monitor(**kwargs)
+        return np.std(self.monitor.collection)
 
 class Histogram(Monitor):
     def __init__(self, name, n_bins=30, rootname=None, append=False, max_capacity=None, **kwargs):
