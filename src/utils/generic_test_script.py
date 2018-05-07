@@ -33,7 +33,7 @@ def test_all_models(test_one_model, model_dict, model_filenames, data_loader, ad
 
         t_valid = time.time()
         logdict = test_one_model(model, data_loader)
-        logdict['model'] = filename
+        logdict['model_name'] = filename
         logging.info("Testing took {:.1f} seconds".format(time.time() - t_valid))
 
         #t_log = time.time()
