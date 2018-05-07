@@ -49,6 +49,7 @@ class ScalarMonitor(Monitor):
         self.ndp = ndp
 
     def visualize(self):
+        print(self.name)
         super().visualize()
 
     @property
