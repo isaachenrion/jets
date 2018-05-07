@@ -110,7 +110,6 @@ class Mean(ScalarMonitor):
         self.monitor = monitor
 
     def call(self, **kwargs):
-        self.monitor(**kwargs)
         return np.mean(self.monitor.collection)
 
 class Std(ScalarMonitor):
@@ -120,7 +119,6 @@ class Std(ScalarMonitor):
         self.monitor = monitor
 
     def call(self, **kwargs):
-        self.monitor(**kwargs)
         return np.std(self.monitor.collection)
 
 class Histogram(Monitor):
