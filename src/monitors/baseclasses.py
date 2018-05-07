@@ -24,7 +24,12 @@ class Monitor:
     def visualize(self):
         if not self.visualizing:
             return
-        self.visualize_count += 1
+        else:
+            self._visualize()
+            self.visualize_count += 1
+
+    def _visualize(self):
+        raise NotImplementedError
 
     @property
     def string(self):
@@ -47,10 +52,6 @@ class ScalarMonitor(Monitor):
         self.numerical = numerical
         self.scalar = True
         self.ndp = ndp
-
-    def visualize(self):
-        print(self.name)
-        super().visualize()
 
     @property
     def _string(self):

@@ -93,8 +93,7 @@ class Collect(ScalarMonitor):
         self.value = self.fn(self.collection)
         return self.value
 
-    def visualize(self, plotname=None, **kwargs):
-        super().visualize()
+    def _visualize(self, plotname=None, **kwargs):
         if plotname is None:
             plotname = self.plotname
         plot_one_training_stat(
@@ -131,8 +130,7 @@ class Histogram(Monitor):
         self.hist += hist
         return None
 
-    def visualize(self, plotname=None):
-        super().visualize()
+    def _visualize(self, plotname=None):
         fig, ax = plt.subplots()
         #hist, bin_edges = np.histogram(self.value, bins=self.n_bins, range=(0, 1), density=True)
         #import ipdb; ipdb.set_trace()
