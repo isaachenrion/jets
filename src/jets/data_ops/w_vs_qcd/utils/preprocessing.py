@@ -71,8 +71,8 @@ def convert_to_jet_dict(x, y):
     mass = x['mass']
 
     outers = [node for node in range(len(x['content'])) if x['tree'][node,0] == -1]
-    constituents = extract_four_vectors(np.stack([tree_content[i] for i in outers], 0)).astype('float32')
-    tree_content = extract_four_vectors(tree_content).astype('float32')
+    constituents = extract_four_vectors(np.stack([tree_content[i] for i in outers], 0), tree_content[x['root_id'], 3]).astype('float32')
+    tree_content = extract_four_vectors(tree_content, tree_content[x['root_id'], 3]).astype('float32')
 
     #binary_tree = binary_dfs(root_id, tree, tree_content)
     progenitor = 'w' if y == 1 else 'qcd'

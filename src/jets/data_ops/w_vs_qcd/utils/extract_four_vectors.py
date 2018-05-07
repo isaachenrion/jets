@@ -1,18 +1,19 @@
 import numpy as np
 
-def extract_four_vectors(four_vectors):
+def extract_four_vectors(four_vectors, total_E=None):
     ''' Convert an array of four-vectors into 7-dim jet constituent representation.
     '''
     assert four_vectors.shape[1] == 4
 
     content = np.zeros((len(four_vectors), 7))
+    if total_E is None:
+        total_E = sum(four_vectors[:, 3])
 
     for i in range(len(four_vectors)):
         px = four_vectors[i, 0]
         py = four_vectors[i, 1]
         pz = four_vectors[i, 2]
         E = four_vectors[i, 3]
-        total_E = sum(four_vectors[:, 3])
 
         p = (four_vectors[i, 0:3] ** 2).sum() ** 0.5
         eta = 0.5 * (np.log(p + pz) - np.log(p - pz))
