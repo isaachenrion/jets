@@ -34,6 +34,7 @@ def permute_by_pt(jet, root_id=None):
 
     return jet
 
+
 def rewrite_content(jet):
     #jet = copy.deepcopy(jet)
 
