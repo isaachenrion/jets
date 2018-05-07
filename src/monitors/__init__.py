@@ -2,6 +2,8 @@ from .meta import Best
 from .meta import Regurgitate
 from .meta import LogOnImprovement
 from .meta import Collect
+from .meta import Mean
+from .meta import Std
 from .meta import Histogram
 from .meta import EachClassHistogram
 
