@@ -23,12 +23,12 @@ def ODLtest_monitor_collection():
     return mc
 
 def test_monitor_collection():
-    roc_auc = ROCAUC(visualizing=True, ndp=5)
-    inv_fpr = InvFPR(visualizing=True)
+    roc_auc = ROCAUC(visualizing=False, ndp=5)
+    inv_fpr = InvFPR(visualizing=False)
     best_inv_fpr = Best(inv_fpr)
     #roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
 
-    valid_loss = Collect('loss', ndp=3,visualizing=True)
+    valid_loss = Collect('loss', ndp=3,visualizing=False)
     best_valid_loss = Best(valid_loss, track='min')
     inv_fpr_at_best_valid_loss = LogOnImprovement(inv_fpr, best_valid_loss)
     roc_auc_at_best_valid_loss = LogOnImprovement(roc_auc, best_valid_loss)
