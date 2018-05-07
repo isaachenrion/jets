@@ -143,7 +143,9 @@ class _DataOps:
     @classmethod
     def test_dataset(cls, data_dir, dataset, n_test, do_preprocessing):
         jet_dicts = cls.load_jet_dicts('test', data_dir, dataset, do_preprocessing)
-        jet_dicts = cls.transform(jet_dicts)
+        tf = cls.get_transform(data_dir, dataset)
+        for jet_dict in jet_dicts:
+            jet_dict["tree_content"] = tf.transform(jet_dict["tree_content"])
         jets = cls.load_jets(jet_dicts)
 
         good_jets, good_weights, _ = cls.crop_and_flatten(jets, dataset == 'wp')
