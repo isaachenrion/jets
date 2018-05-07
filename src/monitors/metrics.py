@@ -43,7 +43,7 @@ class ROCAUC(Collect):
 
     def call(self, targets=None, predictions=None, mask=None, weights=None, **kwargs):
         targets, predictions = _flatten_all_inputs(targets, predictions, mask)
-        weights = ensure_flat_numpy_array(weights)
+        weights = ensure_flat_numpy_array(weights) if weights[0] is not None else None
         return roc_auc_score(targets, predictions, sample_weight=weights)
 
 class ROCCurve(Monitor):
@@ -54,7 +54,7 @@ class ROCCurve(Monitor):
 
     def call(self, targets=None, predictions=None, mask=None, weights=None, **kwargs):
         targets, predictions = _flatten_all_inputs(targets, predictions, mask)
-        weights = ensure_flat_numpy_array(weights)
+        weights = ensure_flat_numpy_array(weights) if weights[0] is not None else None
         self.fpr, self.tpr, _ = roc_curve(targets, predictions, sample_weight=weights)
         return (self.fpr, self.tpr)
 
@@ -64,7 +64,7 @@ class InvFPR(Collect):
 
     def call(self, targets=None, predictions=None, mask=None, weights=None, **kwargs):
         targets, predictions = _flatten_all_inputs(targets, predictions, mask)
-        weights = ensure_flat_numpy_array(weights)
+        weights = ensure_flat_numpy_array(weights) if weights[0] is not None else None
         fpr, tpr, _ = roc_curve(targets, predictions, sample_weight=weights)
         return inv_fpr_at_tpr_equals_half(tpr, fpr)
 

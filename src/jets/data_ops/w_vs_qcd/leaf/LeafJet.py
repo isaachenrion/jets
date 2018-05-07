@@ -21,7 +21,7 @@ class LeafJet:
 
         tree_content = tree_content.astype('float32')
         outers = [node for node in range(len(tree_content)) if tree[node,0] == -1]
-        constituents = np.stack([tree_content[i] for i in outers], 0))
+        constituents = np.stack([tree_content[i] for i in outers], 0)
 
         self.constituents = constituents
         self.mass = mass

@@ -15,7 +15,7 @@ def validation(model, data_loader):
 
         targets.append(target.cpu().numpy())
         predictions.append(prediction.cpu().detach().numpy())
-        weights.append(weight.cpu().numpy())
+        weights.append(weight.cpu().numpy() if weight is not None else None)
 
     l /= len(data_loader)
 
@@ -24,7 +24,7 @@ def validation(model, data_loader):
     logdict = dict(
         targets=targets,
         predictions=predictions,
-        weights=data_loader.dataset.weights,
+        weights=weights,
         loss=l,
         model=model,
         logtime=0,
