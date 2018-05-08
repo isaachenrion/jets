@@ -49,21 +49,21 @@ def main(sysargvlist=None):
     '''
     # Training args
     #training = parser.add_argument_group('training')
-    parser.add_argument("-e", "--epochs", type=int, default=64)
-    parser.add_argument("-b", "--batch_size", type=int, default=128)
+    parser.add_argument("-e", "--epochs", type=int, default=25)
+    parser.add_argument("-b", "--batch_size", type=int, default=64)
     parser.add_argument("--experiment_time", type=int, default=1000000)
     '''
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     '''
     # Optimization args
     #optim = parser.add_argument_group('optim')
-    parser.add_argument("--lr", type=float, default=.002)
+    parser.add_argument("--lr", type=float, default=.0005)
     parser.add_argument("--lr_min", type=float, default=.0000005)
-    parser.add_argument("--decay", type=float, default=.7)
+    parser.add_argument("--decay", type=float, default=.9)
     parser.add_argument("--clip", type=float, default=1.0)
     parser.add_argument("--reg", type=float, default=.00001)
     parser.add_argument("--sched", type=str, default='m1')
-    parser.add_argument("--period", type=int, default=8)
+    parser.add_argument("--period", type=int, default=1)
     parser.add_argument("--momentum", type=float, default=0.0)
     parser.add_argument("--optim", type=str, default='adam')
 
@@ -82,7 +82,7 @@ def main(sysargvlist=None):
     # Data args
 
     parser.add_argument("-n", "--n_train", type=int, default=-1)
-    parser.add_argument("--n_valid", type=int, default=10000)
+    parser.add_argument("--n_valid", type=int, default=5000)
     parser.add_argument("--dataset", type=str, default='w')
     parser.add_argument("--data_dropout", type=float, default=0.0)
     parser.add_argument("--pp", action='store_true', default=False)
@@ -93,7 +93,7 @@ def main(sysargvlist=None):
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     '''
     # Dimension and activation args
-    parser.add_argument("--hidden", type=int, default=64)
+    parser.add_argument("--hidden", type=int, default=40)
     parser.add_argument("--act", type=str, default='leakyrelu')
     parser.add_argument("--dropout", type=float, default=0.)
     parser.add_argument("--ln", action='store_true')
