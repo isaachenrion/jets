@@ -19,28 +19,26 @@ class _DataOps:
     flatten_pileup_jets = utils.flatten_pileup_jets
     flatten_original_jets = utils.flatten_original_jets
 
+    train_suffix = '-train.pickle'
+    test_suffix = '-test.pickle'
     w_vs_qcd = 'w-vs-qcd'
     quark_gluon = 'quark-gluon'
     DATASETS = {
-        'w':(w_vs_qcd,'antikt-kt'),
-        'wp':(w_vs_qcd + '/pileup','pileup'),
-        #'pp': (quark_gluon,'pp'),
-        #'pbpb': (quark_gluon,'pbpb'),
-        'wd':(w_vs_qcd, 'medium'),
-        'desc': (w_vs_qcd, 'antikt-seqpt-reversed')
+        'w':(w_vs_qcd,'antikt-kt' + train_suffix),
+        'wp':(w_vs_qcd + '/pileup','pileup' + train_suffix),
+        'wd':(w_vs_qcd, 'medium' + train_suffix),
+        'desc': (w_vs_qcd, 'antikt-seqpt-reversed' + train_suffix),
+        'w-t':(w_vs_qcd,'antikt-kt' + test_suffix),
+        'wp-t':(w_vs_qcd + '/pileup','pileup' + test_suffix),
+        'wd-t':(w_vs_qcd, 'medium' + test_suffix),
+        'desc-t': (w_vs_qcd, 'antikt-seqpt-reversed' + test_suffix)
     }
 
     @classmethod
-    def load_jet_dicts(cls, dataset_type, data_dir, dataset, do_preprocessing=False):
+    def load_jet_dicts(cls, data_dir, dataset, do_preprocessing=False):
         intermediate_dir, filename = cls.DATASETS.get(dataset, None)
         data_dir = os.path.join(data_dir, intermediate_dir)
-        if dataset_type == 'train':
-            suffix = "-train.pickle"
-        elif dataset_type == 'test':
-            suffix = "-test.pickle"
-        else:
-            raise ValueError
-        jet_dicts = _load_jet_dicts(data_dir, filename + suffix, cls.preprocess_fn, do_preprocessing)
+        jet_dicts = _load_jet_dicts(data_dir, filename, cls.preprocess_fn, do_preprocessing)
         return jet_dicts
 
     @classmethod
@@ -52,7 +50,6 @@ class _DataOps:
 
     @classmethod
     def crop_and_flatten(cls, jets, pileup):
-        #pileup = 'pileup' in filename
         if pileup:
             crop = cls.crop_pileup_jets
             flatten_jets = cls.flatten_pileup_jets
@@ -62,12 +59,13 @@ class _DataOps:
 
         good_jets, bad_jets = crop(jets)
         good_weights = flatten_jets(good_jets)
-        #bad_weights = flatten_jets(bad_jets)
 
         return good_jets, good_weights, bad_jets
 
     @classmethod
     def get_transform(cls, data_dir, dataset):
+        if '-t' == dataset[-2:]:
+            dataset = dataset[:-2]
         intermediate_dir, _ = cls.DATASETS.get(dataset, None)
         complete_data_dir = os.path.join(data_dir, intermediate_dir)
         transform_dir = os.path.join(complete_data_dir, 'transform')
@@ -82,7 +80,7 @@ class _DataOps:
             logging.info("Building transform")
             if not os.path.exists(transform_dir):
                 os.makedirs(transform_dir)
-            jet_dicts = cls.load_jet_dicts('train', data_dir, dataset, False)
+            jet_dicts = cls.load_jet_dicts(data_dir, dataset, False)
             transform = RobustScaler().fit(np.vstack([jd["tree_content"] for jd in jet_dicts]))
             with open(transform_filename, 'wb') as f:
                 pickle.dump(transform, f)
@@ -92,7 +90,7 @@ class _DataOps:
     @classmethod
     def training_and_validation_dataset(cls, data_dir, dataset, n_train, n_valid, do_preprocessing):
 
-        jet_dicts = cls.load_jet_dicts('train', data_dir, dataset, do_preprocessing)
+        jet_dicts = cls.load_jet_dicts(data_dir, dataset, do_preprocessing)
         tf = cls.get_transform(data_dir, dataset)
         for jet_dict in jet_dicts:
             jet_dict["tree_content"] = tf.transform(jet_dict["tree_content"])
@@ -123,7 +121,7 @@ class _DataOps:
 
     @classmethod
     def test_dataset(cls, data_dir, dataset, n_test, do_preprocessing):
-        jet_dicts = cls.load_jet_dicts('test', data_dir, dataset, do_preprocessing)
+        jet_dicts = cls.load_jet_dicts(data_dir, dataset, do_preprocessing)
         tf = cls.get_transform(data_dir, dataset)
         for jet_dict in jet_dicts:
             jet_dict["tree_content"] = tf.transform(jet_dict["tree_content"])
