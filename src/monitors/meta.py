@@ -104,19 +104,21 @@ class Collect(ScalarMonitor):
             )
 
 class Mean(ScalarMonitor):
-    def __init__(self, monitor):
+    def __init__(self, monitor, **kwargs):
         assert isinstance(monitor, Collect)
         assert monitor.numerical
         self.monitor = monitor
+        super().__init__(name='mean_'+monitor.name, *kwargs)
 
     def call(self, **kwargs):
         return np.mean(self.monitor.collection)
 
 class Std(ScalarMonitor):
-    def __init__(self, monitor):
+    def __init__(self, monitor, **kwargs):
         assert isinstance(monitor, Collect)
         assert monitor.numerical
         self.monitor = monitor
+        super().__init__(name='std_'+monitor.name, *kwargs)
 
     def call(self, **kwargs):
         return np.std(self.monitor.collection)
