@@ -42,17 +42,35 @@ class ResidualFullyConnected(FullyConnected):
     def forward(self, x):
         return x + self.block(x)
 
+class HighwayFullyConnected(FullyConnected):
+    def __init__(self, dim, activation, dropout=None, ln=False):
+        super().__init__(dim, dim, activation, dropout, ln)
+        self.gate = FullyConnected(dim, dim, activation='sigmoid')
+
+    def forward(self, x):
+        t = self.gate(x)
+        return x * (1 - t) + self.block(x) * t
+
 class MessagePassingBlock(nn.Module):
     def __init__(self, hidden, update, activation, dropout=None, ln=False):
         super().__init__()
         self.message = ResidualFullyConnected(hidden, activation, dropout=dropout, ln=ln)
         self.activation = ACTIVATIONS[activation]()
-        self.vertex_update = VERTEX_UPDATES[update](hidden, hidden)
+        if update == 'res':
+            self.vertex_update = ResidualFullyConnected(hidden, activation, dropout, ln)
+        elif update == 'hwy':
+            self.vertex_update = HighwayFullyConnected(hidden, activation, dropout, ln)
+        elif update == 'fc':
+            self.vertex_update = FullyConnected(hidden, hidden, activation, dropout, ln)
+        else:
+            self.vertex_update = VERTEX_UPDATES[update](hidden, hidden)
 
     def forward(self, h, A):
-        h_new = self.activation(torch.bmm(A, self.message(h)))
-        h = self.vertex_update(h, h_new)
-        del h_new
+        #h_new = self.activation(torch.bmm(A, self.message(h)))
+        #h = self.vertex_update(h, h_new)
+        #del h_new
+        h = self.activation(torch.bmm(A, self.message(h)))
+        h = self.vertex_update(h)
         return h
 
 class FixedNMP(nn.Module):
@@ -79,7 +97,10 @@ class FixedNMP(nn.Module):
         self.features = features
         m_emb = OrderedDict()
         m_emb['proj'] = FullyConnected(features, hidden, activation, dropout, ln)
-        m_emb['res'] = ResidualFullyConnected(hidden, activation, dropout, ln)
+        if emb_init == 'res':
+            m_emb['res'] = ResidualFullyConnected(hidden, activation, dropout, ln)
+        elif emb_init == 'hwy':
+            m_emb['hwy'] = HighwayFullyConnected(hidden, activation, dropout, ln)
         self.embedding = nn.Sequential(m_emb)
 
         if tied:
@@ -93,15 +114,15 @@ class FixedNMP(nn.Module):
         self.adjacency_matrix = construct_adjacency(matrix=matrix, dim_in=features, dim_out=hidden, **adj_kwargs)
 
         m = OrderedDict()
-        m['res1'] = ResidualFullyConnected(hidden, activation, dropout, ln)
-        m['res2'] = FullyConnected(hidden, 1, activation, dropout, ln)
+        m['res'] = ResidualFullyConnected(hidden, activation, dropout, ln)
+        m['fc'] = FullyConnected(hidden, 1, activation, dropout, ln)
         self.readout = nn.Sequential(m)
 
 
-    def forward(self, x, **kwargs):
-        jets, mask = x
-        h = self.embedding(jets)
-        dij = self.adjacency_matrix(jets, mask=mask, **kwargs)
+    def forward(self, inputs, **kwargs):
+        x, mask = inputs
+        h = self.embedding(x)
+        dij = self.adjacency_matrix(x, mask=mask, **kwargs)
         for mp in self.mp_blocks:
             h = mp(h, dij)
         out = self.readout(h).mean(1).squeeze(-1)
@@ -131,7 +152,10 @@ class VariableNMP(nn.Module):
         self.features = features
         m_emb = OrderedDict()
         m_emb['proj'] = FullyConnected(features, hidden, activation, dropout, ln)
-        m_emb['res'] = ResidualFullyConnected(hidden, activation, dropout, ln)
+        if emb_init == 'res':
+            m_emb['res'] = ResidualFullyConnected(hidden, activation, dropout, ln)
+        elif emb_init == 'hwy':
+            m_emb['hwy'] = HighwayFullyConnected(hidden, activation, dropout, ln)
         self.embedding = nn.Sequential(m_emb)
 
         if tied:
@@ -151,10 +175,10 @@ class VariableNMP(nn.Module):
 
         self.adjacency_matrices = nn.ModuleList([construct_adjacency(matrix=matrix, dim_in=hidden, dim_out=hidden, **adj_kwargs) for _ in range(self.iters)])
 
-    def forward(self, x, **kwargs):
-        jets, mask = x
-        h = self.embedding(jets)
-        dij = self.initial_adjacency_matrix(jets, mask=mask, **kwargs)
+    def forward(self, inputs, **kwargs):
+        x, mask = inputs
+        h = self.embedding(x)
+        dij = self.initial_adjacency_matrix(x, mask=mask, **kwargs)
         for mp, adj in zip(self.mp_blocks, self.adjacency_matrices):
             dij = adj(h, mask=mask, **kwargs)
             h = mp(h, dij)

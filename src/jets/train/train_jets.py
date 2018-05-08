@@ -104,7 +104,7 @@ def main(sysargvlist=None):
     # NMP
     parser.add_argument("-i", "--iters", type=int, default=8)
     parser.add_argument("-u", "--update", type=str, default='gru', help='type of vertex update')
-    #parser.add_argument("--emb_init", type=str, default='1', help='type of message')
+    parser.add_argument("--emb_init", type=str, default='res', help='layer for embedding')
     parser.add_argument("-a","--adj", type=str, nargs='+', default='phy', help='type of matrix layer')
     parser.add_argument("--asym", action='store_true', default=False)
     parser.add_argument("--m_act", type=str, default='soft', help='type of nonlinearity for matrices' )
