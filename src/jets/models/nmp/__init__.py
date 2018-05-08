@@ -1,1 +1,1 @@
-from .FixedNMP import FixedNMP
+from .FixedNMP import FixedNMP, VariableNMP
