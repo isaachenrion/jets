@@ -24,9 +24,10 @@ class _DataOps:
     DATASETS = {
         'w':(w_vs_qcd,'antikt-kt'),
         'wp':(w_vs_qcd + '/pileup','pileup'),
-        'pp': (quark_gluon,'pp'),
-        'pbpb': (quark_gluon,'pbpb'),
-        'wd':(w_vs_qcd, 'medium')
+        #'pp': (quark_gluon,'pp'),
+        #'pbpb': (quark_gluon,'pbpb'),
+        'wd':(w_vs_qcd, 'medium'),
+        'desc': (w_vs_qcd, 'antikt-seqpt-reversed')
     }
 
     @classmethod
@@ -97,19 +98,6 @@ class _DataOps:
             jet_dict["tree_content"] = tf.transform(jet_dict["tree_content"])
         jets = cls.load_jets(jet_dicts)
 
-        '''
-        good_jets, good_weights, bad_jets = cls.crop_and_flatten(jets, dataset == 'wp')
-
-        valid_jets = good_jets[:n_valid]
-        valid_weights = good_weights[:n_valid]
-
-        train_jets = good_jets[n_valid:] + bad_jets
-        if n_train >= 0:
-            train_jets = train_jets[:n_train]
-
-        dummy_train_jets = good_jets[n_valid:2*n_valid]
-        dummy_train_weights = good_weights[n_valid:2*n_valid]
-        '''
         valid_jets = jets[:n_valid]
         train_jets = jets[n_valid:]
         if n_train >= 0:
@@ -127,13 +115,6 @@ class _DataOps:
 
         train_dataset.shuffle()
 
-        ##
-        #logging.warning("Building normalizing transform from training set...")
-        #train_dataset.transform()
-        #valid_dataset.transform(train_dataset.tf)
-        #dummy_train_dataset.transform(train_dataset.tf)
-
-        # add cropped indices to training data
         logging.warning("\tfinal train size = %d" % len(train_dataset))
         logging.warning("\tfinal valid size = %d" % len(valid_dataset))
         logging.warning("\tfinal dummy train size = %d" % len(dummy_train_dataset))
@@ -150,12 +131,10 @@ class _DataOps:
 
         good_jets, good_weights, _ = cls.crop_and_flatten(jets, dataset == 'wp')
 
-        test_jets = good_jets[:n_test]
-        test_weights = good_weights[:n_test]
+        test_jets = good_jets[:n_test] if n_test > 0 else good_jets
+        test_weights = good_weights[:n_test] if n_test > 0 else good_weights
         dataset = cls.Dataset(test_jets, weights=test_weights)
 
-        #dataset.transform(train_dataset.tf)
-        # add cropped indices to training data
         logging.warning("\tfinal test size = %d" % len(dataset))
 
         return dataset
