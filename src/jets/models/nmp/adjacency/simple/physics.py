@@ -5,15 +5,6 @@ import torch.nn.functional as F
 from ._adjacency import _Adjacency
 
 
-def construct_physics_adjacency(alpha=None, R=None, trainable_physics=False):
-    if trainable_physics:
-        assert R is None
-        assert alpha is None
-        return TrainablePhysicsAdjacency()
-    else:
-        return FixedPhysicsAdjacency(alpha=alpha, R=R)
-
-
 def compute_dij(p, alpha, R):
     p1 = p.unsqueeze(1) + 1e-10
     p2 = p.unsqueeze(2) + 1e-10
@@ -43,8 +34,6 @@ class _PhysicsAdjacency(_Adjacency):
 
     def raw_matrix(self, p, mask=None, **kwargs):
         dij = compute_dij(p, self.alpha, self.R)
-        #dij = torch.exp(-dij)
-        #import ipdb; ipdb.set_trace()
         return -dij
 
 
@@ -88,7 +77,43 @@ class TrainablePhysicsAdjacency(_PhysicsAdjacency):
         #R_monitor(R=R.data[0])
         return R
 
+class LearnedFunctionOfPhysics(_PhysicsAdjacency):
+    def __init__(self, alpha=None, R=None,index='',**kwargs):
+        name='lphy'+index
+        super().__init__(name=name, **kwargs)
+        self.register_buffer('_alpha',torch.tensor(alpha).float())
+        self.register_buffer('_R',torch.tensor(R).float())
+
+        fc1 = nn.Linear(1, 100)
+        self.weight1 = fc1.weight
+        self.bias1 = fc1.bias
+
+        fc2 = nn.Linear(100, 1)
+        self.weight2 = fc2.weight
+        self.bias2 = fc2.bias
+        #self.relu = nn.ReLU()
+        #self.fc2 = nn.Linear(100,1)
+
+    @property
+    def alpha(self):
+        return self._alpha
+
+    @property
+    def R(self):
+        return self._R
+
+    def block(self, x):
+        x = F.linear(x, self.weight1.pow(2), self.bias1)
+        x = F.sigmoid(x)
+        x = F.linear(x, self.weight2.pow(2), self.bias2)
+        return x
+
+    def raw_matrix(self, p, **kwargs):
+        neg_dij = super().raw_matrix(p, **kwargs)
+        return self.block(neg_dij.view(*neg_dij.shape, 1)).squeeze(-1)
+
 PHYSICS_ADJACENCIES = dict(
     tphy=TrainablePhysicsAdjacency,
-    phy=FixedPhysicsAdjacency
+    phy=FixedPhysicsAdjacency,
+    lphy=LearnedFunctionOfPhysics
 )
