@@ -104,11 +104,12 @@ class _DataOps:
         valid_weights = good_weights[:n_valid]
         dummy_train_weights = good_weights[n_valid:]
 
+        np.random.shuffle(train_jets)
+        perm = np.random.permutation(len(dummy_train_jets))
+        dummy_train_jets = [dummy_train_jets[i] for i in perm]
+        dummy_train_weights = [dummy_train_weights[i] for i in perm]
+        
         if n_train >= 0:
-            np.random.shuffle(train_jets)
-            perm = np.random.permutation(len(dummy_train_jets))
-            dummy_train_jets = [dummy_train_jets[i] for i in perm]
-            dummy_train_weights = [dummy_train_weights[i] for i in perm]
             train_jets = train_jets[:n_train]
             dummy_train_jets = dummy_train_jets[:n_train]
             dummy_train_weights = dummy_train_weights[:n_train]

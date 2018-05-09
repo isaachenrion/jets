@@ -18,7 +18,6 @@ def main(sysargvlist=None):
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     '''
     # Debugging
-    #admin = parser.add_argument_group('admin')
     parser.add_argument("-d", "--debug", help="sets everything small for fast model debugging. use in combination with ipdb", action='store_true', default=False)
     parser.add_argument("--profile", action='store_true', default=False)
 
@@ -49,8 +48,6 @@ def main(sysargvlist=None):
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     '''
     # Training args
-    #training = parser.add_argument_group('training')
-    #training.add_argument("-e", "--epochs", type=int, default=64)
     parser.add_argument("-b", "--batch_size", type=int, default=128)
     parser.add_argument("--experiment_time", type=int, default=1000000)
 
@@ -58,8 +55,6 @@ def main(sysargvlist=None):
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     '''
     # computing args
-
-    #computing = parser.add_argument_group('computing')
     parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)
     parser.add_argument("-g", "--gpu", type=str, default="")
 
@@ -68,9 +63,7 @@ def main(sysargvlist=None):
     '''
     # Data args
 
-    #data = parser.add_argument_group('data')
     parser.add_argument("-n", "--n_test", type=int, default=-1)
-    #data.add_argument("--n_", type=int, default=27000)
     parser.add_argument("--dataset", type=str, default='w')
     parser.add_argument("--pp", action='store_true', default=False)
     parser.add_argument("--permute_particles", action='store_true')
@@ -86,12 +79,6 @@ def main(sysargvlist=None):
         args = parser.parse_args()
     else:
         args = parser.parse_args(sysargvlist)
-
-
-    #arg_groups={}
-    #for group in parser._action_groups:
-    #    group_dict={a.dest:getattr(args,a.dest,None) for a in group._group_actions}
-    #    arg_groups[group.title + '_args']=argparse.Namespace(**group_dict)
 
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     args.cmd_line_args = (' '.join(sys.argv))
