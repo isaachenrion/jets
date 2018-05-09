@@ -46,6 +46,7 @@ class _DataOps:
         jets = [cls.Jet(**jd) for jd in jet_dicts]
         logging.warning("\tSuccessfully loaded data")
         logging.warning("\tFound {} jets in total".format(len(jets)))
+        np.random.shuffle(jets)
         return jets
 
     @classmethod
