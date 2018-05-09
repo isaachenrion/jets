@@ -27,10 +27,11 @@ class Logger:
         self.headers = [mc.name + '_' + name for mc in self.monitor_collections.values() for name in mc.scalar_monitor_names]
         self.visualized_scalar_monitor_names = [mc.name + '_' + name for mc in self.monitor_collections.values() for name in mc.scalar_monitor_names]
 
-        self.shared_monitor_names = list(
-            set(self.monitor_collections['dummy_train'].monitors.keys()) \
-            & set(self.monitor_collections['valid'].monitors.keys())
-            )
+        if self.train:
+            self.shared_monitor_names = list(
+                set(self.monitor_collections['dummy_train'].monitors.keys()) \
+                & set(self.monitor_collections['valid'].monitors.keys())
+                )
 
         with open(self.scalar_filename, 'a', newline='') as f:
             writer = csv.DictWriter(f, self.headers)
