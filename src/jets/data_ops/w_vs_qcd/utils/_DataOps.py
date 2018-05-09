@@ -111,7 +111,7 @@ class _DataOps:
         #valid_jets = good_valid_jets
         #dummy_train_jets = bad_valid_jets + good_valid_jets
         valid_weights = good_weights[:n_valid]
-        dummy_train_weights = good_weights[n_valid:][:n_train]
+        dummy_train_weights = good_weights[n_valid:][:len(dummy_train_weights)]
         #dummy_train_weights = None
 
         train_dataset = cls.Dataset(train_jets)

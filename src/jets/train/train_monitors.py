@@ -11,24 +11,24 @@ def get_monitor_collections(plotting_frequency):
 
 def train_monitor_collection(plotting_frequency):
     time_monitors = [
-        Collect('epoch', visualizing=False, printing=False),
-        Collect('iteration', visualizing=False, printing=False),
+        Collect('epoch', printing=False),
+        Collect('iteration', printing=False),
         Hours(),
     ]
     optim_monitors = [
         Collect('lr', fn='last', ndp=8,visualizing=True),
     ]
-    monitors = time_monitors + optim_monitors + [Collect('loss', ndp=3,visualizing=True)]
+    monitors = time_monitors + optim_monitors + [Collect('loss', ndp=3)]
     mc = MonitorCollection('train',*monitors, plotting_frequency=plotting_frequency)
     return mc
 
 def valid_monitor_collection(plotting_frequency):
-    roc_auc = ROCAUC(visualizing=True, ndp=5)
-    inv_fpr = InvFPR(visualizing=True)
+    roc_auc = ROCAUC(ndp=5)
+    inv_fpr = InvFPR()
     best_inv_fpr = Best(inv_fpr)
     #roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
 
-    valid_loss = Collect('loss', ndp=3,visualizing=True)
+    valid_loss = Collect('loss', ndp=3)
     best_valid_loss = Best(valid_loss, track='min')
     inv_fpr_at_best_valid_loss = LogOnImprovement(inv_fpr, best_valid_loss)
     roc_auc_at_best_valid_loss = LogOnImprovement(roc_auc, best_valid_loss)
@@ -59,12 +59,12 @@ def valid_monitor_collection(plotting_frequency):
     return mc
 
 def dummy_train_monitor_collection(plotting_frequency):
-    roc_auc = ROCAUC(visualizing=True, ndp=5)
-    inv_fpr = InvFPR(visualizing=True)
+    roc_auc = ROCAUC(ndp=5)
+    inv_fpr = InvFPR()
     #best_inv_fpr = Best(inv_fpr)
     #roc_auc_at_best_inv_fpr = LogOnImprovement(roc_auc, best_inv_fpr)
 
-    valid_loss = Collect('loss', ndp=3,visualizing=True)
+    valid_loss = Collect('loss', ndp=3)
     best_valid_loss = Best(valid_loss, track='min')
     inv_fpr_at_best_valid_loss = LogOnImprovement(inv_fpr, best_valid_loss)
     roc_auc_at_best_valid_loss = LogOnImprovement(roc_auc, best_valid_loss)

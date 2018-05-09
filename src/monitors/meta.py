@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from .baseclasses import ScalarMonitor, Monitor
 from ..visualizing.utils import ensure_numpy_array
 from ..visualizing.utils import ensure_numpy_float
-from ..visualizing.plot_training_stats import plot_one_training_stat
+from ..visualizing.line_graph import line_graph
 from ..visualizing.utils import image_and_pickle
 
 class Best(ScalarMonitor):
@@ -96,12 +96,9 @@ class Collect(ScalarMonitor):
     def _visualize(self, plotname=None, **kwargs):
         if plotname is None:
             plotname = self.plotname
-        plot_one_training_stat(
-            plotname,
-            self.collection,
-            self.plotsdir,
-            **kwargs
-            )
+
+        line_graph(self.collection, plotname, self.plotsdir, smoothing=0.7, xname='Epochs', **kwargs)
+
 
 class Mean(ScalarMonitor):
     def __init__(self, monitor, **kwargs):
