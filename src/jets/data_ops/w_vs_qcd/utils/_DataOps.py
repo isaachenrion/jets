@@ -96,16 +96,23 @@ class _DataOps:
             jet_dict["tree_content"] = tf.transform(jet_dict["tree_content"])
         jets = cls.load_jets(jet_dicts)
 
-        valid_jets = jets[:n_valid]
-        train_jets = jets[n_valid:]
-        if n_train >= 0:
-            train_jets = train_jets[:n_train]
 
-        good_valid_jets, good_valid_weights, bad_valid_jets = cls.crop_and_flatten(valid_jets, dataset == 'wp')
-        valid_jets = good_valid_jets
-        dummy_train_jets = bad_valid_jets + good_valid_jets
-        valid_weights = good_valid_weights
-        dummy_train_weights = None
+        good_jets, good_weights, bad_jets = cls.crop_and_flatten(jets, dataset == 'wp')
+
+        valid_jets = good_jets[:n_valid]
+        dummy_train_jets = good_jets[n_valid:]
+        train_jets = dummy_train_jets + bad_jets
+        if n_train >= 0:
+            np.random.shuffle(train_jets)
+            np.random.shuffle(dummy_train_jets)
+            train_jets = train_jets[:n_train]
+            dummy_train_jets = dummy_train_jets[:n_train]
+
+        #valid_jets = good_valid_jets
+        #dummy_train_jets = bad_valid_jets + good_valid_jets
+        valid_weights = good_weights[:n_valid]
+        dummy_train_weights = good_weights[n_valid:][:n_train]
+        #dummy_train_weights = None
 
         train_dataset = cls.Dataset(train_jets)
         valid_dataset = cls.Dataset(valid_jets, weights=valid_weights)

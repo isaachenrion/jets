@@ -55,22 +55,13 @@ class MessagePassingBlock(nn.Module):
     def __init__(self, hidden, update, activation, dropout=None, ln=False):
         super().__init__()
         self.message = ResidualFullyConnected(hidden, activation, dropout=dropout, ln=ln)
-        self.activation = ACTIVATIONS[activation]()
-        if update == 'res':
-            self.vertex_update = ResidualFullyConnected(hidden, activation, dropout, ln)
-        elif update == 'hwy':
-            self.vertex_update = HighwayFullyConnected(hidden, activation, dropout, ln)
-        elif update == 'fc':
-            self.vertex_update = FullyConnected(hidden, hidden, activation, dropout, ln)
-        else:
-            self.vertex_update = VERTEX_UPDATES[update](hidden, hidden)
+        self.activation = F.relu
+        self.vertex_update = VERTEX_UPDATES[update](hidden, hidden)
 
     def forward(self, h, A):
-        #h_new = self.activation(torch.bmm(A, self.message(h)))
-        #h = self.vertex_update(h, h_new)
-        #del h_new
-        h = self.activation(torch.bmm(A, self.message(h)))
-        h = self.vertex_update(h)
+        h_new = self.activation(torch.bmm(A, self.message(h)))
+        h = self.vertex_update(h, h_new)
+        del h_new
         return h
 
 class FixedNMP(nn.Module):
