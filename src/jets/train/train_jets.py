@@ -88,7 +88,7 @@ def main(sysargvlist=None):
     parser.add_argument("--pp", action='store_true', default=False)
     parser.add_argument("--permute_vertices", action='store_true')
     parser.add_argument("--no_cropped", action='store_true')
-    parser.add_argument("--use_weights", action='store_true')
+    parser.add_argument("--no_weights", action='store_true')
 
     '''
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

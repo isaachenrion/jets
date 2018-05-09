@@ -57,7 +57,8 @@ def get_data_loader_kwargs(args):
         batch_size=args.batch_size,
         dataset=args.dataset,
         do_preprocessing=args.pp,
-        leaves=args.leaves
+        leaves=args.leaves,
+        use_weights=not args.no_weights
 
     )
 
