@@ -3,8 +3,8 @@ import numpy as np
 def get_weights_for_flatness_in_pt(pts, pt_min, pt_max, bins):
     pdf, edges = np.histogram(pts, density=True, range=[pt_min, pt_max], bins=bins)
     indices = np.searchsorted(edges, pts) - 1
-    inv_w = 1. / pdf[indices]
-    inv_w /= inv_w.sum()
+    inv_w = 1. / (pdf[indices] * (pt_max - pt_min))
+    #inv_w /= inv_w.sum()
     return inv_w
 
 def flatten_in_pt_weights(jets, pt_min=None, pt_max=None):

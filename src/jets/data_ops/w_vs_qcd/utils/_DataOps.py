@@ -112,7 +112,7 @@ class _DataOps:
         #dummy_train_jets = bad_valid_jets + good_valid_jets
         valid_weights = good_weights[:n_valid]
         dummy_train_weights = good_weights[n_valid:][:len(dummy_train_jets)]
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
         #dummy_train_weights = None
 
         train_dataset = cls.Dataset(train_jets)
