@@ -14,7 +14,7 @@ class TreeDataLoader(_DataLoader):
         #        tree.to_tensor()
         #    dataset.x[i] = tree
 
-        super().__init__(dataset, batch_size)
+        super().__init__(dataset, batch_size, **kwargs)
 
     @property
     def dim(self):

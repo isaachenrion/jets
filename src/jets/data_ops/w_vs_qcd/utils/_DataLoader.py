@@ -4,8 +4,9 @@ from torch.utils.data import DataLoader as DL
 
 
 class _DataLoader(DL):
-    def __init__(self, dataset, batch_size, **kwargs):
+    def __init__(self, dataset, batch_size, use_weights, **kwargs):
         super().__init__(dataset, batch_size, collate_fn=self.collate)
+        self.use_weights = use_weights
 
     @property
     def dim(self):
@@ -16,7 +17,7 @@ class _DataLoader(DL):
         inputs = self.preprocess_x(x_list)
         y = self.preprocess_y(y_list)
 
-        if weight_list[0] is not None:
+        if self.use_weights and weight_list[0] is not None:
             weight = torch.tensor(weight_list)
         else:
             weight = None

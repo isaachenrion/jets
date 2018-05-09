@@ -9,7 +9,7 @@ from src.data_ops.dropout import get_dropout_masks
 
 class LeafDataLoader(_DataLoader):
     def __init__(self, dataset, batch_size,dropout=None, permute_particles=False,**kwargs):
-        super().__init__(dataset, batch_size)
+        super().__init__(dataset, batch_size, **kwargs)
         self.dropout = dropout
         self.permute_particles = permute_particles
 
