@@ -96,13 +96,14 @@ class _DataOps:
         for jet_dict in jet_dicts:
             jet_dict["tree_content"] = tf.transform(jet_dict["tree_content"])
         jets = cls.load_jets(jet_dicts)
-
-
         good_jets, good_weights, bad_jets = cls.crop_and_flatten(jets, dataset == 'wp')
 
         valid_jets = good_jets[:n_valid]
         dummy_train_jets = good_jets[n_valid:]
         train_jets = dummy_train_jets + bad_jets
+        valid_weights = good_weights[:n_valid]
+        dummy_train_weights = good_weights[n_valid:][:len(dummy_train_jets)]
+        
         if n_train >= 0:
             np.random.shuffle(train_jets)
             np.random.shuffle(dummy_train_jets)
@@ -111,8 +112,6 @@ class _DataOps:
 
         #valid_jets = good_valid_jets
         #dummy_train_jets = bad_valid_jets + good_valid_jets
-        valid_weights = good_weights[:n_valid]
-        dummy_train_weights = good_weights[n_valid:][:len(dummy_train_jets)]
         #import ipdb; ipdb.set_trace()
         #dummy_train_weights = None
 
