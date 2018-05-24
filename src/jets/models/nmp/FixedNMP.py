@@ -20,6 +20,9 @@ ACTIVATIONS = dict(
 
 
 class FullyConnected(nn.Module):
+    '''
+    Fully connected neural network layer.
+    '''
     def __init__(self, dim_in, dim_out, activation, dropout=None, ln=False):
         super().__init__()
         m = OrderedDict()
@@ -52,6 +55,9 @@ class HighwayFullyConnected(FullyConnected):
         return x * (1 - t) + self.block(x) * t
 
 class MessagePassingBlock(nn.Module):
+    '''
+    Basic block for passing messages.
+    '''
     def __init__(self, hidden, update, activation, dropout=None, ln=False):
         super().__init__()
         self.message = ResidualFullyConnected(hidden, activation, dropout=dropout, ln=ln)
@@ -59,12 +65,22 @@ class MessagePassingBlock(nn.Module):
         self.vertex_update = VERTEX_UPDATES[update](hidden, hidden)
 
     def forward(self, h, A):
+        '''
+        inputs
+            h: (B, N, D) tensor of vertex states
+            A: (B, N, N) tensor of adjacency matrices 
+        '''
         h_new = self.activation(torch.bmm(A, self.message(h)))
         h = self.vertex_update(h, h_new)
         del h_new
         return h
 
 class FixedNMP(nn.Module):
+    '''
+    Main model for neural message passing. It takes a collection of vertex data,
+    and embeds it in a higher-dimensional space. Then passes messages within
+    that space, using a particular adjacency matrix (specified by user).
+    '''
     def __init__(self,
         features=None,
         hidden=None,

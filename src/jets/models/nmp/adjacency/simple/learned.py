@@ -20,12 +20,15 @@ class Sum(_Adjacency):
 
 
 class DistMult(_Adjacency):
+    '''
+    Matrix computed as h^T * A * h where A is a parameter matrix.
+    '''
     def __init__(self, dim_in, index='', **kwargs):
         name='dm'+index
         super().__init__(name=name,**kwargs)
         self.matrix = nn.Parameter(torch.zeros(dim_in,dim_in))
         nn.init.xavier_uniform_(self.matrix)
-        
+
     def raw_matrix(self, vertices):
         h = vertices
         A = torch.matmul(h, torch.matmul(self.matrix, h.transpose(1,2)))

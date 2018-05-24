@@ -3,6 +3,9 @@ from ._adjacency import _Adjacency
 
 
 class Ones(_Adjacency):
+    '''
+    This is the adjacency matrix consisting of all ones.
+    '''
     def __init__(self,index='', **kwargs):
         kwargs.pop('symmetric', None)
         kwargs.pop('activation', None)
@@ -15,6 +18,9 @@ class Ones(_Adjacency):
         return matrix
 
 class Eye(_Adjacency):
+    '''
+    This is the adjacency matrix consisting ones on the diagonal and zeros elsewhere.
+    '''
     def __init__(self, index='',**kwargs):
         kwargs.pop('symmetric', None)
         kwargs.pop('activation', None)

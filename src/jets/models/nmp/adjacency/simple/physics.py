@@ -21,6 +21,9 @@ def compute_dij(p, alpha, R):
     return dij
 
 class _PhysicsAdjacency(_Adjacency):
+    '''
+    Computes the physics-based adjacency matrix.
+    '''
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
@@ -38,6 +41,9 @@ class _PhysicsAdjacency(_Adjacency):
 
 
 class FixedPhysicsAdjacency(_PhysicsAdjacency):
+    '''
+    Computes a fixed version of the dij
+    '''
     def __init__(self, alpha=None, R=None,index='',**kwargs):
         name='phy'+index
         super().__init__(name=name, **kwargs)
@@ -78,6 +84,9 @@ class TrainablePhysicsAdjacency(_PhysicsAdjacency):
         return R
 
 class LearnedFunctionOfPhysics(_PhysicsAdjacency):
+    '''
+    Using the dij computed from physics, learns a monotone function of the dij.
+    '''
     def __init__(self, alpha=None, R=None,index='',**kwargs):
         name='lphy'+index
         super().__init__(name=name, **kwargs)

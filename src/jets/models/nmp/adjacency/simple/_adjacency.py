@@ -5,6 +5,10 @@ from src.monitors import BatchMatrixMonitor
 from .matrix_activation import MATRIX_ACTIVATIONS
 
 class _Adjacency(nn.Module):
+    '''
+    Base class for adjacency matrices that are computed as a function of
+    some node states.
+    '''
     def __init__(self, **kwargs):
         super().__init__()
         self.initialize(**kwargs)
@@ -35,6 +39,13 @@ class _Adjacency(nn.Module):
         raise NotImplementedError
 
     def forward(self, h, mask, **kwargs):
+        '''
+        Inputs
+            h: (B, N, D) tensor of N node states of dimension D.
+            mask: (B, N, N) mask tensor to zero out out-of-range states
+        Output
+            M: a (B, N, N) batch of adjacency matrices
+        '''
         #import ipdb; ipdb.set_trace()
         M = self.raw_matrix(h)
 
