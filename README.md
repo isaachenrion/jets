@@ -13,16 +13,18 @@
 - gputil
 
 conda install scipy scikit-learn matplotlib
+
 pip install gputil
 
 ### Email results
-If you want email results, you must create a file called email_addresses.txt
-in the misc directory. The file must contain:
+If you want email results, you must create a file.
+The file must contain:
 First line: recipient email address
 Second line: sender email address
 Third line: sender password
 (You are advised to create a dummy account to send results.)
 If you want to turn email off, add the flag --no_email.
+Pass the path to this file in the argparse args or set it as a default.
 
 ### Data
 
@@ -34,11 +36,13 @@ The training script will look for data in  data/w-vs-qcd/pickles/preprocessed an
 Classification of W vs QCD jets:
 
 ```
+cd src/scripts
 # Training
-python train.py [argparse args]
+python train.py x [argparse args]
 # Test
-python evaluation.py [argparse args]
+python test.py x [argparse args]
 ```
+where x = p for proteins or x = j for jets.
 
 ### Directory structure
 - sh contains bash and slurm scripts for submitting jobs onto a slurm cluster

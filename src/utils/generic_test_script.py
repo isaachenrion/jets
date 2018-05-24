@@ -41,6 +41,15 @@ def test_all_models(test_one_model, model_dict, model_filenames, data_loader, ad
 
 
 def generic_test_script(problem=None,args=None):
+    '''
+    Generic script for running a test experiment.
+    You need to write a problem-specific module that this function will access.
+    Also you need to specify the argparse parser for your problem.
+
+    inputs
+        problem: a string corresponding to a problem module
+        args: an argparse namespace
+    '''
 
     import src.admin._Administrator as Administrator
     problem = importlib.import_module('src.' + problem)

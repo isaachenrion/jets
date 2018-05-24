@@ -5,16 +5,16 @@ Here we provide some utility scripts for running jobs on slurm.
 
 We provide three scripts.
 
-### train.sh 
+### train.sh
 The first argument is an integer specifying the number of jobs you want to run, i.e. random seeds.
-After that, it just takes the arguments you would pass to train.py 
+After that, it just takes the arguments you would pass to train.py
 
-### eval.sh 
+### test.sh 
 The first argument is an integer specifying the number of jobs you want to run, i.e. random seeds.
-After that, it just takes the arguments you would pass to eval.py 
+After that, it just takes the arguments you would pass to eval.py
 
 
-### grid.sh 
+### grid.sh
 The first argument is an integer specifying the number of jobs you want to run, i.e. random seeds.
 After that, it just takes the arguments you would pass to train.py, but comma-separated values will spawn different jobs in a combinatorial fashion.
 

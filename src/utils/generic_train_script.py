@@ -109,6 +109,16 @@ def do_training(
     administrator.finished()
 
 def generic_train_script(problem=None,args=None):
+    '''
+    Generic script for running a training experiment.
+    You need to write a problem-specific module that this function will access.
+    Also you need to specify the argparse parser for your problem.
+
+
+    inputs
+        problem: a string corresponding to a problem module
+        args: an argparse namespace
+    '''
     '''----------------------------------------------------------------------- '''
     ''' IMPORT PROBLEM-SPECIFIC MODULES  '''
     '''----------------------------------------------------------------------- '''
