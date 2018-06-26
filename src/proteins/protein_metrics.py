@@ -5,6 +5,7 @@ import logging
 
 import numpy as np
 
+from src.admin.MonitorCollection import MonitorCollection
 from src.monitors.baseclasses import ScalarMonitor
 from src.monitors.meta import Collect
 from src.monitors.meta import Best
@@ -111,11 +112,9 @@ def compute_protein_metrics(targets, predictions, k_list):
 
 
 
-class ProteinMetricCollection(ScalarMonitor):
+class ProteinMetricCollection(MonitorCollection):
     def __init__(self, target_name, prediction_name, mask_name, *k_values, tracked_k=None, tracked_range=None,**kwargs):
-        super().__init__(name='protein_metrics_collection', **kwargs)
         names = ['acc_short','acc_med', 'acc_long']
-        self.collector_dicts = OrderedDict()
         self.target_name = target_name
         self.prediction_name = prediction_name
         self.mask_name = mask_name
@@ -124,15 +123,22 @@ class ProteinMetricCollection(ScalarMonitor):
             tracked_k = self.k_list[0]
         if tracked_range is None:
             tracked_range = 'long'
+
+        collector_dict = OrderedDict()
         for k in k_values:
-            cd = OrderedDict()
+            #cd = OrderedDict()
             for name in names:
                 name = name+'_L_'+str(k)
                 c = Collect(name, fn='last', plotname=name, **kwargs)
                 if tracked_k == k and tracked_range in name:
-                    self.track_monitor = Best(c, track='max')
-                cd[name] = c
-            self.collector_dicts[k] = cd
+                    track_monitor = Best(c, track='max')
+                collector_dict[name] = c
+            #collector_dict = cd
+
+        super().__init__('protein_metrics_collection', track_monitor=track_monitor, **collector_dict)
+
+    def __call__(self, **kwargs):
+        return self.call(**kwargs)
 
     def call(self, **kwargs):
         targets = kwargs.get(self.target_name, None)
@@ -146,32 +152,42 @@ class ProteinMetricCollection(ScalarMonitor):
         predictions = [prediction[:seq_length,:seq_length] for prediction, seq_length in zip(predictions, seq_lengths)]
 
         stats_dict = compute_protein_metrics(targets, predictions, self.k_list)
-        for _, cd in self.collector_dicts.items():
-            for _, c in cd.items():
-                c(**stats_dict)
+        for _, c in self.monitors.items():
+            #for _, c in cd.items():
+            c(**stats_dict)
         logging.info("Protein metric took {:.2f}s".format(time.time() - t))
 
         self.track_monitor()
-        return None
+        return {name: c.value for name, c in self.monitors.items()}
 
-    def initialize(self, *args):
-        for cd in self.collector_dicts.values():
-            for c in cd.values():
-                c.initialize(*args)
+    #def initialize(self, *args):
+    #    for _, c in self.monitors.items():
+    #        c.initialize(*args)
+    #    #for cd in self.collector_dicts.values():
+    #    #    for c in cd.values():
+    #    #        c.initialize(*args)
 
     @property
     def _string(self):
         out_str = ""
-        for k, cd in self.collector_dicts.items():
+        #import ipdb; ipdb.set_trace()
+        for _, c in self.monitors.items():
+            #c.initialize(*args)
             out_str += "\n"
-            out_str += "L/{}".format(k)+"\t"
-            for c in cd.values():
-                shortname = c.name.split('_')[1]
-                out_str += '\t{} = {:.1f}%'.format(shortname, 100*c.value)
-        out_str += "\n"
-        return out_str
+            out_str += c.string
+            #for k, cd in self.collector_dicts.items():
+            #    out_str += "\n"
+            #    out_str += "L/{}".format(k)+"\t"
+            #    for c in cd.values():
+            #        shortname = c.name.split('_')[1]
+            #        out_str += '\t{} = {:.1f}%'.format(shortname, 100*c.value)
+            out_str += "\n"
+            return out_str
 
-    def visualize(self, **kwargs):
-        for cd in self.collector_dicts.values():
-            for c in cd.values():
-                c.visualize(**kwargs)
+    #def visualize(self, **kwargs):
+    #    for _, c in self.monitors.items():
+    #        c.visualize(**kwargs)
+
+    #    #for cd in self.collector_dicts.values():
+    #    #    for c in cd.values():
+    #    #        c.visualize(**kwargs)
