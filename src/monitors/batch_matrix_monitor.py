@@ -37,7 +37,7 @@ class BatchMatrixMonitor(Monitor):
         return self.value
 
     def visualize(self, plotname=None, n=None, **kwargs):
-        super().visualize()
+        #super().visualize()
         if self.value is not None:
             if self.batch_size is None:
                 matrices = self.value

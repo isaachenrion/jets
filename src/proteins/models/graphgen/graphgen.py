@@ -103,8 +103,8 @@ class ConvolutionalNMPBlock(nn.Module):
         x_conv = self.conv1d(x.transpose(1,2)).transpose(1,2)
 
         s = self.spatial_embedding(x)
-        s = self.spatial_embedding(x)
-        if self.polar:
+        #s = self.spatial_embedding(x)
+        if self.polar: # s is interpreted as a hidden state, not a spatial one
             polar = convert_to_polar(s)
             s = joint_angles_to_cartesian(polar)
         A = torch.exp( - squared_distance_matrix(s, s) ) * batch_mask
@@ -117,6 +117,7 @@ class ConvolutionalNMPBlock(nn.Module):
         loss = loss_fn(A, y, y_mask, batch_mask)
 
         return x, loss
+
 
 class BasicNMPBlock(nn.Module):
     def __init__(self, dim, polar):
