@@ -73,7 +73,7 @@ class TrainablePhysicsAdjacency(_PhysicsAdjacency):
     @property
     def alpha(self):
         alpha = F.tanh(self._base_alpha)
-        #import ipdb; ipdb.set_trace()
+        
         #alpha_monitor(alpha=alpha.data[0])
         return alpha
 

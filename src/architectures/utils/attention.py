@@ -63,13 +63,13 @@ class Attention(nn.Module):
                 value data dimension = {} \
                 but should be equal'.format(dim_query, dim_key, dim_value))
             raise e
-        #import ipdb; ipdb.set_trace()
+
         s = dot(query, key)
         if dimensions is None:
             dimensions  = torch.tensor([key.size()[1]]).view(1, 1, 1).expand_as(s)
         scaling_factor = torch.sqrt(1 / dimensions)
         alpha = F.softmax(s / scaling_factor, dim=2)
         #alpha = alpha.transpose(0,2)
-        #import ipdb; ipdb.set_trace()
+        
         output = torch.bmm(alpha, value)
         return output, alpha

@@ -26,7 +26,7 @@ class ETA(Monitor):
         estimated_total_time = mean_epoch_time * self.epochs
         self.value = self.start_time + datetime.timedelta(0, estimated_total_time)
         self.value = self.value.strftime('%c')
-        #import ipdb; ipdb.set_trace()
+        
         return self.value
 
     @property

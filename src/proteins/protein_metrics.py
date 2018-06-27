@@ -157,7 +157,7 @@ class ProteinMetricCollection(MonitorCollection):
     @property
     def _string(self):
         out_str = ""
-        #import ipdb; ipdb.set_trace()
+
         for _, c in self.monitors.items():
             #c.initialize(*args)
             out_str += "\n"

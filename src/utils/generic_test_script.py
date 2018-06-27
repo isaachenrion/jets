@@ -11,7 +11,7 @@ import torch.nn.functional as F
 from src.utils import load_model
 
 def get_model_filenames(models_dir=None, model=None, single_model=None):
-    #import ipdb; ipdb.set_trace()
+    
 
     model_type_path = os.path.join(models_dir, model)
 
@@ -20,7 +20,7 @@ def get_model_filenames(models_dir=None, model=None, single_model=None):
         model_filenames = list(filter(lambda x: os.path.isdir(x), model_filenames))
     else:
         model_filenames = [model_type_path]
-    #import ipdb; ipdb.set_trace()
+    
     return model_filenames
 
 def test_all_models(test_one_model, model_dict, model_filenames, data_loader, administrator):

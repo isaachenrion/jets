@@ -46,7 +46,7 @@ class _Adjacency(nn.Module):
         Output
             M: a (B, N, N) batch of adjacency matrices
         '''
-        #import ipdb; ipdb.set_trace()
+        
         M = self.raw_matrix(h)
 
         if self.symmetric:
@@ -63,10 +63,10 @@ class _Adjacency(nn.Module):
 
     def logging(self, dij=None, mask=None, epoch=None, iters=None, **kwargs):
 
-        #import ipdb; ipdb.set_trace()
+        
         if False and epoch is not None and epoch % self.logging_frequency == 0:
             #print(self.name)
-            #import ipdb; ipdb.set_trace()
+            
             if mask is not None:
                 nonmask_ends = [int(torch.sum(m,0)[0]) for m in mask.data]
                 dij_hist = [d[:nme, :nme].contiguous().view(-1) for d, nme in zip(dij, nonmask_ends)]

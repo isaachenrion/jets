@@ -16,7 +16,7 @@ class BasicBlock(nn.Module):
     def __init__(self, inplanes, planes, stride=1, downsample=None):
         super(BasicBlock, self).__init__()
         m = OrderedDict()
-        #import ipdb; ipdb.set_trace()
+        
         m['bn1'] = nn.BatchNorm1d(inplanes)
         m['conv1'] = conv_and_pad(inplanes, planes, stride)
         m['relu1'] = nn.ReLU(inplace=True)

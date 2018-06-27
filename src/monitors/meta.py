@@ -148,7 +148,7 @@ class Histogram(Monitor):
     def _visualize(self, plotname=None):
         fig, ax = plt.subplots()
         #hist, bin_edges = np.histogram(self.value, bins=self.n_bins, range=(0, 1), density=True)
-        #import ipdb; ipdb.set_trace()
+        
         self.normalize()
         hist, bin_edges = self.hist, self.bin_edges
         plt.bar(bin_edges[:-1], hist, width=0.7 / self.n_bins)

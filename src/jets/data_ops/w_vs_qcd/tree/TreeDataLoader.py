@@ -51,7 +51,7 @@ class TreeDataLoader(_DataLoader):
         jet_children = np.vstack(jet_children)
         jet_contents = torch.cat([torch.tensor(jet.tree_content, dtype=torch.float32) for jet in jets], 0)
         #jet_contents = torch.cat([torch.tensor(jet.tree_content).float() for jet in jets], 0)
-        #import ipdb; ipdb.set_trace()
+        
         n_nodes = offset
 
         # Level-wise traversal

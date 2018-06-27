@@ -85,7 +85,7 @@ class StackedFixedNMP(AbstractStackedFixedNMP):
     def forward(self, jets, mask=None, **kwargs):
         h = self.embedding(jets)
         attns = None
-        #import ipdb; ipdb.set_trace()
+        
 
         for i, (nmp, pool, adj) in enumerate(zip(self.nmps, self.attn_pools, self.adjs)):
             if i > 0:

@@ -55,7 +55,7 @@ class LearnedComboAdjacency(ComboAdjacency):
     def __init__(self, adj_list=None, **kwargs):
         super().__init__(adj_list=adj_list, **kwargs)
         self._weights = nn.Parameter(torch.zeros(len(self.adjs)))
-        #import ipdb; ipdb.set_trace()
+        
 
     @property
     def weights(self):
