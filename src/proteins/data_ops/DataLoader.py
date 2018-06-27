@@ -47,6 +47,7 @@ class DataLoader(_DL):
             y_list = [torch.tensor(y, device=self.device) for y in y_list]
             mask_list = [torch.tensor(mask, device=self.device) for mask in mask_list]
             print(x_list[0].device)
+            print(torch.zeros(1).device)
             print(self.device)
 
             #x_list = list(map(torch.tensor, x_list))
