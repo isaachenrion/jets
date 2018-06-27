@@ -46,6 +46,10 @@ class DataLoader(_DL):
             y_list = list(map(torch.tensor, y_list))
             mask_list = list(map(torch.tensor, mask_list))
 
+            print(x_list[0].device)
+            print(y_list[0].device)
+            print(mask_list[0].device)
+            
             dropout_masks = get_dropout_masks(x_list, dropout)
             x_list = [x.masked_select(dm.unsqueeze(1)).view(-1, x.shape[1]) for x, dm in zip(x_list, dropout_masks)]
             y_list = [y.masked_select(dm.unsqueeze(1).mm(dm.unsqueeze(0))).view(-1, dm.sum()) for y, dm in zip(y_list, dropout_masks)]

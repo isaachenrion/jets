@@ -100,7 +100,7 @@ def main(sysargvlist=None):
     parser.add_argument("--act", type=str, default='leakyrelu')
     parser.add_argument("--dropout", type=float, default=1.)
 
-    # Transform
+    # Model
     parser.add_argument("-m", "--model", type=str, default="g", help="name of the model you want to train")
 
     # NMP

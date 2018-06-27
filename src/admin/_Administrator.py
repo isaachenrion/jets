@@ -132,7 +132,6 @@ class _Administrator:
                                 train=train,
                             )
 
-
         logger = Logger(exp_dir, train, monitor_collections)
 
         cmd_file = os.path.join(root_dir, current_dir, intermediate_dir, 'command.txt')
