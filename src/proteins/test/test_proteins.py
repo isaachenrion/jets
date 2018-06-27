@@ -94,7 +94,7 @@ def main(sysargvlist=None):
     #    group_dict={a.dest:getattr(args,a.dest,None) for a in group._group_actions}
     #    arg_groups[group.title + '_args']=argparse.Namespace(**group_dict)
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = 0 if args.gpu else ''
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0' if args.gpu else ''
     args.cmd_line_args = (' '.join(sys.argv))
     args.arg_string = '\n'.join(['\t{} = {}'.format(k, v) for k, v in sorted(vars(args).items())])
 
