@@ -75,7 +75,7 @@ def main(sysargvlist=None):
 
     #computing = parser.add_argument_group('computing')
     parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)
-    parser.add_argument("-g", "--gpu", type=str, default="")
+    parser.add_argument("-g", "--gpu", action='store_true')
 
     '''
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
