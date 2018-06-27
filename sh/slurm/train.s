@@ -30,7 +30,7 @@
 #SBATCH --mail-user=henrion@nyu.edu
 
 PYTHONARGS="$@"
-PYTHONARGS="$PYTHONARGS --slurm --gpu 0 --slurm_array_job_id $SLURM_ARRAY_JOB_ID --slurm_array_task_id $SLURM_ARRAY_TASK_ID"
+PYTHONARGS="$PYTHONARGS --slurm --gpu --slurm_array_job_id $SLURM_ARRAY_JOB_ID --slurm_array_task_id $SLURM_ARRAY_TASK_ID"
 cd $SRCDIR/src/scripts/
 python train.py $PYTHONARGS
 #python -m torch.utils.bottleneck train.py $PYTHONARGS
