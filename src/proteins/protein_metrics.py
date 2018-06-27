@@ -14,15 +14,11 @@ def list_multiply(x_list, y_list):
     return list(x * y for x, y in zip(x_list, y_list))
 
 def max_prec_recall(target, indices):
-    #import ipdb; ipdb.set_trace()
-
     hits = target[indices]
     accuracy = sum(hits) / np.minimum(len(indices),len(target))
     return accuracy
 
 def precision_wrt_indices(target, indices):
-    #import ipdb; ipdb.set_trace()
-
     hits = target[indices]
     accuracy = sum(hits) / len(indices)
     return accuracy
@@ -75,11 +71,11 @@ def compute_protein_metrics(targets, predictions, k_list):
         shortidx = np.where((b_dists >= 6) & (b_dists < 12))[0]
 
 
-        def precision_wrt_top_indices(indices):
-            sorted_idx = np.argsort(prediction[ indices])[ ::-1]
-            top_predicted_indices = indices[sorted_idx[ :]]
-            acc_dict = {k: precision_wrt_indices(target, top_predicted_indices[:M]) for k, M in zip(k_list,M_list)}
-            return acc_dict
+        #def precision_wrt_top_indices(indices):
+        #    sorted_idx = np.argsort(prediction[ indices])[ ::-1]
+        #    top_predicted_indices = indices[sorted_idx[ :]]
+        #    acc_dict = {k: precision_wrt_indices(target, top_predicted_indices[:M]) for k, M in zip(k_list,M_list)}
+        #    return acc_dict
 
         def max_pr_wrt_top_indices(indices):
             sorted_idx = np.argsort(prediction[ indices])[ ::-1]
@@ -87,21 +83,15 @@ def compute_protein_metrics(targets, predictions, k_list):
             acc_dict = {k: max_prec_recall(target, top_predicted_indices[:M]) for k, M in zip(k_list,M_list)}
             return acc_dict
 
-        def recall_wrt_top_indices(indices):
-            sorted_idx = np.argsort(prediction[indices])[ ::-1]
-            top_predicted_indices = indices[sorted_idx[ :]]
-            acc_dict = {k: recall_wrt_indices(target, top_predicted_indices[:M]) for k, M in zip(k_list,M_list)}
-            return acc_dict
+        #def recall_wrt_top_indices(indices):
+        #    sorted_idx = np.argsort(prediction[indices])[ ::-1]
+        #    top_predicted_indices = indices[sorted_idx[ :]]
+        #    acc_dict = {k: recall_wrt_indices(target, top_predicted_indices[:M]) for k, M in zip(k_list,M_list)}
+        #    return acc_dict
 
-        prec = False
-        if prec:
-            acc_long[i] = precision_wrt_top_indices(longidx)
-            acc_med[i] = precision_wrt_top_indices(medidx)
-            acc_short[i] = precision_wrt_top_indices(shortidx)
-        else:
-            acc_long[i] = max_pr_wrt_top_indices(longidx)
-            acc_med[i] = max_pr_wrt_top_indices(medidx)
-            acc_short[i] = max_pr_wrt_top_indices(shortidx)
+        acc_long[i] = max_pr_wrt_top_indices(longidx)
+        acc_med[i] = max_pr_wrt_top_indices(medidx)
+        acc_short[i] = max_pr_wrt_top_indices(shortidx)
 
     acc_short = convert_list_of_dicts_to_summary_dict(acc_short, 'acc_short_L')
     acc_long = convert_list_of_dicts_to_summary_dict(acc_long, 'acc_long_L')
@@ -138,9 +128,6 @@ class ProteinMetricCollection(MonitorCollection):
         super().__init__('protein_metrics_collection', track_monitor=track_monitor, **collector_dict)
 
     def __call__(self, **kwargs):
-        return self.call(**kwargs)
-
-    def call(self, **kwargs):
         targets = kwargs.get(self.target_name, None)
         predictions = kwargs.get(self.prediction_name, None)
         masks = kwargs.get(self.mask_name, None)
