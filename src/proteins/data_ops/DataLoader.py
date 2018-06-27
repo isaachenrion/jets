@@ -43,9 +43,9 @@ class DataLoader(_DL):
 
             x_list, y_list, mask_list = list(map(list, zip(*data_tuples)))
 
-            x_list = [torch.tensor(x).to(self.device) for x in x_list]
-            y_list = [torch.tensor(y).to(self.device) for y in y_list]
-            mask_list = [torch.tensor(mask).to(self.device) for mask in mask_list]
+            x_list = [torch.tensor(x) for x in x_list]
+            y_list = [torch.tensor(y) for y in y_list]
+            mask_list = [torch.tensor(mask) for mask in mask_list]
 
             #print(x_list[0].device)
             #print(x_list[0].to('cuda').device)
@@ -56,10 +56,14 @@ class DataLoader(_DL):
             #y_list = list(map(torch.tensor, y_list))
             #mask_list = list(map(torch.tensor, mask_list))
 
-            dropout_masks = get_dropout_masks(x_list, dropout)
+            dropout_masks = [dm.to('cpu') for dm in get_dropout_masks(x_list, dropout)]
             x_list = [x.masked_select(dm.unsqueeze(1)).view(-1, x.shape[1]) for x, dm in zip(x_list, dropout_masks)]
             y_list = [y.masked_select(dm.unsqueeze(1).mm(dm.unsqueeze(0))).view(-1, dm.sum()) for y, dm in zip(y_list, dropout_masks)]
             mask_list = [mask.masked_select(dm.unsqueeze(1).mm(dm.unsqueeze(0))).view(-1, dm.sum()) for mask, dm in zip(mask_list, dropout_masks)]
+
+            x_list = [x.to(self.device) for x in x_list]
+            y_list = [y.to(self.device) for y in y_list]
+            mask_list = [mask.to(self.device) for mask in mask_list]
 
             x, batch_mask = preprocess_x(x_list)
             y = preprocess_y(y_list)
