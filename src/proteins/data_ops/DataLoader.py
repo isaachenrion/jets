@@ -46,7 +46,9 @@ class DataLoader(_DL):
             x_list = [torch.tensor(x, device=self.device) for x in x_list]
             y_list = [torch.tensor(y, device=self.device) for y in y_list]
             mask_list = [torch.tensor(mask, device=self.device) for mask in mask_list]
+
             print(x_list[0].device)
+            print(x_list[0].to('cuda').device)
             print(torch.zeros(1).device)
             print(self.device)
 
