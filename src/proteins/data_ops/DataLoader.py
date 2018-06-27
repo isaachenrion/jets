@@ -36,20 +36,21 @@ def preprocess_x(x_list):
     return data, mask
 
 class DataLoader(_DL):
-    def __init__(self, dataset, batch_size, dropout=0.0, **kwargs):
+    def __init__(self, dataset, batch_size, dropout=0.0, device='cpu', **kwargs):
+        self.device = device
 
         def collate(data_tuples):
 
             x_list, y_list, mask_list = list(map(list, zip(*data_tuples)))
 
-            x_list = list(map(torch.tensor, x_list))
-            y_list = list(map(torch.tensor, y_list))
-            mask_list = list(map(torch.tensor, mask_list))
+            x_list = [torch.tensor(x, device=self.device) for x in x_list]
+            y_list = [torch.tensor(y, device=self.device) for y in y_list]
+            mask_list = [torch.tensor(mask, device=self.device) for mask in mask_list]
 
-            print(x_list[0].device)
-            print(y_list[0].device)
-            print(mask_list[0].device)
-            
+            #x_list = list(map(torch.tensor, x_list))
+            #y_list = list(map(torch.tensor, y_list))
+            #mask_list = list(map(torch.tensor, mask_list))
+
             dropout_masks = get_dropout_masks(x_list, dropout)
             x_list = [x.masked_select(dm.unsqueeze(1)).view(-1, x.shape[1]) for x, dm in zip(x_list, dropout_masks)]
             y_list = [y.masked_select(dm.unsqueeze(1).mm(dm.unsqueeze(0))).view(-1, dm.sum()) for y, dm in zip(y_list, dropout_masks)]

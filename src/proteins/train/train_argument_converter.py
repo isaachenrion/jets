@@ -1,4 +1,7 @@
 import os
+
+import torch
+
 from .train_monitors import get_monitor_collections
 
 def train_argument_converter(args):
@@ -62,7 +65,8 @@ def get_data_loader_kwargs(args):
         n_train=args.n_train,
         n_valid=args.n_valid,
         batch_size=args.batch_size,
-        dropout=args.data_dropout
+        dropout=args.data_dropout,
+        device='cuda' if args.gpu and torch.cuda.is_available() else 'cpu'
     )
 
 def get_optim_args(args):
