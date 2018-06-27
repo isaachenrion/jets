@@ -138,7 +138,7 @@ class _Administrator:
         record_cmd_line_args(cmd_line_args, cmd_file)
 
         seed = random_seed(seed)
-        use_cuda = gpu and torch.cuda.is_available()
+        use_cuda = gpu and torch.cuda.is_available(
         if use_cuda:
             torch.set_default_tensor_type(torch.cuda.FloatTensor)
         else:

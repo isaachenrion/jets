@@ -74,7 +74,7 @@ def main(sysargvlist=None):
 
     #computing = parser.add_argument_group('computing')
     parser.add_argument("--seed", help="Random seed used in torch and numpy", type=int, default=None)
-    parser.add_argument("-g", "--gpu", type=str, default="")
+    parser.add_argument("-g", "--gpu", action='store_true')
 
     '''
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -134,7 +134,7 @@ def main(sysargvlist=None):
     else:
         args = parser.parse_args(sysargvlist)
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+    os.environ['CUDA_VISIBLE_DEVICES'] = 0 if args.gpu else ''
     args.cmd_line_args = (' '.join(sys.argv))
     args.arg_string = '\n'.join(['\t{} = {}'.format(k, v) for k, v in sorted(vars(args).items())])
 
