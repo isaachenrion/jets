@@ -19,7 +19,7 @@ class BasicBlock(nn.Module):
     def __init__(self, inplanes, planes, stride=1, downsample=None):
         super(BasicBlock, self).__init__()
         m = OrderedDict()
-        m['conv1'] = conv_and_pad3x3(inplanes, planes, stride)
+        m['conv1'] = conv_and_pad3x3(inplanes, planes, stride=stride)
         m['bn1'] = nn.BatchNorm2d(planes)
         m['relu1'] = nn.ReLU(inplace=True)
         m['conv2'] = conv_and_pad3x3(planes, planes)

@@ -18,7 +18,7 @@ class BasicBlock(nn.Module):
         m = OrderedDict()
         
         m['bn1'] = nn.BatchNorm1d(inplanes)
-        m['conv1'] = conv_and_pad(inplanes, planes, stride)
+        m['conv1'] = conv_and_pad(inplanes, planes, stride=stride)
         m['relu1'] = nn.ReLU(inplace=True)
         m['bn2'] = nn.BatchNorm1d(planes)
         m['conv2'] = conv_and_pad(planes, planes)

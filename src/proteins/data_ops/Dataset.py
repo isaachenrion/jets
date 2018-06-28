@@ -21,8 +21,9 @@ class Dataset(D):
 
     def crop(self, proteins):
         #max_len = 859 # 99th percentile
-        max_len = 539 # 95th percentile
+        #max_len = 539 # 95th percentile
         #max_len = 429 # 90th percentile
+        max_len = 400 # 95th percentile
         #max_len = 293 # 75th percentile
         proteins = list(filter(lambda x: len(x) <= max_len, proteins))
         return proteins
