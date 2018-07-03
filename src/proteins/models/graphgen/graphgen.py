@@ -34,7 +34,7 @@ class BasicBlock(nn.Module):
     def __init__(self, inplanes, planes, stride=1, downsample=None):
         super(BasicBlock, self).__init__()
         m = OrderedDict()
-        m['conv1'] = conv_and_pad(inplanes, planes, stride)
+        m['conv1'] = conv_and_pad(inplanes, planes, stride=stride)
         m['bn1'] = nn.BatchNorm1d(planes)
         m['relu1'] = nn.ReLU(inplace=True)
         m['conv2'] = conv_and_pad(planes, planes)
@@ -87,8 +87,8 @@ def squared_distance_matrix(x, y):
 class ConvolutionalNMPBlock(nn.Module):
     def __init__(self, dim, polar):
         super().__init__()
-        self.polar = polar
-        self.spatial_embedding = nn.Linear(dim, 3)
+        #self.polar = polar
+        #self.spatial_embedding = nn.Linear(dim, 3)
 
         self.conv1d = BasicBlock(dim, dim)
 
@@ -102,12 +102,12 @@ class ConvolutionalNMPBlock(nn.Module):
     def forward(self, x, batch_mask, y, y_mask):
         x_conv = self.conv1d(x.transpose(1,2)).transpose(1,2)
 
-        s = self.spatial_embedding(x)
         #s = self.spatial_embedding(x)
-        if self.polar: # s is interpreted as a hidden state, not a spatial one
-            polar = convert_to_polar(s)
-            s = joint_angles_to_cartesian(polar)
-        A = torch.exp( - squared_distance_matrix(s, s) ) * batch_mask
+        #s = self.spatial_embedding(x)
+        #if self.polar: # s is interpreted as a hidden state, not a spatial one
+        #    polar = convert_to_polar(s)
+        #    s = joint_angles_to_cartesian(polar)
+        A = torch.exp( - squared_distance_matrix(x, x) ) * batch_mask
         x_nmp = torch.bmm(A, self.message(x))
 
         x_in = torch.cat([x_conv, x_nmp], -1)
@@ -117,6 +117,16 @@ class ConvolutionalNMPBlock(nn.Module):
         loss = loss_fn(A, y, y_mask, batch_mask)
 
         return x, loss
+
+class GraphAttentionBlock(nn.Module):
+    def __init__(self, dim, *args, **kwargs):
+        super().__init__()
+
+        self.message = nn.Sequential(
+                        nn.Linear(dim, dim),
+                        )
+
+        self.update = GRUUpdate(dim, dim)
 
 
 class BasicNMPBlock(nn.Module):

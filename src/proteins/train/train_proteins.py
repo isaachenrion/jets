@@ -117,6 +117,9 @@ def main(sysargvlist=None):
     # ResNet
     parser.add_argument("-c", "--chunks", type=int, default=None)
 
+    # Attention
+    parser.add_argument("--n_head", type=int, default=8)
+
 
     if sysargvlist is None:
         args = parser.parse_args()

@@ -113,6 +113,9 @@ def get_model_kwargs(args):
         # ResNet
         'checkpoint_chunks': args.chunks,
 
+        # Attention
+        'n_head': args.n_head,
+
         'debug':args.debug,
     }
     return model_kwargs
