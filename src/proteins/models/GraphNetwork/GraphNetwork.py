@@ -4,7 +4,7 @@ import torch.nn as nn
 from ..ProteinModel import ProteinModel
 
 from .GraphNetworkBlock import GraphNetworkBlock
-from .CombinationBlocks import DenseGraphNetworkBlock
+from .CombinationBlocks import DenseGraphNetworkBlock, ResidualGraphNetworkBlock
 
 
 class GraphNetwork(nn.Module):
@@ -55,7 +55,7 @@ class GraphNetwork(nn.Module):
                         node_dim_hidden,
                         edge_dim_hidden
                         )
-        self.gn_process = DenseGraphNetworkBlock(
+        self.gn_process = ResidualGraphNetworkBlock(
                          graph_dim_hidden,
                          node_dim_hidden,
                          edge_dim_hidden,
