@@ -5,8 +5,8 @@ import numpy as np
 from src.admin.utils import see_tensors_in_memory
 
 def loss(y_pred, y, y_mask, bm):
-    l = nll
-    #l = fancy_nll
+    #l = nll
+    l = fancy_nll
     return l(y_pred, y, y_mask, bm)
 
 def kl(y_pred, y, y_mask):
@@ -40,7 +40,7 @@ def fancy_nll(logprobs, y, y_mask, batch_mask):
     dists = torch.exp(-(n_.unsqueeze(1) - dists - 1)*0.01)
 
     lossfn = torch.nn.BCEWithLogitsLoss(reduce=False)
-    l = (lossfn(logprobs, y))
+    #l = (lossfn(logprobs, y))
 
     l = (lossfn(logprobs, y))
     l = l * dists
