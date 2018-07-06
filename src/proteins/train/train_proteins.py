@@ -115,7 +115,7 @@ def main(sysargvlist=None):
     parser.add_argument("--polar", action='store_true')
 
     # ResNet
-    parser.add_argument("-c", "--chunks", type=int, default=None)
+    parser.add_argument("-c", "--chunks", type=int, default=1)
 
     # Attention
     parser.add_argument("--n_head", type=int, default=8)

@@ -6,6 +6,7 @@ from src.admin.utils import see_tensors_in_memory
 
 def loss(y_pred, y, y_mask, bm):
     l = nll
+    #l = fancy_nll
     return l(y_pred, y, y_mask, bm)
 
 def kl(y_pred, y, y_mask):
@@ -23,18 +24,25 @@ def kl(y_pred, y, y_mask):
     l = l.mean()
     return l
 
-def nll(y_pred, y, y_mask, batch_mask):
-    n = y_pred.shape[1]
+def nll(logprobs, y, y_mask, batch_mask):
+    lossfn = torch.nn.BCEWithLogitsLoss(reduce=False)
+    l = (lossfn(logprobs, y))
+    l = l.masked_select(y_mask.byte())
+    l = l.mean()
+    return l
+
+def fancy_nll(logprobs, y, y_mask, batch_mask):
+    n = logprobs.shape[1]
     n_ = batch_mask.sum(1,keepdim=True)[:,:,0]
 
     dists = batch_mask.new_tensor(distances(n)).float()
     dists = dists * batch_mask
     dists = torch.exp(-(n_.unsqueeze(1) - dists - 1)*0.01)
 
-    lossfn = torch.nn.NLLLoss(reduce=False)
-    logprobs = stable_log(torch.stack([1-y_pred, y_pred], 1))
+    lossfn = torch.nn.BCEWithLogitsLoss(reduce=False)
+    l = (lossfn(logprobs, y))
 
-    l = (lossfn(logprobs, y.long()))
+    l = (lossfn(logprobs, y))
     l = l * dists
     l = reweight_loss(l, y)
     l = l.masked_select(y_mask.byte())

@@ -118,7 +118,7 @@ class ResNet2d(nn.Module):
         else:
             x = checkpoint_sequential(self.transform, self.checkpoint_chunks, x)
 
-        x = F.sigmoid(torch.mean(x, 1))
+        x = (torch.mean(x, 1))
 
 
         return x
