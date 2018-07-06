@@ -18,7 +18,6 @@ def load_dataset(filename, n):
     return dataset
 
 def get_data_loader(filename, n, batch_size, **kwargs):
-    #import ipdb; ipdb.set_trace()
     dataset = load_dataset(filename, n)
     data_loader = DataLoader(dataset, batch_size, **kwargs)
     return data_loader

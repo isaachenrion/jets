@@ -2,6 +2,7 @@ import logging
 import time
 
 import torch
+import torch.nn.functional as F
 
 from src.data_ops import unwrap
 from ..loss import loss
@@ -17,31 +18,31 @@ def validation(model, data_loader):
     model.eval()
 
     loss = 0.
-    targets, predictions = [], []
+    targets, logits = [], []
     half = []
     batch_masks = []
     hard_pred = []
     for i, batch in enumerate(data_loader):
 
         (x, target, target_mask, batch_mask) = batch
-        l, prediction = model.loss_and_pred(x, batch_mask, target, target_mask)
+        l, logit = model.loss_and_pred(x, batch_mask, target, target_mask)
 
         loss += l.item()
 
         targets.append(unwrap(target))
-        predictions.append(unwrap(prediction))
+        logits.append(unwrap(logit))
         batch_masks.append(unwrap(batch_mask))
 
-        half.append(unwrap(half_and_half(target, prediction)))
-        hard_pred.append(unwrap(half_and_half(target, (prediction > 0.5).float())))
+        half.append(unwrap(half_and_half(target, F.sigmoid(logit))))
+        hard_pred.append(unwrap(half_and_half(target, (logit > 0.).float())))
 
-        del target; del prediction; del target_mask; del x; del batch_mask; del batch; del l
+        del target; del logit; del target_mask; del x; del batch_mask; del batch; del l
 
     loss /= len(data_loader)
 
     logdict = dict(
         targets=targets,
-        predictions=predictions,
+        logits=logits,
         half=half,
         hard_pred=hard_pred,
         masks=batch_masks,
@@ -50,7 +51,7 @@ def validation(model, data_loader):
     )
     model.train()
 
-    del targets; del predictions; del batch_masks; del half; del hard_pred; del loss
+    del targets; del logits; del batch_masks; del half; del hard_pred; del loss
 
     t1=time.time()
     logging.info("Validation took {:.1f} seconds".format(time.time() - t))
