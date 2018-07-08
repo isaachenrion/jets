@@ -9,21 +9,6 @@ def loss(y_pred, y, y_mask, bm):
     l = fancy_nll
     return l(y_pred, y, y_mask, bm)
 
-def kl(y_pred, y, y_mask):
-    n = y_pred.shape[1]
-    dists = torch.tensor(distances(n)) ** (1/2.5).view(-1, n, n)
-
-    logprobs = stable_log(y_pred)
-
-    lossfn = torch.nn.KLDivLoss(reduce=False)
-
-    l = lossfn(logprobs, y)
-    l = l * dists
-    l = reweight_loss(l, y)
-    l = l.masked_select(y_mask.byte())
-    l = l.mean()
-    return l
-
 def nll(logprobs, y, y_mask, batch_mask):
     lossfn = torch.nn.BCEWithLogitsLoss(reduce=False)
     l = (lossfn(logprobs, y))

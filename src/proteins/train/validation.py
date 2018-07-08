@@ -26,7 +26,7 @@ def validation(model, data_loader):
 
         (x, target, target_mask, batch_mask) = batch
         l, logit = model.loss_and_pred(x, batch_mask, target, target_mask)
-
+        #import ipdb; ipdb.set_trace()
         loss += l.item()
 
         targets.append(unwrap(target))

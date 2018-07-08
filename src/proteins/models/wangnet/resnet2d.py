@@ -16,7 +16,7 @@ def conv_and_pad3x3(in_planes, out_planes, kernel_size=3,stride=1):
 
 class BasicBlock(nn.Module):
     expansion = 1
-    def __init__(self, inplanes, planes, stride=1, downsample=None):
+    def __init__(self, inplanes, planes, stride=1, downsample=None, final_activation=True):
         super(BasicBlock, self).__init__()
         m = OrderedDict()
         m['conv1'] = conv_and_pad3x3(inplanes, planes, stride=stride)
@@ -26,8 +26,10 @@ class BasicBlock(nn.Module):
         m['bn2'] = nn.BatchNorm2d(planes)
         self.group1 = nn.Sequential(m)
 
-        self.relu= nn.Sequential(nn.ReLU(inplace=True))
+        if final_activation:
+            self.relu= nn.Sequential(nn.ReLU(inplace=True))
         self.downsample = downsample
+        self.final_activation = final_activation
 
     def forward(self, x):
         if self.downsample is not None:
@@ -38,7 +40,8 @@ class BasicBlock(nn.Module):
         out = self.group1(x) + residual
         del residual
 
-        out = self.relu(out)
+        if self.final_activation:
+            out = self.relu(out)
 
         return out
 
@@ -86,7 +89,7 @@ class ResNet2d(nn.Module):
         self.group1= nn.Sequential(m)
 
         self.transform = self._make_layer(block, hidden, layers)
-
+        #self.final
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
@@ -107,11 +110,13 @@ class ResNet2d(nn.Module):
         layers.append(block(self.inplanes, planes, stride, downsample))
         self.inplanes = planes * block.expansion
         for i in range(1, blocks):
-            layers.append(block(self.inplanes, planes))
+            #print(i+1<blocks)
+            layers.append(block(self.inplanes, planes, final_activation=(i+1<blocks)))
 
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        #import ipdb; ipdb.set_trace()
         x = self.group1(x)
         if self.checkpoint_chunks is None:
             x = self.transform(x)

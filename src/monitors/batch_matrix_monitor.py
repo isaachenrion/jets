@@ -18,7 +18,7 @@ class BatchMatrixMonitor(Monitor):
         super().__init__(value_name + '_matrix', **kwargs)
 
     def call(self, epoch=None, mask=None, **kwargs):
-        
+
         if self.call_count % self.plotting_frequency == 0:
             #self.epoch = epoch
             v = kwargs[self.value_name]
@@ -45,6 +45,8 @@ class BatchMatrixMonitor(Monitor):
                 matrices = self.value[:self.batch_size]
             if plotname is None:
                 plotname = self.value_name
+            #import ipdb; ipdb.set_trace()
+
             visualize_matrix_list(matrices, self.plotsdir, str(self.call_count) + '/' + plotname)
         else:
             pass

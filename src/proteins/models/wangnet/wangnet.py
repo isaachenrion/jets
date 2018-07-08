@@ -35,5 +35,5 @@ class WangNet(ProteinModel):
         del x_l
 
         x = self.resnet_2d(x) * mask
-
+        #import ipdb; ipdb.set_trace()
         return x
