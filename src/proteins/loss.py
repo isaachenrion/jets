@@ -5,9 +5,9 @@ import numpy as np
 from src.admin.utils import see_tensors_in_memory
 
 def loss(y_pred, y, y_mask, bm):
-    l = nll
+    #l = nll
     #l = fancy_nll
-    #l = wang_nll
+    l = wang_nll
     return l(y_pred, y, y_mask, bm)
 
 def nll(logprobs, y, y_mask, batch_mask):
