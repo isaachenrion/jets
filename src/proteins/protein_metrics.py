@@ -18,6 +18,11 @@ def max_prec_recall(target, indices):
     accuracy = sum(hits) / np.minimum(len(indices),len(target))
     return accuracy
 
+def wang_metric(target, indices):
+    hits = target[indices]
+    accuracy = sum(hits) / np.minimum(len(indices),len(target))
+    return accuracy
+
 def precision_wrt_indices(target, indices):
     hits = target[indices]
     accuracy = sum(hits) / len(indices)
@@ -70,7 +75,6 @@ def compute_protein_metrics(targets, predictions, k_list):
         medidx = np.where((b_dists >= 12) & (b_dists < 24))[0]
         shortidx = np.where((b_dists >= 6) & (b_dists < 12))[0]
 
-
         #def precision_wrt_top_indices(indices):
         #    sorted_idx = np.argsort(prediction[ indices])[ ::-1]
         #    top_predicted_indices = indices[sorted_idx[ :]]
@@ -83,15 +87,33 @@ def compute_protein_metrics(targets, predictions, k_list):
             acc_dict = {k: max_prec_recall(target, top_predicted_indices[:M]) for k, M in zip(k_list,M_list)}
             return acc_dict
 
+        def wang_metric_top_indices(indices):
+            sorted_idx = np.argsort(prediction[ indices])[ ::-1]
+            top_predicted_indices = indices[sorted_idx[ :]]
+            n_relevant_native_contacts = target[indices].sum()
+            #import ipdb; ipdb.set_trace()
+            #print("Relevant native contacts: {}".format(n_relevant_native_contacts))
+            acc_dict = {}
+            for k, M in zip(k_list, M_list):
+                hits = target[top_predicted_indices[:M]]
+                #print("\tk={}, M={}: got {} hits".format(k, M, hits.sum()))
+                acc = sum(hits) / np.maximum(n_relevant_native_contacts, M)
+                acc_dict[k] = acc
+            #acc_dict = {k: wang_metric(target, top_predicted_indices[:M]) for k, M in zip(k_list,M_list)}
+            return acc_dict
         #def recall_wrt_top_indices(indices):
         #    sorted_idx = np.argsort(prediction[indices])[ ::-1]
         #    top_predicted_indices = indices[sorted_idx[ :]]
         #    acc_dict = {k: recall_wrt_indices(target, top_predicted_indices[:M]) for k, M in zip(k_list,M_list)}
         #    return acc_dict
-
-        acc_long[i] = max_pr_wrt_top_indices(longidx)
-        acc_med[i] = max_pr_wrt_top_indices(medidx)
-        acc_short[i] = max_pr_wrt_top_indices(shortidx)
+        #metric_wrt_top_indices = max_pr_wrt_top_indices
+        metric_wrt_top_indices = wang_metric_top_indices
+        #print('long')
+        acc_long[i] = metric_wrt_top_indices(longidx)
+        #print('med')
+        acc_med[i] = metric_wrt_top_indices(medidx)
+        #print('short')
+        acc_short[i] = metric_wrt_top_indices(shortidx)
 
     acc_short = convert_list_of_dicts_to_summary_dict(acc_short, 'acc_short_L')
     acc_long = convert_list_of_dicts_to_summary_dict(acc_long, 'acc_long_L')
