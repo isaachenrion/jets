@@ -16,7 +16,7 @@ class BasicBlock(nn.Module):
     def __init__(self, inplanes, planes, stride=1, downsample=None):
         super(BasicBlock, self).__init__()
         m = OrderedDict()
-        
+
         m['bn1'] = nn.BatchNorm1d(inplanes)
         m['conv1'] = conv_and_pad(inplanes, planes, stride=stride)
         m['relu1'] = nn.ReLU(inplace=True)
@@ -132,5 +132,5 @@ class ResNet1d(nn.Module):
         return x
 
 def resnet_1d(**kwargs):
-    model = ResNet1d(BasicBlock, 6, **kwargs)
+    model = ResNet1d(BasicBlock, 3, **kwargs)
     return model
