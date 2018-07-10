@@ -116,18 +116,70 @@ def compute_protein_metrics(targets, predictions, k_list):
         #print('short')
         acc_short[i] = metric_wrt_top_indices(shortidx, 'short')
 
-    acc_short = convert_list_of_dicts_to_summary_dict(acc_short, 'acc_short_L')
-    acc_long = convert_list_of_dicts_to_summary_dict(acc_long, 'acc_long_L')
-    acc_med = convert_list_of_dicts_to_summary_dict(acc_med, 'acc_med_L')
+    acc_short = convert_list_of_dicts_to_summary_dict(acc_short, 'short_L')
+    acc_long = convert_list_of_dicts_to_summary_dict(acc_long, 'long_L')
+    acc_med = convert_list_of_dicts_to_summary_dict(acc_med, 'med_L')
 
     return dict(**acc_long, **acc_med, **acc_short)
 
+def TopAccuracy(pred=None, truth=None, k_list=[1, 2, 5, 10], contactCutoff=8.0):
+    ##this program outputs an array of contact prediction accuracy, arranged in the order of long-, medium-, long+medium- and short-range.
+    ## for each range, the accuracy is calculated on the top L*ratio prediction where L is the sequence length.
 
+    ## pred and truth are 2D matrices. Each entry in pred is a confidence score assigned to the corresponding residue pair indicating how likely this pair forms a contact
+    ## truth is the ground truth distance matrix. The larger the distance, the more unlikely it is a contact. It is fine that one entry has value -1.
+    ## in this distance matrix, only the entries with value between 0 and contactCutoff are treated as contacts.
+
+    if pred is None:
+        print('please provide a predicted contact matrix')
+        exit(-1)
+
+    if truth is None:
+        print('please provide a true distance matrix')
+        exit(-1)
+
+    assert pred.shape == truth.shape
+
+    pred_truth = np.dstack( (pred, truth) )
+
+    M1s = np.ones_like(truth, dtype = np.int8)
+    mask_LR = np.triu(M1s, 24)
+    mask_MLR = np.triu(M1s, 12)
+    mask_SMLR = np.triu(M1s, 6)
+    mask_MR = mask_MLR - mask_LR
+    mask_SR = mask_SMLR - mask_MLR
+
+    seqLen = pred.shape[0]
+
+    acc_dict = {}
+    masks = dict(
+        long=mask_LR,
+        med=mask_MR,
+        short=mask_SR
+        )
+    for name, mask in masks.items():
+
+        res = pred_truth[mask.nonzero()]
+        res_sorted = res [ (-res[:,0]).argsort() ]
+
+        for k in k_list:
+            r = 1.0 / k
+            numTops = int(seqLen * r)
+            numTops = min(numTops, res_sorted.shape[0] )
+            topLabels = res_sorted[:numTops]
+            #numCorrects = ( (0<topLabels) & (topLabels<contactCutoff ) ).sum()
+            numCorrects = ( (0<topLabels) ).sum()
+            accuracy = numCorrects * 1./numTops
+            #accs.append(accuracy)
+            acc_dict[name+'_L_'+ str(k)] = accuracy
+
+    #return np.array(accs)
+    return acc_dict
 
 
 class ProteinMetricCollection(MonitorCollection):
     def __init__(self, target_name, prediction_name, mask_name, *k_values, tracked_k=None, tracked_range=None,**kwargs):
-        names = ['acc_short','acc_med', 'acc_long']
+        names = ['short','med', 'long']
         self.target_name = target_name
         self.prediction_name = prediction_name
         self.mask_name = mask_name
@@ -161,7 +213,14 @@ class ProteinMetricCollection(MonitorCollection):
         targets = [target[:seq_length,:seq_length] for target, seq_length in zip(targets, seq_lengths)]
         predictions = [prediction[:seq_length,:seq_length] for prediction, seq_length in zip(predictions, seq_lengths)]
 
-        stats_dict = compute_protein_metrics(targets, predictions, self.k_list)
+        acc_dicts = []
+        for pred, targ in zip(predictions, targets):
+            acc_dict = TopAccuracy(pred, targ, self.k_list)
+            acc_dicts.append(acc_dict)
+            #stats_dict['acc_short_{}'.format()]
+        stats_dict = convert_list_of_dicts_to_summary_dict(acc_dicts)
+        #import ipdb; ipdb.set_trace()
+        #stats_dict = compute_protein_metrics(targets, predictions, self.k_list)
         for _, c in self.monitors.items():
             #for _, c in cd.items():
             c(**stats_dict)
