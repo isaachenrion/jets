@@ -162,7 +162,7 @@ def generic_train_script(problem=None,args=None):
             settings = pickle.load(f)
     else:
         model_kwargs = arg_groups['model_kwargs']
-        model_kwargs['features'] = train_data_loader.dim
+        model_kwargs['features'] = train_data_loader.xdim
         model = build_model(MODEL_DICT, model_kwargs, logger=administrator.logger)
         settings = {
         "model_kwargs": model_kwargs,

@@ -14,8 +14,8 @@ def valid_monitor_collection(plotting_frequency):
     valid_loss = Collect('loss', ndp=3,visualizing=True)
     best_valid_loss = Best(valid_loss, track='min',ndp=3)
     protein_metrics = ProteinMetricCollection(
-        'targets',
-        'logits',
+        'truths',
+        'preds',
         'masks',
         1,2,5,10,
         tracked_k=10,
@@ -29,9 +29,9 @@ def valid_monitor_collection(plotting_frequency):
 
     ]
     viz_monitors = [
-        BatchMatrixMonitor('targets', plotting_frequency=plotting_frequency, batch_size=10, visualizing=True),
-        BatchMatrixMonitor('half', plotting_frequency=plotting_frequency, batch_size=10, visualizing=True),
-        BatchMatrixMonitor('hard_pred', plotting_frequency=plotting_frequency, batch_size=10, visualizing=True),
+        #BatchMatrixMonitor('truths', plotting_frequency=plotting_frequency, batch_size=10, visualizing=True),
+        #BatchMatrixMonitor('preds', plotting_frequency=plotting_frequency, batch_size=10, visualizing=True),
+        #BatchMatrixMonitor('hard_pred', plotting_frequency=plotting_frequency, batch_size=10, visualizing=True),
         #BatchMatrixMonitor('predictions', plotting_frequency=plotting_frequency, batch_size=10, visualizing=True)
     ]
     monitors = metric_monitors + viz_monitors
@@ -67,8 +67,8 @@ def train_monitor_collection(plotting_frequency):
 def dummy_train_monitor_collection(plotting_frequency):
 
     protein_metrics = ProteinMetricCollection(
-        'targets',
-        'logits',
+        'truths',
+        'preds',
         'masks',
         1,2,5,10,
         ndp=3,

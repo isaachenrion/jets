@@ -1,5 +1,5 @@
 from .wangnet import WangNet
-from .graphgen import GraphGen
+#from .graphgen import GraphGen
 from .GraphNetwork import ProteinGraphNetwork
 #from .graphattention import GraphAttention
 

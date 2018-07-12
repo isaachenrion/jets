@@ -56,9 +56,7 @@ def get_admin_kwargs(args):
 
 def get_data_loader_kwargs(args):
     data_dir = os.path.join(args.data_dir, 'proteins', 'pdb25')
-    if args.debug:
-        data_dir = os.path.join(data_dir, 'small')
-
+    
     return dict(
         debug=args.debug,
         data_dir=data_dir,

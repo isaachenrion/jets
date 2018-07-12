@@ -4,18 +4,18 @@ import numpy as np
 
 from src.admin.utils import see_tensors_in_memory
 
-def loss(y_pred, y, y_mask, bm):
-    #l = nll
-    l = fancy_nll
+def lossfn(*args):
+    l = nll
+    #l = fancy_nll
     #l = wang_nll
-    return l(y_pred, y, y_mask, bm)
+    return l(*args)
 
-def nll(logprobs, y, y_mask, batch_mask):
-    lossfn = torch.nn.BCEWithLogitsLoss(reduce=False)
-    l = (lossfn(logprobs, y))
-    l = l.masked_select(y_mask.byte())
-    l = l.mean()
-    return l
+def lossfn(pred, coords, mask):
+    c = coords.unsqueeze(1).expand(coords.shape[0], coords.shape[1], coords.shape[1], coords.shape[2])
+    dists = (c - c.transpose(1,2)).pow(2).sum(-1).pow(0.5)
+    contacts = (dists < 8).float()
+    return (F.binary_cross_entropy_with_logits(pred, contacts, reduce=False) * mask).mean()
+
 
 def wang_nll(logprobs, y, y_mask, batch_mask):
     lossfn = torch.nn.BCEWithLogitsLoss(reduce=False)

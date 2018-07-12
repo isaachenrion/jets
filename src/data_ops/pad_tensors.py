@@ -52,8 +52,12 @@ def pad_tensors(tensor_list):
             mask[i, :, seq_length:].fill_(0)
 
     return (padded_data, mask)
-
+    
 def pad_matrices(matrix_list):
+    '''
+    Given a list of square matrices, return a tensor whose i'th element
+    is the i'th matrix, padded right and bottom with zeros.
+    '''
     data = matrix_list
     seq_lengths = [len(x) for x in data]
     max_seq_length = max(seq_lengths)
