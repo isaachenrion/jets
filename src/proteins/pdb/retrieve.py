@@ -10,7 +10,7 @@ def retrieve_ids_from_raptorX_dataset(pdir, mode, savedir):
         ids = [x['name'].upper() for x in obj]
     with open(os.path.join(savedir, mode+'.txt'), 'w') as f:
         f.write(','.join(sorted(ids)))
-    return ids   
+    return ids
 
 
 def download_pdbs(id_list_filename, savedir):
@@ -30,7 +30,7 @@ def download_pdbs(id_list_filename, savedir):
         path_name = os.path.join(savedir, pdb_id)
         urllib.request.urlretrieve(url, path_name)
 
-    logging.info('Dowloaded {} PDB files into {}'.format(len(ids), save_dir))
+    logging.info('Dowloaded {} PDB files into {}'.format(len(ids), savedir))
     return None
 
 if __name__ == '__main__':
