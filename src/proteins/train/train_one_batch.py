@@ -4,9 +4,7 @@ import torch
 
 from src.admin.utils import see_tensors_in_memory, log_gpu_usage
 
-from ..loss import lossfn
-
-def train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip):
+def train_one_batch(model, batch, lossfn, optimizer, administrator, epoch, batch_number, clip):
     optimizer.zero_grad()
     (sequence, coords, bmask, cmask) = batch
     sequence.requires_grad_()

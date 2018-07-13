@@ -1,8 +1,6 @@
 import torch
 import torch.nn as nn
 
-from ..ProteinModel import ProteinModel
-
 from .GraphNetworkBlock import GraphNetworkBlock
 from .CombinationBlocks import DenseGraphNetworkBlock, ResidualGraphNetworkBlock
 
@@ -76,7 +74,7 @@ class GraphNetwork(nn.Module):
         u, V, A = self.gn_decode(u, V, A)
         return u, V, A
 
-class ProteinGraphNetwork(ProteinModel):
+class ProteinGraphNetwork(nn.Module):
     def __init__(self,
                  features=None,
                  hidden=None,

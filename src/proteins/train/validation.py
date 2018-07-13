@@ -5,7 +5,6 @@ import torch
 import torch.nn.functional as F
 
 from src.data_ops import unwrap
-from ..loss import lossfn
 
 
 def half_and_half(a,b):
@@ -13,7 +12,7 @@ def half_and_half(a,b):
     b = torch.stack([torch.tril(x, diagonal=-1) for x in b], 0).detach()
     return a + b
 
-def validation(model, data_loader):
+def validation(model, data_loader, lossfn):
     t = time.time()
     model.eval()
 

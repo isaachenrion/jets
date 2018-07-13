@@ -32,7 +32,14 @@ def train_argument_converter(args):
         data_loader_kwargs=get_data_loader_kwargs(args),
         model_kwargs=get_model_kwargs(args),
         training_kwargs=get_training_kwargs(args),
-        optim_kwargs=get_optim_args(args)
+        optim_kwargs=get_optim_args(args),
+        loss_kwargs=get_loss_kwargs(args),
+    )
+
+def get_loss_kwargs(args):
+    return dict(
+        T=args.distance_temp,
+        #reweight=args.reweight
     )
 
 def get_admin_kwargs(args):
@@ -56,7 +63,7 @@ def get_admin_kwargs(args):
 
 def get_data_loader_kwargs(args):
     data_dir = os.path.join(args.data_dir, 'proteins', 'pdb25')
-    
+
     return dict(
         debug=args.debug,
         data_dir=data_dir,

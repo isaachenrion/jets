@@ -23,6 +23,7 @@ def do_training(
         train_data_loader,
         valid_data_loader,
         dummy_train_data_loader,
+        lossfn,
         optimizer,
         scheduler,
         administrator,
@@ -43,7 +44,7 @@ def do_training(
                 logging.info("Batch {}".format(batch_number))
                 log_gpu_usage()
             iteration += 1
-            l = train_one_batch(model, batch, optimizer, administrator, epoch, batch_number, clip)
+            l = train_one_batch(model, batch, lossfn, optimizer, administrator, epoch, batch_number, clip)
             loss += l
 
         scheduler.step()
@@ -82,8 +83,8 @@ def do_training(
 
         train_dict = train_one_epoch(epoch, iteration)
         with torch.no_grad():
-            valid_dict = validation(model, valid_data_loader)
-            dummy_train_dict = validation(model, dummy_train_data_loader)
+            valid_dict = validation(model, valid_data_loader, lossfn)
+            dummy_train_dict = validation(model, dummy_train_data_loader, lossfn)
 
         valid_dict.update(static_dict)
         logdict = dict(
@@ -174,12 +175,13 @@ def generic_train_script(problem=None,args=None):
     administrator.save(model, settings)
 
     '''----------------------------------------------------------------------- '''
-    ''' OPTIMIZER AND SCHEDULER '''
+    ''' LOSS, OPTIMIZER AND SCHEDULER '''
     '''----------------------------------------------------------------------- '''
 
     logging.info('***********')
-    logging.info("Building optimizer and scheduler...")
+    logging.info("Building loss, optimizer and scheduler...")
 
+    lossfn = problem.build_lossfn(**(arg_groups['loss_kwargs']))
     optimizer = build_optimizer(model, **(arg_groups['optim_kwargs']))
     scheduler = build_scheduler(optimizer, **(arg_groups['optim_kwargs']))
 
@@ -197,6 +199,7 @@ def generic_train_script(problem=None,args=None):
         train_data_loader,
         valid_data_loader,
         dummy_train_data_loader,
+        lossfn,
         optimizer,
         scheduler,
         administrator,

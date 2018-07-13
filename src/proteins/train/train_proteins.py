@@ -71,6 +71,11 @@ def main(sysargvlist=None):
     '''
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     '''
+    # loss args
+    parser.add_argument("--distance_temp", type=float, default=100)
+    '''
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    '''
     # computing args
 
     #computing = parser.add_argument_group('computing')

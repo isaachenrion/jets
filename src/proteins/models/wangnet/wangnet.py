@@ -7,7 +7,6 @@ from .resnet2d import resnet_2d
 
 from src.admin.utils import memory_snapshot
 
-from ..ProteinModel import ProteinModel
 
 def mean_index_matrix(v):
     bs, L, v_dim = v.shape
@@ -18,7 +17,7 @@ def mean_index_matrix(v):
     A = A.view(bs, L, L, v_dim)
     return A
 
-class WangNet(ProteinModel):
+class WangNet(nn.Module):
     def __init__(self,
         features=None,
         hidden=None,
@@ -38,7 +37,7 @@ class WangNet(ProteinModel):
         x_l = x.unsqueeze(2).repeat(1,1,x.size(2),1)
         x_r = x.unsqueeze(3).repeat(1,1,1,x.size(2))
         x_halfway = mean_index_matrix(x.transpose(1,2)).transpose(1,3)
-        
+
         x = torch.cat([x_l, x_r, x_halfway], 1)
 
         del x_r
