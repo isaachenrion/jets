@@ -10,7 +10,7 @@ from Bio.Alphabet import ThreeLetterProtein
 
 from utils import *
 
-def preprocess_pdb_directory(pdb_directory, id_list_filename, save_dir, file_format, n=11):
+def preprocess_pdb_directory(pdb_directory, id_list_filename, save_dir, file_format, n=None):
     '''Preprocess all of the pdb files in a directory that correspond to named ids in
     a given id list. '''
     t = time.time()
