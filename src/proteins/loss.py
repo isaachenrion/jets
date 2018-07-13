@@ -26,6 +26,8 @@ def distances(n):
     columns = indices % n
     dists = abs(rows - columns)
     dists = torch.tensor(dists).float().view(n, n)
+    if torch.cuda.is_available():
+        dists = dists.to('cuda')
     return dists
 
 
