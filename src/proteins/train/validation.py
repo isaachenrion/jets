@@ -32,7 +32,7 @@ def validation(model, data_loader):
 
         truths.append(dists)
         preds.append(pred)
-        masks.append(mask)
+        masks.append(cmask)
 
     total_loss /= len(data_loader)
 
