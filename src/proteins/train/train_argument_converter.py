@@ -105,15 +105,15 @@ def get_model_kwargs(args):
         'model':args.model,
 
         # NMP
-        'block': args.block,
-        'iters': args.iters,
-        'update': args.update,
-        'message': args.message,
-        'emb_init':args.emb_init,
-        'wn': args.wn,
-        'no_grad': args.no_grad,
-        'tied': args.tied,
-        'polar': args.polar,
+        #'block': args.block,
+        'layers': args.layers,
+        #'update': args.update,
+        #'message': args.message,
+        #'emb_init':args.emb_init,
+        #'wn': args.wn,
+        #'no_grad': args.no_grad,
+        #'tied': args.tied,
+        #'polar': args.polar,
 
         # ResNet
         'checkpoint_chunks': args.chunks,

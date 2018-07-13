@@ -41,7 +41,7 @@ def main(sysargvlist=None):
     '''
     # Loading previous models args
     #loading = parser.add_argument_group('loading')
-    parser.add_argument("-l", "--load", help="model directory from which we load a state_dict", type=str, default=None)
+    parser.add_argument("--load", help="model directory from which we load a state_dict", type=str, default=None)
     parser.add_argument("-r", "--restart", help="restart a loaded model from where it left off", action='store_true', default=False)
 
     '''
@@ -109,15 +109,7 @@ def main(sysargvlist=None):
     parser.add_argument("-m", "--model", type=str, default="g", help="name of the model you want to train")
 
     # NMP
-    parser.add_argument("-i", "--iters", type=int, default=4)
-    parser.add_argument("--block", type=str, default='cnmp')
-    parser.add_argument("-u", "--update", type=str, default='gru', help='type of vertex update')
-    parser.add_argument("--message", type=str, default='2', help='type of message')
-    parser.add_argument("--emb_init", type=str, default='1', help='type of message')
-    parser.add_argument("--wn", action='store_true')
-    parser.add_argument("--no_grad", action='store_true')
-    parser.add_argument("--tied", action='store_true')
-    parser.add_argument("--polar", action='store_true')
+    parser.add_argument("-l", "--layers", type=int, default=4)
 
     # ResNet
     parser.add_argument("-c", "--chunks", type=int, default=1)

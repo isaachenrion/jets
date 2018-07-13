@@ -129,5 +129,5 @@ class ResNet2d(nn.Module):
         return x
 
 def resnet_2d(**kwargs):
-    model = ResNet2d(BasicBlock, kwargs['iters'], **kwargs)
+    model = ResNet2d(BasicBlock, **kwargs)
     return model

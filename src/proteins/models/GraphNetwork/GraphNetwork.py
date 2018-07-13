@@ -78,7 +78,7 @@ class ProteinGraphNetwork(nn.Module):
     def __init__(self,
                  features=None,
                  hidden=None,
-                 iters=None,
+                 layers=None,
                  **kwargs
                 ):
 
@@ -93,7 +93,7 @@ class ProteinGraphNetwork(nn.Module):
                     graph_dim_out=hidden,
                     node_dim_out=hidden,
                     edge_dim_out=hidden,
-                    n_process_layers=iters
+                    n_process_layers=layers
         )
         self.f_A_out = nn.Linear(hidden, 1)
 
