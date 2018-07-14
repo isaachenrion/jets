@@ -5,14 +5,21 @@ import numpy as np
 
 from src.admin.utils import see_tensors_in_memory
 from src.monitors.baseclasses import ScalarMonitor
+from .utils import pairwise_distances
 
 def distance_weights(n, T=100):
     dists = F.softmax((distances(n)/T).view(n ** 2), dim=-1).view(1, n, n) * n ** 2
     return dists
 
+def balance_weights(y):
+    n_pos = y.sum(1, keepdim=True).sum(1, keepdim=True)
+    n_neg = (1 - y).sum(1, keepdim=True).sum(1, keepdim=True)
+    return None
+    
 def reweight_loss(l, y):
-    n_pos = y.sum(1, keepdim=True)
-    n_neg = (1 - y).sum(1, keepdim=True)
+    #import ipdb; ipdb.set_trace()
+    n_pos = y.sum(1, keepdim=True).sum(2, keepdim=True)
+    n_neg = (1 - y).sum(1, keepdim=True).sum(2, keepdim=True)
 
     l_pos = y * l
     l_neg = (1 - y) * l
@@ -38,9 +45,9 @@ class ProteinLoss(nn.Module):
         self.reweight = reweight
 
     def forward(self, pred, coords, mask):
-        c = coords.unsqueeze(1).expand(coords.shape[0], coords.shape[1], coords.shape[1], coords.shape[2])
-        dists = (c - c.transpose(1,2)).pow(2).sum(-1).pow(0.5)
+        dists = pairwise_distances(coords)
         contacts = (dists < 8).float()
+
         l = (F.binary_cross_entropy_with_logits(pred, contacts, reduce=False) * mask)
 
         if self.reweight:
