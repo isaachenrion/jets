@@ -30,7 +30,7 @@ class BatchMatrixMonitor(Monitor):
             mask = kwargs.get(self.mask_name, None)
             if mask is not None:
                 mask_lengths = lengths_from_mask(mask)
-                self.value = [x[:n, :n] for x, n in zip(self.value, mask_lengths)]
+                self.value = [x[:n, :n].to('cpu') for x, n in zip(self.value, mask_lengths)]
             #assert self.value.ndim == 3
             self.visualize()
         else:
