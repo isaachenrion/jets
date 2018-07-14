@@ -1,54 +1,78 @@
-
+import os
 from collections import OrderedDict
+
+
 class MonitorCollection:
     def __init__(self, name, *monitors, plotting_frequency=1, track_monitor=None,**kw_monitors):
         self.name = name
-        self.monitors = OrderedDict()
+        self._monitors = OrderedDict()
         for m in monitors:
-            self.monitors[m.name] = m
-        self.monitors.update(kw_monitors)
+            self._monitors[m.name] = m
+        self._monitors.update(kw_monitors)
         self.track_monitor = track_monitor
         self.visualize_calls = 0
         self.plotting_frequency = plotting_frequency
         self.subcollections = None
 
     @property
-    def monitor_names(self):
-        return list(self.monitors.keys())
+    def names(self):
+        l = list(self.monitors.keys())
+        if self.subcollections is not None:
+            for c in self.subcollections:
+                l += c.names
+        return l
 
     @property
-    def visualized_scalar_monitor_names(self):
+    def monitors(self):
+        return self._monitors
+
+
+    @property
+    def visualized_scalar_names(self):
         out = [m.name for m in self.monitors.values() if m.scalar and m.visualizing]
         if self.subcollections is not None:
             for c in self.subcollections:
-                out += c.visualized_scalar_monitor_names
+                out += c.visualized_scalar_names
         return out
 
     @property
-    def scalar_monitor_names(self):
+    def scalar_names(self):
         out = [m.name for m in self.monitors.values() if m.scalar]
         if self.subcollections is not None:
             for c in self.subcollections:
-                out += c.scalar_monitor_names
+                out += c.scalar_names
         return out
 
-    def initialize(self, *args, **kwargs):
-        self._initialize_args = args
-        self._initialize_kwargs = kwargs
+    def initialize(self, statsdir, plotsdir):
+        self.statsdir = statsdir
+        self.plotsdir = plotsdir
+        if not os.path.exists(self.statsdir):
+            os.makedirs(self.statsdir)
+        if not os.path.exists(self.plotsdir):
+            os.makedirs(self.plotsdir)
+
         for m in self.monitors.values():
-            m.initialize(*args, **kwargs)
+            m.initialize(statsdir, plotsdir)
 
         if self.subcollections is not None:
             for c in self.subcollections:
-                c.initialize(*args, **kwargs)
+                c.initialize(statsdir, plotsdir)
 
 
     def __call__(self, **kwargs):
-        out_dict = {name:self.monitors[name](**kwargs) for name in self.monitor_names}
+        out_dict = {name:monitor(**kwargs) for name, monitor in self.monitors.items()}
         if self.subcollections is not None:
             for c in self.subcollections:
                 out_dict.update(c(**kwargs))
         return out_dict
+
+    @property
+    def scalar_values(self):
+        d = {n:m.value for n, m in self.monitors.items() if m.scalar}
+        if self.subcollections is not None:
+            for c in self.subcollections:
+                d.update(c.scalar_values)
+        return d
 
     def visualize(self, **kwargs):
         if self.visualize_calls % self.plotting_frequency == 0:
@@ -64,7 +88,7 @@ class MonitorCollection:
     def add_monitor(self, monitor, initialize=False):
         self.monitors[monitor.name] = monitor
         if initialize:
-            monitor.initialize(*self._initialize_args, **self._initialize_kwargs)
+            monitor.initialize(self.statsdir, self.plotsdir)
         return monitor
 
     def add_monitors(self, *monitors, initialize=False):
@@ -80,6 +104,14 @@ class MonitorCollection:
             for c in self.subcollections:
                 s += c.string
         return s
+
+
+    def new_epoch(self):
+        for monitor in self.monitors.values():
+            monitor.new_epoch()
+        if self.subcollections is not None:
+            for c in self.subcollections:
+                c.new_epoch()
 
     def add_subcollection(self, collection):
         if self.subcollections is None:

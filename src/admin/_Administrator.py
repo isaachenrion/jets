@@ -132,6 +132,7 @@ class _Administrator:
                                 train=train,
                             )
 
+        #headers = monitor_names
         logger = Logger(exp_dir, train, monitor_collections)
 
         cmd_file = os.path.join(root_dir, current_dir, intermediate_dir, 'command.txt')
@@ -218,13 +219,14 @@ class _Administrator:
         if not os.path.exists(exp_dir):
             os.makedirs(exp_dir)
 
-        valid_monitor_collection = monitor_collections['valid']
+        #valid_monitor_collection = monitor_collections['valid']
+        #monitor_collections['valid'].add_monitor(saver)
+        #valid_monitor_collection.add_monitors(saver, initialize=False)
+        #monitor_collections['valid'] = valid_monitor_collection
         model_file = os.path.join(exp_dir, 'model_state_dict.pt')
         settings_file = os.path.join(exp_dir, 'settings.pickle')
-        saver = Saver(valid_monitor_collection.track_monitor, model_file, settings_file, visualizing=False, printing=False)
-        valid_monitor_collection.add_monitors(saver, initialize=False)
-        monitor_collections['valid'] = valid_monitor_collection
-
+        saver = Saver(monitor_collections['valid'].track_monitor, model_file, settings_file, visualizing=False, printing=False)
+        #
         dirs = dict(
             root_dir=root_dir,
             intermediate_dir=intermediate_dir,

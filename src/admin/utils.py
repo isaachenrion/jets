@@ -16,6 +16,7 @@ def get_immediate_subdirectories(a_dir):
             if os.path.isdir(os.path.join(a_dir, name))]
 
 def get_logfile(exp_dir, silent, verbose):
+    #import ipdb; ipdb.set_trace()
     logfile = os.path.join(exp_dir, 'log.txt')
 
     logging.basicConfig(level=logging.INFO, filename=logfile, filemode="a+",

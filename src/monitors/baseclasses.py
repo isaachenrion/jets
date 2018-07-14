@@ -10,15 +10,24 @@ class Monitor:
         self.printing = printing
         self.visualize_count = 0
         self.call_count = 0
+        self.plotsdir = None
+        self.statsdir = None
+        self.epoch = 0
+        self.batch = 0
 
     def initialize(self, statsdir, plotsdir):
         #print("INIT, {}, {}".format(savedir, self.name))
         self.plotsdir = plotsdir
         self.statsdir = statsdir
 
+    def new_epoch(self):
+        self.epoch += 1
+        self.batch = 0
+
     def __call__(self, **kwargs):
-        self.call_count += 1
         self.value = self.call(**kwargs)
+        self.batch += 1
+        self.call_count += 1
         return self.value
 
     def visualize(self):

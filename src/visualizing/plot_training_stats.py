@@ -55,5 +55,5 @@ def plot_training_versus_validation_stat(name, training_stat, validation_stat, p
 
     imgdir = plotsdir
     pkldir = os.path.join(plotsdir, 'pkl')
-    image_and_pickle(fig, 'tv_{}'.format(name), imgdir, pkldir)
+    image_and_pickle(fig, '{}'.format(name), imgdir, pkldir)
     plt.close(fig)

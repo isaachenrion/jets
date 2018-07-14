@@ -94,7 +94,6 @@ class Collect(ScalarMonitor):
         return self.value
 
     def _visualize(self, plotname=None, **kwargs):
-        print(self.name)
         if plotname is None:
             plotname = self.plotname
 

@@ -25,7 +25,7 @@ def visualize_matrix_list(matrix_list, plotsdir, path_to_visualizations):
         visualize_matrix(matrix, prefix=os.path.join(plotsdir, path_to_visualizations, str(i)))
 
 
-def visualize_matrix(matrix, prefix='matrix', cmin=0., cmax=None, log=False, clabel=r'$A_{ij}$', save=True):
+def visualize_matrix(matrix, prefix='matrix', cmin=0., cmax=1, log=False, clabel=r'$A_{ij}$', save=True):
     assert matrix.max() <= 1.0
     assert matrix.min() >= 0.0
 

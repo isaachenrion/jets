@@ -4,21 +4,12 @@ from collections import OrderedDict
 import logging
 
 import numpy as np
+import torch.nn.functional as F
 from src.admin.MonitorCollection import MonitorCollection
 from src.monitors.meta import Collect
 from src.monitors.meta import Best
-
-
-def convert_list_of_dicts_to_summary_dict(dict_list, name=None):
-    out_dict = {}
-    for k in dict_list[0].keys():
-        if name is not None:
-            n = name + '_' + str(k)
-        else:
-            n = k
-        out_dict[n] = np.mean([d[k] for d in dict_list])
-
-    return out_dict
+from src.monitors.batch_matrix_monitor import BatchMatrixMonitor
+from .utils import pairwise_distances, convert_list_of_dicts_to_summary_dict, half_and_half
 
 def TopAccuracy(pred=None, truth=None, k_list=[1, 2, 5, 10], contactCutoff=8.0):
     ##this program outputs an array of contact prediction accuracy, arranged in the order of long-, medium-, long+medium- and short-range.
@@ -100,9 +91,9 @@ class ProteinMetricCollection(MonitorCollection):
         predictions = kwargs.get(self.prediction_name, None)
         masks = kwargs.get(self.mask_name, None)
 
-        targets = [target for batch in targets for target in batch]
-        predictions = [prediction for batch in predictions for prediction in batch]
-        masks = [mask for batch in masks for mask in batch]
+        #targets = [target for batch in targets for target in batch]
+        #predictions = [prediction for batch in predictions for prediction in batch]
+        #masks = [mask for batch in masks for mask in batch]
 
         targets = [target * mask for target, mask in zip(targets, masks)]
         predictions = [prediction * mask for prediction, mask in zip(predictions, masks)]
@@ -131,3 +122,51 @@ class ProteinMetricCollection(MonitorCollection):
             out_str += c.string
             out_str += "\n"
             return out_str
+
+class ContactMapMonitor(BatchMatrixMonitor):
+    def __init__(self, name_in_dict, data_type='coords',**kwargs):
+        data_types = ['coords', 'dists', 'contacts', 'logits']
+        if data_type not in data_types:
+            raise ValueError("Invalid data type for ContactMapMonitor. Needs to be \
+            one of [{}]".format(', '.join(data_types)))
+        self.data_type = data_type
+
+        super().__init__(value_name='ContactMap-'+name_in_dict, **kwargs)
+        self.name_in_dict = name_in_dict
+
+    def call(self, **kwargs):
+        #import ipdb; ipdb.set_trace()
+        if self.call_condition:
+            v = kwargs.get(self.name_in_dict, None)
+            kwargs[self.value_name] = self.get_contacts(v)
+        return super().call(**kwargs)
+
+    def get_contacts(self, v):
+        if self.data_type == 'coords':
+            distances = pairwise_distances(v)
+            contacts = (distances < 8)
+        elif self.data_type == 'dists':
+            contacts = (v < 8)
+        elif self.data_type == 'logits':
+            contacts = F.sigmoid(v)
+        elif self.data_type == 'contacts':
+            contacts = v
+        return contacts
+
+class SplitBatchMatrixMonitor(BatchMatrixMonitor):
+    def __init__(self, bmm1, bmm2, value_name, **kwargs):
+        self.bmm1 = bmm1
+        self.bmm2 = bmm2
+        super().__init__(value_name, **kwargs)
+
+    def call(self, **kwargs):
+        if self.call_condition:
+            v1_list = self.bmm1.value
+            v2_list = self.bmm2.value
+            mixed = []
+            for v1, v2 in zip(v1_list, v2_list):
+                mix = half_and_half(v1, v2)
+                #import ipdb; ipdb.set_trace()
+                mixed.append(mix)
+            kwargs[self.value_name] = mixed
+        return super().call(**kwargs)

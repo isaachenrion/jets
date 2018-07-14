@@ -8,9 +8,11 @@ def collate_protein_tuples(protein_tuples):
     sequences, batch_mask = pad_tensors_extra_channel(sequences)
     coords, _ = pad_tensors(coords)
 
-    coords_mask = torch.zeros(coords.shape[0], coords.shape[1], 1)
-    coords_mask[np.where(coords[:,:,0] != np.inf)] = 1
-
+    coords_mask = torch.ones(coords.shape[0], coords.shape[1], coords.shape[1])
+    bs_idx, v_idx = np.where(coords[:,:,0] == np.inf)
+    coords_mask[bs_idx, v_idx, :] = 0
+    coords_mask[bs_idx, :, v_idx] = 0
+    coords_mask = coords_mask * batch_mask
 
     batch = (sequences, coords, batch_mask, coords_mask)
     return batch

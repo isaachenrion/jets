@@ -14,7 +14,7 @@ from src.admin.utils import see_tensors_in_memory
 from src.admin.utils import log_gpu_usage
 from src.admin.utils import compute_model_size
 from src.admin.utils import format_bytes
-
+from src.proteins.utils import dict_append, dict_summarize
 def do_training(
         train_one_batch,
         validation,
@@ -27,43 +27,48 @@ def do_training(
         optimizer,
         scheduler,
         administrator,
+        monitor_collections,
+        saver,
         epochs=None,
         time_limit=None,
         clip=None,
         debug=None,
         ):
 
-    def train_one_epoch(epoch, iteration):
+    train_monitor_collection = monitor_collections['train']
+    valid_monitor_collection = monitor_collections['valid']
+    dummy_train_monitor_collection = monitor_collections['dummy_train']
+
+    def train_one_epoch(epoch, iteration, train_monitor_collection):
         log_gpu_usage()
 
-        loss = 0.0
+        total_loss = 0.0
         t_train = time.time()
-
+        summary_stats_dict = {}
         for batch_number, batch in enumerate(train_data_loader):
             if epoch == 1 and batch_number < 20:
                 logging.info("Batch {}".format(batch_number))
                 log_gpu_usage()
             iteration += 1
-            l = train_one_batch(model, batch, lossfn, optimizer, administrator, epoch, batch_number, clip)
-            loss += l
+            loss = train_one_batch(model, batch, lossfn, optimizer, administrator, epoch, batch_number, clip)
+            total_loss += loss
 
         scheduler.step()
 
         n_batches = len(train_data_loader)
 
-        loss = loss / n_batches
         train_time = time.time() - t_train
         logging.info("Training {} batches took {:.1f} seconds at {:.1f} examples per second".format(n_batches, train_time, len(train_data_loader.dataset)/train_time))
 
-        train_dict = dict(
-            loss=loss,
+        summary_stats_dict = train_monitor_collection(
+            loss=total_loss,
             lr=scheduler.get_lr()[0],
             epoch=epoch,
             iteration=iteration,
             time=train_time,
             )
 
-        return train_dict
+        return summary_stats_dict
 
     t_start = time.time()
     #administrator = administrator
@@ -79,13 +84,16 @@ def do_training(
 
     for epoch in range(1,epochs+1):
         logging.info("Epoch\t{}/{}".format(epoch, epochs))
-
+        for _, monitor_collection in monitor_collections.items():
+            monitor_collection.new_epoch()
         t0 = time.time()
 
         train_dict = train_one_epoch(epoch, iteration, train_monitor_collection)
         with torch.no_grad():
             valid_dict = validation(model, valid_data_loader, lossfn, valid_monitor_collection)
             dummy_train_dict = validation(model, dummy_train_data_loader, lossfn, dummy_train_monitor_collection)
+        #import ipdb; ipdb.set_trace()
+        saver(model=model, settings=settings)
 
         valid_dict.update(static_dict)
         logdict = dict(
@@ -141,11 +149,18 @@ def generic_train_script(problem=None,args=None):
     arg_groups = argument_converter(args)
 
     '''----------------------------------------------------------------------- '''
+    ''' MONITORS '''
+    '''----------------------------------------------------------------------- '''
+
+    monitor_collections = problem.train_monitors.get_monitor_collections(args.plotting_frequency)
+
+
+    '''----------------------------------------------------------------------- '''
     ''' ADMINISTRATOR '''
     '''----------------------------------------------------------------------- '''
 
     administrator = Administrator.train(
-        **arg_groups['admin_kwargs']
+        **arg_groups['admin_kwargs'],monitor_collections=monitor_collections
     )
 
     '''----------------------------------------------------------------------- '''
@@ -204,5 +219,7 @@ def generic_train_script(problem=None,args=None):
         optimizer,
         scheduler,
         administrator,
+        monitor_collections,
+        administrator._saver,
         **arg_groups['training_kwargs']
     )
