@@ -132,5 +132,6 @@ class ResNet1d(nn.Module):
         return x
 
 def resnet_1d(**kwargs):
+    kwargs.pop('layers')
     model = ResNet1d(BasicBlock, 3, **kwargs)
     return model
