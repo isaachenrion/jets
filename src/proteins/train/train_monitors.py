@@ -28,8 +28,8 @@ def valid_monitor_collection(plotting_frequency):
         best_valid_loss,
 
     ]
-    coords_cm = ContactMapMonitor('coords', mask_name='batch_mask', data_type='coords', plotting_frequency=plotting_frequency, batch_size=10, visualizing=True)
-    preds_cm = ContactMapMonitor('pred', mask_name='batch_mask', data_type='logits', plotting_frequency=plotting_frequency, batch_size=10, visualizing=True)
+    coords_cm = ContactMapMonitor('coords', mask_name='batch_mask', data_type='coords', plotting_frequency=plotting_frequency, batch_size=10, visualizing=False)
+    preds_cm = ContactMapMonitor('pred', mask_name='batch_mask', data_type='logits', plotting_frequency=plotting_frequency, batch_size=10, visualizing=False)
 
     viz_monitors = [
         coords_cm,

@@ -58,6 +58,9 @@ class ProteinLoss(nn.Module):
         #l = l * w_dist
         if self.reweight:
             l = reweight_loss(l, contacts, pos_weights=w_dist)
+        #import ipdb; ipdb.set_trace()
+        n_elements = mask.view(mask.shape[0], mask.shape[1] ** 2).sum(1)
+        l = l.view(mask.shape[0], mask.shape[1] ** 2).sum(1) / n_elements
         l = l.mean()
         return l
 

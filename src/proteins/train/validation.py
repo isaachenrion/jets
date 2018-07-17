@@ -19,7 +19,7 @@ def validation(model, data_loader, lossfn, monitor_collection):
     for i, batch in enumerate(data_loader):
         (sequence, coords, bmask, cmask) = batch
         pred = model(sequence, bmask)
-        loss = lossfn(pred, coords, cmask)
+        loss = lossfn(pred, coords, bmask)
         total_loss += loss.item()
 
         c = coords.unsqueeze(1).expand(coords.shape[0], coords.shape[1], coords.shape[1], coords.shape[2])

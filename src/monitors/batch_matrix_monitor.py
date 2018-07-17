@@ -37,7 +37,7 @@ class BatchMatrixMonitor(Monitor):
             self.value = None
         return self.value
 
-    def visualize(self, plotname=None, **kwargs):
+    def _visualize(self, plotname=None, **kwargs):
 
         if self.call_condition:
 

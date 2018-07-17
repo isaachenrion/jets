@@ -10,7 +10,7 @@ def train_one_batch(model, batch, lossfn, optimizer, administrator, epoch, batch
     sequence.requires_grad_()
 
     pred = model(sequence, bmask)
-    loss = lossfn(pred, coords, cmask)
+    loss = lossfn(pred, coords, bmask)
     loss.backward()
     if clip is not None:
         torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
