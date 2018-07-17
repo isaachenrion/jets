@@ -15,14 +15,19 @@ def balance_weights(y):
     n_pos = y.sum(1, keepdim=True).sum(1, keepdim=True)
     n_neg = (1 - y).sum(1, keepdim=True).sum(1, keepdim=True)
     return None
-    
-def reweight_loss(l, y):
+
+def reweight_loss(l, y, pos_weights=None, neg_weights=None):
     #import ipdb; ipdb.set_trace()
     n_pos = y.sum(1, keepdim=True).sum(2, keepdim=True)
     n_neg = (1 - y).sum(1, keepdim=True).sum(2, keepdim=True)
 
     l_pos = y * l
+    if pos_weights is not None:
+        l_pos = l_pos * pos_weights
     l_neg = (1 - y) * l
+    if neg_weights is not None:
+        l_neg = l_neg * neg_weights
+    #import ipdb; ipdb.set_trace()
 
     l = (l_pos * n_neg + l_neg * n_pos) / (n_pos + n_neg)
     return l
@@ -49,10 +54,10 @@ class ProteinLoss(nn.Module):
         contacts = (dists < 8).float()
 
         l = (F.binary_cross_entropy_with_logits(pred, contacts, reduce=False) * mask)
-
+        w_dist = distance_weights(pred.shape[1], self.T)
+        #l = l * w_dist
         if self.reweight:
-            l = reweight_loss(l, contacts)
-        l = l * distance_weights(pred.shape[1], self.T)
+            l = reweight_loss(l, contacts, pos_weights=w_dist)
         l = l.mean()
         return l
 
